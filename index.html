@@ -8,7 +8,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="Audipo2">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="app-version" content="v25">
+  <meta name="app-version" content="v26">
   <link rel="manifest" href="./manifest.json">
   <title>Audipo風 練習プレイヤー＆レコーダー</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='bg' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%231b2030'/%3E%3Cstop offset='100%25' stop-color='%230d0f15'/%3E%3C/linearGradient%3E%3ClinearGradient id='wv' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0%25' stop-color='%2360c5ff'/%3E%3Cstop offset='100%25' stop-color='%232563eb'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='url(%23bg)'/%3E%3Crect x='1' y='1' width='62' height='62' rx='15' fill='none' stroke='%233b82f6' stroke-opacity='0.3' stroke-width='2'/%3E%3Cg fill='url(%23wv)'%3E%3Crect x='10' y='28' width='4.5' height='12' rx='2.25' opacity='0.6'/%3E%3Crect x='18' y='22' width='4.5' height='24' rx='2.25' opacity='0.85'/%3E%3Crect x='26' y='15' width='4.5' height='36' rx='2.25'/%3E%3Crect x='34' y='21' width='4.5' height='25' rx='2.25' opacity='0.9'/%3E%3Crect x='42' y='26' width='4.5' height='16' rx='2.25' opacity='0.75'/%3E%3Crect x='50' y='30' width='4.5' height='9' rx='2.25' opacity='0.5'/%3E%3C/g%3E%3Cpath d='M36.25 10.5c0-1.4 1.1-2.5 2.5-2.5h5.5c1.4 0 2.5 1.1 2.5 2.5v2.4c0 .8-.3 1.5-.9 2.1l-3.2 3.1c-.6.6-1.6.6-2.2 0l-3.2-3.1c-.6-.6-.9-1.3-.9-2.1v-2.4z' fill='%23facc15'/%3E%3C/svg%3E">
@@ -2408,6 +2408,42 @@
       color: #ffffff;
     }
 
+    .sec-title-group {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      min-width: 0;
+    }
+
+    .setting-help-btn {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: rgba(66, 165, 245, 0.16);
+      border: 1px solid rgba(96, 165, 250, 0.58);
+      color: #93c5fd;
+      font-size: 11px;
+      font-weight: 800;
+      line-height: 1;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: transform 0.08s ease, background-color 0.12s ease;
+    }
+
+    .setting-help-btn:active {
+      transform: scale(0.9);
+      background: rgba(66, 165, 245, 0.32);
+    }
+
+    .sec-mini-hint {
+      font-size: 11px;
+      line-height: 1.42;
+      color: var(--text-sub);
+      margin: -3px 0 7px;
+    }
+
     .sec-value {
       font-size: 12px;
       font-weight: 700;
@@ -2920,6 +2956,102 @@
 
     .whats-new-ok-btn:active {
       transform: scale(0.97);
+    }
+
+    /* ==================== SETTING HELP (?) DETAIL MODAL ==================== */
+    .help-modal-card {
+      width: 100%;
+      max-width: 420px;
+      max-height: 85dvh;
+      background: #1c1c22;
+      border: 1px solid rgba(96, 165, 250, 0.52);
+      border-radius: 18px;
+      padding: 16px 16px 14px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.85), 0 0 24px rgba(66, 165, 245, 0.14);
+    }
+
+    .help-summary-box {
+      background: rgba(66, 165, 245, 0.11);
+      border: 1px solid rgba(96, 165, 250, 0.35);
+      border-radius: 12px;
+      padding: 10px 12px;
+      font-size: 12.5px;
+      line-height: 1.55;
+      color: #e0f2fe;
+      font-weight: 600;
+    }
+
+    .help-sec-card {
+      background: #141419;
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 10px 12px;
+    }
+
+    .help-sec-title {
+      font-size: 12.5px;
+      font-weight: 800;
+      color: #ffffff;
+      margin: 0 0 6px;
+    }
+
+    .help-sec-list {
+      margin: 0;
+      padding-left: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      font-size: 12px;
+      line-height: 1.52;
+      color: #d4d4d8;
+    }
+
+    .help-sec-list li::marker {
+      color: #60a5fa;
+    }
+
+    .help-sec-list strong {
+      color: #ffffff;
+    }
+
+    .help-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 11.5px;
+      line-height: 1.45;
+      margin-top: 2px;
+    }
+
+    .help-table th,
+    .help-table td {
+      padding: 6px 8px;
+      border-bottom: 1px solid var(--border-subtle);
+      text-align: left;
+      vertical-align: top;
+    }
+
+    .help-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .help-table th {
+      color: #93c5fd;
+      font-weight: 700;
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    .help-table td:first-child {
+      white-space: nowrap;
+      font-weight: 700;
+      color: #fde68a;
+      width: 34%;
+    }
+
+    .help-table td:last-child {
+      color: #d4d4d8;
     }
 
     /* Toast Notification (never uses alert/confirm) */
@@ -3640,7 +3772,10 @@
         <!-- Pitch Shift Control -->
         <div class="modal-section">
           <div class="sec-head">
-            <span class="sec-title">ピッチ（半音キー変更 -6 〜 +6）</span>
+            <span class="sec-title-group">
+              <span class="sec-title">ピッチ（半音キー変更 -6 〜 +6）</span>
+              <button type="button" class="setting-help-btn" data-help-key="pitch" aria-label="ピッチの説明">?</button>
+            </span>
             <span id="modalPitchVal" class="sec-value mono" style="color:#4ade80;">#:±0</span>
           </div>
           <input type="range" id="pitchSlider" min="-6" max="6" step="1" value="0">
@@ -3654,7 +3789,10 @@
         <!-- Slow-down Audio Engine Selector -->
         <div class="modal-section">
           <div class="sec-head">
-            <span class="sec-title">スロー再生エンジン（再生中も切替可）</span>
+            <span class="sec-title-group">
+              <span class="sec-title">スロー再生エンジン（再生中も切替可）</span>
+              <button type="button" class="setting-help-btn" data-help-key="engine" aria-label="スロー再生エンジンの説明">?</button>
+            </span>
           </div>
 
           <button id="btnEngVocoder" type="button" class="engine-card active">
@@ -3674,7 +3812,10 @@
 
           <div class="toggle-row">
             <div>
-              <div class="sec-title">高域スムージングフィルター</div>
+              <div class="sec-title-group">
+                <span class="sec-title">高域スムージングフィルター</span>
+                <button type="button" class="setting-help-btn" data-help-key="lpf" aria-label="高域スムージングフィルターの説明">?</button>
+              </div>
               <div id="lpfStatusText" class="engine-desc mono">速度連動ローパス (現在: 18.0kHz)</div>
             </div>
             <button id="btnToggleLpf" type="button" class="toggle-pill on">ON</button>
@@ -3684,7 +3825,10 @@
         <!-- Waveform Vertical Scale, Playback Boost & Mic Gain -->
         <div class="modal-section">
           <div class="sec-head">
-            <span class="sec-title">波形の縦高さ倍率</span>
+            <span class="sec-title-group">
+              <span class="sec-title">波形の縦高さ倍率</span>
+              <button type="button" class="setting-help-btn" data-help-key="waveGain" aria-label="波形の縦高さ倍率の説明">?</button>
+            </span>
             <span id="modalWaveGainVal" class="sec-value mono" style="color:#86efac;">自動 (1.0x)</span>
           </div>
           <div class="opt-grid-5">
@@ -3696,7 +3840,10 @@
           </div>
 
           <div class="sec-head" style="margin-top:12px;">
-            <span class="sec-title">再生音量ブースト（リミッター保護付）</span>
+            <span class="sec-title-group">
+              <span class="sec-title">再生音量ブースト（リミッター保護付）</span>
+              <button type="button" class="setting-help-btn" data-help-key="boost" aria-label="再生音量ブーストの説明">?</button>
+            </span>
             <span id="modalBoostVal" class="sec-value mono" style="color:#fcd34d;">自動 (100%)</span>
           </div>
           <div class="opt-grid-6">
@@ -3709,9 +3856,13 @@
           </div>
 
           <div class="sec-head" style="margin-top:12px;">
-            <span class="sec-title">マイク録音入力ゲイン（1xはコンプ完全バイパス）</span>
+            <span class="sec-title-group">
+              <span class="sec-title">マイク録音感度（入力ゲイン）</span>
+              <button type="button" class="setting-help-btn" data-help-key="micGain" aria-label="マイク録音感度の説明">?</button>
+            </span>
             <span id="modalMicGainVal" class="sec-value mono" style="color:#fca5a5;">1.0x (0dB・原音)</span>
           </div>
+          <div class="sec-mini-hint">基本は 1x（自然なそのままの音）でOK。録った音が小さすぎるときだけ数字を上げます。</div>
           <div class="opt-grid-5">
             <button type="button" data-mic-gain="1" class="opt-pill mic-gain-opt active-red mono">1x</button>
             <button type="button" data-mic-gain="1.5" class="opt-pill mic-gain-opt mono">1.5x</button>
@@ -3721,7 +3872,10 @@
           </div>
 
           <div class="sec-head" style="margin-top:12px;">
-            <span class="sec-title">録音PCMフォーマット（WAV出力）</span>
+            <span class="sec-title-group">
+              <span class="sec-title">録音PCMフォーマット（WAV出力）</span>
+              <button type="button" class="setting-help-btn" data-help-key="recFormat" aria-label="録音PCMフォーマットの説明">?</button>
+            </span>
             <span id="modalRecBitVal" class="sec-value mono" style="color:#93c5fd;">24bit ハイレゾPCM</span>
           </div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
@@ -3731,14 +3885,20 @@
 
           <div class="toggle-row">
             <div>
-              <div class="sec-title">録音後の自動ノーマライズ</div>
+              <div class="sec-title-group">
+                <span class="sec-title">録音後の自動ノーマライズ</span>
+                <button type="button" class="setting-help-btn" data-help-key="recNorm" aria-label="録音後の自動ノーマライズの説明">?</button>
+              </div>
               <div id="recNormStatusText" class="engine-desc">OFF（無加工の原音PCMそのまま保存）</div>
             </div>
             <button id="btnToggleRecNorm" type="button" class="toggle-pill">OFF</button>
           </div>
 
           <div class="sec-head" style="margin-top:10px;">
-            <span class="sec-title">入力マイク選択（外部マイク対応）</span>
+            <span class="sec-title-group">
+              <span class="sec-title">入力マイク選択（外部マイク対応）</span>
+              <button type="button" class="setting-help-btn" data-help-key="micSelect" aria-label="入力マイク選択の説明">?</button>
+            </span>
             <button id="btnRefreshMics" type="button" class="step-btn" style="padding:2px 8px;font-size:10px;">更新</button>
           </div>
           <select id="selectMicDevice" class="text-input" style="font-size:12px;">
@@ -3757,11 +3917,14 @@
         <!-- Auto-Save Memory & Session Persistence Info -->
         <div class="modal-section">
           <div class="sec-head">
-            <span class="sec-title">ピン記憶・セッション自動復元</span>
+            <span class="sec-title-group">
+              <span class="sec-title">ピン記憶・セッション自動復元</span>
+              <button type="button" class="setting-help-btn" data-help-key="pinMemory" aria-label="ピン記憶・セッション自動復元の説明">?</button>
+            </span>
             <span id="modalMemoryCount" class="sec-value mono" style="color:#fde047;">0 / 1000件</span>
           </div>
           <div class="engine-desc" style="margin-bottom:9px;">
-            再生時間とファイルサイズで音源を判別し、黄色ピン・名前・スキップ設定・再生位置を最大1000ファイルまで自動記憶します（ファイル名を変更しても引き継がれ、1000件を超えると古いものから自動削除）。未保存の録音は一時キャッシュ枠にのみ保持します（「保存」後に1000件記憶へ登録）。
+            再生時間とファイルサイズで音源を判別し、ピン・名前・スキップ設定・再生位置を最大1000件まで自動記憶します（ファイル名を変えても引き継がれます）。
           </div>
           <div style="display:flex;gap:8px;">
             <button id="btnClearSessionCache" type="button" class="step-btn" style="flex:1;">一時音源キャッシュ削除</button>
@@ -3773,7 +3936,7 @@
         <div class="modal-section" style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
           <div>
             <div class="sec-title">バージョン情報</div>
-            <div id="settingsVersionLabel" class="engine-desc mono">現在: v25</div>
+            <div id="settingsVersionLabel" class="engine-desc mono">現在: v26</div>
           </div>
           <button id="btnShowReleaseHistory" type="button" class="step-btn" style="color:#93c5fd;border-color:rgba(66,165,245,0.45);">更新履歴を見る</button>
         </div>
@@ -3906,7 +4069,7 @@
           </div>
           <div>
             <h3 id="whatsNewTitle" class="whats-new-title">アップデートのお知らせ</h3>
-            <p id="whatsNewSub" class="whats-new-sub mono">v25 に更新されました</p>
+            <p id="whatsNewSub" class="whats-new-sub mono">v26 に更新されました</p>
           </div>
         </div>
         <button id="btnCloseWhatsNewX" type="button" class="modal-close" aria-label="閉じる">✕</button>
@@ -3916,6 +4079,30 @@
 
       <div class="whats-new-footer">
         <button id="btnCloseWhatsNewOk" type="button" class="whats-new-ok-btn">確認してはじめる</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== 9. SETTING HELP (?) MODAL ==================== -->
+  <div id="settingHelpModal" class="modal-backdrop hidden" style="z-index:84;">
+    <div class="help-modal-card" role="dialog" aria-modal="true" aria-labelledby="settingHelpTitle">
+      <div class="whats-new-head">
+        <div class="whats-new-title-wrap">
+          <div class="whats-new-icon" aria-hidden="true">
+            <span style="font-size:18px;font-weight:900;line-height:1;">?</span>
+          </div>
+          <div>
+            <h3 id="settingHelpTitle" class="whats-new-title">項目のくわしい説明</h3>
+            <p id="settingHelpSub" class="whats-new-sub">設定の使い分けガイド</p>
+          </div>
+        </div>
+        <button id="btnCloseSettingHelpX" type="button" class="modal-close" aria-label="閉じる">✕</button>
+      </div>
+
+      <div id="settingHelpBody" class="whats-new-list"></div>
+
+      <div class="whats-new-footer">
+        <button id="btnCloseSettingHelpOk" type="button" class="whats-new-ok-btn">閉じる</button>
       </div>
     </div>
   </div>
@@ -11260,11 +11447,21 @@
       document.addEventListener('webkitfullscreenchange', onFullscreenStateChanged);
 
       // ==================== GITHUB / PWA SOFTWARE UPDATE CHECK & APPLY ====================
-      const APP_VERSION = 'v25';
+      const APP_VERSION = 'v26';
 
       // Ordered newest-first; each release appends a new object at the top.
       // Users who skip multiple versions automatically see ALL unseen versions between lastSeen and current.
       const APP_RELEASE_NOTES = [
+        {
+          version: 'v26',
+          verNum: 26,
+          date: '2026/11/23',
+          title: '設定画面に「?」くわしい説明ボタンを追加',
+          items: [
+            '「マイク録音感度（入力ゲイン）」の説明をわかりやすく簡潔に見直し、「?」ボタンから詳細な意味や使い分けを確認できるようにしました',
+            'スロー再生エンジン・フィルター・音量ブースト・PCM形式・ノーマライズ・ピン記憶など、設定画面の専門的な項目にも「?」ボタンを追加しました'
+          ]
+        },
         {
           version: 'v25',
           verNum: 25,
@@ -11487,6 +11684,291 @@
       if (settingsVersionLabelEl) {
         settingsVersionLabelEl.textContent = `現在: ${APP_VERSION}`;
       }
+
+      // ==================== SETTING HELP (?) CONTENT & MODAL ====================
+      const SETTING_HELP_TOPICS = {
+        micGain: {
+          title: 'マイク録音感度（入力ゲイン）',
+          sub: 'マイクで録る音の大きさ（感度）の倍率',
+          summary: 'マイクで録る音の大きさを何倍に持ち上げるかの設定です。基本は「1x（自然なそのままの音）」でOK。録った音が小さすぎるときだけ数字を上げます。',
+          sections: [
+            {
+              title: '数字が小さいとき（1x・初期設定）',
+              bullets: [
+                ['どうなる？', 'マイクが拾った音をそのままの大きさ（1倍）で録音します。'],
+                ['コンプ完全バイパス', '大きい音が割れないように抑える安全装置（リミッター）を通さず、完全に素の音のままで記録します。'],
+                ['メリット', '小さな音から大きな音までの強弱（ダイナミクス）や響きが最も自然でクリアに録れます。'],
+                ['デメリット', '音源から離れている場合、録れた音が小さく感じることがあります（再生側の「音量ブースト」で大きく聴くことは可能です）。']
+              ]
+            },
+            {
+              title: '数字が大きいとき（1.5x 〜 6x）',
+              bullets: [
+                ['どうなる？', 'マイクが拾った音を1.5倍〜6倍に大きく増幅して録音します。'],
+                ['安全装置が自動ON', '音割れ（バリバリと歪む現象）を防ぐため、1.5x以上では音割れ防止リミッターが自動で働きます。'],
+                ['メリット', '遠くの演奏や小さな声でも、最初からハッキリ大きく録音できます。'],
+                ['デメリット', '上げすぎると空調音などの雑音まで大きくなり、急に大きい音が出たときは強弱の差がやや平らになることがあります。']
+              ]
+            }
+          ],
+          tableTitle: '使い分けの目安',
+          tableHeaders: ['設定', '向いている場面'],
+          tableRows: [
+            ['1x（標準）', '普段の録音・近くでの演奏・自然な強弱をそのまま残したいとき'],
+            ['1.5x 〜 2x', '少し離れた位置から録るとき・1xだと波形が小さすぎるとき'],
+            ['4x 〜 6x', '広いホールの客席などかなり遠い場所・非常に小さい音を拾いたいとき']
+          ]
+        },
+        pitch: {
+          title: 'ピッチ（半音キー変更）',
+          sub: '再生スピードを変えずに音の高さだけを調整',
+          summary: '曲のキー（音の高さ）を半音単位で -6（半オクターブ下）〜 +6（半オクターブ上）まで変えられます。普段は「±0 原曲」のままでOKです。',
+          sections: [
+            {
+              title: '主な使い道',
+              bullets: [
+                ['移調の練習', '楽譜と音源のキーが違うときや、歌いやすい高さに合わせて練習したいときに便利です。'],
+                ['音質について', '±0（原曲）かつ 1.00x のときは音質加工を完全に通さず、原音そのままのダイレクト再生になります。'],
+                ['注意', 'スロー再生エンジンが「テープ再生」または「OS標準」のときは、ピッチ単独変更は「ボコーダ」選択時に有効になります。']
+              ]
+            }
+          ]
+        },
+        engine: {
+          title: 'スロー再生エンジン',
+          sub: '速度を変えたときの音の作り方を選べます',
+          summary: 'ゆっくり再生（0.50xなど）したときの音質の処理方式を切り替えます。基本は初期設定の「ボコーダ」がおすすめです。',
+          sections: [
+            {
+              title: '3つのエンジンの違い',
+              bullets: [
+                ['ボコーダ（標準）', '音程を保ったまま速度を変えられます。ロボット声のような違和感を抑える位相ロック処理を搭載し、1.00x時は加工ゼロの原音そのまま再生します。'],
+                ['OS標準', 'スマホやブラウザ内蔵の標準機能で再生します。電池消費を抑えたいときや、非常に容量の大きいファイルで動作を軽くしたいとき向けです。'],
+                ['テープ再生', 'カセットテープを遅く回すように、速度と一緒に音程も低く（速くすると高く）なります。音程維持のデジタル加工を一切しないため、ノイズが原理上0%です。']
+              ]
+            }
+          ],
+          tableTitle: '選び方の目安',
+          tableHeaders: ['エンジン', 'おすすめ用途'],
+          tableRows: [
+            ['ボコーダ', '楽器の耳コピ・運指確認・普段のスロー練習全般'],
+            ['OS標準', '長時間の省電力再生・超大容量ファイルの再生'],
+            ['テープ再生', '音程が変わってもよいのでデジタル歪みゼロで聴きたいとき']
+          ]
+        },
+        lpf: {
+          title: '高域スムージングフィルター',
+          sub: 'スロー再生時の耳障りな高音ノイズを軽減',
+          summary: 'ゆっくり再生したときに目立ちやすい「シャリシャリ・ザラザラした高い音」をなめらかに整えるフィルターです。基本は ON のままでOKです。',
+          sections: [
+            {
+              title: '動作のポイント',
+              bullets: [
+                ['ON（標準）', '速度を落としたときだけ自動で働き、聴き疲れしにくい自然な音にします。'],
+                ['OFF', '高い周波数を一切カットせずそのまま出します。金属音や息遣いの高域まで細部を確認したいときに試してください。'],
+                ['等速(1.00x)のとき', 'ONにしていても、1.00x・原曲キーの通常再生時は自動で完全にバイパスされ、原音のまま鳴ります。']
+              ]
+            }
+          ]
+        },
+        waveGain: {
+          title: '波形の縦高さ倍率',
+          sub: '画面に見える波形の「縦の大きさ」だけを変更',
+          summary: '画面に表示される波形グラフの縦の見た目サイズを拡大します。実際の再生音量や録音データ自体は一切変わりません。',
+          sections: [
+            {
+              title: '使い分け',
+              bullets: [
+                ['自動（おすすめ）', '曲全体の最大音量に合わせて、一番見やすい高さへ自動調整します。'],
+                ['1x 〜 8x（手動）', '静かな弱奏部分（pp）の細かい音の立ち上がりを見たいときに「4x」「8x」などへ大きくすると、ピンを打ちやすくなります。']
+              ]
+            }
+          ]
+        },
+        boost: {
+          title: '再生音量ブースト（リミッター保護付）',
+          sub: '小さく録れた音源を大きく聴きやすく再生',
+          summary: '端末のボリュームを最大にしても聴き取りにくい小さな録音を、最大500%（5倍）まで持ち上げて再生できます。元のファイルは書き換わりません。',
+          sections: [
+            {
+              title: '設定のポイント',
+              bullets: [
+                ['自動（おすすめ）', '音が小さい音源だけ適切な音量へ自動ブーストし、もともと十分な音量の曲は100%（無加工）のまま再生します。'],
+                ['リミッター保護', '100%より大きくブーストしたときは、耳やスピーカーを守る音割れ防止リミッターが自動で働きます。'],
+                ['100%（原音）', '音量持ち上げもリミッターも完全に通さず、録音そのままのダイナミクスで再生します。']
+              ]
+            }
+          ]
+        },
+        recFormat: {
+          title: '録音PCMフォーマット（WAV出力）',
+          sub: '録音データの音のきめ細かさ（ビット深度）',
+          summary: 'マイク録音して「保存」する際のWAVファイルの音質形式を選びます。楽器演奏の繊細な響きを残すなら標準の「24bit」がおすすめです。',
+          sections: [
+            {
+              title: '24bit と 16bit の違い',
+              bullets: [
+                ['24bit ハイレゾPCM（標準）', '音の強弱の表現幅が非常に広く、小さい音（pp）から大きい音（ff）までノイズが少なく繊細に記録できます。'],
+                ['16bit 高互換（ディザ付）', '音楽CDと同じ形式です。24bitよりファイル容量が約3分の2と軽く、古い機器やソフトでも確実に再生できます（微小な音の滑らかさを保つディザ処理付き）。']
+              ]
+            }
+          ],
+          tableTitle: '容量と用途の目安',
+          tableHeaders: ['形式', '特徴・おすすめ場面'],
+          tableRows: [
+            ['24bit', '高音質・強弱の広いクラシック演奏や練習記録におすすめ'],
+            ['16bit', '長時間録音でファイル容量を節約したい・他機器へ共有したいとき']
+          ]
+        },
+        recNorm: {
+          title: '録音後の自動ノーマライズ',
+          sub: '録音終了後に全体の音量を自動でそろえる機能',
+          summary: '録音を止めた直後に、一番大きい音が音割れしないギリギリ（-1dBFS）まで全体を自動で引き上げて保存する機能です。',
+          sections: [
+            {
+              title: 'OFF と ON の違い',
+              bullets: [
+                ['OFF（初期設定）', '録った音を一切加工せず、そのままの素のPCMデータとして保持します。元の音量バランスを保ちたい方におすすめです。'],
+                ['ON', 'マイクから離れていて録音が小さくなった場合でも、録音停止後に自動でちょうど良い音量へ持ち上げます（強弱の比率は崩さず全体を均等に引き上げます）。']
+              ]
+            }
+          ]
+        },
+        micSelect: {
+          title: '入力マイク選択（外部マイク対応）',
+          sub: '録音・チューナーに使うマイクの切り替え',
+          summary: 'スマホ内蔵マイクのほか、USB-C接続の外付けマイクやオーディオインターフェースを選んで録音・チューナーに使用できます。',
+          sections: [
+            {
+              title: '使い方のコツ',
+              bullets: [
+                ['外部マイクを繋いだとき', 'マイクを接続したあとに右側の「更新」ボタンを押すと一覧に外部マイクが表示されます。'],
+                ['名前が表示されないとき', 'ブラウザの仕様上、1度マイク使用を許可するまでは機器名が出ない場合があります。1回録音またはチューナーをONにして許可すると正式名称が表示されます。']
+              ]
+            }
+          ]
+        },
+        pinMemory: {
+          title: 'ピン記憶・セッション自動復元',
+          sub: 'ファイルごとのピン自動保存とキャッシュ管理',
+          summary: '黄色ピン・マーク名・スキップ設定・再生位置を最大1000ファイルまで自動記憶し、次に開いたとき自動で復元します。',
+          sections: [
+            {
+              title: '仕組みとボタンの違い',
+              bullets: [
+                ['時間とサイズで自動判別', 'ファイル名ではなく「再生時間＋ファイルサイズ」で音源を判別するため、スマホ側でファイル名を変更してもピンが引き継がれます。区間削除後の新しいサイズ・ピン位置にも追従します。'],
+                ['未保存の録音について', '録音直後の未保存データは1000件の保存枠を使わず、一時キャッシュ枠にのみ保持されます。「保存」すると正式に1000件枠へ登録されます。'],
+                ['一時音源キャッシュ削除', '次回起動時に前回の音源を自動で開き直す一時データだけを削除します（1000件のピン記憶は消えません）。'],
+                ['全ピン記憶を初期化', 'これまで記憶した最大1000ファイル分のピン情報をすべて消去します。']
+              ]
+            }
+          ]
+        }
+      };
+
+      const settingHelpModal = document.getElementById('settingHelpModal');
+      const settingHelpTitle = document.getElementById('settingHelpTitle');
+      const settingHelpSub = document.getElementById('settingHelpSub');
+      const settingHelpBody = document.getElementById('settingHelpBody');
+
+      function openSettingHelpModal(helpKey) {
+        const topic = SETTING_HELP_TOPICS[helpKey];
+        if (!topic || !settingHelpModal) return;
+
+        settingHelpTitle.textContent = topic.title;
+        settingHelpSub.textContent = topic.sub || '設定のくわしい説明';
+        settingHelpBody.innerHTML = '';
+
+        if (topic.summary) {
+          const sumBox = document.createElement('div');
+          sumBox.className = 'help-summary-box';
+          sumBox.textContent = topic.summary;
+          settingHelpBody.appendChild(sumBox);
+        }
+
+        (topic.sections || []).forEach((sec) => {
+          const card = document.createElement('div');
+          card.className = 'help-sec-card';
+          if (sec.title) {
+            const h = document.createElement('div');
+            h.className = 'help-sec-title';
+            h.textContent = sec.title;
+            card.appendChild(h);
+          }
+          const ul = document.createElement('ul');
+          ul.className = 'help-sec-list';
+          (sec.bullets || []).forEach((b) => {
+            const li = document.createElement('li');
+            if (Array.isArray(b)) {
+              const st = document.createElement('strong');
+              st.textContent = `${b[0]}：`;
+              li.appendChild(st);
+              li.appendChild(document.createTextNode(b[1]));
+            } else {
+              li.textContent = String(b);
+            }
+            ul.appendChild(li);
+          });
+          card.appendChild(ul);
+          settingHelpBody.appendChild(card);
+        });
+
+        if (topic.tableRows && topic.tableRows.length > 0) {
+          const card = document.createElement('div');
+          card.className = 'help-sec-card';
+          if (topic.tableTitle) {
+            const h = document.createElement('div');
+            h.className = 'help-sec-title';
+            h.textContent = topic.tableTitle;
+            card.appendChild(h);
+          }
+          const table = document.createElement('table');
+          table.className = 'help-table';
+          if (topic.tableHeaders && topic.tableHeaders.length === 2) {
+            const thead = document.createElement('thead');
+            const tr = document.createElement('tr');
+            topic.tableHeaders.forEach((thTxt) => {
+              const th = document.createElement('th');
+              th.textContent = thTxt;
+              tr.appendChild(th);
+            });
+            thead.appendChild(tr);
+            table.appendChild(thead);
+          }
+          const tbody = document.createElement('tbody');
+          topic.tableRows.forEach((row) => {
+            const tr = document.createElement('tr');
+            row.forEach((cell) => {
+              const td = document.createElement('td');
+              td.textContent = cell;
+              tr.appendChild(td);
+            });
+            tbody.appendChild(tr);
+          });
+          table.appendChild(tbody);
+          card.appendChild(table);
+          settingHelpBody.appendChild(card);
+        }
+
+        settingHelpModal.classList.remove('hidden');
+        settingHelpBody.scrollTop = 0;
+      }
+
+      function closeSettingHelpModal() {
+        if (settingHelpModal) settingHelpModal.classList.add('hidden');
+      }
+
+      document.querySelectorAll('.setting-help-btn').forEach((btn) => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          openSettingHelpModal(btn.dataset.helpKey);
+        });
+      });
+      document.getElementById('btnCloseSettingHelpX').addEventListener('click', closeSettingHelpModal);
+      document.getElementById('btnCloseSettingHelpOk').addEventListener('click', closeSettingHelpModal);
+      settingHelpModal.addEventListener('click', (e) => {
+        if (e.target === settingHelpModal) closeSettingHelpModal();
+      });
 
       const appUpdateState = {
         checking: false,
@@ -12057,7 +12539,9 @@
 
       window.addEventListener('popstate', () => {
         // 1. Close topmost open modal if any
-        if (whatsNewModal && !whatsNewModal.classList.contains('hidden')) {
+        if (settingHelpModal && !settingHelpModal.classList.contains('hidden')) {
+          closeSettingHelpModal();
+        } else if (whatsNewModal && !whatsNewModal.classList.contains('hidden')) {
           closeWhatsNewModal();
         } else if (clearPinsConfirmModal && !clearPinsConfirmModal.classList.contains('hidden')) {
           clearPinsConfirmModal.classList.add('hidden');
