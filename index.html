@@ -8,7 +8,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="Audipo2">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="app-version" content="v19">
+  <meta name="app-version" content="v20">
   <link rel="manifest" href="./manifest.json">
   <title>Audipo風 練習プレイヤー＆レコーダー</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='bg' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%231b2030'/%3E%3Cstop offset='100%25' stop-color='%230d0f15'/%3E%3C/linearGradient%3E%3ClinearGradient id='wv' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0%25' stop-color='%2360c5ff'/%3E%3Cstop offset='100%25' stop-color='%232563eb'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='url(%23bg)'/%3E%3Crect x='1' y='1' width='62' height='62' rx='15' fill='none' stroke='%233b82f6' stroke-opacity='0.3' stroke-width='2'/%3E%3Cg fill='url(%23wv)'%3E%3Crect x='10' y='28' width='4.5' height='12' rx='2.25' opacity='0.6'/%3E%3Crect x='18' y='22' width='4.5' height='24' rx='2.25' opacity='0.85'/%3E%3Crect x='26' y='15' width='4.5' height='36' rx='2.25'/%3E%3Crect x='34' y='21' width='4.5' height='25' rx='2.25' opacity='0.9'/%3E%3Crect x='42' y='26' width='4.5' height='16' rx='2.25' opacity='0.75'/%3E%3Crect x='50' y='30' width='4.5' height='9' rx='2.25' opacity='0.5'/%3E%3C/g%3E%3Cpath d='M36.25 10.5c0-1.4 1.1-2.5 2.5-2.5h5.5c1.4 0 2.5 1.1 2.5 2.5v2.4c0 .8-.3 1.5-.9 2.1l-3.2 3.1c-.6.6-1.6.6-2.2 0l-3.2-3.1c-.6-.6-.9-1.3-.9-2.1v-2.4z' fill='%23facc15'/%3E%3C/svg%3E">
@@ -289,16 +289,25 @@
       overflow: hidden;
     }
 
-    /* ==================== PAGE 0 (FAR LEFT): 2-OCTAVE MUSICAL KEYBOARD ==================== */
+    /* ==================== PAGE 0 (FAR LEFT): 1-OCTAVE (PORTRAIT) / 2-OCTAVE (LANDSCAPE) KEYBOARD ==================== */
     .upper-page-kbd {
       display: flex;
       flex-direction: column;
       background: linear-gradient(180deg, #16161d 0%, #0e0e12 100%);
       padding: 5px 6px 16px;
-      gap: 5px;
+      gap: 6px;
+    }
+
+    .kbd-toolbar-shell {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-shrink: 0;
     }
 
     .kbd-toolbar {
+      flex: 1;
+      min-width: 0;
       display: flex;
       flex-wrap: wrap;
       align-items: center;
@@ -308,7 +317,6 @@
       background: #1a1a22;
       border: 1px solid var(--border-subtle);
       border-radius: 11px;
-      flex-shrink: 0;
     }
 
     .kbd-bar-group {
@@ -339,7 +347,7 @@
     }
 
     .kbd-readout {
-      min-width: 82px;
+      min-width: 78px;
       max-width: 155px;
       height: 27px;
       padding: 0 7px;
@@ -428,7 +436,7 @@
 
     .kbd-toggle-btn {
       height: 27px;
-      padding: 0 8px;
+      padding: 0 9px;
       border-radius: 7px;
       background: #23232c;
       border: 1px solid var(--border-strong);
@@ -451,30 +459,70 @@
       color: #fef08a;
     }
 
-    .kbd-toggle-btn.active-land {
-      background: var(--accent-blue-bg);
-      border-color: var(--accent-blue);
-      color: #bae6fd;
-    }
-
-    .kbd-portrait-tip {
+    /* Prominent Large "横にする（2オクターブ）" CTA Button in Portrait Mode */
+    .kbd-to-landscape-hero {
+      width: 100%;
+      height: 46px;
+      padding: 0 14px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #2563eb 0%, #4f46e5 100%);
+      border: 1.5px solid rgba(147, 197, 253, 0.72);
+      color: #ffffff;
+      font-size: 14px;
+      font-weight: 800;
+      letter-spacing: 0.2px;
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      gap: 8px;
-      padding: 4px 8px;
-      border-radius: 8px;
-      background: rgba(139, 92, 246, 0.12);
-      border: 1px solid rgba(167, 139, 250, 0.35);
-      color: #ddd6fe;
-      font-size: 10.5px;
+      justify-content: center;
+      gap: 9px;
       flex-shrink: 0;
+      box-shadow: 0 4px 16px rgba(37, 99, 235, 0.42), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+      transition: transform 0.08s ease, filter 0.12s ease;
+    }
+
+    .kbd-to-landscape-hero:active {
+      transform: scale(0.97);
+      filter: brightness(1.08);
+    }
+
+    .kbd-to-landscape-badge {
+      padding: 2px 7px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.2);
+      font-size: 11px;
+      font-weight: 800;
+      color: #e0f2fe;
+    }
+
+    /* Prominent "縦に戻す" Button (Visible & Always Pinned in Landscape / 2-Octave Mode) */
+    .kbd-to-portrait-btn {
+      display: none;
+      height: 40px;
+      padding: 0 14px;
+      border-radius: 11px;
+      background: linear-gradient(135deg, #f59e0b 0%, #ea580c 100%);
+      border: 1.5px solid rgba(254, 240, 138, 0.85);
+      color: #ffffff;
+      font-size: 13px;
+      font-weight: 800;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      white-space: nowrap;
+      flex-shrink: 0;
+      box-shadow: 0 0 16px rgba(245, 158, 11, 0.48), inset 0 1px 0 rgba(255, 255, 255, 0.28);
+      transition: transform 0.08s ease, filter 0.12s ease;
+    }
+
+    .kbd-to-portrait-btn:active {
+      transform: scale(0.95);
+      filter: brightness(1.08);
     }
 
     .kbd-stage {
       position: relative;
       flex: 1;
-      min-height: 112px;
+      min-height: 120px;
       width: 100%;
       background: #0a0a0d;
       border: 1px solid #2f2f39;
@@ -501,12 +549,12 @@
       background: linear-gradient(180deg, #f8fafc 0%, #eef2f6 82%, #cbd5e1 100%);
       border-right: 1px solid #94a3b8;
       border-bottom: 3px solid #94a3b8;
-      border-radius: 0 0 6px 6px;
+      border-radius: 0 0 7px 7px;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: flex-end;
-      padding-bottom: 7px;
+      padding-bottom: 10px;
       color: #334155;
       transition: background 0.04s ease, transform 0.04s ease;
     }
@@ -533,10 +581,10 @@
     }
 
     .kbd-key-label {
-      font-size: 9.5px;
+      font-size: 12px;
       font-weight: 800;
       line-height: 1.05;
-      letter-spacing: -0.3px;
+      letter-spacing: -0.2px;
       pointer-events: none;
       text-align: center;
     }
@@ -565,13 +613,13 @@
       display: flex;
       align-items: flex-end;
       justify-content: center;
-      padding-bottom: 5px;
-      color: rgba(228, 228, 231, 0.72);
+      padding-bottom: 6px;
+      color: rgba(228, 228, 231, 0.78);
       transition: background 0.04s ease, border-bottom-width 0.04s ease;
     }
 
     .kbd-key-black .kbd-key-label {
-      font-size: 7.5px;
+      font-size: 9px;
       font-weight: 700;
     }
 
@@ -588,7 +636,7 @@
       color: #ffffff;
     }
 
-    /* Full-Screen Landscape Immersive Mode when playing 2-Octave Keyboard */
+    /* Full-Screen Landscape Immersive Mode (2-Octave Keyboard + Prominent "縦に戻す" Button) */
     body.kbd-immersive .app-header,
     body.kbd-immersive #zoomPane,
     body.kbd-immersive #zoomCollapsedBar,
@@ -596,13 +644,17 @@
     body.kbd-immersive .section-action-bar,
     body.kbd-immersive .control-footer,
     body.kbd-immersive .upper-page-dots,
-    body.kbd-immersive .kbd-portrait-tip {
+    body.kbd-immersive .kbd-to-landscape-hero {
       display: none !important;
     }
 
     body.kbd-immersive .upper-page-kbd {
       padding: calc(5px + env(safe-area-inset-top)) calc(8px + env(safe-area-inset-right)) calc(6px + env(safe-area-inset-bottom)) calc(8px + env(safe-area-inset-left));
       gap: 6px;
+    }
+
+    body.kbd-immersive .kbd-to-portrait-btn {
+      display: inline-flex;
     }
 
     body.kbd-immersive .kbd-toolbar {
@@ -613,15 +665,15 @@
     }
 
     body.kbd-immersive .kbd-key-white {
-      padding-bottom: 10px;
+      padding-bottom: 9px;
     }
 
     body.kbd-immersive .kbd-key-white .kbd-key-label {
-      font-size: 12px;
+      font-size: 11px;
     }
 
     body.kbd-immersive .kbd-key-black .kbd-key-label {
-      font-size: 9px;
+      font-size: 8.5px;
     }
 
     .upper-page-metro {
@@ -2661,57 +2713,73 @@
     <div class="overview-wrap">
       <div id="upperPagerViewport" class="upper-pager-viewport">
         <div id="upperPagerTrack" class="upper-pager-track page-wave">
-          <!-- Page 0 (Far Left): Landscape 2-Octave Keyboard (Piano / Synth / Flute / Violin) -->
+          <!-- Page 0 (Far Left): 1-Octave (Portrait) / 2-Octave (Landscape) Musical Keyboard -->
           <div id="upperPageKbd" class="upper-page upper-page-kbd">
-            <div class="kbd-toolbar">
-              <div class="kbd-bar-group">
-                <button id="btnKbdToMetro" type="button" class="kbd-nav-btn" title="メトロノーム画面へ戻る">
-                  <span>メトロ</span>
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
-                </button>
-                <div id="kbdNoteReadout" class="kbd-readout mono">C4〜C6</div>
-              </div>
+            <div class="kbd-toolbar-shell">
+              <button id="btnKbdToPortrait" type="button" class="kbd-to-portrait-btn" title="縦画面（1オクターブ）に戻す">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="7" y="2.5" width="10" height="19" rx="2"/>
+                  <path d="M12 18h.01"/>
+                </svg>
+                <span>縦に戻す</span>
+              </button>
 
-              <div class="kbd-inst-group" role="group" aria-label="鍵盤の音色">
-                <button type="button" data-kbd-inst="piano" class="kbd-inst-btn active">ピアノ</button>
-                <button type="button" data-kbd-inst="synth" class="kbd-inst-btn">電子音</button>
-                <button type="button" data-kbd-inst="flute" class="kbd-inst-btn">フルート</button>
-                <button type="button" data-kbd-inst="violin" class="kbd-inst-btn">バイオリン</button>
-              </div>
-
-              <div class="kbd-bar-group">
-                <!-- Key Transposition Base (キー基準) -->
-                <div class="kbd-stepper" title="キー基準（移調）を変更／中央タップでCに戻す">
-                  <button id="btnKbdKeyDown" type="button" class="kbd-step-btn" aria-label="キーを下げる">-</button>
-                  <span id="kbdKeyVal" class="kbd-step-val mono">キー:C</span>
-                  <button id="btnKbdKeyUp" type="button" class="kbd-step-btn" aria-label="キーを上げる">+</button>
+              <div class="kbd-toolbar">
+                <div class="kbd-bar-group">
+                  <button id="btnKbdToMetro" type="button" class="kbd-nav-btn" title="メトロノーム画面へ戻る">
+                    <span>メトロ</span>
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+                  </button>
+                  <div id="kbdNoteReadout" class="kbd-readout mono">C4〜C5</div>
                 </div>
 
-                <!-- Octave Switcher (オクターブ切替) -->
-                <div class="kbd-stepper" title="オクターブ切替／中央タップでC4-C6に戻す">
-                  <button id="btnKbdOctDown" type="button" class="kbd-step-btn" aria-label="オクターブを下げる">-</button>
-                  <span id="kbdOctVal" class="kbd-step-val mono">Oct:4</span>
-                  <button id="btnKbdOctUp" type="button" class="kbd-step-btn" aria-label="オクターブを上げる">+</button>
+                <div class="kbd-inst-group" role="group" aria-label="鍵盤の音色">
+                  <button type="button" data-kbd-inst="piano" class="kbd-inst-btn active">ピアノ</button>
+                  <button type="button" data-kbd-inst="synth" class="kbd-inst-btn">電子音</button>
+                  <button type="button" data-kbd-inst="flute" class="kbd-inst-btn">フルート</button>
+                  <button type="button" data-kbd-inst="violin" class="kbd-inst-btn">バイオリン</button>
                 </div>
 
-                <!-- Concert Pitch A4 Reference (基準ピッチ) -->
-                <div class="kbd-stepper" title="基準ピッチ A4 (430〜450Hz)／中央タップで440Hzに戻す">
-                  <button id="btnKbdA4Down" type="button" class="kbd-step-btn" aria-label="基準ピッチを下げる">-</button>
-                  <span id="kbdA4Val" class="kbd-step-val mono">440Hz</span>
-                  <button id="btnKbdA4Up" type="button" class="kbd-step-btn" aria-label="基準ピッチを上げる">+</button>
-                </div>
+                <div class="kbd-bar-group">
+                  <!-- Key Transposition Base (キー基準) -->
+                  <div class="kbd-stepper" title="キー基準（移調）を変更／中央タップでCに戻す">
+                    <button id="btnKbdKeyDown" type="button" class="kbd-step-btn" aria-label="キーを下げる">-</button>
+                    <span id="kbdKeyVal" class="kbd-step-val mono">キー:C</span>
+                    <button id="btnKbdKeyUp" type="button" class="kbd-step-btn" aria-label="キーを上げる">+</button>
+                  </div>
 
-                <button id="btnKbdHold" type="button" class="kbd-toggle-btn" title="持続モード（離しても音が鳴り続けます・基準音出しに便利）">持続</button>
-                <button id="btnKbdLandscape" type="button" class="kbd-toggle-btn" title="横画面・全画面キーボードを切替">横画面</button>
+                  <!-- Octave Switcher (オクターブ切替) -->
+                  <div class="kbd-stepper" title="オクターブ切替／中央タップでOct:4に戻す">
+                    <button id="btnKbdOctDown" type="button" class="kbd-step-btn" aria-label="オクターブを下げる">-</button>
+                    <span id="kbdOctVal" class="kbd-step-val mono">Oct:4</span>
+                    <button id="btnKbdOctUp" type="button" class="kbd-step-btn" aria-label="オクターブを上げる">+</button>
+                  </div>
+
+                  <!-- Concert Pitch A4 Reference (基準ピッチ) -->
+                  <div class="kbd-stepper" title="基準ピッチ A4 (430〜450Hz)／中央タップで440Hzに戻す">
+                    <button id="btnKbdA4Down" type="button" class="kbd-step-btn" aria-label="基準ピッチを下げる">-</button>
+                    <span id="kbdA4Val" class="kbd-step-val mono">440Hz</span>
+                    <button id="btnKbdA4Up" type="button" class="kbd-step-btn" aria-label="基準ピッチを上げる">+</button>
+                  </div>
+
+                  <button id="btnKbdHold" type="button" class="kbd-toggle-btn" title="持続モード（離しても音が鳴り続けます・基準音出しに便利）">持続</button>
+                </div>
               </div>
             </div>
 
-            <div id="kbdPortraitTip" class="kbd-portrait-tip">
-              <span>スマホを横向きにするか「横画面」を押すと2オクターブを全画面で弾けます</span>
-              <button id="btnKbdTipLandscape" type="button" class="kbd-toggle-btn active-land" style="height:22px;padding:0 7px;font-size:10px;">横にする</button>
-            </div>
+            <!-- Prominent Large Button to Switch to Landscape 2-Octave Mode (shown in Portrait mode) -->
+            <button id="btnKbdToLandscape" type="button" class="kbd-to-landscape-hero" title="横画面にして2オクターブ鍵盤を全画面表示">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="2.5" y="6.5" width="19" height="11" rx="2.2"/>
+                <path d="M18 12h.01"/>
+                <path d="M6.5 4.2A8.5 8.5 0 0 1 17.5 4.2"/>
+                <path d="m15.2 2.2 2.4 2-2.2 2"/>
+              </svg>
+              <span>横画面にする</span>
+              <span class="kbd-to-landscape-badge">2オクターブ</span>
+            </button>
 
-            <div id="kbdStage" class="kbd-stage" aria-label="2オクターブ鍵盤">
+            <div id="kbdStage" class="kbd-stage" aria-label="鍵盤">
               <div id="kbdWhites" class="kbd-whites"></div>
               <div id="kbdBlacks" class="kbd-blacks"></div>
             </div>
@@ -3578,7 +3646,8 @@
       const kbdOctVal = document.getElementById('kbdOctVal');
       const kbdA4Val = document.getElementById('kbdA4Val');
       const btnKbdHold = document.getElementById('btnKbdHold');
-      const btnKbdLandscape = document.getElementById('btnKbdLandscape');
+      const btnKbdToLandscape = document.getElementById('btnKbdToLandscape');
+      const btnKbdToPortrait = document.getElementById('btnKbdToPortrait');
       const dotUpperWave = document.getElementById('dotUpperWave');
       const dotUpperPins = document.getElementById('dotUpperPins');
       const metroLedStrip = document.getElementById('metroLedStrip');
@@ -8474,8 +8543,16 @@
 
       // ==================== 2-OCTAVE POLYPHONIC MUSICAL KEYBOARD (PIANO / SYNTH / FLUTE / VIOLIN) ====================
       const KBD_NOTE_NAMES = ['C', 'C#', 'D', 'Eb', 'E', 'F', 'F#', 'G', 'Ab', 'A', 'Bb', 'B'];
-      const KBD_WHITE_SEMITONES = [0, 2, 4, 5, 7, 9, 11, 12, 14, 16, 17, 19, 21, 23, 24];
-      const KBD_BLACK_DEFS = [
+      const KBD_WHITE_1OCT = [0, 2, 4, 5, 7, 9, 11, 12];
+      const KBD_BLACK_1OCT = [
+        { semi: 1, slot: 0.96 },
+        { semi: 3, slot: 2.04 },
+        { semi: 6, slot: 3.94 },
+        { semi: 8, slot: 5.00 },
+        { semi: 10, slot: 6.06 }
+      ];
+      const KBD_WHITE_2OCT = [0, 2, 4, 5, 7, 9, 11, 12, 14, 16, 17, 19, 21, 23, 24];
+      const KBD_BLACK_2OCT = [
         { semi: 1, slot: 0.96 },
         { semi: 3, slot: 2.04 },
         { semi: 6, slot: 3.94 },
@@ -8497,7 +8574,9 @@
         activeTouches: new Map(), // touchId -> keyIndex
         mouseDownKey: null,
         keyEls: new Map(), // keyIndex -> DOM element
+        renderedOctaves: 0, // 1 in portrait, 2 in landscape
         forceImmersive: false,
+        forcePortrait: false,
         orientationLockedByKbd: false,
         fullscreenByKbd: false
       };
@@ -8556,14 +8635,27 @@
         return withOctave ? `${KBD_NOTE_NAMES[idx]}${oct}` : KBD_NOTE_NAMES[idx];
       }
 
-      function buildKeyboardDOM() {
+      function buildKeyboardDOM(octaves = 1) {
         if (!kbdWhites || !kbdBlacks) return;
+        const targetOcts = octaves === 2 ? 2 : 1;
+        if (kbd.renderedOctaves === targetOcts && kbd.keyEls.size > 0) {
+          updateKeyboardKeyLabels();
+          return;
+        }
+
+        if (kbd.renderedOctaves !== 0) {
+          stopAllKeyboardNotes();
+        }
+        kbd.renderedOctaves = targetOcts;
         kbdWhites.innerHTML = '';
         kbdBlacks.innerHTML = '';
         kbd.keyEls.clear();
 
-        // 15 White Keys (2 full octaves + top tonic C)
-        KBD_WHITE_SEMITONES.forEach((semi) => {
+        const whiteList = targetOcts === 2 ? KBD_WHITE_2OCT : KBD_WHITE_1OCT;
+        const blackList = targetOcts === 2 ? KBD_BLACK_2OCT : KBD_BLACK_1OCT;
+        const whiteCount = whiteList.length; // 8 in portrait (1 oct), 15 in landscape (2 oct)
+
+        whiteList.forEach((semi) => {
           const el = document.createElement('div');
           el.className = 'kbd-key-white' + (semi % 12 === 0 ? ' is-tonic' : '');
           el.dataset.kbdKey = String(semi);
@@ -8574,10 +8666,9 @@
           kbd.keyEls.set(semi, el);
         });
 
-        // 10 Black Keys positioned precisely across the 15 white-key slots
-        const whiteW = 100 / 15;
-        const blackW = whiteW * 0.64;
-        KBD_BLACK_DEFS.forEach((def) => {
+        const whiteW = 100 / whiteCount;
+        const blackW = whiteW * (targetOcts === 2 ? 0.64 : 0.62);
+        blackList.forEach((def) => {
           const el = document.createElement('div');
           el.className = 'kbd-key-black';
           el.dataset.kbdKey = String(def.semi);
@@ -8591,6 +8682,7 @@
         });
 
         updateKeyboardKeyLabels();
+        updateKbdNoteReadout();
       }
 
       function updateKeyboardKeyLabels() {
@@ -8609,8 +8701,9 @@
         const activeList = [];
         kbd.voices.forEach((v) => activeList.push(v));
         if (activeList.length === 0) {
+          const topSemi = kbd.renderedOctaves === 2 ? 24 : 12;
           const low = midiToNoteLabel(getKbdKeyMidi(0), true);
-          const high = midiToNoteLabel(getKbdKeyMidi(24), true);
+          const high = midiToNoteLabel(getKbdKeyMidi(topSemi), true);
           kbdNoteReadout.textContent = `${low}〜${high}`;
           return;
         }
@@ -9002,25 +9095,27 @@
         if (btnKbdHold) {
           btnKbdHold.classList.toggle('active-hold', state.kbdHold);
         }
-        const isImmersive = document.body.classList.contains('kbd-immersive');
-        if (btnKbdLandscape) {
-          btnKbdLandscape.classList.toggle('active-land', isImmersive);
-          btnKbdLandscape.textContent = isImmersive ? '標準' : '横画面';
-        }
         updateKeyboardKeyLabels();
         updateKbdNoteReadout();
       }
 
       function syncKbdImmersiveLayout() {
         const isLand = window.innerWidth > window.innerHeight;
-        const wantImmersive = (state.upperPage === 'kbd') && (isLand || kbd.forceImmersive);
-        document.body.classList.toggle('kbd-immersive', wantImmersive);
+        // Once the device actually returns to portrait, release the manual portrait override
+        if (!isLand) {
+          kbd.forcePortrait = false;
+        }
+        const wantLandscapeMode = (state.upperPage === 'kbd') && !kbd.forcePortrait && (isLand || kbd.forceImmersive);
+        document.body.classList.toggle('kbd-immersive', wantLandscapeMode);
+        // Portrait = 1 octave (8 white + 5 black), Landscape = 2 octaves (15 white + 10 black)
+        buildKeyboardDOM(wantLandscapeMode ? 2 : 1);
         if (state.upperPage === 'kbd') {
           updateKeyboardUI();
         }
       }
 
       async function enterKbdLandscapeMode() {
+        kbd.forcePortrait = false;
         kbd.forceImmersive = true;
         syncKbdImmersiveLayout();
         try {
@@ -9040,36 +9135,34 @@
           }
         } catch (_) {
           if (window.innerWidth <= window.innerHeight) {
-            showToast('スマホを横向きに傾けると2オクターブをさらに広く弾けます');
+            showToast('2オクターブ横モード表示中（端末を横向きにするとさらに広くなります）');
           }
         }
         syncKbdImmersiveLayout();
       }
 
-      function exitKbdLandscapeMode() {
+      async function exitKbdLandscapeMode() {
         kbd.forceImmersive = false;
+        kbd.forcePortrait = true;
+        syncKbdImmersiveLayout();
         try {
-          if (kbd.orientationLockedByKbd && screen.orientation && screen.orientation.unlock) {
+          if (screen.orientation && screen.orientation.lock) {
+            // Attempt to rotate back to portrait cleanly before unlocking
+            try { await screen.orientation.lock('portrait'); } catch (_) {}
+          }
+          if (screen.orientation && screen.orientation.unlock) {
             screen.orientation.unlock();
           }
         } catch (_) {}
         kbd.orientationLockedByKbd = false;
         try {
           if (kbd.fullscreenByKbd && isInFullscreen()) {
-            if (document.exitFullscreen) document.exitFullscreen().catch(() => {});
+            if (document.exitFullscreen) await document.exitFullscreen().catch(() => {});
             else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
           }
         } catch (_) {}
         kbd.fullscreenByKbd = false;
         syncKbdImmersiveLayout();
-      }
-
-      function toggleKbdLandscapeMode() {
-        if (document.body.classList.contains('kbd-immersive') && (kbd.forceImmersive || kbd.orientationLockedByKbd)) {
-          exitKbdLandscapeMode();
-        } else {
-          enterKbdLandscapeMode();
-        }
       }
 
       // ==================== PRECISION WEB AUDIO METRONOME (LOUD BUS + PENDULUM NEEDLE) + CHROMATIC TUNER ====================
@@ -10162,7 +10255,8 @@
       document.getElementById('btnKbdOctUp').addEventListener('click', () => setKbdOctave(state.kbdOctave + 1));
       kbdOctVal.addEventListener('click', () => {
         setKbdOctave(4);
-        showToast('オクターブを Oct:4 (C4〜C6) にリセットしました');
+        const topNote = kbd.renderedOctaves === 2 ? 'C6' : 'C5';
+        showToast(`オクターブを Oct:4 (C4〜${topNote}) にリセットしました`);
       });
       document.getElementById('btnKbdA4Down').addEventListener('click', () => setTunerA4(state.tunerA4 - 1));
       document.getElementById('btnKbdA4Up').addEventListener('click', () => setTunerA4(state.tunerA4 + 1));
@@ -10171,8 +10265,8 @@
         showToast('基準ピッチを A=440Hz にリセットしました');
       });
       btnKbdHold.addEventListener('click', toggleKbdHold);
-      btnKbdLandscape.addEventListener('click', toggleKbdLandscapeMode);
-      document.getElementById('btnKbdTipLandscape').addEventListener('click', enterKbdLandscapeMode);
+      btnKbdToLandscape.addEventListener('click', enterKbdLandscapeMode);
+      btnKbdToPortrait.addEventListener('click', exitKbdLandscapeMode);
 
       kbdStage.addEventListener('touchstart', (e) => {
         e.preventDefault();
@@ -10294,7 +10388,7 @@
       });
 
       // ==================== GITHUB / PWA SOFTWARE UPDATE CHECK & APPLY ====================
-      const APP_VERSION = 'v19';
+      const APP_VERSION = 'v20';
       const appUpdateState = {
         checking: false,
         available: false,
@@ -10882,7 +10976,7 @@
         updateRecSettingsUI();
         refreshMicDeviceList();
         initTunerBars();
-        buildKeyboardDOM();
+        buildKeyboardDOM(window.innerWidth > window.innerHeight ? 2 : 1);
         updateTunerA4UI();
         clearTunerVisuals('OFF');
         updateMetroUI();
