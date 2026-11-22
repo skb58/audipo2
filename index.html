@@ -2,13 +2,13 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta name="theme-color" content="#111113">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="Audipo2">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="app-version" content="v20">
+  <meta name="app-version" content="v21">
   <link rel="manifest" href="./manifest.json">
   <title>Audipo風 練習プレイヤー＆レコーダー</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='bg' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%231b2030'/%3E%3Cstop offset='100%25' stop-color='%230d0f15'/%3E%3C/linearGradient%3E%3ClinearGradient id='wv' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0%25' stop-color='%2360c5ff'/%3E%3Cstop offset='100%25' stop-color='%232563eb'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='url(%23bg)'/%3E%3Crect x='1' y='1' width='62' height='62' rx='15' fill='none' stroke='%233b82f6' stroke-opacity='0.3' stroke-width='2'/%3E%3Cg fill='url(%23wv)'%3E%3Crect x='10' y='28' width='4.5' height='12' rx='2.25' opacity='0.6'/%3E%3Crect x='18' y='22' width='4.5' height='24' rx='2.25' opacity='0.85'/%3E%3Crect x='26' y='15' width='4.5' height='36' rx='2.25'/%3E%3Crect x='34' y='21' width='4.5' height='25' rx='2.25' opacity='0.9'/%3E%3Crect x='42' y='26' width='4.5' height='16' rx='2.25' opacity='0.75'/%3E%3Crect x='50' y='30' width='4.5' height='9' rx='2.25' opacity='0.5'/%3E%3C/g%3E%3Cpath d='M36.25 10.5c0-1.4 1.1-2.5 2.5-2.5h5.5c1.4 0 2.5 1.1 2.5 2.5v2.4c0 .8-.3 1.5-.9 2.1l-3.2 3.1c-.6.6-1.6.6-2.2 0l-3.2-3.1c-.6-.6-.9-1.3-.9-2.1v-2.4z' fill='%23facc15'/%3E%3C/svg%3E">
@@ -44,9 +44,22 @@
       box-sizing: border-box;
     }
 
-    html, body {
+    html {
       width: 100%;
-      height: 100dvh;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      background-color: var(--bg-base);
+      overflow: hidden;
+      overscroll-behavior: none;
+    }
+
+    body {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: var(--app-height, 100%);
+      max-height: 100%;
       margin: 0;
       padding: 0;
       background-color: var(--bg-base);
@@ -57,9 +70,6 @@
       -webkit-tap-highlight-color: transparent;
       user-select: none;
       -webkit-user-select: none;
-    }
-
-    body {
       display: flex;
       flex-direction: column;
       justify-content: space-between;
@@ -1817,7 +1827,7 @@
     /* ==================== 5. AUDIPO 3x7 CONTROL GRID ==================== */
     .control-footer {
       background: var(--bg-base);
-      padding: 6px 6px calc(7px + env(safe-area-inset-bottom));
+      padding: 6px 6px calc(9px + env(safe-area-inset-bottom, 0px));
       flex-shrink: 0;
     }
 
@@ -3566,6 +3576,45 @@
   <script>
     (() => {
       'use strict';
+
+      // Prevent browser from restoring stale scroll offsets after reload
+      try {
+        if ('scrollRestoration' in history) {
+          history.scrollRestoration = 'manual';
+        }
+      } catch (_) {}
+
+      // Lock app height strictly to real visible viewport so reload in Android Chrome/PWA never hides the bottom buttons
+      let lastAppliedViewportH = 0;
+      function syncAppViewportHeight(forceRedraw = false) {
+        const innerH = window.innerHeight || document.documentElement.clientHeight || 0;
+        const clientH = document.documentElement.clientHeight || innerH;
+        let targetH = Math.min(innerH || clientH, clientH || innerH);
+
+        const vv = window.visualViewport;
+        if (vv && vv.height > 0) {
+          const activeTag = document.activeElement ? document.activeElement.tagName : '';
+          const isEditingText = activeTag === 'INPUT' || activeTag === 'TEXTAREA' || activeTag === 'SELECT';
+          // Clamp to visualViewport height unless the soft keyboard is actively open for text entry
+          if (!isEditingText) {
+            targetH = Math.min(targetH, Math.floor(vv.height));
+          }
+        }
+
+        if (targetH > 120) {
+          const rounded = Math.floor(targetH);
+          if (rounded !== lastAppliedViewportH || forceRedraw) {
+            lastAppliedViewportH = rounded;
+            document.documentElement.style.setProperty('--app-height', `${rounded}px`);
+          }
+        }
+
+        if (window.scrollY !== 0 || window.scrollX !== 0) {
+          window.scrollTo(0, 0);
+        }
+      }
+
+      syncAppViewportHeight(true);
 
       // ==================== DOM ELEMENTS ====================
       const audioEl = document.getElementById('audioEl');
@@ -10378,17 +10427,23 @@
       }
 
       btnFullscreenToggle.addEventListener('click', toggleFullscreenMode);
-      document.addEventListener('fullscreenchange', () => {
+      const onFullscreenStateChanged = () => {
         updateFullscreenUI();
-        setTimeout(renderAllCanvases, 60);
-      });
-      document.addEventListener('webkitfullscreenchange', () => {
-        updateFullscreenUI();
-        setTimeout(renderAllCanvases, 60);
-      });
+        syncAppViewportHeight(true);
+        setTimeout(() => {
+          syncAppViewportHeight(true);
+          renderAllCanvases();
+        }, 80);
+        setTimeout(() => {
+          syncAppViewportHeight(true);
+          renderAllCanvases();
+        }, 260);
+      };
+      document.addEventListener('fullscreenchange', onFullscreenStateChanged);
+      document.addEventListener('webkitfullscreenchange', onFullscreenStateChanged);
 
       // ==================== GITHUB / PWA SOFTWARE UPDATE CHECK & APPLY ====================
-      const APP_VERSION = 'v20';
+      const APP_VERSION = 'v21';
       const appUpdateState = {
         checking: false,
         available: false,
@@ -10541,7 +10596,21 @@
           try { await fetch('./', { cache: 'reload' }); } catch (_) {}
           try { await fetch('./index.html', { cache: 'reload' }); } catch (_) {}
 
-          location.reload();
+          // Clean UI state before reload so Android Chrome PWA recalculates viewport insets cleanly
+          try {
+            if (document.activeElement && document.activeElement.blur) {
+              document.activeElement.blur();
+            }
+            settingsModal.classList.add('hidden');
+            if (isInFullscreen()) {
+              if (document.exitFullscreen) await document.exitFullscreen().catch(() => {});
+              else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+            }
+            window.scrollTo(0, 0);
+            sessionStorage.setItem('audipo2_just_updated', '1');
+          } catch (_) {}
+
+          setTimeout(() => location.reload(), 40);
         } catch (err) {
           console.warn('Apply update fallback reload:', err);
           location.reload();
@@ -10932,6 +11001,7 @@
           saveCurrentFileMemory(true);
           saveAppPrefs();
         } else {
+          syncAppViewportHeight(true);
           renderAllCanvases();
           updateTimeUI();
           updatePinButtonsUI();
@@ -10949,26 +11019,57 @@
         saveAppPrefs();
       });
 
-      window.addEventListener('pageshow', () => {
-        renderAllCanvases();
-      });
-
-      // Resize, Orientation & Startup Render + Automatic Session Restore
-      window.addEventListener('resize', () => {
+      function refreshViewportAndLayout() {
+        syncAppViewportHeight(false);
         upperPagerViewport.scrollLeft = 0;
         syncKbdImmersiveLayout();
         renderAllCanvases();
+      }
+
+      window.addEventListener('pageshow', () => {
+        syncAppViewportHeight(true);
+        refreshViewportAndLayout();
+        setTimeout(refreshViewportAndLayout, 180);
       });
+
+      // Resize, VisualViewport, Orientation & Startup Render + Automatic Session Restore
+      window.addEventListener('resize', refreshViewportAndLayout);
+      if (window.visualViewport) {
+        window.visualViewport.addEventListener('resize', refreshViewportAndLayout);
+        window.visualViewport.addEventListener('scroll', () => {
+          if (window.scrollY !== 0 || window.scrollX !== 0) window.scrollTo(0, 0);
+          syncAppViewportHeight(false);
+        });
+      }
       if (screen.orientation && screen.orientation.addEventListener) {
         screen.orientation.addEventListener('change', () => {
           setTimeout(() => {
-            upperPagerViewport.scrollLeft = 0;
-            syncKbdImmersiveLayout();
-            renderAllCanvases();
+            syncAppViewportHeight(true);
+            refreshViewportAndLayout();
           }, 80);
+          setTimeout(() => {
+            syncAppViewportHeight(true);
+            refreshViewportAndLayout();
+          }, 300);
         });
       }
       window.onload = async () => {
+        syncAppViewportHeight(true);
+        requestAnimationFrame(() => refreshViewportAndLayout());
+        [120, 350, 800, 1500].forEach((ms) => {
+          setTimeout(() => {
+            syncAppViewportHeight(true);
+            renderAllCanvases();
+          }, ms);
+        });
+
+        try {
+          if (sessionStorage.getItem('audipo2_just_updated') === '1') {
+            sessionStorage.removeItem('audipo2_just_updated');
+            setTimeout(() => showToast(`最新バージョンへ更新しました (${APP_VERSION})`), 350);
+          }
+        } catch (_) {}
+
         loadAppPrefs();
         updateWaveGainUI();
         applyMasterBoost();
