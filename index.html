@@ -8,7 +8,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="Audipo2">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="app-version" content="v26">
+  <meta name="app-version" content="v27">
   <link rel="manifest" href="./manifest.json">
   <title>Audipo風 練習プレイヤー＆レコーダー</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='bg' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%231b2030'/%3E%3Cstop offset='100%25' stop-color='%230d0f15'/%3E%3C/linearGradient%3E%3ClinearGradient id='wv' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0%25' stop-color='%2360c5ff'/%3E%3Cstop offset='100%25' stop-color='%232563eb'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='url(%23bg)'/%3E%3Crect x='1' y='1' width='62' height='62' rx='15' fill='none' stroke='%233b82f6' stroke-opacity='0.3' stroke-width='2'/%3E%3Cg fill='url(%23wv)'%3E%3Crect x='10' y='28' width='4.5' height='12' rx='2.25' opacity='0.6'/%3E%3Crect x='18' y='22' width='4.5' height='24' rx='2.25' opacity='0.85'/%3E%3Crect x='26' y='15' width='4.5' height='36' rx='2.25'/%3E%3Crect x='34' y='21' width='4.5' height='25' rx='2.25' opacity='0.9'/%3E%3Crect x='42' y='26' width='4.5' height='16' rx='2.25' opacity='0.75'/%3E%3Crect x='50' y='30' width='4.5' height='9' rx='2.25' opacity='0.5'/%3E%3C/g%3E%3Cpath d='M36.25 10.5c0-1.4 1.1-2.5 2.5-2.5h5.5c1.4 0 2.5 1.1 2.5 2.5v2.4c0 .8-.3 1.5-.9 2.1l-3.2 3.1c-.6.6-1.6.6-2.2 0l-3.2-3.1c-.6-.6-.9-1.3-.9-2.1v-2.4z' fill='%23facc15'/%3E%3C/svg%3E">
@@ -3054,6 +3054,113 @@
       color: #d4d4d8;
     }
 
+    /* ==================== 2-STEP DANGER CONFIRMATION MODAL ==================== */
+    .danger-confirm-card {
+      width: 100%;
+      max-width: 390px;
+      background: #232024;
+      border: 1.5px solid rgba(248, 113, 113, 0.52);
+      border-radius: 16px;
+      padding: 18px 18px 14px;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.88), 0 0 26px rgba(239, 68, 68, 0.16);
+      color: var(--text-main);
+    }
+
+    .danger-confirm-card.step-final {
+      border-color: rgba(239, 68, 68, 0.92);
+      background: linear-gradient(180deg, rgba(239, 68, 68, 0.12) 0%, #231c1e 38%);
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.92), 0 0 32px rgba(239, 68, 68, 0.28);
+    }
+
+    .danger-step-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 2px 9px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 800;
+      margin-bottom: 10px;
+      background: rgba(245, 158, 11, 0.18);
+      border: 1px solid rgba(245, 158, 11, 0.55);
+      color: #fcd34d;
+    }
+
+    .danger-confirm-card.step-final .danger-step-badge {
+      background: rgba(239, 68, 68, 0.24);
+      border-color: rgba(248, 113, 113, 0.85);
+      color: #fecaca;
+    }
+
+    .danger-stats-box {
+      padding: 9px 11px;
+      border-radius: 10px;
+      background: rgba(0, 0, 0, 0.32);
+      border: 1px solid rgba(248, 113, 113, 0.3);
+      margin-bottom: 12px;
+      font-size: 12px;
+      line-height: 1.5;
+      color: #fde68a;
+      font-weight: 700;
+    }
+
+    .danger-footer-stack {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 14px;
+      padding-top: 6px;
+    }
+
+    .danger-btn-safe {
+      padding: 9px 14px;
+      border-radius: 9px;
+      background: #2f2f38;
+      border: 1px solid var(--border-strong);
+      color: #f4f4f6;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .danger-btn-safe:active {
+      transform: scale(0.96);
+    }
+
+    .danger-btn-next {
+      padding: 9px 14px;
+      border-radius: 9px;
+      background: rgba(239, 68, 68, 0.18);
+      border: 1px solid rgba(248, 113, 113, 0.65);
+      color: #fca5a5;
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .danger-btn-next:active {
+      transform: scale(0.96);
+    }
+
+    .danger-btn-execute {
+      padding: 9px 14px;
+      border-radius: 9px;
+      background: #dc2626;
+      border: 1px solid #f87171;
+      color: #ffffff;
+      font-size: 13px;
+      font-weight: 800;
+      transition: opacity 0.15s ease, transform 0.08s ease;
+    }
+
+    .danger-btn-execute:active {
+      transform: scale(0.96);
+    }
+
+    .danger-btn-execute:disabled {
+      opacity: 0.42;
+      pointer-events: none;
+    }
+
     /* Toast Notification (never uses alert/confirm) */
     .toast-banner {
       position: fixed;
@@ -3936,7 +4043,7 @@
         <div class="modal-section" style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
           <div>
             <div class="sec-title">バージョン情報</div>
-            <div id="settingsVersionLabel" class="engine-desc mono">現在: v26</div>
+            <div id="settingsVersionLabel" class="engine-desc mono">現在: v27</div>
           </div>
           <button id="btnShowReleaseHistory" type="button" class="step-btn" style="color:#93c5fd;border-color:rgba(66,165,245,0.45);">更新履歴を見る</button>
         </div>
@@ -4069,7 +4176,7 @@
           </div>
           <div>
             <h3 id="whatsNewTitle" class="whats-new-title">アップデートのお知らせ</h3>
-            <p id="whatsNewSub" class="whats-new-sub mono">v26 に更新されました</p>
+            <p id="whatsNewSub" class="whats-new-sub mono">v27 に更新されました</p>
           </div>
         </div>
         <button id="btnCloseWhatsNewX" type="button" class="modal-close" aria-label="閉じる">✕</button>
@@ -4103,6 +4210,26 @@
 
       <div class="whats-new-footer">
         <button id="btnCloseSettingHelpOk" type="button" class="whats-new-ok-btn">閉じる</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== 10. 2-STEP CLEAR ALL PIN MEMORY CONFIRMATION MODAL ==================== -->
+  <div id="clearPinMemoryConfirmModal" class="modal-backdrop hidden" style="z-index:85;">
+    <div id="clearPinMemoryCard" class="danger-confirm-card" role="dialog" aria-modal="true" aria-labelledby="clearPinMemoryTitle">
+      <div id="clearPinMemoryStepBadge" class="danger-step-badge mono">確認 1 / 2</div>
+      <h3 id="clearPinMemoryTitle" class="mark-edit-title" style="color:#fca5a5;margin-bottom:10px;">すべてのピン記憶を初期化しますか？</h3>
+      <div id="clearPinMemoryStats" class="danger-stats-box mono"></div>
+      <p id="clearPinMemoryDesc" style="margin:0;font-size:12.5px;line-height:1.62;color:#e4e4e7;"></p>
+
+      <div id="clearPinMemoryFooterStep1" class="danger-footer-stack">
+        <button id="btnClearPinMemCancel1" type="button" class="danger-btn-safe">キャンセル</button>
+        <button id="btnClearPinMemNext" type="button" class="danger-btn-next">最終確認へ進む</button>
+      </div>
+
+      <div id="clearPinMemoryFooterStep2" class="danger-footer-stack hidden" style="justify-content:space-between;">
+        <button id="btnClearPinMemExecute" type="button" class="danger-btn-execute" disabled>本当に初期化する (2)</button>
+        <button id="btnClearPinMemCancel2" type="button" class="danger-btn-safe" style="background:#3b82f6;border-color:#93c5fd;color:#ffffff;">やめる</button>
       </div>
     </div>
   </div>
@@ -11447,11 +11574,21 @@
       document.addEventListener('webkitfullscreenchange', onFullscreenStateChanged);
 
       // ==================== GITHUB / PWA SOFTWARE UPDATE CHECK & APPLY ====================
-      const APP_VERSION = 'v26';
+      const APP_VERSION = 'v27';
 
       // Ordered newest-first; each release appends a new object at the top.
       // Users who skip multiple versions automatically see ALL unseen versions between lastSeen and current.
       const APP_RELEASE_NOTES = [
+        {
+          version: 'v27',
+          verNum: 27,
+          date: '2026/11/23',
+          title: '「全ピン記憶を初期化」の2段階確認を追加',
+          items: [
+            '設定画面の「全ピン記憶を初期化」を押した際、誤操作で大切なピン情報が消えないよう2段階の確認画面を表示するようにしました',
+            '2回目の最終確認ではボタン配置を変えたうえで2秒間の誤タップ防止ロックを入れ、記憶中のファイル数・合計ピン数を確認してから慎重に実行できるようにしました'
+          ]
+        },
         {
           version: 'v26',
           verNum: 26,
@@ -12475,14 +12612,105 @@
         showToast('一時音源・未保存ピンキャッシュを削除しました（1000件のピン記憶は保持されます）');
       });
 
-      document.getElementById('btnClearPinMemory').addEventListener('click', () => {
+      const clearPinMemoryConfirmModal = document.getElementById('clearPinMemoryConfirmModal');
+      const clearPinMemoryCard = document.getElementById('clearPinMemoryCard');
+      const clearPinMemoryStepBadge = document.getElementById('clearPinMemoryStepBadge');
+      const clearPinMemoryTitle = document.getElementById('clearPinMemoryTitle');
+      const clearPinMemoryStats = document.getElementById('clearPinMemoryStats');
+      const clearPinMemoryDesc = document.getElementById('clearPinMemoryDesc');
+      const clearPinMemoryFooterStep1 = document.getElementById('clearPinMemoryFooterStep1');
+      const clearPinMemoryFooterStep2 = document.getElementById('clearPinMemoryFooterStep2');
+      const btnClearPinMemExecute = document.getElementById('btnClearPinMemExecute');
+
+      let clearPinMemCountdownTimer = null;
+      let clearPinMemSnapshot = { fileCount: 0, totalPins: 0 };
+
+      function closeClearPinMemoryModal() {
+        clearInterval(clearPinMemCountdownTimer);
+        clearPinMemCountdownTimer = null;
+        if (clearPinMemoryConfirmModal) clearPinMemoryConfirmModal.classList.add('hidden');
+      }
+
+      function renderClearPinMemoryStep(step) {
+        clearInterval(clearPinMemCountdownTimer);
+        clearPinMemCountdownTimer = null;
+        const { fileCount, totalPins } = clearPinMemSnapshot;
+        clearPinMemoryStats.textContent = `対象: 記憶済み ${fileCount}ファイル（黄色ピン 合計 ${totalPins}個）`;
+
+        if (step === 1) {
+          clearPinMemoryCard.classList.remove('step-final');
+          clearPinMemoryStepBadge.textContent = '確認 1 / 2';
+          clearPinMemoryTitle.textContent = 'すべてのピン記憶を初期化しますか？';
+          clearPinMemoryDesc.textContent = 'これまで登録したすべてのファイルの黄色ピン・マーク名・区間スキップ設定・再生位置がまとめて消去されます。一度消すと元に戻せません。';
+          clearPinMemoryFooterStep1.classList.remove('hidden');
+          clearPinMemoryFooterStep2.classList.add('hidden');
+          btnClearPinMemExecute.disabled = true;
+          return;
+        }
+
+        // Step 2 (Final Warning) with swapped button layout + 2-second anti-accidental-tap countdown
+        clearPinMemoryCard.classList.add('step-final');
+        clearPinMemoryStepBadge.textContent = '確認 2 / 2 ・最終確認';
+        clearPinMemoryTitle.textContent = '本当にすべて消去してよろしいですか？';
+        clearPinMemoryDesc.textContent = 'この操作は取り消せません。これまでのピン登録や名前付けの記録がすべて完全に失われます。本当に初期化して問題ない場合のみ実行してください。';
+        clearPinMemoryFooterStep1.classList.add('hidden');
+        clearPinMemoryFooterStep2.classList.remove('hidden');
+
+        let remain = 2;
+        btnClearPinMemExecute.disabled = true;
+        btnClearPinMemExecute.textContent = `本当に初期化する (${remain})`;
+        clearPinMemCountdownTimer = setInterval(() => {
+          remain -= 1;
+          if (remain <= 0) {
+            clearInterval(clearPinMemCountdownTimer);
+            clearPinMemCountdownTimer = null;
+            btnClearPinMemExecute.disabled = false;
+            btnClearPinMemExecute.textContent = '本当に初期化する';
+          } else {
+            btnClearPinMemExecute.textContent = `本当に初期化する (${remain})`;
+          }
+        }, 1000);
+      }
+
+      function openClearPinMemoryConfirm() {
+        const map = readAllFileMemories();
+        const recs = Object.values(map);
+        const fileCount = recs.length;
+        if (fileCount === 0) {
+          showToast('初期化できるピン記憶がありません');
+          return;
+        }
+        let totalPins = 0;
+        for (let i = 0; i < recs.length; i++) {
+          if (recs[i] && Array.isArray(recs[i].markers)) {
+            totalPins += recs[i].markers.length;
+          }
+        }
+        clearPinMemSnapshot = { fileCount, totalPins };
+        renderClearPinMemoryStep(1);
+        clearPinMemoryConfirmModal.classList.remove('hidden');
+      }
+
+      function executeClearAllPinMemory() {
+        closeClearPinMemoryModal();
         try {
           localStorage.removeItem(LS_FILE_MEM_KEY);
           localStorage.removeItem(LS_LAST_SESSION_KEY);
         } catch (_) {}
+        state.currentMemoryKey = null;
+        state.ephemeralCutMemoryKey = null;
         updateMemoryCountBadge();
         updateStartupLastFileHint();
         showToast('記憶していたすべてのファイルピン情報を初期化しました');
+      }
+
+      document.getElementById('btnClearPinMemory').addEventListener('click', openClearPinMemoryConfirm);
+      document.getElementById('btnClearPinMemCancel1').addEventListener('click', closeClearPinMemoryModal);
+      document.getElementById('btnClearPinMemCancel2').addEventListener('click', closeClearPinMemoryModal);
+      document.getElementById('btnClearPinMemNext').addEventListener('click', () => renderClearPinMemoryStep(2));
+      btnClearPinMemExecute.addEventListener('click', executeClearAllPinMemory);
+      clearPinMemoryConfirmModal.addEventListener('click', (e) => {
+        if (e.target === clearPinMemoryConfirmModal) closeClearPinMemoryModal();
       });
 
       document.getElementById('btnAutoPinStartsModal').addEventListener('click', () => {
@@ -12539,7 +12767,9 @@
 
       window.addEventListener('popstate', () => {
         // 1. Close topmost open modal if any
-        if (settingHelpModal && !settingHelpModal.classList.contains('hidden')) {
+        if (clearPinMemoryConfirmModal && !clearPinMemoryConfirmModal.classList.contains('hidden')) {
+          closeClearPinMemoryModal();
+        } else if (settingHelpModal && !settingHelpModal.classList.contains('hidden')) {
           closeSettingHelpModal();
         } else if (whatsNewModal && !whatsNewModal.classList.contains('hidden')) {
           closeWhatsNewModal();
