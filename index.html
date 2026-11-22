@@ -8,7 +8,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="Audipo2">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="app-version" content="v18">
+  <meta name="app-version" content="v19">
   <link rel="manifest" href="./manifest.json">
   <title>Audipo風 練習プレイヤー＆レコーダー</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='bg' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%231b2030'/%3E%3Cstop offset='100%25' stop-color='%230d0f15'/%3E%3C/linearGradient%3E%3ClinearGradient id='wv' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0%25' stop-color='%2360c5ff'/%3E%3Cstop offset='100%25' stop-color='%232563eb'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='url(%23bg)'/%3E%3Crect x='1' y='1' width='62' height='62' rx='15' fill='none' stroke='%233b82f6' stroke-opacity='0.3' stroke-width='2'/%3E%3Cg fill='url(%23wv)'%3E%3Crect x='10' y='28' width='4.5' height='12' rx='2.25' opacity='0.6'/%3E%3Crect x='18' y='22' width='4.5' height='24' rx='2.25' opacity='0.85'/%3E%3Crect x='26' y='15' width='4.5' height='36' rx='2.25'/%3E%3Crect x='34' y='21' width='4.5' height='25' rx='2.25' opacity='0.9'/%3E%3Crect x='42' y='26' width='4.5' height='16' rx='2.25' opacity='0.75'/%3E%3Crect x='50' y='30' width='4.5' height='9' rx='2.25' opacity='0.5'/%3E%3C/g%3E%3Cpath d='M36.25 10.5c0-1.4 1.1-2.5 2.5-2.5h5.5c1.4 0 2.5 1.1 2.5 2.5v2.4c0 .8-.3 1.5-.9 2.1l-3.2 3.1c-.6.6-1.6.6-2.2 0l-3.2-3.1c-.6-.6-.9-1.3-.9-2.1v-2.4z' fill='%23facc15'/%3E%3C/svg%3E">
@@ -254,9 +254,9 @@
 
     .upper-pager-track {
       display: flex;
-      width: 300%;
+      width: 400%;
       height: 100%;
-      transform: translate3d(-33.333333%, 0, 0);
+      transform: translate3d(-50%, 0, 0);
       transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
       will-change: transform;
     }
@@ -265,24 +265,363 @@
       transition: none;
     }
 
-    .upper-pager-track.page-metro {
+    .upper-pager-track.page-kbd {
       transform: translate3d(0%, 0, 0);
     }
 
+    .upper-pager-track.page-metro {
+      transform: translate3d(-25%, 0, 0);
+    }
+
     .upper-pager-track.page-wave {
-      transform: translate3d(-33.333333%, 0, 0);
+      transform: translate3d(-50%, 0, 0);
     }
 
     .upper-pager-track.page-pins {
-      transform: translate3d(-66.666667%, 0, 0);
+      transform: translate3d(-75%, 0, 0);
     }
 
     .upper-page {
-      width: 33.333333%;
+      width: 25%;
       height: 100%;
       flex-shrink: 0;
       position: relative;
       overflow: hidden;
+    }
+
+    /* ==================== PAGE 0 (FAR LEFT): 2-OCTAVE MUSICAL KEYBOARD ==================== */
+    .upper-page-kbd {
+      display: flex;
+      flex-direction: column;
+      background: linear-gradient(180deg, #16161d 0%, #0e0e12 100%);
+      padding: 5px 6px 16px;
+      gap: 5px;
+    }
+
+    .kbd-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 4px 6px;
+      padding: 5px 7px;
+      background: #1a1a22;
+      border: 1px solid var(--border-subtle);
+      border-radius: 11px;
+      flex-shrink: 0;
+    }
+
+    .kbd-bar-group {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      flex-wrap: nowrap;
+      min-width: 0;
+    }
+
+    .kbd-nav-btn {
+      height: 27px;
+      padding: 0 8px;
+      border-radius: 7px;
+      background: #262630;
+      border: 1px solid var(--border-strong);
+      color: #e4e4e7;
+      font-size: 10.5px;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      white-space: nowrap;
+    }
+
+    .kbd-nav-btn:active {
+      transform: scale(0.94);
+    }
+
+    .kbd-readout {
+      min-width: 82px;
+      max-width: 155px;
+      height: 27px;
+      padding: 0 7px;
+      border-radius: 7px;
+      background: #101015;
+      border: 1px solid var(--border-subtle);
+      color: #c4b5fd;
+      font-size: 11px;
+      font-weight: 800;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .kbd-inst-group {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      background: #111116;
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px;
+      padding: 2px;
+    }
+
+    .kbd-inst-btn {
+      height: 24px;
+      padding: 0 7px;
+      border-radius: 6px;
+      font-size: 10.5px;
+      font-weight: 700;
+      color: var(--text-sub);
+      white-space: nowrap;
+      transition: background-color 0.12s ease, color 0.12s ease;
+    }
+
+    .kbd-inst-btn:active {
+      transform: scale(0.95);
+    }
+
+    .kbd-inst-btn.active {
+      background: rgba(139, 92, 246, 0.32);
+      color: #ede9fe;
+      box-shadow: inset 0 0 0 1px rgba(167, 139, 250, 0.72);
+    }
+
+    .kbd-stepper {
+      display: inline-flex;
+      align-items: center;
+      gap: 2px;
+      background: #111116;
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px;
+      padding: 2px 3px;
+      height: 27px;
+    }
+
+    .kbd-step-btn {
+      width: 22px;
+      height: 21px;
+      border-radius: 5px;
+      background: #262630;
+      color: #f4f4f6;
+      font-size: 12px;
+      font-weight: 800;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .kbd-step-btn:active {
+      transform: scale(0.9);
+      background: #353543;
+    }
+
+    .kbd-step-val {
+      padding: 0 4px;
+      font-size: 10.5px;
+      font-weight: 700;
+      color: #e4e4e7;
+      white-space: nowrap;
+      cursor: pointer;
+    }
+
+    .kbd-toggle-btn {
+      height: 27px;
+      padding: 0 8px;
+      border-radius: 7px;
+      background: #23232c;
+      border: 1px solid var(--border-strong);
+      color: #d4d4d8;
+      font-size: 10.5px;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      white-space: nowrap;
+    }
+
+    .kbd-toggle-btn:active {
+      transform: scale(0.94);
+    }
+
+    .kbd-toggle-btn.active-hold {
+      background: rgba(250, 204, 21, 0.22);
+      border-color: var(--accent-yellow);
+      color: #fef08a;
+    }
+
+    .kbd-toggle-btn.active-land {
+      background: var(--accent-blue-bg);
+      border-color: var(--accent-blue);
+      color: #bae6fd;
+    }
+
+    .kbd-portrait-tip {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 4px 8px;
+      border-radius: 8px;
+      background: rgba(139, 92, 246, 0.12);
+      border: 1px solid rgba(167, 139, 250, 0.35);
+      color: #ddd6fe;
+      font-size: 10.5px;
+      flex-shrink: 0;
+    }
+
+    .kbd-stage {
+      position: relative;
+      flex: 1;
+      min-height: 112px;
+      width: 100%;
+      background: #0a0a0d;
+      border: 1px solid #2f2f39;
+      border-radius: 10px;
+      overflow: hidden;
+      touch-action: none;
+      user-select: none;
+      -webkit-user-select: none;
+      box-shadow: inset 0 6px 14px rgba(0, 0, 0, 0.65);
+    }
+
+    .kbd-whites {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      width: 100%;
+      height: 100%;
+    }
+
+    .kbd-key-white {
+      position: relative;
+      flex: 1 1 0;
+      height: 100%;
+      background: linear-gradient(180deg, #f8fafc 0%, #eef2f6 82%, #cbd5e1 100%);
+      border-right: 1px solid #94a3b8;
+      border-bottom: 3px solid #94a3b8;
+      border-radius: 0 0 6px 6px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
+      padding-bottom: 7px;
+      color: #334155;
+      transition: background 0.04s ease, transform 0.04s ease;
+    }
+
+    .kbd-key-white:last-child {
+      border-right: none;
+    }
+
+    .kbd-key-white.is-tonic {
+      background: linear-gradient(180deg, #ffffff 0%, #eff6ff 82%, #bfdbfe 100%);
+    }
+
+    .kbd-key-white.pressed {
+      background: linear-gradient(180deg, #c4b5fd 0%, #8b5cf6 100%);
+      border-bottom-width: 1px;
+      color: #ffffff;
+      box-shadow: inset 0 4px 10px rgba(30, 27, 75, 0.35);
+    }
+
+    .kbd-key-white.held {
+      background: linear-gradient(180deg, #fef08a 0%, #f59e0b 100%);
+      border-bottom-width: 1px;
+      color: #18181b;
+    }
+
+    .kbd-key-label {
+      font-size: 9.5px;
+      font-weight: 800;
+      line-height: 1.05;
+      letter-spacing: -0.3px;
+      pointer-events: none;
+      text-align: center;
+    }
+
+    .kbd-blacks {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 60%;
+      pointer-events: none;
+      z-index: 3;
+    }
+
+    .kbd-key-black {
+      position: absolute;
+      top: 0;
+      height: 100%;
+      pointer-events: auto;
+      background: linear-gradient(180deg, #2b2b34 0%, #141418 72%, #09090b 100%);
+      border: 1px solid #09090b;
+      border-top: none;
+      border-bottom: 4px solid #050507;
+      border-radius: 0 0 6px 6px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.65), inset 0 1px 0 rgba(255, 255, 255, 0.14);
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      padding-bottom: 5px;
+      color: rgba(228, 228, 231, 0.72);
+      transition: background 0.04s ease, border-bottom-width 0.04s ease;
+    }
+
+    .kbd-key-black .kbd-key-label {
+      font-size: 7.5px;
+      font-weight: 700;
+    }
+
+    .kbd-key-black.pressed {
+      background: linear-gradient(180deg, #7c3aed 0%, #4c1d95 100%);
+      border-bottom-width: 1px;
+      color: #ffffff;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.8), 0 0 10px rgba(139, 92, 246, 0.55);
+    }
+
+    .kbd-key-black.held {
+      background: linear-gradient(180deg, #f59e0b 0%, #b45309 100%);
+      border-bottom-width: 1px;
+      color: #ffffff;
+    }
+
+    /* Full-Screen Landscape Immersive Mode when playing 2-Octave Keyboard */
+    body.kbd-immersive .app-header,
+    body.kbd-immersive #zoomPane,
+    body.kbd-immersive #zoomCollapsedBar,
+    body.kbd-immersive .status-bar,
+    body.kbd-immersive .section-action-bar,
+    body.kbd-immersive .control-footer,
+    body.kbd-immersive .upper-page-dots,
+    body.kbd-immersive .kbd-portrait-tip {
+      display: none !important;
+    }
+
+    body.kbd-immersive .upper-page-kbd {
+      padding: calc(5px + env(safe-area-inset-top)) calc(8px + env(safe-area-inset-right)) calc(6px + env(safe-area-inset-bottom)) calc(8px + env(safe-area-inset-left));
+      gap: 6px;
+    }
+
+    body.kbd-immersive .kbd-toolbar {
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      padding: 5px 8px;
+      gap: 6px;
+    }
+
+    body.kbd-immersive .kbd-key-white {
+      padding-bottom: 10px;
+    }
+
+    body.kbd-immersive .kbd-key-white .kbd-key-label {
+      font-size: 12px;
+    }
+
+    body.kbd-immersive .kbd-key-black .kbd-key-label {
+      font-size: 9px;
     }
 
     .upper-page-metro {
@@ -902,6 +1241,12 @@
       border-radius: 50%;
       background: rgba(255, 255, 255, 0.28);
       transition: background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .upper-dot.active-kbd {
+      background: #a78bfa;
+      transform: scale(1.3);
+      box-shadow: 0 0 6px rgba(167, 139, 250, 0.85);
     }
 
     .upper-dot.active-metro {
@@ -2312,11 +2657,67 @@
 
   <!-- ==================== 2. WAVEFORM WORKSPACE ==================== -->
   <main class="waveform-workspace">
-    <!-- Upper Pane: Home-Screen-Style 3-Page Swipe Area (Left: Metronome / Center [Default]: Full Waveform / Right: Pin List) -->
+    <!-- Upper Pane: Home-Screen-Style 4-Page Swipe Area (Far-Left: 2-Octave Keyboard / Left: Metronome / Center [Default]: Full Waveform / Right: Pin List) -->
     <div class="overview-wrap">
       <div id="upperPagerViewport" class="upper-pager-viewport">
         <div id="upperPagerTrack" class="upper-pager-track page-wave">
-          <!-- Page 0 (Left): Chromatic Tuner + Pendulum Metronome -->
+          <!-- Page 0 (Far Left): Landscape 2-Octave Keyboard (Piano / Synth / Flute / Violin) -->
+          <div id="upperPageKbd" class="upper-page upper-page-kbd">
+            <div class="kbd-toolbar">
+              <div class="kbd-bar-group">
+                <button id="btnKbdToMetro" type="button" class="kbd-nav-btn" title="メトロノーム画面へ戻る">
+                  <span>メトロ</span>
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+                </button>
+                <div id="kbdNoteReadout" class="kbd-readout mono">C4〜C6</div>
+              </div>
+
+              <div class="kbd-inst-group" role="group" aria-label="鍵盤の音色">
+                <button type="button" data-kbd-inst="piano" class="kbd-inst-btn active">ピアノ</button>
+                <button type="button" data-kbd-inst="synth" class="kbd-inst-btn">電子音</button>
+                <button type="button" data-kbd-inst="flute" class="kbd-inst-btn">フルート</button>
+                <button type="button" data-kbd-inst="violin" class="kbd-inst-btn">バイオリン</button>
+              </div>
+
+              <div class="kbd-bar-group">
+                <!-- Key Transposition Base (キー基準) -->
+                <div class="kbd-stepper" title="キー基準（移調）を変更／中央タップでCに戻す">
+                  <button id="btnKbdKeyDown" type="button" class="kbd-step-btn" aria-label="キーを下げる">-</button>
+                  <span id="kbdKeyVal" class="kbd-step-val mono">キー:C</span>
+                  <button id="btnKbdKeyUp" type="button" class="kbd-step-btn" aria-label="キーを上げる">+</button>
+                </div>
+
+                <!-- Octave Switcher (オクターブ切替) -->
+                <div class="kbd-stepper" title="オクターブ切替／中央タップでC4-C6に戻す">
+                  <button id="btnKbdOctDown" type="button" class="kbd-step-btn" aria-label="オクターブを下げる">-</button>
+                  <span id="kbdOctVal" class="kbd-step-val mono">Oct:4</span>
+                  <button id="btnKbdOctUp" type="button" class="kbd-step-btn" aria-label="オクターブを上げる">+</button>
+                </div>
+
+                <!-- Concert Pitch A4 Reference (基準ピッチ) -->
+                <div class="kbd-stepper" title="基準ピッチ A4 (430〜450Hz)／中央タップで440Hzに戻す">
+                  <button id="btnKbdA4Down" type="button" class="kbd-step-btn" aria-label="基準ピッチを下げる">-</button>
+                  <span id="kbdA4Val" class="kbd-step-val mono">440Hz</span>
+                  <button id="btnKbdA4Up" type="button" class="kbd-step-btn" aria-label="基準ピッチを上げる">+</button>
+                </div>
+
+                <button id="btnKbdHold" type="button" class="kbd-toggle-btn" title="持続モード（離しても音が鳴り続けます・基準音出しに便利）">持続</button>
+                <button id="btnKbdLandscape" type="button" class="kbd-toggle-btn" title="横画面・全画面キーボードを切替">横画面</button>
+              </div>
+            </div>
+
+            <div id="kbdPortraitTip" class="kbd-portrait-tip">
+              <span>スマホを横向きにするか「横画面」を押すと2オクターブを全画面で弾けます</span>
+              <button id="btnKbdTipLandscape" type="button" class="kbd-toggle-btn active-land" style="height:22px;padding:0 7px;font-size:10px;">横にする</button>
+            </div>
+
+            <div id="kbdStage" class="kbd-stage" aria-label="2オクターブ鍵盤">
+              <div id="kbdWhites" class="kbd-whites"></div>
+              <div id="kbdBlacks" class="kbd-blacks"></div>
+            </div>
+          </div>
+
+          <!-- Page 1 (Left): Chromatic Tuner + Pendulum Metronome -->
           <div id="upperPageMetro" class="upper-page upper-page-metro">
             <div class="metro-panel">
               <!-- Top: Chromatic Tuner Bar (with 25-bar cent meter & A=440Hz calibration) -->
@@ -2523,6 +2924,7 @@
         </div>
 
         <div class="upper-page-dots" aria-hidden="true">
+          <span id="dotUpperKbd" class="upper-dot"></span>
           <span id="dotUpperMetro" class="upper-dot"></span>
           <span id="dotUpperWave" class="upper-dot active"></span>
           <span id="dotUpperPins" class="upper-dot"></span>
@@ -3166,7 +3568,17 @@
       const startupLastHint = document.getElementById('startupLastHint');
       const upperPagerViewport = document.getElementById('upperPagerViewport');
       const upperPagerTrack = document.getElementById('upperPagerTrack');
+      const dotUpperKbd = document.getElementById('dotUpperKbd');
       const dotUpperMetro = document.getElementById('dotUpperMetro');
+      const kbdStage = document.getElementById('kbdStage');
+      const kbdWhites = document.getElementById('kbdWhites');
+      const kbdBlacks = document.getElementById('kbdBlacks');
+      const kbdNoteReadout = document.getElementById('kbdNoteReadout');
+      const kbdKeyVal = document.getElementById('kbdKeyVal');
+      const kbdOctVal = document.getElementById('kbdOctVal');
+      const kbdA4Val = document.getElementById('kbdA4Val');
+      const btnKbdHold = document.getElementById('btnKbdHold');
+      const btnKbdLandscape = document.getElementById('btnKbdLandscape');
       const dotUpperWave = document.getElementById('dotUpperWave');
       const dotUpperPins = document.getElementById('dotUpperPins');
       const metroLedStrip = document.getElementById('metroLedStrip');
@@ -3265,6 +3677,10 @@
         metroRunning: false,
         tunerA4: 440,
         tunerRunning: false,
+        kbdInst: 'piano', // 'piano' | 'synth' | 'flute' | 'violin'
+        kbdOctave: 4, // 1..6 (base octave for 2-octave span C{oct}..C{oct+2})
+        kbdTranspose: 0, // -6..+6 semitones (key center shift)
+        kbdHold: false,
         numRows: 12,
         zoomVisible: true,
         zoomWindowSeconds: 8.0,
@@ -3648,7 +4064,10 @@
             metroBeats: state.metroBeats,
             metroVolume: state.metroVolume,
             metroVolDefaultV2: true,
-            tunerA4: state.tunerA4
+            tunerA4: state.tunerA4,
+            kbdInst: state.kbdInst,
+            kbdOctave: state.kbdOctave,
+            kbdTranspose: state.kbdTranspose
           }));
         } catch (_) {}
       }
@@ -3735,6 +4154,15 @@
           }
           if (typeof p.tunerA4 === 'number' && p.tunerA4 >= 430 && p.tunerA4 <= 450) {
             state.tunerA4 = Math.round(p.tunerA4);
+          }
+          if (['piano', 'synth', 'flute', 'violin'].includes(p.kbdInst)) {
+            state.kbdInst = p.kbdInst;
+          }
+          if (typeof p.kbdOctave === 'number' && p.kbdOctave >= 1 && p.kbdOctave <= 6) {
+            state.kbdOctave = Math.round(p.kbdOctave);
+          }
+          if (typeof p.kbdTranspose === 'number' && p.kbdTranspose >= -6 && p.kbdTranspose <= 6) {
+            state.kbdTranspose = Math.round(p.kbdTranspose);
           }
         } catch (_) {}
       }
@@ -7453,7 +7881,7 @@
       }
 
       // Home-Screen-Style 3-Page Horizontal Swipe Pager (Left: Metronome / Center: Waveform / Right: Pin List)
-      const UPPER_PAGES = ['metro', 'wave', 'pins'];
+      const UPPER_PAGES = ['kbd', 'metro', 'wave', 'pins'];
 
       const pagerDrag = {
         active: false,
@@ -7470,7 +7898,7 @@
 
       function getCurrentPageIndex() {
         const idx = UPPER_PAGES.indexOf(state.upperPage);
-        return idx >= 0 ? idx : 1;
+        return idx >= 0 ? idx : 2;
       }
 
       function applyPagerDragOffset(dx) {
@@ -7489,8 +7917,12 @@
       }
 
       function beginPagerGesture(clientX, clientY, targetEl, sourceType) {
-        // Never hijack range sliders or numeric/text inputs inside the metronome page!
-        if (targetEl && targetEl.closest && targetEl.closest('input, select, textarea')) {
+        // Never hijack range sliders, inputs, or piano keyboard keys!
+        if (targetEl && targetEl.closest && targetEl.closest('input, select, textarea, #kbdStage')) {
+          return false;
+        }
+        // In landscape full-screen keyboard mode, disable horizontal pager swipe so tapping toolbar controls is rock-solid
+        if (document.body.classList.contains('kbd-immersive')) {
           return false;
         }
         pagerDrag.active = true;
@@ -7995,10 +8427,12 @@
 
       // ==================== UPPER AREA 3-PAGE SWITCHER (LEFT: METRONOME / CENTER: WAVEFORM / RIGHT: PIN LIST) ====================
       function updateUpperDotsUI() {
+        const isKbd = state.upperPage === 'kbd';
         const isMetro = state.upperPage === 'metro';
         const isWave = state.upperPage === 'wave';
         const isPins = state.upperPage === 'pins';
 
+        dotUpperKbd.classList.toggle('active-kbd', isKbd);
         dotUpperMetro.classList.toggle('active-metro', isMetro);
         dotUpperMetro.classList.toggle('metro-running-hint', !isMetro && state.metroRunning);
         dotUpperWave.classList.toggle('active', isWave);
@@ -8006,6 +8440,7 @@
       }
 
       function setUpperPage(page, opts = {}) {
+        const prevPage = state.upperPage;
         const nextPage = UPPER_PAGES.includes(page) ? page : 'wave';
         state.upperPage = nextPage;
 
@@ -8013,19 +8448,627 @@
         upperPagerViewport.scrollLeft = 0;
         upperPagerTrack.classList.remove('dragging');
         upperPagerTrack.style.transform = '';
+        upperPagerTrack.classList.toggle('page-kbd', nextPage === 'kbd');
         upperPagerTrack.classList.toggle('page-metro', nextPage === 'metro');
         upperPagerTrack.classList.toggle('page-wave', nextPage === 'wave');
         upperPagerTrack.classList.toggle('page-pins', nextPage === 'pins');
 
+        if (prevPage === 'kbd' && nextPage !== 'kbd') {
+          stopAllKeyboardNotes();
+          exitKbdLandscapeMode();
+        }
+        syncKbdImmersiveLayout();
         updateUpperDotsUI();
 
-        if (nextPage === 'pins') {
+        if (nextPage === 'kbd') {
+          updateKeyboardUI();
+        } else if (nextPage === 'pins') {
           renderMarkerList();
           if (opts.scrollActive !== false) {
             requestAnimationFrame(() => scrollActiveMarkerIntoView(upperMarkerListWrap));
           }
         } else if (nextPage === 'wave') {
           renderOverviewCanvas();
+        }
+      }
+
+      // ==================== 2-OCTAVE POLYPHONIC MUSICAL KEYBOARD (PIANO / SYNTH / FLUTE / VIOLIN) ====================
+      const KBD_NOTE_NAMES = ['C', 'C#', 'D', 'Eb', 'E', 'F', 'F#', 'G', 'Ab', 'A', 'Bb', 'B'];
+      const KBD_WHITE_SEMITONES = [0, 2, 4, 5, 7, 9, 11, 12, 14, 16, 17, 19, 21, 23, 24];
+      const KBD_BLACK_DEFS = [
+        { semi: 1, slot: 0.96 },
+        { semi: 3, slot: 2.04 },
+        { semi: 6, slot: 3.94 },
+        { semi: 8, slot: 5.00 },
+        { semi: 10, slot: 6.06 },
+        { semi: 13, slot: 7.96 },
+        { semi: 15, slot: 9.04 },
+        { semi: 18, slot: 10.94 },
+        { semi: 20, slot: 12.00 },
+        { semi: 22, slot: 13.06 }
+      ];
+
+      const kbd = {
+        masterGain: null,
+        limiter: null,
+        noiseBuf: null,
+        voices: new Map(), // keyIndex (0..24) -> { stop(immediate?), midi, freq, keyEl }
+        heldKeys: new Set(), // keyIndex (0..24) currently latched in HOLD mode
+        activeTouches: new Map(), // touchId -> keyIndex
+        mouseDownKey: null,
+        keyEls: new Map(), // keyIndex -> DOM element
+        forceImmersive: false,
+        orientationLockedByKbd: false,
+        fullscreenByKbd: false
+      };
+
+      function ensureKbdAudioBus() {
+        initAudioGraph();
+        if (!audioCtx) return null;
+        if (kbd.masterGain && kbd.masterGain.context === audioCtx) {
+          return kbd.masterGain;
+        }
+        const master = audioCtx.createGain();
+        master.gain.value = 0.72;
+
+        const lim = audioCtx.createDynamicsCompressor();
+        lim.threshold.value = -3.0;
+        lim.knee.value = 6.0;
+        lim.ratio.value = 12.0;
+        lim.attack.value = 0.002;
+        lim.release.value = 0.09;
+
+        master.connect(lim);
+        lim.connect(audioCtx.destination);
+        kbd.masterGain = master;
+        kbd.limiter = lim;
+        return master;
+      }
+
+      function ensureKbdNoiseBuffer() {
+        if (!audioCtx) return null;
+        if (kbd.noiseBuf && kbd.noiseBuf.sampleRate === audioCtx.sampleRate) {
+          return kbd.noiseBuf;
+        }
+        const sr = audioCtx.sampleRate;
+        const len = Math.floor(sr * 1.0);
+        const buf = audioCtx.createBuffer(1, len, sr);
+        const data = buf.getChannelData(0);
+        for (let i = 0; i < len; i++) {
+          data[i] = Math.random() * 2 - 1;
+        }
+        kbd.noiseBuf = buf;
+        return buf;
+      }
+
+      function getKbdKeyMidi(keyIndex) {
+        // C{oct} = (oct + 1) * 12 (e.g., C4 = MIDI 60)
+        return (state.kbdOctave + 1) * 12 + keyIndex + state.kbdTranspose;
+      }
+
+      function midiToFreq(midi) {
+        return state.tunerA4 * Math.pow(2, (midi - 69) / 12);
+      }
+
+      function midiToNoteLabel(midi, withOctave = true) {
+        const idx = ((midi % 12) + 12) % 12;
+        const oct = Math.floor(midi / 12) - 1;
+        return withOctave ? `${KBD_NOTE_NAMES[idx]}${oct}` : KBD_NOTE_NAMES[idx];
+      }
+
+      function buildKeyboardDOM() {
+        if (!kbdWhites || !kbdBlacks) return;
+        kbdWhites.innerHTML = '';
+        kbdBlacks.innerHTML = '';
+        kbd.keyEls.clear();
+
+        // 15 White Keys (2 full octaves + top tonic C)
+        KBD_WHITE_SEMITONES.forEach((semi) => {
+          const el = document.createElement('div');
+          el.className = 'kbd-key-white' + (semi % 12 === 0 ? ' is-tonic' : '');
+          el.dataset.kbdKey = String(semi);
+          const lbl = document.createElement('span');
+          lbl.className = 'kbd-key-label mono';
+          el.appendChild(lbl);
+          kbdWhites.appendChild(el);
+          kbd.keyEls.set(semi, el);
+        });
+
+        // 10 Black Keys positioned precisely across the 15 white-key slots
+        const whiteW = 100 / 15;
+        const blackW = whiteW * 0.64;
+        KBD_BLACK_DEFS.forEach((def) => {
+          const el = document.createElement('div');
+          el.className = 'kbd-key-black';
+          el.dataset.kbdKey = String(def.semi);
+          el.style.width = `${blackW.toFixed(3)}%`;
+          el.style.left = `${(def.slot * whiteW - blackW * 0.5).toFixed(3)}%`;
+          const lbl = document.createElement('span');
+          lbl.className = 'kbd-key-label mono';
+          el.appendChild(lbl);
+          kbdBlacks.appendChild(el);
+          kbd.keyEls.set(def.semi, el);
+        });
+
+        updateKeyboardKeyLabels();
+      }
+
+      function updateKeyboardKeyLabels() {
+        kbd.keyEls.forEach((el, semi) => {
+          const midi = getKbdKeyMidi(semi);
+          const lbl = el.querySelector('.kbd-key-label');
+          if (!lbl) return;
+          const isBlack = el.classList.contains('kbd-key-black');
+          const showOct = !isBlack && (semi % 12 === 0 || state.kbdTranspose !== 0);
+          lbl.textContent = midiToNoteLabel(midi, showOct);
+        });
+      }
+
+      function updateKbdNoteReadout() {
+        if (!kbdNoteReadout) return;
+        const activeList = [];
+        kbd.voices.forEach((v) => activeList.push(v));
+        if (activeList.length === 0) {
+          const low = midiToNoteLabel(getKbdKeyMidi(0), true);
+          const high = midiToNoteLabel(getKbdKeyMidi(24), true);
+          kbdNoteReadout.textContent = `${low}〜${high}`;
+          return;
+        }
+        activeList.sort((a, b) => a.midi - b.midi);
+        if (activeList.length === 1) {
+          const v = activeList[0];
+          kbdNoteReadout.textContent = `${midiToNoteLabel(v.midi, true)} ${v.freq.toFixed(1)}Hz`;
+        } else {
+          kbdNoteReadout.textContent = activeList.slice(0, 4).map(v => midiToNoteLabel(v.midi, true)).join(' ');
+        }
+      }
+
+      function startKeyboardVoice(keyIndex) {
+        const bus = ensureKbdAudioBus();
+        if (!bus || !audioCtx) return;
+
+        // Re-trigger cleanly if already sounding
+        if (kbd.voices.has(keyIndex)) {
+          stopKeyboardVoice(keyIndex, true);
+        }
+
+        // Gentle polyphony cap (12 voices max) to keep mobile CPU smooth
+        if (kbd.voices.size >= 12) {
+          const oldestKey = kbd.voices.keys().next().value;
+          if (oldestKey !== undefined) {
+            kbd.heldKeys.delete(oldestKey);
+            stopKeyboardVoice(oldestKey, true);
+          }
+        }
+
+        const midi = getKbdKeyMidi(keyIndex);
+        const freq = midiToFreq(midi);
+        const now = audioCtx.currentTime;
+        const inst = state.kbdInst;
+
+        const env = audioCtx.createGain();
+        env.gain.setValueAtTime(0.0001, now);
+        env.connect(bus);
+
+        const nodesToStop = [];
+        const nodesToDisconnect = [env];
+        let releaseSec = 0.14;
+
+        if (inst === 'piano') {
+          // Warm acoustic grand piano: 3 partials + dynamic lowpass bloom + soft hammer transient
+          const lpf = audioCtx.createBiquadFilter();
+          lpf.type = 'lowpass';
+          const brightStart = Math.min(10500, Math.max(1200, freq * 8.5));
+          const brightEnd = Math.min(2800, Math.max(420, freq * 2.8));
+          lpf.frequency.setValueAtTime(brightStart, now);
+          lpf.frequency.exponentialRampToValueAtTime(brightEnd, now + 1.15);
+          lpf.Q.value = 0.7;
+          lpf.connect(env);
+          nodesToDisconnect.push(lpf);
+
+          const partials = [
+            { type: 'triangle', mult: 1, detune: 0, gain: 0.58 },
+            { type: 'sine', mult: 2, detune: 1.6, gain: 0.27 },
+            { type: 'sine', mult: 3, detune: -1.4, gain: 0.11 },
+            { type: 'sine', mult: 4, detune: 2.2, gain: 0.04 }
+          ];
+          partials.forEach((p) => {
+            if (freq * p.mult > audioCtx.sampleRate * 0.45) return;
+            const osc = audioCtx.createOscillator();
+            const g = audioCtx.createGain();
+            osc.type = p.type;
+            osc.frequency.setValueAtTime(freq * p.mult, now);
+            osc.detune.setValueAtTime(p.detune, now);
+            g.gain.setValueAtTime(p.gain, now);
+            osc.connect(g);
+            g.connect(lpf);
+            osc.start(now);
+            nodesToStop.push(osc);
+            nodesToDisconnect.push(osc, g);
+          });
+
+          // Subtle hammer strike noise burst (~14ms)
+          const nb = ensureKbdNoiseBuffer();
+          if (nb) {
+            const nSrc = audioCtx.createBufferSource();
+            nSrc.buffer = nb;
+            const bp = audioCtx.createBiquadFilter();
+            bp.type = 'bandpass';
+            bp.frequency.setValueAtTime(Math.min(6000, freq * 3.5), now);
+            bp.Q.value = 1.6;
+            const ng = audioCtx.createGain();
+            ng.gain.setValueAtTime(0.18, now);
+            ng.gain.exponentialRampToValueAtTime(0.0005, now + 0.018);
+            nSrc.connect(bp);
+            bp.connect(ng);
+            ng.connect(env);
+            nSrc.start(now);
+            nSrc.stop(now + 0.025);
+            nodesToDisconnect.push(nSrc, bp, ng);
+          }
+
+          const decayDur = Math.max(1.2, Math.min(3.8, 3.6 - (midi - 36) * 0.045));
+          env.gain.linearRampToValueAtTime(0.95, now + 0.005);
+          env.gain.exponentialRampToValueAtTime(0.32, now + 0.45);
+          env.gain.exponentialRampToValueAtTime(0.06, now + decayDur);
+          releaseSec = 0.17;
+        } else if (inst === 'synth') {
+          // Crisp, stable electronic keyboard / tuning synth
+          const lpf = audioCtx.createBiquadFilter();
+          lpf.type = 'lowpass';
+          lpf.frequency.setValueAtTime(Math.min(5400, Math.max(1400, freq * 4.5)), now);
+          lpf.Q.value = 1.1;
+          lpf.connect(env);
+          nodesToDisconnect.push(lpf);
+
+          const osc1 = audioCtx.createOscillator();
+          const osc2 = audioCtx.createOscillator();
+          const g1 = audioCtx.createGain();
+          const g2 = audioCtx.createGain();
+          osc1.type = 'triangle';
+          osc2.type = 'sawtooth';
+          osc1.frequency.setValueAtTime(freq, now);
+          osc2.frequency.setValueAtTime(freq, now);
+          osc2.detune.setValueAtTime(3.0, now);
+          g1.gain.value = 0.62;
+          g2.gain.value = 0.22;
+          osc1.connect(g1); g1.connect(lpf);
+          osc2.connect(g2); g2.connect(lpf);
+          osc1.start(now); osc2.start(now);
+          nodesToStop.push(osc1, osc2);
+          nodesToDisconnect.push(osc1, osc2, g1, g2);
+
+          env.gain.linearRampToValueAtTime(0.82, now + 0.008);
+          env.gain.linearRampToValueAtTime(0.68, now + 0.14);
+          releaseSec = 0.095;
+        } else if (inst === 'flute') {
+          // Expressive concert flute: pure sine harmonics + airy chiff + delayed vibrato
+          const vibratoLfo = audioCtx.createOscillator();
+          const vibratoGain = audioCtx.createGain();
+          vibratoLfo.type = 'sine';
+          vibratoLfo.frequency.setValueAtTime(5.1, now);
+          vibratoGain.gain.setValueAtTime(0.0, now);
+          vibratoGain.gain.setValueAtTime(0.0, now + 0.26);
+          vibratoGain.gain.linearRampToValueAtTime(4.8, now + 0.85);
+          vibratoLfo.connect(vibratoGain);
+          vibratoLfo.start(now);
+          nodesToStop.push(vibratoLfo);
+          nodesToDisconnect.push(vibratoLfo, vibratoGain);
+
+          const flutePartials = [
+            { mult: 1, gain: 0.72 },
+            { mult: 2, gain: 0.20 },
+            { mult: 3, gain: 0.055 }
+          ];
+          flutePartials.forEach((p) => {
+            if (freq * p.mult > audioCtx.sampleRate * 0.45) return;
+            const osc = audioCtx.createOscillator();
+            const g = audioCtx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(freq * p.mult, now);
+            vibratoGain.connect(osc.detune);
+            g.gain.value = p.gain;
+            osc.connect(g);
+            g.connect(env);
+            osc.start(now);
+            nodesToStop.push(osc);
+            nodesToDisconnect.push(osc, g);
+          });
+
+          // Soft breathy chiff air component
+          const nb = ensureKbdNoiseBuffer();
+          if (nb) {
+            const nSrc = audioCtx.createBufferSource();
+            nSrc.buffer = nb;
+            nSrc.loop = true;
+            const bp = audioCtx.createBiquadFilter();
+            bp.type = 'bandpass';
+            bp.frequency.setValueAtTime(Math.min(5800, Math.max(700, freq * 1.55)), now);
+            bp.Q.value = 3.2;
+            const ng = audioCtx.createGain();
+            ng.gain.setValueAtTime(0.001, now);
+            ng.gain.linearRampToValueAtTime(0.095, now + 0.032);
+            ng.gain.exponentialRampToValueAtTime(0.022, now + 0.16);
+            nSrc.connect(bp);
+            bp.connect(ng);
+            ng.connect(env);
+            nSrc.start(now);
+            nodesToStop.push(nSrc);
+            nodesToDisconnect.push(nSrc, bp, ng);
+          }
+
+          env.gain.linearRampToValueAtTime(0.86, now + 0.058);
+          env.gain.linearRampToValueAtTime(0.76, now + 0.22);
+          releaseSec = 0.135;
+        } else {
+          // Violin: bowed detuned sawtooth pair + violin body formant resonances + expressive vibrato
+          const bodyLo = audioCtx.createBiquadFilter();
+          bodyLo.type = 'peaking';
+          bodyLo.frequency.value = 460;
+          bodyLo.Q.value = 1.8;
+          bodyLo.gain.value = 4.2;
+
+          const bodyHi = audioCtx.createBiquadFilter();
+          bodyHi.type = 'peaking';
+          bodyHi.frequency.value = 2650;
+          bodyHi.Q.value = 2.0;
+          bodyHi.gain.value = 3.0;
+
+          const lpf = audioCtx.createBiquadFilter();
+          lpf.type = 'lowpass';
+          lpf.frequency.setValueAtTime(Math.min(5200, Math.max(1500, freq * 5.2)), now);
+          lpf.Q.value = 0.85;
+
+          bodyLo.connect(bodyHi);
+          bodyHi.connect(lpf);
+          lpf.connect(env);
+          nodesToDisconnect.push(bodyLo, bodyHi, lpf);
+
+          const vibratoLfo = audioCtx.createOscillator();
+          const vibratoGain = audioCtx.createGain();
+          vibratoLfo.type = 'sine';
+          vibratoLfo.frequency.setValueAtTime(5.6, now);
+          vibratoGain.gain.setValueAtTime(0.0, now);
+          vibratoGain.gain.setValueAtTime(0.0, now + 0.20);
+          vibratoGain.gain.linearRampToValueAtTime(7.5, now + 0.72);
+          vibratoLfo.connect(vibratoGain);
+          vibratoLfo.start(now);
+          nodesToStop.push(vibratoLfo);
+          nodesToDisconnect.push(vibratoLfo, vibratoGain);
+
+          const osc1 = audioCtx.createOscillator();
+          const osc2 = audioCtx.createOscillator();
+          const g1 = audioCtx.createGain();
+          const g2 = audioCtx.createGain();
+          osc1.type = 'sawtooth';
+          osc2.type = 'sawtooth';
+          osc1.frequency.setValueAtTime(freq, now);
+          osc2.frequency.setValueAtTime(freq, now);
+          osc1.detune.setValueAtTime(-2.4, now);
+          osc2.detune.setValueAtTime(2.4, now);
+          vibratoGain.connect(osc1.detune);
+          vibratoGain.connect(osc2.detune);
+          g1.gain.value = 0.28;
+          g2.gain.value = 0.24;
+          osc1.connect(g1); g1.connect(bodyLo);
+          osc2.connect(g2); g2.connect(bodyLo);
+          osc1.start(now); osc2.start(now);
+          nodesToStop.push(osc1, osc2);
+          nodesToDisconnect.push(osc1, osc2, g1, g2);
+
+          env.gain.linearRampToValueAtTime(0.80, now + 0.085);
+          env.gain.linearRampToValueAtTime(0.72, now + 0.24);
+          releaseSec = 0.18;
+        }
+
+        const keyEl = kbd.keyEls.get(keyIndex);
+        if (keyEl) {
+          keyEl.classList.add('pressed');
+          keyEl.classList.toggle('held', state.kbdHold && kbd.heldKeys.has(keyIndex));
+        }
+
+        let stopped = false;
+        const stop = (immediate = false) => {
+          if (stopped) return;
+          stopped = true;
+          const t = audioCtx.currentTime;
+          const rel = immediate ? 0.02 : releaseSec;
+          try {
+            env.gain.cancelScheduledValues(t);
+            env.gain.setValueAtTime(Math.max(0.0001, env.gain.value), t);
+            env.gain.exponentialRampToValueAtTime(0.0001, t + rel);
+            nodesToStop.forEach((n) => {
+              try { n.stop(t + rel + 0.03); } catch (_) {}
+            });
+            setTimeout(() => {
+              nodesToDisconnect.forEach((n) => {
+                try { n.disconnect(); } catch (_) {}
+              });
+            }, Math.round((rel + 0.07) * 1000));
+          } catch (_) {}
+          if (keyEl) {
+            keyEl.classList.remove('pressed', 'held');
+          }
+        };
+
+        kbd.voices.set(keyIndex, { stop, midi, freq, keyEl });
+        updateKbdNoteReadout();
+      }
+
+      function stopKeyboardVoice(keyIndex, immediate = false) {
+        const v = kbd.voices.get(keyIndex);
+        if (!v) return;
+        kbd.voices.delete(keyIndex);
+        v.stop(immediate);
+        updateKbdNoteReadout();
+      }
+
+      function stopAllKeyboardNotes() {
+        kbd.heldKeys.clear();
+        kbd.activeTouches.clear();
+        kbd.mouseDownKey = null;
+        const keys = Array.from(kbd.voices.keys());
+        keys.forEach((k) => stopKeyboardVoice(k, true));
+        kbd.keyEls.forEach((el) => el.classList.remove('pressed', 'held'));
+        updateKbdNoteReadout();
+      }
+
+      function handleKeyPressDown(keyIndex) {
+        if (state.kbdHold) {
+          if (kbd.heldKeys.has(keyIndex)) {
+            kbd.heldKeys.delete(keyIndex);
+            stopKeyboardVoice(keyIndex, false);
+          } else {
+            kbd.heldKeys.add(keyIndex);
+            startKeyboardVoice(keyIndex);
+          }
+          return;
+        }
+        startKeyboardVoice(keyIndex);
+      }
+
+      function handleKeyReleaseUp(keyIndex) {
+        if (state.kbdHold) return;
+        // Keep playing if another touch is still holding this exact key
+        for (const activeKey of kbd.activeTouches.values()) {
+          if (activeKey === keyIndex) return;
+        }
+        if (kbd.mouseDownKey === keyIndex) return;
+        stopKeyboardVoice(keyIndex, false);
+      }
+
+      function hitTestKeyboardKey(clientX, clientY) {
+        const el = document.elementFromPoint(clientX, clientY);
+        if (!el) return null;
+        const keyEl = el.closest ? el.closest('[data-kbd-key]') : null;
+        if (!keyEl) return null;
+        const idx = parseInt(keyEl.dataset.kbdKey, 10);
+        return isFinite(idx) ? idx : null;
+      }
+
+      function setKbdInstrument(inst) {
+        if (!['piano', 'synth', 'flute', 'violin'].includes(inst)) return;
+        state.kbdInst = inst;
+        document.querySelectorAll('.kbd-inst-btn').forEach((btn) => {
+          btn.classList.toggle('active', btn.dataset.kbdInst === inst);
+        });
+        saveAppPrefs();
+      }
+
+      function setKbdOctave(oct) {
+        const clamped = Math.max(1, Math.min(6, Math.round(Number(oct) || 4)));
+        if (clamped === state.kbdOctave) return;
+        stopAllKeyboardNotes();
+        state.kbdOctave = clamped;
+        updateKeyboardUI();
+        saveAppPrefs();
+      }
+
+      function setKbdTranspose(semi) {
+        const clamped = Math.max(-6, Math.min(6, Math.round(Number(semi) || 0)));
+        if (clamped === state.kbdTranspose) return;
+        stopAllKeyboardNotes();
+        state.kbdTranspose = clamped;
+        updateKeyboardUI();
+        saveAppPrefs();
+      }
+
+      function toggleKbdHold() {
+        state.kbdHold = !state.kbdHold;
+        if (!state.kbdHold) {
+          stopAllKeyboardNotes();
+        }
+        updateKeyboardUI();
+        showToast(state.kbdHold ? '鍵盤持続(HOLD): ON（もう一度押すと止まります）' : '鍵盤持続(HOLD): OFF');
+      }
+
+      function updateKeyboardUI() {
+        document.querySelectorAll('.kbd-inst-btn').forEach((btn) => {
+          btn.classList.toggle('active', btn.dataset.kbdInst === state.kbdInst);
+        });
+
+        const keyIdx = ((state.kbdTranspose % 12) + 12) % 12;
+        const keyName = KBD_NOTE_NAMES[keyIdx];
+        const sign = state.kbdTranspose > 0 ? `+${state.kbdTranspose}` : (state.kbdTranspose < 0 ? `${state.kbdTranspose}` : '');
+        if (kbdKeyVal) {
+          kbdKeyVal.textContent = sign ? `キー:${keyName}(${sign})` : `キー:${keyName}`;
+        }
+        if (kbdOctVal) {
+          kbdOctVal.textContent = `Oct:${state.kbdOctave}`;
+        }
+        if (kbdA4Val) {
+          kbdA4Val.textContent = `${state.tunerA4}Hz`;
+        }
+        if (btnKbdHold) {
+          btnKbdHold.classList.toggle('active-hold', state.kbdHold);
+        }
+        const isImmersive = document.body.classList.contains('kbd-immersive');
+        if (btnKbdLandscape) {
+          btnKbdLandscape.classList.toggle('active-land', isImmersive);
+          btnKbdLandscape.textContent = isImmersive ? '標準' : '横画面';
+        }
+        updateKeyboardKeyLabels();
+        updateKbdNoteReadout();
+      }
+
+      function syncKbdImmersiveLayout() {
+        const isLand = window.innerWidth > window.innerHeight;
+        const wantImmersive = (state.upperPage === 'kbd') && (isLand || kbd.forceImmersive);
+        document.body.classList.toggle('kbd-immersive', wantImmersive);
+        if (state.upperPage === 'kbd') {
+          updateKeyboardUI();
+        }
+      }
+
+      async function enterKbdLandscapeMode() {
+        kbd.forceImmersive = true;
+        syncKbdImmersiveLayout();
+        try {
+          if (!isInFullscreen()) {
+            const el = document.documentElement;
+            if (el.requestFullscreen) {
+              await el.requestFullscreen({ navigationUI: 'hide' });
+              kbd.fullscreenByKbd = true;
+            } else if (el.webkitRequestFullscreen) {
+              el.webkitRequestFullscreen();
+              kbd.fullscreenByKbd = true;
+            }
+          }
+          if (screen.orientation && screen.orientation.lock) {
+            await screen.orientation.lock('landscape');
+            kbd.orientationLockedByKbd = true;
+          }
+        } catch (_) {
+          if (window.innerWidth <= window.innerHeight) {
+            showToast('スマホを横向きに傾けると2オクターブをさらに広く弾けます');
+          }
+        }
+        syncKbdImmersiveLayout();
+      }
+
+      function exitKbdLandscapeMode() {
+        kbd.forceImmersive = false;
+        try {
+          if (kbd.orientationLockedByKbd && screen.orientation && screen.orientation.unlock) {
+            screen.orientation.unlock();
+          }
+        } catch (_) {}
+        kbd.orientationLockedByKbd = false;
+        try {
+          if (kbd.fullscreenByKbd && isInFullscreen()) {
+            if (document.exitFullscreen) document.exitFullscreen().catch(() => {});
+            else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+          }
+        } catch (_) {}
+        kbd.fullscreenByKbd = false;
+        syncKbdImmersiveLayout();
+      }
+
+      function toggleKbdLandscapeMode() {
+        if (document.body.classList.contains('kbd-immersive') && (kbd.forceImmersive || kbd.orientationLockedByKbd)) {
+          exitKbdLandscapeMode();
+        } else {
+          enterKbdLandscapeMode();
         }
       }
 
@@ -8597,6 +9640,7 @@
 
       function updateTunerA4UI() {
         if (tunerA4Text) tunerA4Text.textContent = `A=${state.tunerA4}`;
+        if (kbdA4Val) kbdA4Val.textContent = `${state.tunerA4}Hz`;
       }
 
       function setTunerA4(hz) {
@@ -9102,6 +10146,107 @@
       btnTunerToggle.addEventListener('click', toggleTuner);
       document.getElementById('btnTunerA4Down').addEventListener('click', () => setTunerA4(state.tunerA4 - 1));
       document.getElementById('btnTunerA4Up').addEventListener('click', () => setTunerA4(state.tunerA4 + 1));
+
+      // 2-Octave Keyboard Listeners (Multi-touch polyphony + glissando + controls)
+      document.getElementById('btnKbdToMetro').addEventListener('click', () => setUpperPage('metro', { scrollActive: false }));
+      document.querySelectorAll('.kbd-inst-btn').forEach((btn) => {
+        btn.addEventListener('click', () => setKbdInstrument(btn.dataset.kbdInst));
+      });
+      document.getElementById('btnKbdKeyDown').addEventListener('click', () => setKbdTranspose(state.kbdTranspose - 1));
+      document.getElementById('btnKbdKeyUp').addEventListener('click', () => setKbdTranspose(state.kbdTranspose + 1));
+      kbdKeyVal.addEventListener('click', () => {
+        setKbdTranspose(0);
+        showToast('キー基準を C (±0) にリセットしました');
+      });
+      document.getElementById('btnKbdOctDown').addEventListener('click', () => setKbdOctave(state.kbdOctave - 1));
+      document.getElementById('btnKbdOctUp').addEventListener('click', () => setKbdOctave(state.kbdOctave + 1));
+      kbdOctVal.addEventListener('click', () => {
+        setKbdOctave(4);
+        showToast('オクターブを Oct:4 (C4〜C6) にリセットしました');
+      });
+      document.getElementById('btnKbdA4Down').addEventListener('click', () => setTunerA4(state.tunerA4 - 1));
+      document.getElementById('btnKbdA4Up').addEventListener('click', () => setTunerA4(state.tunerA4 + 1));
+      kbdA4Val.addEventListener('click', () => {
+        setTunerA4(440);
+        showToast('基準ピッチを A=440Hz にリセットしました');
+      });
+      btnKbdHold.addEventListener('click', toggleKbdHold);
+      btnKbdLandscape.addEventListener('click', toggleKbdLandscapeMode);
+      document.getElementById('btnKbdTipLandscape').addEventListener('click', enterKbdLandscapeMode);
+
+      kbdStage.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        for (let i = 0; i < e.changedTouches.length; i++) {
+          const t = e.changedTouches[i];
+          const kIdx = hitTestKeyboardKey(t.clientX, t.clientY);
+          if (kIdx !== null) {
+            kbd.activeTouches.set(t.identifier, kIdx);
+            handleKeyPressDown(kIdx);
+          }
+        }
+      }, { passive: false });
+
+      kbdStage.addEventListener('touchmove', (e) => {
+        e.preventDefault();
+        if (state.kbdHold) return;
+        for (let i = 0; i < e.changedTouches.length; i++) {
+          const t = e.changedTouches[i];
+          const prevKey = kbd.activeTouches.get(t.identifier);
+          const nextKey = hitTestKeyboardKey(t.clientX, t.clientY);
+          if (nextKey !== prevKey) {
+            if (prevKey !== undefined && prevKey !== null) {
+              kbd.activeTouches.delete(t.identifier);
+              handleKeyReleaseUp(prevKey);
+            }
+            if (nextKey !== null) {
+              kbd.activeTouches.set(t.identifier, nextKey);
+              handleKeyPressDown(nextKey);
+            }
+          }
+        }
+      }, { passive: false });
+
+      const handleKbdTouchEnd = (e) => {
+        e.preventDefault();
+        for (let i = 0; i < e.changedTouches.length; i++) {
+          const t = e.changedTouches[i];
+          const prevKey = kbd.activeTouches.get(t.identifier);
+          if (prevKey !== undefined) {
+            kbd.activeTouches.delete(t.identifier);
+            handleKeyReleaseUp(prevKey);
+          }
+        }
+      };
+      kbdStage.addEventListener('touchend', handleKbdTouchEnd, { passive: false });
+      kbdStage.addEventListener('touchcancel', handleKbdTouchEnd, { passive: false });
+
+      kbdStage.addEventListener('mousedown', (e) => {
+        if (e.button !== 0) return;
+        e.preventDefault();
+        const kIdx = hitTestKeyboardKey(e.clientX, e.clientY);
+        if (kIdx !== null) {
+          kbd.mouseDownKey = kIdx;
+          handleKeyPressDown(kIdx);
+        }
+      });
+
+      window.addEventListener('mousemove', (e) => {
+        if (kbd.mouseDownKey === null || state.kbdHold) return;
+        const nextKey = hitTestKeyboardKey(e.clientX, e.clientY);
+        if (nextKey !== kbd.mouseDownKey) {
+          const prevKey = kbd.mouseDownKey;
+          kbd.mouseDownKey = nextKey;
+          handleKeyReleaseUp(prevKey);
+          if (nextKey !== null) handleKeyPressDown(nextKey);
+        }
+      });
+
+      window.addEventListener('mouseup', () => {
+        if (kbd.mouseDownKey === null) return;
+        const prevKey = kbd.mouseDownKey;
+        kbd.mouseDownKey = null;
+        handleKeyReleaseUp(prevKey);
+      });
       document.getElementById('btnRecStop').addEventListener('click', stopRecording);
       document.getElementById('btnRecAddMarker').addEventListener('click', addMarkerDuringRecording);
       btnSaveWav.addEventListener('click', exportCurrentWav);
@@ -9149,7 +10294,7 @@
       });
 
       // ==================== GITHUB / PWA SOFTWARE UPDATE CHECK & APPLY ====================
-      const APP_VERSION = 'v18';
+      const APP_VERSION = 'v19';
       const appUpdateState = {
         checking: false,
         available: false,
@@ -9689,6 +10834,7 @@
       // Lifecycle persistence: save immediately when switching apps or closing browser, and redraw canvas on return
       document.addEventListener('visibilitychange', () => {
         if (document.hidden) {
+          stopAllKeyboardNotes();
           saveCurrentFileMemory(true);
           saveAppPrefs();
         } else {
@@ -9713,11 +10859,21 @@
         renderAllCanvases();
       });
 
-      // Resize & Startup Render + Automatic Session Restore
+      // Resize, Orientation & Startup Render + Automatic Session Restore
       window.addEventListener('resize', () => {
         upperPagerViewport.scrollLeft = 0;
+        syncKbdImmersiveLayout();
         renderAllCanvases();
       });
+      if (screen.orientation && screen.orientation.addEventListener) {
+        screen.orientation.addEventListener('change', () => {
+          setTimeout(() => {
+            upperPagerViewport.scrollLeft = 0;
+            syncKbdImmersiveLayout();
+            renderAllCanvases();
+          }, 80);
+        });
+      }
       window.onload = async () => {
         loadAppPrefs();
         updateWaveGainUI();
@@ -9726,9 +10882,11 @@
         updateRecSettingsUI();
         refreshMicDeviceList();
         initTunerBars();
+        buildKeyboardDOM();
         updateTunerA4UI();
         clearTunerVisuals('OFF');
         updateMetroUI();
+        updateKeyboardUI();
         setUpperPage('wave', { scrollActive: false });
         updateSectionBarUI();
         updateStartupLastFileHint();
