@@ -222,81 +222,31 @@
       overflow: hidden;
     }
 
-    /* Upper Area 2-Page Switcher Bar (Left: Full Waveform / Right: Pin List) */
-    .upper-pager-bar {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      background: #141418;
-      border-bottom: 1px solid var(--border-subtle);
-      flex-shrink: 0;
-      z-index: 5;
-    }
-
-    .upper-page-tab {
-      position: relative;
-      height: 28px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 5px;
-      font-size: 11.5px;
-      font-weight: 700;
-      color: var(--text-dim);
-      transition: color 0.14s ease, background-color 0.14s ease;
-    }
-
-    .upper-page-tab:active {
-      background: rgba(255, 255, 255, 0.04);
-    }
-
-    .upper-page-tab.active {
-      color: #ffffff;
-      background: rgba(66, 165, 245, 0.08);
-    }
-
-    .upper-page-tab.active::after {
-      content: '';
-      position: absolute;
-      left: 16%;
-      right: 16%;
-      bottom: 0;
-      height: 2px;
-      border-radius: 2px 2px 0 0;
-      background: var(--accent-blue);
-    }
-
-    .upper-page-tab[data-page="pins"].active::after {
-      background: var(--accent-yellow);
-    }
-
-    .upper-tab-count {
-      font-size: 10px;
-      padding: 0 5px;
-      border-radius: 999px;
-      background: rgba(250, 204, 21, 0.16);
-      color: #fde047;
-      line-height: 1.5;
-    }
-
+    /* Upper Area Home-Screen-Style 2-Page Swipe Pager (Left: Full Waveform / Right: Pin List) */
     .upper-pager-viewport {
       position: relative;
       flex: 1;
       min-height: 0;
       width: 100%;
       overflow: hidden;
+      overflow: clip;
     }
 
     .upper-pager-track {
       display: flex;
       width: 200%;
       height: 100%;
-      transform: translateX(0%);
-      transition: transform 0.24s cubic-bezier(0.22, 1, 0.36, 1);
+      transform: translate3d(0%, 0, 0);
+      transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
       will-change: transform;
     }
 
+    .upper-pager-track.dragging {
+      transition: none;
+    }
+
     .upper-pager-track.show-pins {
-      transform: translateX(-50%);
+      transform: translate3d(-50%, 0, 0);
     }
 
     .upper-page {
@@ -308,7 +258,7 @@
     }
 
     .upper-page-wave {
-      padding: 4px 6px;
+      padding: 4px 6px 10px;
     }
 
     .upper-page-pins {
@@ -321,17 +271,53 @@
       flex: 1;
       min-height: 0;
       overflow-y: auto;
+      overflow-x: hidden;
       -webkit-overflow-scrolling: touch;
+      touch-action: pan-y;
       padding: 6px 8px 4px;
     }
 
     .upper-pin-footer {
       display: flex;
       gap: 8px;
-      padding: 5px 8px 6px;
+      padding: 5px 8px 12px;
       background: #141418;
       border-top: 1px solid var(--border-subtle);
       flex-shrink: 0;
+    }
+
+    /* Minimal Home-Screen-Style 2-Dot Page Indicator (non-blocking, zero vertical bloat) */
+    .upper-page-dots {
+      position: absolute;
+      left: 50%;
+      bottom: 3px;
+      transform: translateX(-50%);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 2px 7px;
+      border-radius: 999px;
+      background: rgba(12, 12, 15, 0.55);
+      pointer-events: none;
+      z-index: 8;
+    }
+
+    .upper-dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.28);
+      transition: background-color 0.2s ease, transform 0.2s ease;
+    }
+
+    .upper-dot.active {
+      background: var(--accent-blue);
+      transform: scale(1.25);
+    }
+
+    .upper-dot.active-pins {
+      background: var(--accent-yellow);
+      transform: scale(1.25);
     }
 
     #overviewCanvas {
@@ -345,7 +331,7 @@
     /* Non-intrusive Waveform Analysis Progress Bar & Pill */
     .wave-progress-wrap {
       position: absolute;
-      top: 28px;
+      top: 0;
       left: 0;
       right: 0;
       z-index: 12;
@@ -1615,19 +1601,9 @@
 
   <!-- ==================== 2. WAVEFORM WORKSPACE ==================== -->
   <main class="waveform-workspace">
-    <!-- Upper Pane: 2-Page Workspace (Left [Default]: Full Overview Waveform / Right: Pin List) -->
+    <!-- Upper Pane: Home-Screen-Style 2-Page Swipe Area (Left [Default]: Full Waveform / Right: Pin List) -->
     <div class="overview-wrap">
-      <div id="upperPagerBar" class="upper-pager-bar" role="tablist" aria-label="上段表示切替">
-        <button id="btnUpperPageWave" type="button" data-page="wave" role="tab" aria-selected="true" class="upper-page-tab active">
-          <span>全体波形</span>
-        </button>
-        <button id="btnUpperPagePins" type="button" data-page="pins" role="tab" aria-selected="false" class="upper-page-tab">
-          <span>ピン一覧</span>
-          <span id="upperPinTabCount" class="upper-tab-count mono">0</span>
-        </button>
-      </div>
-
-      <div class="upper-pager-viewport">
+      <div id="upperPagerViewport" class="upper-pager-viewport">
         <div id="upperPagerTrack" class="upper-pager-track">
           <!-- Left Page (Default): Full Multi-Row Overview Waveform -->
           <div class="upper-page upper-page-wave">
@@ -1642,6 +1618,11 @@
               <button id="btnClearAllMarkersUpper" type="button" class="step-btn" style="color:#fca5a5;border-color:rgba(239,68,68,0.5);">全削除</button>
             </div>
           </div>
+        </div>
+
+        <div class="upper-page-dots" aria-hidden="true">
+          <span id="dotUpperWave" class="upper-dot active"></span>
+          <span id="dotUpperPins" class="upper-dot"></span>
         </div>
       </div>
 
@@ -2245,11 +2226,10 @@
       const waveProgressFill = document.getElementById('waveProgressFill');
       const waveProgressText = document.getElementById('waveProgressText');
       const startupLastHint = document.getElementById('startupLastHint');
-      const upperPagerBar = document.getElementById('upperPagerBar');
+      const upperPagerViewport = document.getElementById('upperPagerViewport');
       const upperPagerTrack = document.getElementById('upperPagerTrack');
-      const btnUpperPageWave = document.getElementById('btnUpperPageWave');
-      const btnUpperPagePins = document.getElementById('btnUpperPagePins');
-      const upperPinTabCount = document.getElementById('upperPinTabCount');
+      const dotUpperWave = document.getElementById('dotUpperWave');
+      const dotUpperPins = document.getElementById('dotUpperPins');
       const upperPagePins = document.getElementById('upperPagePins');
       const upperMarkerListWrap = document.getElementById('upperMarkerListWrap');
 
@@ -6119,21 +6099,170 @@
         return rIdx * rowDur + frac * rowDur;
       }
 
-      overviewCanvas.addEventListener('pointerdown', (e) => {
-        if (!state.hasAudio) return;
-        state.isDraggingOverview = true;
-        overviewCanvas.setPointerCapture(e.pointerId);
-        seekTo(overviewCoordsToTime(e.clientX, e.clientY), { setGreenPin: true });
+      // Home-Screen-Style Horizontal Swipe Pager + Tap-Only Cursor Move on Main Overview Waveform
+      const pagerDrag = {
+        active: false,
+        pointerId: null,
+        sourceType: null, // 'touch' | 'mouse'
+        startedOnCanvas: false,
+        startX: 0,
+        startY: 0,
+        lastX: 0,
+        lastPerf: 0,
+        velPxPerMs: 0,
+        mode: 'undecided', // 'undecided' | 'horizontal' | 'vertical'
+        suppressClickUntil: 0
+      };
+
+      function applyPagerDragOffset(dx) {
+        const vw = Math.max(1, upperPagerViewport.clientWidth);
+        const baseOffset = state.upperPage === 'pins' ? -vw : 0;
+        let targetPx = baseOffset + dx;
+        // Soft rubber-band resistance past left edge (page 0) or right edge (page 1)
+        if (targetPx > 0) {
+          targetPx = targetPx * 0.28;
+        } else if (targetPx < -vw) {
+          targetPx = -vw + (targetPx + vw) * 0.28;
+        }
+        upperPagerViewport.scrollLeft = 0;
+        upperPagerTrack.style.transform = `translate3d(${targetPx.toFixed(1)}px, 0, 0)`;
+      }
+
+      function beginPagerGesture(clientX, clientY, targetEl, sourceType) {
+        if (!state.hasAudio) return false;
+        pagerDrag.active = true;
+        pagerDrag.sourceType = sourceType;
+        pagerDrag.startedOnCanvas = (targetEl === overviewCanvas);
+        pagerDrag.startX = clientX;
+        pagerDrag.startY = clientY;
+        pagerDrag.lastX = clientX;
+        pagerDrag.lastPerf = performance.now();
+        pagerDrag.velPxPerMs = 0;
+        pagerDrag.mode = 'undecided';
+        upperPagerViewport.scrollLeft = 0;
+        return true;
+      }
+
+      function movePagerGesture(clientX, clientY, preventDefaultFn) {
+        if (!pagerDrag.active) return;
+        const dx = clientX - pagerDrag.startX;
+        const dy = clientY - pagerDrag.startY;
+        const absDx = Math.abs(dx);
+        const absDy = Math.abs(dy);
+
+        if (pagerDrag.mode === 'undecided') {
+          if (absDx > 10 && absDx > absDy * 1.15) {
+            pagerDrag.mode = 'horizontal';
+            state.isDraggingOverview = true;
+            upperPagerTrack.classList.add('dragging');
+          } else if (absDy > 12 && absDy > absDx * 1.15) {
+            pagerDrag.mode = 'vertical';
+          }
+        }
+
+        if (pagerDrag.mode === 'horizontal') {
+          if (preventDefaultFn) preventDefaultFn();
+          const now = performance.now();
+          const dt = Math.max(1, now - pagerDrag.lastPerf);
+          const instVel = (clientX - pagerDrag.lastX) / dt;
+          pagerDrag.velPxPerMs = pagerDrag.velPxPerMs * 0.55 + instVel * 0.45;
+          pagerDrag.lastX = clientX;
+          pagerDrag.lastPerf = now;
+          applyPagerDragOffset(dx);
+        }
+      }
+
+      function endPagerGesture(clientX, clientY, cancelled = false) {
+        if (!pagerDrag.active) return;
+        const wasHorizontal = pagerDrag.mode === 'horizontal';
+        const wasUndecided = pagerDrag.mode === 'undecided';
+        const startedOnCanvas = pagerDrag.startedOnCanvas;
+        const dx = clientX - pagerDrag.startX;
+        const dy = clientY - pagerDrag.startY;
+        const vel = pagerDrag.velPxPerMs;
+
+        pagerDrag.active = false;
+        pagerDrag.mode = 'undecided';
+        state.isDraggingOverview = false;
+        upperPagerTrack.classList.remove('dragging');
+        upperPagerTrack.style.transform = '';
+        upperPagerViewport.scrollLeft = 0;
+
+        if (cancelled) {
+          setUpperPage(state.upperPage, { scrollActive: false });
+          return;
+        }
+
+        if (wasHorizontal) {
+          pagerDrag.suppressClickUntil = performance.now() + 260;
+          const vw = Math.max(1, upperPagerViewport.clientWidth);
+          const distThreshold = vw * 0.22;
+          const velThreshold = 0.35;
+
+          if (state.upperPage === 'wave' && (dx < -distThreshold || (dx < -24 && vel < -velThreshold))) {
+            setUpperPage('pins');
+          } else if (state.upperPage === 'pins' && (dx > distThreshold || (dx > 24 && vel > velThreshold))) {
+            setUpperPage('wave');
+          } else {
+            setUpperPage(state.upperPage, { scrollActive: false });
+          }
+          return;
+        }
+
+        // Tap ONLY on the main overview waveform moves the cursor (no seek when dragging!)
+        if (startedOnCanvas && wasUndecided && state.upperPage === 'wave' && Math.hypot(dx, dy) <= 12) {
+          seekTo(overviewCoordsToTime(pagerDrag.startX, pagerDrag.startY), { setGreenPin: true });
+        }
+      }
+
+      // Suppress accidental click on pin rows immediately after finishing a horizontal swipe
+      upperPagerViewport.addEventListener('click', (e) => {
+        if (performance.now() < pagerDrag.suppressClickUntil) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+      }, true);
+
+      // Mobile Touch Events on Upper Pager Viewport (both Waveform Page & Pin List Page)
+      upperPagerViewport.addEventListener('touchstart', (e) => {
+        if (e.touches.length !== 1) return;
+        const t = e.touches[0];
+        beginPagerGesture(t.clientX, t.clientY, e.target, 'touch');
+      }, { passive: true });
+
+      upperPagerViewport.addEventListener('touchmove', (e) => {
+        if (!pagerDrag.active || pagerDrag.sourceType !== 'touch' || e.touches.length !== 1) return;
+        const t = e.touches[0];
+        movePagerGesture(t.clientX, t.clientY, () => e.preventDefault());
+      }, { passive: false });
+
+      upperPagerViewport.addEventListener('touchend', (e) => {
+        if (!pagerDrag.active || pagerDrag.sourceType !== 'touch') return;
+        const t = e.changedTouches[0];
+        endPagerGesture(t ? t.clientX : pagerDrag.lastX, t ? t.clientY : pagerDrag.startY, false);
+      }, { passive: true });
+
+      upperPagerViewport.addEventListener('touchcancel', () => {
+        if (!pagerDrag.active || pagerDrag.sourceType !== 'touch') return;
+        endPagerGesture(pagerDrag.lastX, pagerDrag.startY, true);
+      }, { passive: true });
+
+      // Desktop Mouse Support on Upper Pager Viewport
+      upperPagerViewport.addEventListener('mousedown', (e) => {
+        if (e.button !== 0) return;
+        // Let buttons inside pin list work normally unless dragged horizontally
+        beginPagerGesture(e.clientX, e.clientY, e.target, 'mouse');
       });
 
-      overviewCanvas.addEventListener('pointermove', (e) => {
-        if (!state.isDraggingOverview || !state.hasAudio) return;
-        seekTo(overviewCoordsToTime(e.clientX, e.clientY), { setGreenPin: true });
+      window.addEventListener('mousemove', (e) => {
+        if (!pagerDrag.active || pagerDrag.sourceType !== 'mouse') return;
+        movePagerGesture(e.clientX, e.clientY, () => e.preventDefault());
       });
 
-      const stopOverviewDrag = () => { state.isDraggingOverview = false; };
-      overviewCanvas.addEventListener('pointerup', stopOverviewDrag);
-      overviewCanvas.addEventListener('pointercancel', stopOverviewDrag);
+      window.addEventListener('mouseup', (e) => {
+        if (!pagerDrag.active || pagerDrag.sourceType !== 'mouse') return;
+        endPagerGesture(e.clientX, e.clientY, false);
+      });
 
       function stopInertia() {
         state.isInertiaActive = false;
@@ -6435,16 +6564,19 @@
         state.upperPage = nextPage;
         const isPins = nextPage === 'pins';
 
+        // Always lock horizontal scrollLeft to 0 so the viewport can never drift sideways
+        upperPagerViewport.scrollLeft = 0;
+        upperPagerTrack.classList.remove('dragging');
+        upperPagerTrack.style.transform = '';
         upperPagerTrack.classList.toggle('show-pins', isPins);
-        btnUpperPageWave.classList.toggle('active', !isPins);
-        btnUpperPagePins.classList.toggle('active', isPins);
-        btnUpperPageWave.setAttribute('aria-selected', String(!isPins));
-        btnUpperPagePins.setAttribute('aria-selected', String(isPins));
+
+        dotUpperWave.classList.toggle('active', !isPins);
+        dotUpperPins.classList.toggle('active-pins', isPins);
 
         if (isPins) {
           renderMarkerList();
           if (opts.scrollActive !== false) {
-            setTimeout(() => scrollActiveMarkerIntoView(upperMarkerListWrap), 60);
+            requestAnimationFrame(() => scrollActiveMarkerIntoView(upperMarkerListWrap));
           }
         } else {
           renderOverviewCanvas();
@@ -6541,7 +6673,6 @@
       function renderMarkerList() {
         const countStr = String(state.markers.length);
         document.getElementById('markerTabCount').textContent = countStr;
-        if (upperPinTabCount) upperPinTabCount.textContent = countStr;
         populateMarkerListContainer(upperMarkerListWrap, { closeSettingsOnSeek: false });
         populateMarkerListContainer(document.getElementById('markerListWrap'), { closeSettingsOnSeek: true });
       }
@@ -6561,15 +6692,22 @@
         });
       }
 
+      // Safe vertical-only scroll (never uses scrollIntoView(), which corrupts horizontal pager scrollLeft!)
       function scrollActiveMarkerIntoView(containerEl = null) {
-        const targetContainer = containerEl || document.getElementById('markerListWrap');
-        if (!targetContainer) return;
-        const activeEl = targetContainer.querySelector('.list-item.active-section');
-        if (activeEl) {
-          requestAnimationFrame(() => {
-            activeEl.scrollIntoView({ block: 'center', behavior: 'smooth' });
-          });
-        }
+        const targetContainer = containerEl || document.getElementById('panelMarkers');
+        const listWrap = containerEl || document.getElementById('markerListWrap');
+        if (!targetContainer || !listWrap) return;
+        const activeEl = listWrap.querySelector('.list-item.active-section');
+        if (!activeEl) return;
+
+        requestAnimationFrame(() => {
+          const scrollBox = (targetContainer === listWrap) ? targetContainer : targetContainer;
+          const boxRect = scrollBox.getBoundingClientRect();
+          const elRect = activeEl.getBoundingClientRect();
+          const desiredTop = scrollBox.scrollTop + (elRect.top - boxRect.top) - (boxRect.height * 0.5) + (elRect.height * 0.5);
+          scrollBox.scrollTop = Math.max(0, desiredTop);
+          upperPagerViewport.scrollLeft = 0;
+        });
       }
 
       function renderPlaylist() {
@@ -6672,42 +6810,7 @@
       btnSaveWav.addEventListener('click', exportCurrentWav);
       document.getElementById('headerInfo').addEventListener('click', () => openSettingsModal('settings'));
 
-      // Upper Area 2-Page Switcher Listeners (Left: Full Waveform / Right: Pin List)
-      btnUpperPageWave.addEventListener('click', () => setUpperPage('wave'));
-      btnUpperPagePins.addEventListener('click', () => setUpperPage('pins'));
-
-      // Swipe right on Pin List page -> return smoothly to Left Page (Full Waveform)
-      let upperPinSwipeStartX = 0;
-      let upperPinSwipeStartY = 0;
-      let upperPinSwipeTracking = false;
-      upperPagePins.addEventListener('touchstart', (e) => {
-        if (e.touches.length !== 1) return;
-        upperPinSwipeStartX = e.touches[0].clientX;
-        upperPinSwipeStartY = e.touches[0].clientY;
-        upperPinSwipeTracking = true;
-      }, { passive: true });
-      upperPagePins.addEventListener('touchend', (e) => {
-        if (!upperPinSwipeTracking || e.changedTouches.length === 0) return;
-        upperPinSwipeTracking = false;
-        const dx = e.changedTouches[0].clientX - upperPinSwipeStartX;
-        const dy = e.changedTouches[0].clientY - upperPinSwipeStartY;
-        if (dx > 60 && Math.abs(dx) > Math.abs(dy) * 1.45) {
-          setUpperPage('wave');
-        }
-      }, { passive: true });
-
-      // Swipe left/right on the thin top switcher bar itself
-      let barSwipeStartX = 0;
-      upperPagerBar.addEventListener('touchstart', (e) => {
-        if (e.touches.length === 1) barSwipeStartX = e.touches[0].clientX;
-      }, { passive: true });
-      upperPagerBar.addEventListener('touchend', (e) => {
-        if (e.changedTouches.length === 0) return;
-        const dx = e.changedTouches[0].clientX - barSwipeStartX;
-        if (dx < -40) setUpperPage('pins');
-        else if (dx > 40) setUpperPage('wave');
-      }, { passive: true });
-
+      // Upper Pin List Footer Actions
       document.getElementById('btnAddMarkerFromUpper').addEventListener('click', () => {
         addYellowPinAtCurrent();
         scrollActiveMarkerIntoView(upperMarkerListWrap);
@@ -6997,7 +7100,10 @@
       });
 
       // Resize & Startup Render + Automatic Session Restore
-      window.addEventListener('resize', renderAllCanvases);
+      window.addEventListener('resize', () => {
+        upperPagerViewport.scrollLeft = 0;
+        renderAllCanvases();
+      });
       window.onload = async () => {
         loadAppPrefs();
         updateWaveGainUI();
