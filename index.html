@@ -1862,7 +1862,7 @@
 
           <button id="btnEngVocoder" type="button" class="engine-card active">
             <div class="engine-name">● ボコーダ（同一位相ロック・ロボット声対策 / 標準）</div>
-            <div class="engine-desc">FFT 2048・75%重複ハニング窓＋スペクトルピーク位相ロックにより、0.30x低速でも音程を保ったまま機械的なビリビリ感を抑えます（半音ピッチ変更対応）。</div>
+            <div class="engine-desc">1.00x・原曲キー時はDSPを通さず原音そのままダイレクト再生。速度・ピッチ変更時のみ位相ロック・フェーズボコーダで高音質スロー再生します。</div>
           </button>
 
           <button id="btnEngNative" type="button" class="engine-card">
@@ -1908,7 +1908,7 @@
             <button type="button" data-boost="1.5" class="opt-pill boost-opt mono">150%</button>
             <button type="button" data-boost="2" class="opt-pill boost-opt mono">200%</button>
             <button type="button" data-boost="3" class="opt-pill boost-opt mono">300%</button>
-            <button type="button" data-boost="4" class="opt-pill boost-opt mono">400%</button>
+            <button type="button" data-boost="5" class="opt-pill boost-opt mono">500%</button>
           </div>
 
           <div class="sec-head" style="margin-top:12px;">
@@ -2128,6 +2128,7 @@
 
         // Real PCM Buffer & Multi-Resolution Min/Max Pyramid
         audioBuffer: null,
+        wavMeta: null,
         waveformPyramid: null,
         rawBlob: null,
         isFallbackLargeFile: false,
@@ -2255,8 +2256,26 @@
         return /\.(m4a|mp3|wav|aac|flac|ogg|opus|wma|aif|aiff|caf|3gp|mp4|webm)$/i.test(file.name);
       }
 
+      function isDirectPassthrough() {
+        return Math.abs(state.playbackRate - 1.0) < 0.005 && state.pitchSemitones === 0;
+      }
+
+      // Strictly mutually-exclusive active playback path:
+      //  - 'audioEl':      OS native <audio> element (native engine, large streamed WAV, or while PCM is decoding)
+      //  - 'bufferDirect': Native AudioBufferSourceNode (1.00x/±0 lossless passthrough OR tape variable-speed mode)
+      //  - 'vocoderDsp':   Identity phase-locked Phase Vocoder (only when speed != 1.00x or pitch != 0)
+      function getActivePlaybackPath() {
+        if (!state.audioBuffer || state.isFallbackLargeFile || state.engine === 'native') {
+          return 'audioEl';
+        }
+        if (state.engine === 'tape' || (state.engine === 'vocoder' && isDirectPassthrough())) {
+          return 'bufferDirect';
+        }
+        return 'vocoderDsp';
+      }
+
       function isUsingAudioEl() {
-        return state.engine === 'native' || !state.audioBuffer || state.isFallbackLargeFile;
+        return getActivePlaybackPath() === 'audioEl';
       }
 
       let waveProgressHideTimer = null;
@@ -2395,6 +2414,8 @@
 
       // ==================== WEB AUDIO GRAPH & 3 PLAYBACK ENGINES ====================
       let audioCtx = null;
+      let inputBusNode = null;
+      let postFilterNode = null;
       let vocoderNode = null;
       let mediaElSource = null;
       let tapeSourceNode = null;
@@ -2407,6 +2428,7 @@
       let masterBoostNode = null;
       let masterLimiterNode = null;
       let audioGraphReady = false;
+      let currentRouteKey = '';
 
       // ---------- Identity Phase-Locked Phase Vocoder (Laroche & Dolson, FFT 2048, Hop 512) ----------
       const PV_N = 2048;
@@ -2692,7 +2714,7 @@
       function onVocoderProcess(event) {
         const outL = event.outputBuffer.getChannelData(0);
         const outR = event.outputBuffer.getChannelData(1);
-        if (!state.isPlaying || !state.hasAudio || !state.audioBuffer || state.isFallbackLargeFile || state.engine !== 'vocoder') {
+        if (!state.isPlaying || !state.hasAudio || getActivePlaybackPath() !== 'vocoderDsp') {
           outL.fill(0);
           outR.fill(0);
           return;
@@ -2767,6 +2789,46 @@
         }
       }
 
+      function updateAudioRouting() {
+        if (!audioGraphReady || !audioCtx || !inputBusNode || !postFilterNode) return;
+
+        // Only engage Low-pass filter when slowing down with LPF enabled (bypass completely at 1.00x!)
+        const needLpf = state.lpfEnabled && state.playbackRate < 0.98 && !isDirectPassthrough();
+        // Only engage Reverb convolver when reverb preset is selected
+        const needReverb = state.reverbIndex > 0;
+        // Only engage Limiter when volume boost > 102% (bypass completely at 100% so zero dynamics compression!)
+        const needLimiter = getEffectiveBoost() > 1.02;
+
+        const key = `${needLpf ? 1 : 0}_${needReverb ? 1 : 0}_${needLimiter ? 1 : 0}`;
+        if (key === currentRouteKey) return;
+        currentRouteKey = key;
+
+        try { inputBusNode.disconnect(); } catch (_) {}
+        try { lowpassNode.disconnect(); } catch (_) {}
+        try { postFilterNode.disconnect(); } catch (_) {}
+        try { masterBoostNode.disconnect(); } catch (_) {}
+        try { masterLimiterNode.disconnect(); } catch (_) {}
+
+        if (needLpf) {
+          inputBusNode.connect(lowpassNode);
+          lowpassNode.connect(postFilterNode);
+        } else {
+          inputBusNode.connect(postFilterNode);
+        }
+
+        postFilterNode.connect(dryGainNode);
+        if (needReverb) {
+          postFilterNode.connect(convolverNode);
+        }
+
+        if (needLimiter) {
+          masterBoostNode.connect(masterLimiterNode);
+          masterLimiterNode.connect(audioCtx.destination);
+        } else {
+          masterBoostNode.connect(audioCtx.destination);
+        }
+      }
+
       function initAudioGraph() {
         if (!audioCtx) {
           const Ctx = window.AudioContext || window.webkitAudioContext;
@@ -2778,12 +2840,18 @@
         if (audioGraphReady) return;
 
         try {
+          inputBusNode = audioCtx.createGain();
+          inputBusNode.gain.value = 1.0;
+
+          postFilterNode = audioCtx.createGain();
+          postFilterNode.gain.value = 1.0;
+
           vocoderNode = audioCtx.createScriptProcessor(2048, 0, 2);
           vocoderNode.onaudioprocess = onVocoderProcess;
 
           lowpassNode = audioCtx.createBiquadFilter();
           lowpassNode.type = 'lowpass';
-          lowpassNode.frequency.value = 18000;
+          lowpassNode.frequency.value = 20000;
           lowpassNode.Q.value = 0.65;
 
           dryGainNode = audioCtx.createGain();
@@ -2792,41 +2860,37 @@
           dryGainNode.gain.value = 1.0;
           wetGainNode.gain.value = 0.0;
 
-          // Master Volume Boost + Soft Limiter
+          // Master Volume Boost + Clip-Guard Limiter (bypassed at 100% for full dynamic range & loudness)
           masterBoostNode = audioCtx.createGain();
           masterBoostNode.gain.value = getEffectiveBoost();
 
           masterLimiterNode = audioCtx.createDynamicsCompressor();
-          masterLimiterNode.threshold.value = -1.5;
-          masterLimiterNode.knee.value = 5.0;
-          masterLimiterNode.ratio.value = 16.0;
-          masterLimiterNode.attack.value = 0.002;
-          masterLimiterNode.release.value = 0.08;
+          masterLimiterNode.threshold.value = -0.5;
+          masterLimiterNode.knee.value = 1.5;
+          masterLimiterNode.ratio.value = 20.0;
+          masterLimiterNode.attack.value = 0.001;
+          masterLimiterNode.release.value = 0.06;
 
-          vocoderNode.connect(lowpassNode);
+          vocoderNode.connect(inputBusNode);
 
           mediaElSource = audioCtx.createMediaElementSource(audioEl);
-          mediaElSource.connect(lowpassNode);
+          mediaElSource.connect(inputBusNode);
 
-          lowpassNode.connect(dryGainNode);
           dryGainNode.connect(masterBoostNode);
-
-          lowpassNode.connect(convolverNode);
           convolverNode.connect(wetGainNode);
           wetGainNode.connect(masterBoostNode);
 
-          masterBoostNode.connect(masterLimiterNode);
-          masterLimiterNode.connect(audioCtx.destination);
-
           audioGraphReady = true;
+          currentRouteKey = '';
           updateLowpassFilter();
           applyMasterBoost();
+          updateAudioRouting();
         } catch (err) {
           console.warn('AudioGraph init issue:', err);
         }
       }
 
-      // ---------- Pure AudioBufferSourceNode Tape Mode Helpers ----------
+      // ---------- Pure Native AudioBufferSourceNode Helpers (1.00x Lossless Passthrough & Tape Mode) ----------
       function stopTapeSource() {
         if (tapeSourceNode) {
           try {
@@ -2840,14 +2904,14 @@
 
       function startTapeSourceAt(offsetSec) {
         stopTapeSource();
-        if (!state.audioBuffer || !audioCtx || !lowpassNode) return;
+        if (!state.audioBuffer || !audioCtx || !inputBusNode) return;
         const clamped = Math.max(0, Math.min(Math.max(0, state.duration - 0.01), offsetSec));
         const src = audioCtx.createBufferSource();
         src.buffer = state.audioBuffer;
         src.playbackRate.setValueAtTime(state.playbackRate, audioCtx.currentTime);
-        src.connect(lowpassNode);
+        src.connect(inputBusNode);
         src.onended = () => {
-          if (tapeSourceNode === src && state.isPlaying && state.engine === 'tape') {
+          if (tapeSourceNode === src && state.isPlaying && getActivePlaybackPath() === 'bufferDirect') {
             tapeSourceNode = null;
             handleTrackEnded();
           }
@@ -2896,27 +2960,30 @@
             wetGainNode.gain.setTargetAtTime(p.wet, audioCtx.currentTime, 0.03);
             dryGainNode.gain.setTargetAtTime(1.0 - p.wet * 0.25, audioCtx.currentTime, 0.03);
           }
+          updateAudioRouting();
         }
         showToast(`音響エフェクト: ${p.name}`);
       }
 
       function updateLowpassFilter() {
-        let cutoff = 18000;
-        if (state.lpfEnabled) {
-          if (state.playbackRate < 0.98) {
-            cutoff = Math.max(4600, Math.min(18000, 3600 + 13500 * state.playbackRate));
-          }
-        } else {
-          cutoff = 20000;
+        const activeSlowLpf = state.lpfEnabled && state.playbackRate < 0.98 && !isDirectPassthrough();
+        let cutoff = 20000;
+        if (activeSlowLpf) {
+          cutoff = Math.max(4600, Math.min(18000, 3600 + 13500 * state.playbackRate));
         }
         if (audioCtx && lowpassNode) {
           lowpassNode.frequency.setTargetAtTime(cutoff, audioCtx.currentTime, 0.025);
+          updateAudioRouting();
         }
         const el = document.getElementById('lpfStatusText');
         if (el) {
-          el.textContent = state.lpfEnabled
-            ? `速度連動ローパス (現在: ${(cutoff / 1000).toFixed(1)}kHz)`
-            : 'フィルターOFF（原音帯域スルー）';
+          if (!state.lpfEnabled) {
+            el.textContent = 'フィルターOFF（原音帯域スルー）';
+          } else if (!activeSlowLpf) {
+            el.textContent = '等速時は完全バイパス（原音そのまま）';
+          } else {
+            el.textContent = `スロー時ローパス稼働中 (${(cutoff / 1000).toFixed(1)}kHz)`;
+          }
         }
       }
 
@@ -2946,6 +3013,7 @@
         const eff = getEffectiveBoost();
         if (audioCtx && masterBoostNode) {
           masterBoostNode.gain.setTargetAtTime(eff, audioCtx.currentTime, 0.02);
+          updateAudioRouting();
         }
         const pct = Math.round(eff * 100);
         if (state.boostMode === 'auto') {
@@ -3006,12 +3074,12 @@
         cTap.querySelector('.engine-name').textContent = (nextEngine === 'tape' ? '● ' : '○ ') + 'テープ再生（音程連動・DSP加工ゼロ）';
 
         if (state.hasAudio) {
-          if (nextEngine === 'vocoder' && state.audioBuffer && !state.isFallbackLargeFile) {
+          const path = getActivePlaybackPath();
+          if (path === 'vocoderDsp') {
             resetVocoderAtSample(Math.floor(curT * state.audioBuffer.sampleRate));
-          } else if (nextEngine === 'tape' && state.audioBuffer && !state.isFallbackLargeFile) {
+          } else if (path === 'bufferDirect') {
             if (wasPlaying) startTapeSourceAt(curT);
           } else {
-            // Either OS standard, or PCM is still decoding in background
             audioEl.preservesPitch = true;
             audioEl.mozPreservesPitch = true;
             audioEl.webkitPreservesPitch = true;
@@ -3022,12 +3090,47 @@
               showToast(`波形解析完了後に「${labels[nextEngine]}」へ自動切替します`);
             }
           }
+          updateLowpassFilter();
           state.lastSyncTime = curT;
           state.lastSyncPerf = performance.now();
         }
       }
 
-      // ==================== REAL PCM PYRAMID BUILDER ====================
+      // ==================== REAL PCM PYRAMID BUILDER & STREAMING WAV ENGINE ====================
+      function chooseAdaptiveBaseBin(totalFrames) {
+        let bin = 16;
+        while (Math.ceil(totalFrames / bin) > 524288) {
+          bin *= 2;
+        }
+        return bin;
+      }
+
+      function buildUpperPyramidLevels(baseBin, min0, max0) {
+        const levels = [{ binSize: baseBin, min: min0, max: max0 }];
+        const factor = 8;
+        for (let lvl = 1; lvl <= 3; lvl++) {
+          const prev = levels[lvl - 1];
+          const pLen = prev.min.length;
+          const nLen = Math.max(1, Math.ceil(pLen / factor));
+          const nMin = new Float32Array(nLen);
+          const nMax = new Float32Array(nLen);
+          for (let b = 0; b < nLen; b++) {
+            const s = b * factor;
+            const e = Math.min(pLen, s + factor);
+            let lo = 1.0, hi = -1.0;
+            for (let j = s; j < e; j++) {
+              if (prev.min[j] < lo) lo = prev.min[j];
+              if (prev.max[j] > hi) hi = prev.max[j];
+            }
+            if (lo > hi) { lo = 0; hi = 0; }
+            nMin[b] = lo;
+            nMax[b] = hi;
+          }
+          levels.push({ binSize: prev.binSize * factor, min: nMin, max: nMax });
+        }
+        return levels;
+      }
+
       function buildPcmPyramid(audioBuffer) {
         const numCh = audioBuffer.numberOfChannels;
         const totalSamples = audioBuffer.length;
@@ -3035,7 +3138,7 @@
         const ch0 = audioBuffer.getChannelData(0);
         const ch1 = numCh > 1 ? audioBuffer.getChannelData(1) : null;
 
-        const baseBin = 16;
+        const baseBin = chooseAdaptiveBaseBin(totalSamples);
         const count0 = Math.max(1, Math.ceil(totalSamples / baseBin));
         const min0 = new Float32Array(count0);
         const max0 = new Float32Array(count0);
@@ -3062,29 +3165,7 @@
           if (a > peak) peak = a;
         }
 
-        const levels = [{ binSize: baseBin, min: min0, max: max0 }];
-        const factor = 8;
-        for (let lvl = 1; lvl <= 3; lvl++) {
-          const prev = levels[lvl - 1];
-          const pLen = prev.min.length;
-          const nLen = Math.max(1, Math.ceil(pLen / factor));
-          const nMin = new Float32Array(nLen);
-          const nMax = new Float32Array(nLen);
-          for (let b = 0; b < nLen; b++) {
-            const s = b * factor;
-            const e = Math.min(pLen, s + factor);
-            let lo = 1.0, hi = -1.0;
-            for (let j = s; j < e; j++) {
-              if (prev.min[j] < lo) lo = prev.min[j];
-              if (prev.max[j] > hi) hi = prev.max[j];
-            }
-            if (lo > hi) { lo = 0; hi = 0; }
-            nMin[b] = lo;
-            nMax[b] = hi;
-          }
-          levels.push({ binSize: prev.binSize * factor, min: nMin, max: nMax });
-        }
-
+        const levels = buildUpperPyramidLevels(baseBin, min0, max0);
         return { sampleRate: sr, totalSamples, duration: audioBuffer.duration, peak, levels };
       }
 
@@ -3095,13 +3176,13 @@
         const ch0 = audioBuffer.getChannelData(0);
         const ch1 = numCh > 1 ? audioBuffer.getChannelData(1) : null;
 
-        const baseBin = 16;
+        const baseBin = chooseAdaptiveBaseBin(totalSamples);
         const count0 = Math.max(1, Math.ceil(totalSamples / baseBin));
         const min0 = new Float32Array(count0);
         const max0 = new Float32Array(count0);
         let peak = 0;
 
-        const chunkBins = 6144; // ~98k samples per time-slice keeps UI 100% responsive
+        const chunkBins = Math.max(1024, Math.floor(131072 / baseBin));
         const startPerf = performance.now();
         let lastReportPerf = startPerf;
 
@@ -3130,7 +3211,7 @@
           }
 
           const now = performance.now();
-          if (now - lastReportPerf >= 50 || bEnd === count0) {
+          if (now - lastReportPerf >= 55 || bEnd === count0) {
             lastReportPerf = now;
             const frac = bEnd / count0;
             const elapsedSec = Math.max(0.02, (now - startPerf) / 1000);
@@ -3141,32 +3222,230 @@
         }
 
         if (isCancelled && isCancelled()) return null;
-
-        const levels = [{ binSize: baseBin, min: min0, max: max0 }];
-        const factor = 8;
-        for (let lvl = 1; lvl <= 3; lvl++) {
-          const prev = levels[lvl - 1];
-          const pLen = prev.min.length;
-          const nLen = Math.max(1, Math.ceil(pLen / factor));
-          const nMin = new Float32Array(nLen);
-          const nMax = new Float32Array(nLen);
-          for (let b = 0; b < nLen; b++) {
-            const s = b * factor;
-            const e = Math.min(pLen, s + factor);
-            let lo = 1.0, hi = -1.0;
-            for (let j = s; j < e; j++) {
-              if (prev.min[j] < lo) lo = prev.min[j];
-              if (prev.max[j] > hi) hi = prev.max[j];
-            }
-            if (lo > hi) { lo = 0; hi = 0; }
-            nMin[b] = lo;
-            nMax[b] = hi;
-          }
-          levels.push({ binSize: prev.binSize * factor, min: nMin, max: nMax });
-        }
-
+        const levels = buildUpperPyramidLevels(baseBin, min0, max0);
         if (onProgress) onProgress(1.0, 0);
         return { sampleRate: sr, totalSamples, duration: audioBuffer.duration, peak, levels };
+      }
+
+      // ---------- Zero-OOM Streaming WAV Parser & Waveform Pyramid Builder (Supports 1GB+ WAV) ----------
+      function readFourCC(dv, offset) {
+        return String.fromCharCode(
+          dv.getUint8(offset),
+          dv.getUint8(offset + 1),
+          dv.getUint8(offset + 2),
+          dv.getUint8(offset + 3)
+        );
+      }
+
+      async function parseWavHeader(blob) {
+        if (!blob || blob.size < 44) return null;
+        const headSlice = await blob.slice(0, Math.min(blob.size, 64)).arrayBuffer();
+        const headView = new DataView(headSlice);
+        const riff = readFourCC(headView, 0);
+        const wave = readFourCC(headView, 8);
+        if ((riff !== 'RIFF' && riff !== 'RF64') || wave !== 'WAVE') return null;
+
+        let offset = 12;
+        let fmt = null;
+        let dataOffset = -1;
+        let dataSize = 0;
+        let rf64DataSize = 0;
+        let guard = 0;
+
+        while (offset + 8 <= blob.size && guard < 128) {
+          guard++;
+          const hdrBuf = await blob.slice(offset, Math.min(blob.size, offset + 8)).arrayBuffer();
+          if (hdrBuf.byteLength < 8) break;
+          const hdrDv = new DataView(hdrBuf);
+          const id = readFourCC(hdrDv, 0);
+          let size = hdrDv.getUint32(4, true);
+          const bodyStart = offset + 8;
+
+          if (id === 'ds64' && size >= 16) {
+            const dsBuf = await blob.slice(bodyStart, Math.min(blob.size, bodyStart + 24)).arrayBuffer();
+            const dsDv = new DataView(dsBuf);
+            const lo = dsDv.getUint32(8, true);
+            const hi = dsDv.getUint32(12, true);
+            rf64DataSize = hi * 4294967296 + lo;
+          } else if (id === 'fmt ' && size >= 16) {
+            const fmtLen = Math.min(size, 64);
+            const fmtBuf = await blob.slice(bodyStart, Math.min(blob.size, bodyStart + fmtLen)).arrayBuffer();
+            const fmtDv = new DataView(fmtBuf);
+            let audioFormat = fmtDv.getUint16(0, true);
+            const numChannels = fmtDv.getUint16(2, true);
+            const sampleRate = fmtDv.getUint32(4, true);
+            const blockAlign = fmtDv.getUint16(12, true);
+            const bitsPerSample = fmtDv.getUint16(14, true);
+            if (audioFormat === 0xFFFE && fmtBuf.byteLength >= 26) {
+              audioFormat = fmtDv.getUint16(24, true);
+            }
+            fmt = { audioFormat, numChannels, sampleRate, blockAlign, bitsPerSample };
+          } else if (id === 'data') {
+            dataOffset = bodyStart;
+            const rawSize = (size === 0xFFFFFFFF && rf64DataSize > 0) ? rf64DataSize : size;
+            dataSize = Math.min(blob.size - dataOffset, rawSize > 0 ? rawSize : (blob.size - dataOffset));
+            break;
+          }
+
+          if (size === 0 && id !== 'data') break;
+          offset = bodyStart + size + (size & 1);
+        }
+
+        if (!fmt || dataOffset < 0 || dataSize <= 0) return null;
+        if (fmt.numChannels < 1 || fmt.sampleRate < 1000 || fmt.blockAlign < 1) return null;
+        const validPcm = fmt.audioFormat === 1 && (fmt.bitsPerSample === 8 || fmt.bitsPerSample === 16 || fmt.bitsPerSample === 24 || fmt.bitsPerSample === 32);
+        const validFloat = fmt.audioFormat === 3 && (fmt.bitsPerSample === 32 || fmt.bitsPerSample === 64);
+        if (!validPcm && !validFloat) return null;
+
+        const totalFrames = Math.floor(dataSize / fmt.blockAlign);
+        if (totalFrames <= 0) return null;
+
+        return {
+          ...fmt,
+          dataOffset,
+          dataSize: totalFrames * fmt.blockAlign,
+          totalFrames,
+          duration: totalFrames / fmt.sampleRate
+        };
+      }
+
+      async function buildWavStreamPyramidAsync(blob, wavMeta, onProgress, onPartialPyramid, isCancelled) {
+        const { audioFormat, numChannels, sampleRate, blockAlign, bitsPerSample, dataOffset, totalFrames } = wavMeta;
+        const bytesPerSample = bitsPerSample >> 3;
+        const scanCh = Math.min(2, numChannels);
+        const baseBin = chooseAdaptiveBaseBin(totalFrames);
+        const count0 = Math.max(1, Math.ceil(totalFrames / baseBin));
+        const min0 = new Float32Array(count0);
+        const max0 = new Float32Array(count0);
+        let peak = 0;
+
+        // Read in ~4MB aligned chunks (multiple of baseBin frames) so memory stays tiny even on 1GB+ WAVs
+        const targetChunkBytes = 4 * 1024 * 1024;
+        const binsPerChunk = Math.max(256, Math.floor(targetChunkBytes / (blockAlign * baseBin)));
+        const framesPerChunk = binsPerChunk * baseBin;
+
+        const startPerf = performance.now();
+        let lastPartialPerf = startPerf;
+        let frameCursor = 0;
+        let binCursor = 0;
+
+        while (frameCursor < totalFrames) {
+          if (isCancelled && isCancelled()) return null;
+
+          const chunkFrames = Math.min(framesPerChunk, totalFrames - frameCursor);
+          const byteStart = dataOffset + frameCursor * blockAlign;
+          const byteEnd = byteStart + chunkFrames * blockAlign;
+          const ab = await blob.slice(byteStart, byteEnd).arrayBuffer();
+          if (isCancelled && isCancelled()) return null;
+
+          const dv = new DataView(ab);
+          const u8 = new Uint8Array(ab);
+          const is16Pcm = audioFormat === 1 && bitsPerSample === 16;
+          const is24Pcm = audioFormat === 1 && bitsPerSample === 24;
+          const is32Pcm = audioFormat === 1 && bitsPerSample === 32;
+          const is8Pcm = audioFormat === 1 && bitsPerSample === 8;
+          const is32Float = audioFormat === 3 && bitsPerSample === 32;
+          const is64Float = audioFormat === 3 && bitsPerSample === 64;
+
+          // Fast path for standard 16-bit PCM (little-endian)
+          const i16 = (is16Pcm && (ab.byteLength % 2 === 0)) ? new Int16Array(ab) : null;
+          const chunkBins = Math.ceil(chunkFrames / baseBin);
+
+          for (let cb = 0; cb < chunkBins; cb++) {
+            const fStart = cb * baseBin;
+            const fEnd = Math.min(chunkFrames, fStart + baseBin);
+            let lo = 1.0, hi = -1.0;
+
+            if (i16) {
+              const stride = blockAlign >> 1;
+              if (scanCh === 2 && stride >= 2) {
+                for (let f = fStart; f < fEnd; f++) {
+                  const idx = f * stride;
+                  const v0 = i16[idx] * 0.000030517578125;
+                  const v1 = i16[idx + 1] * 0.000030517578125;
+                  if (v0 < lo) lo = v0;
+                  if (v0 > hi) hi = v0;
+                  if (v1 < lo) lo = v1;
+                  if (v1 > hi) hi = v1;
+                }
+              } else {
+                for (let f = fStart; f < fEnd; f++) {
+                  const v0 = i16[f * stride] * 0.000030517578125;
+                  if (v0 < lo) lo = v0;
+                  if (v0 > hi) hi = v0;
+                }
+              }
+            } else {
+              for (let f = fStart; f < fEnd; f++) {
+                const fByte = f * blockAlign;
+                for (let ch = 0; ch < scanCh; ch++) {
+                  const p = fByte + ch * bytesPerSample;
+                  let v = 0;
+                  if (is24Pcm) {
+                    let s24 = u8[p] | (u8[p + 1] << 8) | (u8[p + 2] << 16);
+                    if (s24 & 0x800000) s24 -= 0x1000000;
+                    v = s24 * 1.1920928955078125e-7;
+                  } else if (is32Float) {
+                    v = dv.getFloat32(p, true);
+                  } else if (is32Pcm) {
+                    v = dv.getInt32(p, true) * 4.656612873077393e-10;
+                  } else if (is8Pcm) {
+                    v = (u8[p] - 128) * 0.0078125;
+                  } else if (is64Float) {
+                    v = dv.getFloat64(p, true);
+                  } else if (is16Pcm) {
+                    v = dv.getInt16(p, true) * 0.000030517578125;
+                  }
+                  if (v < lo) lo = v;
+                  if (v > hi) hi = v;
+                }
+              }
+            }
+
+            if (lo > hi) { lo = 0; hi = 0; }
+            const bIdx = binCursor + cb;
+            min0[bIdx] = lo;
+            max0[bIdx] = hi;
+            const a = Math.max(Math.abs(lo), Math.abs(hi));
+            if (a > peak) peak = a;
+          }
+
+          frameCursor += chunkFrames;
+          binCursor += chunkBins;
+
+          const now = performance.now();
+          const frac = frameCursor / totalFrames;
+          const elapsedSec = Math.max(0.02, (now - startPerf) / 1000);
+          const etaSec = frac > 0.02 ? (elapsedSec * (1 - frac) / frac) : null;
+
+          if (onProgress) onProgress(frac * 0.96, etaSec);
+
+          // Progressive waveform redraw every ~260ms so user sees waveform appearing live!
+          if (onPartialPyramid && (now - lastPartialPerf >= 260)) {
+            lastPartialPerf = now;
+            const partialLevels = buildUpperPyramidLevels(baseBin, min0, max0);
+            onPartialPyramid({
+              sampleRate,
+              totalSamples: totalFrames,
+              duration: totalFrames / sampleRate,
+              peak: Math.max(peak, 0.05),
+              levels: partialLevels
+            });
+          }
+
+          await new Promise(r => setTimeout(r, 0));
+        }
+
+        if (isCancelled && isCancelled()) return null;
+        const levels = buildUpperPyramidLevels(baseBin, min0, max0);
+        if (onProgress) onProgress(1.0, 0);
+        return {
+          sampleRate,
+          totalSamples: totalFrames,
+          duration: totalFrames / sampleRate,
+          peak,
+          levels
+        };
       }
 
       function queryPyramid(pyramid, t0, t1) {
@@ -3231,19 +3510,32 @@
           const url = URL.createObjectURL(blob);
           state.rawBlob = blob;
           state.audioBuffer = null;
+          state.wavMeta = null;
           state.waveformPyramid = null;
           state.isFallbackLargeFile = false;
           state.isAnalyzingWave = false;
           state.undoCutSnapshot = null;
 
-          // Step 1: Resolve duration quickly & make player IMMEDIATELY usable!
-          let resolvedDuration = preDecodedBuffer ? preDecodedBuffer.duration : await probeDuration(url);
+          // Step 1: Quickly inspect WAV header (if WAV) or probe metadata duration & make player IMMEDIATELY usable!
+          let wavMeta = null;
+          if (!preDecodedBuffer) {
+            try { wavMeta = await parseWavHeader(blob); } catch (_) { wavMeta = null; }
+          }
+          if (isCancelled()) {
+            URL.revokeObjectURL(url);
+            return;
+          }
+
+          let resolvedDuration = preDecodedBuffer
+            ? preDecodedBuffer.duration
+            : (wavMeta ? wavMeta.duration : await probeDuration(url));
           if (isCancelled()) {
             URL.revokeObjectURL(url);
             return;
           }
           if (!resolvedDuration || resolvedDuration <= 0) resolvedDuration = 30;
 
+          state.wavMeta = wavMeta;
           state.duration = resolvedDuration;
           state.currentTime = 0;
           state.lastSyncTime = 0;
@@ -3269,7 +3561,7 @@
           startupOverlay.classList.add('hidden');
           btnSaveWav.disabled = false;
           btnToggleSectionSkip.disabled = false;
-          btnCutYellowSection.disabled = true;
+          btnCutYellowSection.disabled = !(preDecodedBuffer || wavMeta);
           trackTitleEl.textContent = title;
 
           updateWaveGainUI();
@@ -3282,15 +3574,15 @@
 
           if (autoPlay) startPlayback();
 
-          // Step 2: Background PCM decode & waveform pyramid build with non-intrusive progress & ETA
+          // Step 2: Background PCM decode or Zero-OOM Streaming WAV waveform analysis
           if (preDecodedBuffer) {
             state.audioBuffer = preDecodedBuffer;
             state.isAnalyzingWave = true;
-            showWaveProgress(65, '波形生成中', null);
+            showWaveProgress(60, '波形生成中', null);
             const pyr = await buildPcmPyramidAsync(
               preDecodedBuffer,
               (frac, etaSec) => {
-                if (!isCancelled()) showWaveProgress(65 + frac * 35, '波形生成中', etaSec);
+                if (!isCancelled()) showWaveProgress(60 + frac * 40, '波形生成中', etaSec);
               },
               isCancelled
             );
@@ -3299,21 +3591,52 @@
             return;
           }
 
-          if (blob.size > 140 * 1024 * 1024) {
-            state.isFallbackLargeFile = true;
-            setEngine('native');
-            hideWaveProgress(0);
-            showToast('超大容量ファイルのため簡易波形・OS標準再生で動作します');
+          // Large WAV (> 90MB): Use Zero-OOM Streaming WAV Waveform Builder! Works for 400MB ~ 2GB+ WAV files!
+          if (wavMeta && blob.size > 90 * 1024 * 1024) {
+            (async () => {
+              state.isAnalyzingWave = true;
+              state.isFallbackLargeFile = true;
+              setEngine('native');
+              showWaveProgress(1, '大容量WAV波形解析中', null);
+
+              const pyr = await buildWavStreamPyramidAsync(
+                blob,
+                wavMeta,
+                (frac, etaSec) => {
+                  if (!isCancelled()) showWaveProgress(frac * 100, '波形解析中', etaSec);
+                },
+                (partialPyr) => {
+                  if (isCancelled()) return;
+                  state.waveformPyramid = partialPyr;
+                  if (partialPyr.peak > 0.0005) {
+                    state.autoWaveGain = Math.min(12.0, Math.max(1.0, 0.88 / partialPyr.peak));
+                  }
+                  updateWaveGainUI();
+                  renderAllCanvases();
+                },
+                isCancelled
+              );
+              if (isCancelled() || !pyr) return;
+              finalizeStreamedWavPyramid(pyr, myToken);
+            })();
             return;
           }
 
-          // Run async background analysis (do NOT block UI)
+          if (!wavMeta && blob.size > 250 * 1024 * 1024) {
+            state.isFallbackLargeFile = true;
+            setEngine('native');
+            hideWaveProgress(0);
+            showToast('超大容量の圧縮音声のためOS標準再生で動作します');
+            return;
+          }
+
+          // Standard files (<= 90MB WAV or <= 250MB MP3/M4A/etc.): Full PCM decode with fallback to WAV streaming if OOM
           (async () => {
             state.isAnalyzingWave = true;
             const totalMB = Math.max(0.1, blob.size / (1024 * 1024));
             const estReadSec = Math.max(0.2, totalMB * 0.04);
-            const estDecodeSec = Math.max(0.7, totalMB * 0.22 + 0.35);
-            const estPyrSec = Math.max(0.3, totalMB * 0.08 + 0.15);
+            const estDecodeSec = Math.max(0.6, totalMB * 0.20 + 0.3);
+            const estPyrSec = Math.max(0.25, totalMB * 0.06 + 0.12);
 
             showWaveProgress(2, 'ファイル読込中', estReadSec + estDecodeSec + estPyrSec);
 
@@ -3330,7 +3653,7 @@
                 },
                 isCancelled
               );
-            } catch (readErr) {
+            } catch (_) {
               if (!isCancelled()) {
                 state.isAnalyzingWave = false;
                 state.isFallbackLargeFile = true;
@@ -3340,7 +3663,6 @@
             }
             if (isCancelled()) return;
 
-            // Stage 2: decodeAudioData (20% -> 65%) with smooth asymptotic ETA ticker
             let decodeTimer = null;
             const decStart = performance.now();
             showWaveProgress(22, '音声デコード中', estDecodeSec + estPyrSec);
@@ -3364,17 +3686,40 @@
               clearInterval(decodeTimer);
               if (isCancelled()) return;
               console.warn('decodeAudioData fallback:', decErr);
+
+              // If it's a WAV file and decodeAudioData failed (e.g. OOM on mobile), seamlessly fall back to streaming WAV waveform!
+              if (wavMeta) {
+                state.isFallbackLargeFile = true;
+                setEngine('native');
+                showWaveProgress(5, '省メモリ波形解析へ切替中', null);
+                const pyr = await buildWavStreamPyramidAsync(
+                  blob,
+                  wavMeta,
+                  (frac, etaSec) => {
+                    if (!isCancelled()) showWaveProgress(frac * 100, '波形解析中', etaSec);
+                  },
+                  (partialPyr) => {
+                    if (isCancelled()) return;
+                    state.waveformPyramid = partialPyr;
+                    renderAllCanvases();
+                  },
+                  isCancelled
+                );
+                if (isCancelled() || !pyr) return;
+                finalizeStreamedWavPyramid(pyr, myToken);
+                return;
+              }
+
               state.isAnalyzingWave = false;
               state.isFallbackLargeFile = true;
               setEngine('native');
               hideWaveProgress(0);
-              showToast('波形デコード非対応形式のためOS標準再生で動作します');
+              showToast('メモリ上限または非対応形式のためOS標準再生で動作します');
               return;
             }
             clearInterval(decodeTimer);
             if (isCancelled() || !decoded) return;
 
-            // Stage 3: Chunked PCM Pyramid generation (65% -> 100%)
             showWaveProgress(65, '波形生成中', estPyrSec);
             const pyr = await buildPcmPyramidAsync(
               decoded,
@@ -3397,6 +3742,39 @@
         }
       }
 
+      function computeAutoGainsFromPeak(pk) {
+        if (pk > 0.0005) {
+          state.autoWaveGain = Math.min(12.0, Math.max(1.0, 0.88 / pk));
+          // Aim for 0.96 peak (~ -0.35 dBFS) so loudness matches native music apps,
+          // while staying at clean 1.0x passthrough if track is already loud (>= 0.90)
+          state.autoBoostGain = pk >= 0.90 ? 1.0 : Math.min(5.0, Math.max(1.0, 0.96 / pk));
+        } else {
+          state.autoWaveGain = 1.0;
+          state.autoBoostGain = 1.0;
+        }
+      }
+
+      function finalizeStreamedWavPyramid(pyramid, token) {
+        if (token !== state.loadToken) return;
+        state.waveformPyramid = pyramid;
+        state.isAnalyzingWave = false;
+        if (pyramid.duration && pyramid.duration > 0) {
+          state.duration = pyramid.duration;
+          state.numRows = computeRows(state.duration);
+        }
+        computeAutoGainsFromPeak(pyramid.peak);
+        btnCutYellowSection.disabled = !state.wavMeta;
+        updateWaveGainUI();
+        applyMasterBoost();
+        updateTimeUI();
+        updatePinButtonsUI();
+        updateSectionBarUI();
+        renderAllCanvases();
+
+        showWaveProgress(100, '波形解析完了', 0);
+        hideWaveProgress(650);
+      }
+
       function finalizeDecodedAudio(decoded, pyramid, token) {
         if (token !== state.loadToken) return;
 
@@ -3412,14 +3790,7 @@
           state.numRows = computeRows(state.duration);
         }
 
-        if (pyramid && pyramid.peak > 0.0005) {
-          const pk = pyramid.peak;
-          state.autoWaveGain = Math.min(12.0, Math.max(1.0, 0.88 / pk));
-          state.autoBoostGain = Math.min(4.0, Math.max(1.0, 0.71 / pk));
-        } else {
-          state.autoWaveGain = 1.0;
-          state.autoBoostGain = 1.0;
-        }
+        computeAutoGainsFromPeak(pyramid ? pyramid.peak : 0);
 
         const clampedT = Math.max(0, Math.min(state.duration, liveT));
         state.currentTime = clampedT;
@@ -3428,19 +3799,22 @@
 
         resetVocoderAtSample(Math.floor(clampedT * decoded.sampleRate));
 
-        // If user was already playing via audioEl and preferred vocoder/tape, hot-swap seamlessly
-        if (wasPlaying && state.engine !== 'native') {
-          if (!audioEl.paused) audioEl.pause();
-          if (state.engine === 'vocoder') {
-            resetVocoderAtSample(Math.floor(clampedT * decoded.sampleRate));
-          } else if (state.engine === 'tape') {
+        // Hot-swap smoothly if user was already playing via audioEl
+        if (wasPlaying) {
+          const path = getActivePlaybackPath();
+          if (path === 'bufferDirect') {
+            if (!audioEl.paused) audioEl.pause();
             startTapeSourceAt(clampedT);
+          } else if (path === 'vocoderDsp') {
+            if (!audioEl.paused) audioEl.pause();
+            resetVocoderAtSample(Math.floor(clampedT * decoded.sampleRate));
           }
         }
 
         btnCutYellowSection.disabled = false;
         updateWaveGainUI();
         applyMasterBoost();
+        updateLowpassFilter();
         updateTimeUI();
         updatePinButtonsUI();
         updateSectionBarUI();
@@ -4017,7 +4391,7 @@
           return;
         }
         btnToggleSectionSkip.disabled = false;
-        btnCutYellowSection.disabled = !state.audioBuffer;
+        btnCutYellowSection.disabled = !(state.audioBuffer || state.wavMeta);
 
         const sec = getCurrentYellowSection(state.currentTime);
         if (!sec) return;
@@ -4081,8 +4455,8 @@
       let pendingCutSection = null;
 
       function openCutSectionModal() {
-        if (!state.hasAudio || !state.audioBuffer) {
-          showToast(state.isAnalyzingWave ? '波形解析の完了後に区間削除が使えます' : '音声バッファが読み込まれていません');
+        if (!state.hasAudio || (!state.audioBuffer && !state.wavMeta)) {
+          showToast(state.isAnalyzingWave ? '波形解析の完了後に区間削除が使えます' : '音声データが読み込まれていません');
           return;
         }
         const sec = getCurrentYellowSection(state.currentTime);
@@ -4101,9 +4475,29 @@
         cutConfirmModal.classList.remove('hidden');
       }
 
-      function executeCutYellowSection() {
+      function buildWavHeaderArrayBuffer(meta, newDataSize) {
+        const ab = new ArrayBuffer(44);
+        const v = new DataView(ab);
+        const wStr = (off, s) => { for (let i = 0; i < s.length; i++) v.setUint8(off + i, s.charCodeAt(i)); };
+        wStr(0, 'RIFF');
+        v.setUint32(4, 36 + newDataSize, true);
+        wStr(8, 'WAVE');
+        wStr(12, 'fmt ');
+        v.setUint32(16, 16, true);
+        v.setUint16(20, meta.audioFormat, true);
+        v.setUint16(22, meta.numChannels, true);
+        v.setUint32(24, meta.sampleRate, true);
+        v.setUint32(28, meta.sampleRate * meta.blockAlign, true);
+        v.setUint16(32, meta.blockAlign, true);
+        v.setUint16(34, meta.bitsPerSample, true);
+        wStr(36, 'data');
+        v.setUint32(40, newDataSize, true);
+        return ab;
+      }
+
+      async function executeCutYellowSection() {
         cutConfirmModal.classList.add('hidden');
-        if (!pendingCutSection || !state.audioBuffer) return;
+        if (!pendingCutSection || (!state.audioBuffer && !state.wavMeta)) return;
 
         const sec = pendingCutSection;
         pendingCutSection = null;
@@ -4111,6 +4505,71 @@
         const wasPlaying = state.isPlaying;
         if (wasPlaying) pausePlayback();
         stopInertia();
+
+        // Fast Zero-Copy Blob Slice Cut for Large Streamed WAVs (no AudioBuffer needed!)
+        if (!state.audioBuffer && state.wavMeta && state.rawBlob) {
+          const meta = state.wavMeta;
+          const sr = meta.sampleRate;
+          const s0 = Math.max(0, Math.min(meta.totalFrames, Math.floor(sec.start * sr)));
+          const s1 = Math.max(s0, Math.min(meta.totalFrames, Math.floor(sec.end * sr)));
+          const cutFrames = s1 - s0;
+          const newFrames = meta.totalFrames - cutFrames;
+          if (cutFrames <= 0 || newFrames < Math.floor(sr * 0.1)) {
+            showToast('削除区間が短すぎるか、残りが短すぎます');
+            return;
+          }
+          const cutStartByte = meta.dataOffset + s0 * meta.blockAlign;
+          const cutEndByte = meta.dataOffset + s1 * meta.blockAlign;
+          const dataEndByte = meta.dataOffset + meta.dataSize;
+          const newDataSize = newFrames * meta.blockAlign;
+          const hdrBuf = buildWavHeaderArrayBuffer(meta, newDataSize);
+          const newBlob = new Blob([
+            hdrBuf,
+            state.rawBlob.slice(meta.dataOffset, cutStartByte),
+            state.rawBlob.slice(cutEndByte, dataEndByte)
+          ], { type: 'audio/wav' });
+
+          const cutDuration = cutFrames / sr;
+          const newDuration = newFrames / sr;
+          const spliceTime = s0 / sr;
+
+          const updatedMarkers = [];
+          for (const m of state.markers) {
+            if (m.time > sec.start + 0.02 && m.time < sec.end - 0.02) continue;
+            if (m.time >= sec.end - 0.02) {
+              const shifted = Math.max(0, m.time - cutDuration);
+              if (shifted > 0.05 && shifted < newDuration - 0.05) {
+                const dupIdx = updatedMarkers.findIndex(x => Math.abs(x.time - shifted) < 0.06);
+                if (dupIdx >= 0) {
+                  if (!updatedMarkers[dupIdx].name && m.name) updatedMarkers[dupIdx].name = m.name;
+                  updatedMarkers[dupIdx].sectionEnabled = m.sectionEnabled;
+                } else {
+                  updatedMarkers.push({ ...m, time: shifted });
+                }
+              }
+            } else if (m.time > 0.05 && m.time < newDuration - 0.05) {
+              updatedMarkers.push({ ...m });
+            }
+          }
+          updatedMarkers.sort((a, b) => a.time - b.time);
+
+          let nextStartEnabled = state.startSectionEnabled;
+          if (sec.start <= 0.02) {
+            const boundaryMarker = state.markers.find(m => Math.abs(m.time - sec.end) < 0.03);
+            nextStartEnabled = boundaryMarker ? boundaryMarker.sectionEnabled : true;
+          }
+
+          if (state.playlist[state.currentTrackIndex]) {
+            state.playlist[state.currentTrackIndex].blob = newBlob;
+            state.playlist[state.currentTrackIndex].markers = cloneMarkerList(updatedMarkers);
+            state.playlist[state.currentTrackIndex].startSectionEnabled = nextStartEnabled;
+          }
+
+          await loadAudioBlob(newBlob, trackTitleEl.textContent.trim(), updatedMarkers, false, null, nextStartEnabled);
+          seekTo(Math.min(state.duration, spliceTime), { setGreenPin: false });
+          showToast(`区間を削除しました (-${formatTime(cutDuration)})`);
+          return;
+        }
 
         const buf = state.audioBuffer;
         const sr = buf.sampleRate;
@@ -4361,10 +4820,11 @@
       // ==================== TRANSPORT, PLAYHEAD INTERPOLATION & PLAYLIST ====================
       function getLivePlayheadTime() {
         if (!state.hasAudio) return 0;
-        if (state.isPlaying && state.engine === 'tape' && tapeSourceNode) {
+        const path = getActivePlaybackPath();
+        if (state.isPlaying && path === 'bufferDirect' && tapeSourceNode) {
           return getTapeCurrentTime();
         }
-        if (state.isPlaying && isUsingAudioEl()) {
+        if (state.isPlaying && path === 'audioEl') {
           return audioEl.currentTime;
         }
         return state.currentTime;
@@ -4375,7 +4835,7 @@
         if (!state.isPlaying || state.isDraggingOverview || state.isDraggingZoom || state.isPinchingZoom || state.isInertiaActive) {
           return state.currentTime;
         }
-        if (state.engine === 'tape' && tapeSourceNode) {
+        if (getActivePlaybackPath() === 'bufferDirect' && tapeSourceNode) {
           return getTapeCurrentTime();
         }
         const dtSec = Math.max(0, (performance.now() - state.lastSyncPerf) / 1000);
@@ -4388,6 +4848,36 @@
           }
         }
         return Math.min(state.duration, Math.max(0, t));
+      }
+
+      function syncPlaybackPathTransition(prevPath, curTimeSec) {
+        const nextPath = getActivePlaybackPath();
+        if (prevPath === nextPath) {
+          if (state.isPlaying && nextPath === 'bufferDirect' && tapeSourceNode && audioCtx) {
+            tapeAnchorOffset = curTimeSec;
+            tapeAnchorCtxTime = audioCtx.currentTime;
+            tapeSourceNode.playbackRate.setValueAtTime(state.playbackRate, audioCtx.currentTime);
+          }
+          return;
+        }
+        // Cleanly transition between direct native AudioBufferSourceNode and Vocoder DSP mid-playback
+        stopTapeSource();
+        if (!audioEl.paused) audioEl.pause();
+        state.currentTime = curTimeSec;
+        state.lastSyncTime = curTimeSec;
+        state.lastSyncPerf = performance.now();
+
+        if (!state.hasAudio || !state.isPlaying) return;
+
+        if (nextPath === 'bufferDirect') {
+          startTapeSourceAt(curTimeSec);
+        } else if (nextPath === 'vocoderDsp') {
+          resetVocoderAtSample(Math.floor(curTimeSec * state.audioBuffer.sampleRate));
+        } else {
+          audioEl.currentTime = curTimeSec;
+          audioEl.playbackRate = state.playbackRate;
+          audioEl.play().catch(() => {});
+        }
       }
 
       function seekTo(timeSec, opts = {}) {
@@ -4404,9 +4894,10 @@
           state.tempMarker = clamped;
         }
 
-        if (state.engine === 'vocoder' && state.audioBuffer && !state.isFallbackLargeFile) {
+        const path = getActivePlaybackPath();
+        if (path === 'vocoderDsp') {
           resetVocoderAtSample(Math.floor(clamped * state.audioBuffer.sampleRate));
-        } else if (state.engine === 'tape' && state.audioBuffer) {
+        } else if (path === 'bufferDirect') {
           if (state.isPlaying) {
             startTapeSourceAt(clamped);
           }
@@ -4443,9 +4934,13 @@
         state.lastSyncTime = state.currentTime;
         state.lastSyncPerf = performance.now();
 
-        if (state.engine === 'vocoder' && state.audioBuffer && !state.isFallbackLargeFile) {
+        updateLowpassFilter();
+        updateAudioRouting();
+
+        const path = getActivePlaybackPath();
+        if (path === 'vocoderDsp') {
           resetVocoderAtSample(Math.floor(state.currentTime * state.audioBuffer.sampleRate));
-        } else if (state.engine === 'tape' && state.audioBuffer) {
+        } else if (path === 'bufferDirect') {
           startTapeSourceAt(state.currentTime);
         } else {
           audioEl.currentTime = state.currentTime;
@@ -4486,16 +4981,13 @@
 
       function setPlaybackSpeed(rate) {
         const clamped = Math.max(0.25, Math.min(2.0, Math.round(rate * 100) / 100));
-
-        if (state.isPlaying && state.engine === 'tape' && tapeSourceNode && audioCtx) {
-          tapeAnchorOffset = getTapeCurrentTime();
-          tapeAnchorCtxTime = audioCtx.currentTime;
-          tapeSourceNode.playbackRate.setValueAtTime(clamped, audioCtx.currentTime);
-        }
+        const prevPath = getActivePlaybackPath();
+        const curT = getLivePlayheadTime();
 
         state.playbackRate = clamped;
         audioEl.playbackRate = clamped;
         updateLowpassFilter();
+        syncPlaybackPathTransition(prevPath, curT);
 
         const txt = `${clamped.toFixed(2)}x`;
         speedBadgeText.textContent = txt;
@@ -4510,7 +5002,13 @@
 
       function setPitch(semi) {
         const clamped = Math.max(-6, Math.min(6, Math.round(semi)));
+        const prevPath = getActivePlaybackPath();
+        const curT = getLivePlayheadTime();
+
         state.pitchSemitones = clamped;
+        updateLowpassFilter();
+        syncPlaybackPathTransition(prevPath, curT);
+
         const txt = clamped === 0 ? '#:±0' : (clamped > 0 ? `#:+${clamped}` : `#:${clamped}`);
         pitchBadgeText.textContent = txt;
         pitchBadgeText.classList.toggle('shifted', clamped !== 0);
@@ -5259,7 +5757,7 @@
       // ==================== 60/120FPS ANIMATION & PLAYBACK SYNC LOOP ====================
       function animationLoop() {
         if (state.hasAudio && state.isPlaying && !state.isDraggingOverview && !state.isDraggingZoom && !state.isPinchingZoom) {
-          if (state.engine === 'tape' && tapeSourceNode) {
+          if (getActivePlaybackPath() === 'bufferDirect' && tapeSourceNode) {
             state.currentTime = getTapeCurrentTime();
             const skipDest = resolveSkipTarget(state.currentTime);
             if (skipDest !== null) {
@@ -5560,7 +6058,7 @@
       btnPlaylistIndex.addEventListener('click', () => openSettingsModal('playlist'));
       btnBoostQuick.addEventListener('click', () => {
         initAudioGraph();
-        const seq = ['auto', 1, 1.5, 2, 3, 4];
+        const seq = ['auto', 1, 1.5, 2, 3, 5];
         const idx = seq.findIndex(v => String(v) === String(state.boostMode));
         state.boostMode = seq[(idx + 1) % seq.length];
         applyMasterBoost();
