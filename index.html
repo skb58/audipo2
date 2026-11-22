@@ -1003,14 +1003,15 @@
       z-index: 60;
       background: rgba(0, 0, 0, 0.76);
       display: flex;
-      align-items: flex-end;
+      align-items: flex-start;
       justify-content: center;
-      padding: 10px;
+      padding: calc(12px + env(safe-area-inset-top)) 10px 10px;
     }
 
     @media (min-width: 560px) {
       .modal-backdrop {
-        align-items: center;
+        align-items: flex-start;
+        padding-top: 28px;
       }
     }
 
@@ -3499,9 +3500,19 @@
           showToast('曲の開始・終了付近には追加できません');
           return;
         }
+        // Clear green temp pin at current position so display switches cleanly from green to yellow
+        const clearedGreen = state.tempMarker !== null && Math.abs(state.tempMarker - t) <= 0.5;
         if (state.markers.some(m => Math.abs(m.time - t) < 0.2)) {
+          if (clearedGreen) {
+            state.tempMarker = null;
+            updatePinButtonsUI();
+            renderAllCanvases();
+          }
           showToast('すぐ近くに黄色ピンが存在します');
           return;
+        }
+        if (clearedGreen) {
+          state.tempMarker = null;
         }
         state.markers.push(makeMarkerObj(t, '', true, true));
         state.markers.sort((a, b) => a.time - b.time);
@@ -3516,7 +3527,8 @@
       function jumpPrevYellowPin() {
         if (!state.hasAudio) return;
         const enabled = getEnabledMarkers();
-        const ref = state.currentTime - 0.35;
+        const margin = state.isPlaying ? Math.min(0.35, state.duration * 0.05) : 0.03;
+        const ref = state.currentTime - margin;
         let target = 0;
         let targetName = '';
         for (let i = enabled.length - 1; i >= 0; i--) {
@@ -3533,7 +3545,7 @@
       function jumpNextYellowPin() {
         if (!state.hasAudio) return;
         const enabled = getEnabledMarkers();
-        const ref = state.currentTime + 0.15;
+        const ref = state.currentTime + 0.03;
         let target = state.duration;
         let targetName = '';
         for (let i = 0; i < enabled.length; i++) {
@@ -5188,7 +5200,28 @@
       btnSectionRepeat.addEventListener('click', toggleSectionRepeat);
       document.getElementById('btnPrevTrack').addEventListener('click', () => {
         if (!state.hasAudio) return;
-        if (state.currentTime > 2.0 || state.playlist.length <= 1) {
+        const enabled = getEnabledMarkers();
+        const margin = state.isPlaying ? Math.min(0.4, state.duration * 0.05) : 0.03;
+        const ref = state.currentTime - margin;
+
+        // First: jump to the nearest previous enabled yellow marker (e.g. start of current section)
+        let targetMarker = null;
+        for (let i = enabled.length - 1; i >= 0; i--) {
+          if (enabled[i].time < ref) {
+            targetMarker = enabled[i];
+            break;
+          }
+        }
+        if (targetMarker) {
+          seekTo(targetMarker.time, { setGreenPin: false });
+          if (targetMarker.name) {
+            showToast(`移動: ${formatTime(targetMarker.time)} ${targetMarker.name}`);
+          }
+          return;
+        }
+
+        // Otherwise: return to 0:00, or if already at 0:00 and playlist has multiple tracks, go to previous track
+        if (state.currentTime > 0.05 || state.playlist.length <= 1) {
           seekTo(0, { setGreenPin: false });
         } else {
           switchTrack(state.currentTrackIndex - 1, state.isPlaying);
