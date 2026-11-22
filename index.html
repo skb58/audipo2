@@ -2057,11 +2057,11 @@
 
           <div class="sec-head" style="margin-top:12px;">
             <span class="sec-title">録音PCMフォーマット（WAV出力）</span>
-            <span id="modalRecBitVal" class="sec-value mono" style="color:#93c5fd;">16bit (ディザ付)</span>
+            <span id="modalRecBitVal" class="sec-value mono" style="color:#93c5fd;">24bit ハイレゾPCM</span>
           </div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
-            <button type="button" data-rec-bits="16" class="opt-pill rec-bits-opt active-green">16bit 高互換（ディザ付）</button>
-            <button type="button" data-rec-bits="24" class="opt-pill rec-bits-opt">24bit ハイレゾPCM</button>
+            <button type="button" data-rec-bits="16" class="opt-pill rec-bits-opt">16bit 高互換（ディザ付）</button>
+            <button type="button" data-rec-bits="24" class="opt-pill rec-bits-opt active-green">24bit ハイレゾPCM</button>
           </div>
 
           <div class="toggle-row">
@@ -2096,7 +2096,7 @@
             <span id="modalMemoryCount" class="sec-value mono" style="color:#fde047;">0 / 1000件</span>
           </div>
           <div class="engine-desc" style="margin-bottom:9px;">
-            ファイルごとの黄色ピン・名前・スキップ設定・再生位置を最大1000ファイルまで自動記憶します（1000件を超えると古いものから自動削除）。録音した音源は「保存」するまでピン記憶に登録されません。
+            ファイルごとの黄色ピン・名前・スキップ設定・再生位置を最大1000ファイルまで自動記憶します（1000件を超えると古いものから自動削除）。未保存の録音は1000件の保存枠を使わず、一時キャッシュ枠にのみ音源とピンを一時保持します（「保存」後に1000件記憶へ登録）。
           </div>
           <div style="display:flex;gap:8px;">
             <button id="btnClearSessionCache" type="button" class="step-btn" style="flex:1;">一時音源キャッシュ削除</button>
@@ -2331,7 +2331,7 @@
         boostMode: 'auto', // 'auto' | 1 | 1.5 | 2 | 3 | 5
         autoBoostGain: 1.0,
         micGain: 1.0, // Default 0dB pure uncompressed capture
-        recBitDepth: 16, // 16 (TPDF dithered) | 24 (high-res PCM)
+        recBitDepth: 24, // 24 (high-res PCM default) | 16 (TPDF dithered)
         recAutoNormalize: false, // Default OFF for raw untouched PCM
         micDeviceId: '',
 
@@ -2533,9 +2533,34 @@
       const LS_FILE_MEM_KEY = 'audipo2_file_memory_v1';
       const LS_APP_PREFS_KEY = 'audipo2_app_prefs_v1';
       const LS_LAST_SESSION_KEY = 'audipo2_last_session_v1';
+      const LS_TEMP_SESSION_STATE_KEY = 'audipo2_temp_session_state_v1';
       const IDB_NAME = 'audipo2_session_db_v1';
       const IDB_STORE = 'session_store';
       const MAX_REMEMBERED_FILES = 1000;
+
+      function loadTempSessionState(origName, size) {
+        try {
+          const raw = localStorage.getItem(LS_TEMP_SESSION_STATE_KEY);
+          if (!raw) return null;
+          const rec = JSON.parse(raw);
+          if (!rec || typeof rec !== 'object') return null;
+          if (origName && rec.origName && rec.origName !== origName && rec.displayName !== origName) {
+            return null;
+          }
+          if (size && rec.size && Math.abs(rec.size - size) > 64) {
+            return null;
+          }
+          return rec;
+        } catch (_) {
+          return null;
+        }
+      }
+
+      function clearTempSessionState() {
+        try {
+          localStorage.removeItem(LS_TEMP_SESSION_STATE_KEY);
+        } catch (_) {}
+      }
 
       function makeFileFingerprint(name, size) {
         return `${String(name || '')}::${Number(size) || 0}`;
@@ -2598,8 +2623,7 @@
       let lastPeriodicSavePerf = 0;
 
       function saveCurrentFileMemory(immediate = false) {
-        // Do NOT save pin info for recordings that have not yet been saved as a file
-        if (!state.hasAudio || !state.currentFileOrigName || state.isUnsavedRecording) return;
+        if (!state.hasAudio || !state.currentFileOrigName) return;
         const doSave = () => {
           clearTimeout(saveMemTimer);
           saveMemTimer = null;
@@ -2609,10 +2633,7 @@
           const origName = state.currentFileOrigName;
           const size = state.currentFileSize || (state.rawBlob ? state.rawBlob.size : 0);
           const displayName = trackTitleEl.textContent.trim() || origName;
-          const key = makeFileFingerprint(origName, size);
-
-          const map = readAllFileMemories();
-          map[key] = {
+          const snapshot = {
             origName,
             displayName,
             size,
@@ -2626,6 +2647,19 @@
             zoomWindowSeconds: state.zoomWindowSeconds,
             updatedAt: Date.now()
           };
+
+          if (state.isUnsavedRecording) {
+            // Unsaved recording: NEVER use the 1000-file storage; only cache pins in the single temporary session slot
+            try {
+              localStorage.setItem(LS_TEMP_SESSION_STATE_KEY, JSON.stringify(snapshot));
+            } catch (_) {}
+            return;
+          }
+
+          clearTempSessionState();
+          const key = makeFileFingerprint(origName, size);
+          const map = readAllFileMemories();
+          map[key] = snapshot;
           writeAllFileMemories(map);
 
           try {
@@ -2634,8 +2668,8 @@
               displayName,
               size,
               markerCount: state.markers.length,
-              currentTime: Math.max(0, Math.min(state.duration || 0, Number(liveTime) || 0)),
-              updatedAt: Date.now()
+              currentTime: snapshot.currentTime,
+              updatedAt: snapshot.updatedAt
             }));
           } catch (_) {}
         };
@@ -2659,6 +2693,7 @@
             micGain: state.micGain,
             micGainDefaultV2: true,
             recBitDepth: state.recBitDepth,
+            recBitDepthDefaultV2: true,
             recAutoNormalize: state.recAutoNormalize,
             micDeviceId: state.micDeviceId,
             reverbIndex: state.reverbIndex,
@@ -2710,7 +2745,12 @@
             // Migrate legacy v1 default (4.0x) to clean 1.0x (0dB) once
             state.micGain = 1.0;
           }
-          if (p.recBitDepth === 16 || p.recBitDepth === 24) state.recBitDepth = p.recBitDepth;
+          if (p.recBitDepthDefaultV2 && (p.recBitDepth === 16 || p.recBitDepth === 24)) {
+            state.recBitDepth = p.recBitDepth;
+          } else {
+            // Migrate legacy default (16bit) to high-res 24bit default once
+            state.recBitDepth = 24;
+          }
           if (typeof p.recAutoNormalize === 'boolean') state.recAutoNormalize = p.recAutoNormalize;
           if (typeof p.micDeviceId === 'string') state.micDeviceId = p.micDeviceId;
           if (typeof p.reverbIndex === 'number' && p.reverbIndex >= 0 && p.reverbIndex < state.reverbPresets.length) {
@@ -4104,9 +4144,14 @@
           let finalTempMarker = typeof opts.initialTempMarker === 'number' ? opts.initialTempMarker : null;
           let restoredFromMem = false;
 
+          let mem = null;
           if (!isUnsavedRec && opts.restoreFromMemory !== false && finalMarkers.length === 0) {
-            const mem = lookupFileMemory(origName, blob.size);
-            if (mem) {
+            mem = lookupFileMemory(origName, blob.size);
+          } else if (isUnsavedRec && opts.restoreFromTempCache && finalMarkers.length === 0) {
+            mem = loadTempSessionState(origName, blob.size);
+          }
+          if (mem) {
+            {
               restoredFromMem = true;
               if (mem.displayName) finalDisplayName = mem.displayName;
               if (Array.isArray(mem.markers)) finalMarkers = cloneMarkerList(mem.markers);
@@ -7369,7 +7414,8 @@
 
       document.getElementById('btnClearSessionCache').addEventListener('click', async () => {
         await clearSessionAudioFromIDB();
-        showToast('一時音源キャッシュを削除しました（ピン記憶は保持されます）');
+        clearTempSessionState();
+        showToast('一時音源・未保存ピンキャッシュを削除しました（1000件のピン記憶は保持されます）');
       });
 
       document.getElementById('btnClearPinMemory').addEventListener('click', () => {
@@ -7451,7 +7497,9 @@
           const origName = cached.origName || cached.displayName || '前回の音源.wav';
           const dispName = cached.displayName || origName;
           const isUnsaved = Boolean(cached.isUnsavedRecording);
-          const mem = isUnsaved ? null : lookupFileMemory(origName, cached.blob.size);
+          const mem = isUnsaved
+            ? loadTempSessionState(origName, cached.blob.size)
+            : lookupFileMemory(origName, cached.blob.size);
           state.playlist = [{
             name: mem?.displayName || dispName,
             origName,
@@ -7464,6 +7512,7 @@
           await loadAudioBlob(cached.blob, dispName, [], false, null, true, {
             origName,
             restoreFromMemory: !isUnsaved,
+            restoreFromTempCache: isUnsaved,
             persistSession: false,
             silentRestoreToast: true,
             isUnsavedRecording: isUnsaved
