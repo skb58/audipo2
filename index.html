@@ -371,6 +371,18 @@
       color: #e4e4e7;
     }
 
+    .startup-last-hint {
+      margin-top: 12px;
+      padding: 8px 10px;
+      border-radius: 10px;
+      background: rgba(250, 204, 21, 0.1);
+      border: 1px solid rgba(250, 204, 21, 0.35);
+      color: #fef08a;
+      font-size: 11px;
+      line-height: 1.45;
+      text-align: left;
+    }
+
     /* Live Recording Overlay Banner */
     .rec-overlay {
       position: absolute;
@@ -1530,9 +1542,8 @@
               <span style="width:10px;height:10px;border-radius:50%;background:#fff;display:inline-block;"></span>
               <span>マイクで録音する</span>
             </button>
-
-
           </div>
+          <div id="startupLastHint" class="startup-last-hint hidden"></div>
         </div>
       </div>
 
@@ -1931,6 +1942,21 @@
           </div>
           <input type="text" id="inputTrackName" class="text-input" placeholder="トラック名を入力">
         </div>
+
+        <!-- Auto-Save Memory & Session Persistence Info -->
+        <div class="modal-section">
+          <div class="sec-head">
+            <span class="sec-title">ピン記憶・セッション自動復元</span>
+            <span id="modalMemoryCount" class="sec-value mono" style="color:#fde047;">0 / 1000件</span>
+          </div>
+          <div class="engine-desc" style="margin-bottom:9px;">
+            ファイルごとの黄色ピン・名前・スキップ設定・再生位置を最大1000ファイルまで自動記憶します（1000件を超えると古いものから自動削除）。録音した音源は「保存」するまでピン記憶に登録されません。
+          </div>
+          <div style="display:flex;gap:8px;">
+            <button id="btnClearSessionCache" type="button" class="step-btn" style="flex:1;">一時音源キャッシュ削除</button>
+            <button id="btnClearPinMemory" type="button" class="step-btn" style="color:#fca5a5;border-color:rgba(239,68,68,0.45);">全ピン記憶を初期化</button>
+          </div>
+        </div>
       </div>
 
       <!-- TAB 2: YELLOW MARKER LIST -->
@@ -2078,6 +2104,7 @@
       const waveProgressWrap = document.getElementById('waveProgressWrap');
       const waveProgressFill = document.getElementById('waveProgressFill');
       const waveProgressText = document.getElementById('waveProgressText');
+      const startupLastHint = document.getElementById('startupLastHint');
 
       // ==================== APPLICATION STATE ====================
       let nextMarkerUid = 1;
@@ -2131,6 +2158,9 @@
         wavMeta: null,
         waveformPyramid: null,
         rawBlob: null,
+        currentFileOrigName: '',
+        currentFileSize: 0,
+        isUnsavedRecording: false,
         isFallbackLargeFile: false,
         isAnalyzingWave: false,
         loadToken: 0,
@@ -2336,6 +2366,310 @@
           reader.onabort = () => reject(new Error('cancelled'));
           reader.readAsArrayBuffer(blob);
         });
+      }
+
+      // ==================== PERSISTENCE: PER-FILE PIN MEMORY & SESSION AUTO-RESTORE ====================
+      const LS_FILE_MEM_KEY = 'audipo2_file_memory_v1';
+      const LS_APP_PREFS_KEY = 'audipo2_app_prefs_v1';
+      const LS_LAST_SESSION_KEY = 'audipo2_last_session_v1';
+      const IDB_NAME = 'audipo2_session_db_v1';
+      const IDB_STORE = 'session_store';
+      const MAX_REMEMBERED_FILES = 1000;
+
+      function makeFileFingerprint(name, size) {
+        return `${String(name || '')}::${Number(size) || 0}`;
+      }
+
+      function readAllFileMemories() {
+        try {
+          const raw = localStorage.getItem(LS_FILE_MEM_KEY);
+          if (!raw) return {};
+          const parsed = JSON.parse(raw);
+          return (parsed && typeof parsed === 'object') ? parsed : {};
+        } catch (_) {
+          return {};
+        }
+      }
+
+      function writeAllFileMemories(map) {
+        // Sort newest-first so any entries beyond MAX_REMEMBERED_FILES (1000) are evicted oldest-first
+        let entries = Object.entries(map).sort((a, b) => (b[1]?.updatedAt || 0) - (a[1]?.updatedAt || 0));
+        if (entries.length > MAX_REMEMBERED_FILES) {
+          entries = entries.slice(0, MAX_REMEMBERED_FILES);
+        }
+
+        // Attempt write; if browser localStorage quota is tight, trim oldest entries until it fits
+        while (entries.length > 0) {
+          try {
+            localStorage.setItem(LS_FILE_MEM_KEY, JSON.stringify(Object.fromEntries(entries)));
+            return;
+          } catch (err) {
+            if (entries.length <= 1) {
+              console.warn('localStorage file memory write failed:', err);
+              return;
+            }
+            const drop = Math.max(1, Math.ceil(entries.length * 0.1));
+            entries = entries.slice(0, entries.length - drop);
+          }
+        }
+      }
+
+      function lookupFileMemory(origName, size) {
+        if (!origName) return null;
+        const map = readAllFileMemories();
+        const exactKey = makeFileFingerprint(origName, size);
+        if (map[exactKey]) return map[exactKey];
+
+        // Fallback: latest entry with matching original file name (useful if same file re-exported or size slightly differs)
+        let best = null;
+        for (const key in map) {
+          const rec = map[key];
+          if (rec && (rec.origName === origName || rec.displayName === origName)) {
+            if (!best || (rec.updatedAt || 0) > (best.updatedAt || 0)) {
+              best = rec;
+            }
+          }
+        }
+        return best;
+      }
+
+      let saveMemTimer = null;
+      let lastPeriodicSavePerf = 0;
+
+      function saveCurrentFileMemory(immediate = false) {
+        // Do NOT save pin info for recordings that have not yet been saved as a file
+        if (!state.hasAudio || !state.currentFileOrigName || state.isUnsavedRecording) return;
+        const doSave = () => {
+          clearTimeout(saveMemTimer);
+          saveMemTimer = null;
+          lastPeriodicSavePerf = performance.now();
+
+          const liveTime = getLivePlayheadTime();
+          const origName = state.currentFileOrigName;
+          const size = state.currentFileSize || (state.rawBlob ? state.rawBlob.size : 0);
+          const displayName = trackTitleEl.textContent.trim() || origName;
+          const key = makeFileFingerprint(origName, size);
+
+          const map = readAllFileMemories();
+          map[key] = {
+            origName,
+            displayName,
+            size,
+            markers: cloneMarkerList(state.markers),
+            startSectionEnabled: state.startSectionEnabled !== false,
+            tempMarker: state.tempMarker !== null ? Number(state.tempMarker) : null,
+            currentTime: Math.max(0, Math.min(state.duration || 0, Number(liveTime) || 0)),
+            playbackRate: state.playbackRate,
+            pitchSemitones: state.pitchSemitones,
+            sectionRepeat: Boolean(state.sectionRepeat),
+            zoomWindowSeconds: state.zoomWindowSeconds,
+            updatedAt: Date.now()
+          };
+          writeAllFileMemories(map);
+
+          try {
+            localStorage.setItem(LS_LAST_SESSION_KEY, JSON.stringify({
+              origName,
+              displayName,
+              size,
+              markerCount: state.markers.length,
+              currentTime: Math.max(0, Math.min(state.duration || 0, Number(liveTime) || 0)),
+              updatedAt: Date.now()
+            }));
+          } catch (_) {}
+        };
+
+        if (immediate) {
+          doSave();
+        } else {
+          clearTimeout(saveMemTimer);
+          saveMemTimer = setTimeout(doSave, 350);
+        }
+      }
+
+      function saveAppPrefs() {
+        try {
+          localStorage.setItem(LS_APP_PREFS_KEY, JSON.stringify({
+            engine: state.engine,
+            lpfEnabled: state.lpfEnabled,
+            orderMode: state.orderMode,
+            waveGainMode: state.waveGainMode,
+            boostMode: state.boostMode,
+            micGain: state.micGain,
+            reverbIndex: state.reverbIndex,
+            zoomVisible: state.zoomVisible,
+            zoomWindowSeconds: state.zoomWindowSeconds
+          }));
+        } catch (_) {}
+      }
+
+      function loadAppPrefs() {
+        try {
+          const raw = localStorage.getItem(LS_APP_PREFS_KEY);
+          if (!raw) return;
+          const p = JSON.parse(raw);
+          if (!p || typeof p !== 'object') return;
+
+          if (['vocoder', 'native', 'tape'].includes(p.engine)) {
+            state.engine = p.engine;
+            const labels = { vocoder: 'ボコーダ', native: 'OS標準', tape: 'テープ' };
+            btnEngineQuick.textContent = labels[p.engine];
+            const cVoc = document.getElementById('btnEngVocoder');
+            const cNat = document.getElementById('btnEngNative');
+            const cTap = document.getElementById('btnEngTape');
+            cVoc.className = 'engine-card' + (p.engine === 'vocoder' ? ' active' : '');
+            cNat.className = 'engine-card' + (p.engine === 'native' ? ' active' : '');
+            cTap.className = 'engine-card' + (p.engine === 'tape' ? ' active-tape' : '');
+            cVoc.querySelector('.engine-name').textContent = (p.engine === 'vocoder' ? '● ' : '○ ') + 'ボコーダ（同一位相ロック・ロボット声対策 / 標準）';
+            cNat.querySelector('.engine-name').textContent = (p.engine === 'native' ? '● ' : '○ ') + 'OS標準（端末内蔵ストレッチ）';
+            cTap.querySelector('.engine-name').textContent = (p.engine === 'tape' ? '● ' : '○ ') + 'テープ再生（音程連動・DSP加工ゼロ）';
+          }
+          if (typeof p.lpfEnabled === 'boolean') {
+            state.lpfEnabled = p.lpfEnabled;
+            const b = document.getElementById('btnToggleLpf');
+            b.textContent = state.lpfEnabled ? 'ON' : 'OFF';
+            b.classList.toggle('on', state.lpfEnabled);
+          }
+          if (['loop1', 'loopAll', 'stop', 'shuffle'].includes(p.orderMode)) {
+            state.orderMode = p.orderMode;
+            document.getElementById('btnOrderLoop1').classList.toggle('active', p.orderMode === 'loop1');
+            document.getElementById('btnOrderLoopAll').classList.toggle('active', p.orderMode === 'loopAll');
+            document.getElementById('btnOrderStopEnd').classList.toggle('active', p.orderMode === 'stop');
+            document.getElementById('btnOrderShuffle').classList.toggle('active', p.orderMode === 'shuffle');
+          }
+          if (p.waveGainMode !== undefined) state.waveGainMode = p.waveGainMode;
+          if (p.boostMode !== undefined) state.boostMode = p.boostMode;
+          if (typeof p.micGain === 'number' && isFinite(p.micGain)) state.micGain = p.micGain;
+          if (typeof p.reverbIndex === 'number' && p.reverbIndex >= 0 && p.reverbIndex < state.reverbPresets.length) {
+            state.reverbIndex = p.reverbIndex;
+            const rp = state.reverbPresets[state.reverbIndex];
+            reverbLabel.textContent = rp.name;
+            const active = state.reverbIndex > 0;
+            reverbLabel.style.color = active ? '#42a5f5' : '';
+            reverbIcon.style.color = active ? '#42a5f5' : '';
+          }
+          if (typeof p.zoomVisible === 'boolean') {
+            state.zoomVisible = p.zoomVisible;
+            zoomPane.classList.toggle('hidden', !state.zoomVisible);
+            zoomCollapsedBar.classList.toggle('hidden', state.zoomVisible);
+          }
+          if (typeof p.zoomWindowSeconds === 'number' && isFinite(p.zoomWindowSeconds)) {
+            setZoomSpan(p.zoomWindowSeconds);
+          }
+        } catch (_) {}
+      }
+
+      // ---------- IndexedDB Session Storage (keeps audio alive across browser close / OS tab discard) ----------
+      function openSessionDB() {
+        return new Promise((resolve, reject) => {
+          if (!('indexedDB' in window)) return reject(new Error('No IndexedDB'));
+          const req = indexedDB.open(IDB_NAME, 1);
+          req.onupgradeneeded = () => {
+            const db = req.result;
+            if (!db.objectStoreNames.contains(IDB_STORE)) {
+              db.createObjectStore(IDB_STORE);
+            }
+          };
+          req.onsuccess = () => resolve(req.result);
+          req.onerror = () => reject(req.error || new Error('IDB open failed'));
+        });
+      }
+
+      async function saveSessionAudioToIDB(blob, origName, displayName, isUnsavedRecording = false) {
+        if (!blob) return false;
+        try {
+          // Guard against exceeding device browser storage quota
+          const maxSafeBytes = 550 * 1024 * 1024;
+          if (blob.size > maxSafeBytes) return false;
+          if (navigator.storage && navigator.storage.estimate) {
+            const est = await navigator.storage.estimate();
+            if (est && est.quota && est.usage !== undefined) {
+              const avail = est.quota - est.usage;
+              if (blob.size > avail * 0.65) {
+                console.warn('Skipping IDB audio cache due to low storage quota');
+                return false;
+              }
+            }
+          }
+
+          const db = await openSessionDB();
+          await new Promise((resolve, reject) => {
+            const tx = db.transaction(IDB_STORE, 'readwrite');
+            const store = tx.objectStore(IDB_STORE);
+            store.put({
+              blob,
+              origName: origName || displayName,
+              displayName: displayName || origName,
+              size: blob.size,
+              isUnsavedRecording: Boolean(isUnsavedRecording),
+              savedAt: Date.now()
+            }, 'active_track');
+            tx.oncomplete = () => resolve();
+            tx.onerror = () => reject(tx.error);
+            tx.onabort = () => reject(tx.error || new Error('IDB tx aborted'));
+          });
+          db.close();
+          return true;
+        } catch (err) {
+          console.warn('IDB session save skipped:', err);
+          return false;
+        }
+      }
+
+      async function loadSessionAudioFromIDB() {
+        try {
+          const db = await openSessionDB();
+          const data = await new Promise((resolve, reject) => {
+            const tx = db.transaction(IDB_STORE, 'readonly');
+            const req = tx.objectStore(IDB_STORE).get('active_track');
+            req.onsuccess = () => resolve(req.result || null);
+            req.onerror = () => reject(req.error);
+          });
+          db.close();
+          return data;
+        } catch (_) {
+          return null;
+        }
+      }
+
+      async function clearSessionAudioFromIDB() {
+        try {
+          const db = await openSessionDB();
+          await new Promise((resolve, reject) => {
+            const tx = db.transaction(IDB_STORE, 'readwrite');
+            tx.objectStore(IDB_STORE).delete('active_track');
+            tx.oncomplete = () => resolve();
+            tx.onerror = () => reject(tx.error);
+          });
+          db.close();
+        } catch (_) {}
+      }
+
+      function updateStartupLastFileHint() {
+        try {
+          const raw = localStorage.getItem(LS_LAST_SESSION_KEY);
+          if (!raw) {
+            startupLastHint.classList.add('hidden');
+            return;
+          }
+          const last = JSON.parse(raw);
+          if (last && last.origName) {
+            const pinNote = last.markerCount > 0 ? `（黄色ピン ${last.markerCount}個記憶済）` : '（再生位置記憶済）';
+            startupLastHint.innerHTML = `前回: <strong>${escapeHtml(last.origName)}</strong> ${pinNote}<br>同じファイルを開くと前回のピン・位置を自動復元します。`;
+            startupLastHint.classList.remove('hidden');
+          } else {
+            startupLastHint.classList.add('hidden');
+          }
+        } catch (_) {
+          startupLastHint.classList.add('hidden');
+        }
+      }
+
+      function updateMemoryCountBadge() {
+        const el = document.getElementById('modalMemoryCount');
+        if (!el) return;
+        const count = Object.keys(readAllFileMemories()).length;
+        el.textContent = `${count} / ${MAX_REMEMBERED_FILES}件`;
       }
 
       // ==================== SECTION & SKIP HELPERS ====================
@@ -2962,6 +3296,7 @@
           }
           updateAudioRouting();
         }
+        saveAppPrefs();
         showToast(`音響エフェクト: ${p.name}`);
       }
 
@@ -3094,6 +3429,7 @@
           state.lastSyncTime = curT;
           state.lastSyncPerf = performance.now();
         }
+        saveAppPrefs();
       }
 
       // ==================== REAL PCM PYRAMID BUILDER & STREAMING WAV ENGINE ====================
@@ -3498,7 +3834,7 @@
         return 14;
       }
 
-      async function loadAudioBlob(blob, title, initialMarkers = [], autoPlay = false, preDecodedBuffer = null, startSecEnabled = true) {
+      async function loadAudioBlob(blob, title, initialMarkers = [], autoPlay = false, preDecodedBuffer = null, startSecEnabled = true, opts = {}) {
         const myToken = ++state.loadToken;
         const isCancelled = () => myToken !== state.loadToken;
 
@@ -3535,15 +3871,58 @@
           }
           if (!resolvedDuration || resolvedDuration <= 0) resolvedDuration = 30;
 
+          const origName = opts.origName || title;
+          const isUnsavedRec = Boolean(opts.isUnsavedRecording);
+          state.currentFileOrigName = origName;
+          state.currentFileSize = blob.size || 0;
+          state.isUnsavedRecording = isUnsavedRec;
+
+          let finalDisplayName = title;
+          let finalMarkers = cloneMarkerList(initialMarkers);
+          let finalStartSecEnabled = startSecEnabled !== false;
+          let finalCurrentTime = typeof opts.initialTime === 'number' ? opts.initialTime : 0;
+          let finalTempMarker = typeof opts.initialTempMarker === 'number' ? opts.initialTempMarker : null;
+          let restoredFromMem = false;
+
+          if (!isUnsavedRec && opts.restoreFromMemory !== false && finalMarkers.length === 0) {
+            const mem = lookupFileMemory(origName, blob.size);
+            if (mem) {
+              restoredFromMem = true;
+              if (mem.displayName) finalDisplayName = mem.displayName;
+              if (Array.isArray(mem.markers)) finalMarkers = cloneMarkerList(mem.markers);
+              finalStartSecEnabled = mem.startSectionEnabled !== false;
+              if (typeof mem.currentTime === 'number' && isFinite(mem.currentTime)) {
+                finalCurrentTime = mem.currentTime;
+              }
+              if (typeof mem.tempMarker === 'number' && isFinite(mem.tempMarker)) {
+                finalTempMarker = mem.tempMarker;
+              }
+              if (typeof mem.playbackRate === 'number' && isFinite(mem.playbackRate)) {
+                setPlaybackSpeed(mem.playbackRate);
+              }
+              if (typeof mem.pitchSemitones === 'number' && isFinite(mem.pitchSemitones)) {
+                setPitch(mem.pitchSemitones);
+              }
+              if (typeof mem.sectionRepeat === 'boolean') {
+                state.sectionRepeat = mem.sectionRepeat;
+                btnSectionRepeat.classList.toggle('active-green', state.sectionRepeat);
+                sectionRepeatLabel.textContent = state.sectionRepeat ? '区間ON' : '区間OFF';
+              }
+              if (typeof mem.zoomWindowSeconds === 'number' && isFinite(mem.zoomWindowSeconds)) {
+                setZoomSpan(mem.zoomWindowSeconds);
+              }
+            }
+          }
+
           state.wavMeta = wavMeta;
           state.duration = resolvedDuration;
-          state.currentTime = 0;
-          state.lastSyncTime = 0;
+          state.currentTime = Math.max(0, Math.min(resolvedDuration, finalCurrentTime));
+          state.lastSyncTime = state.currentTime;
           state.lastSyncPerf = performance.now();
           state.numRows = computeRows(resolvedDuration);
-          state.markers = cloneMarkerList(initialMarkers).filter(m => m.time > 0.05 && m.time < resolvedDuration - 0.05);
-          state.startSectionEnabled = startSecEnabled !== false;
-          state.tempMarker = null;
+          state.markers = finalMarkers.filter(m => m.time > 0.05 && m.time < resolvedDuration - 0.05);
+          state.startSectionEnabled = finalStartSecEnabled;
+          state.tempMarker = (finalTempMarker !== null && finalTempMarker >= 0 && finalTempMarker <= resolvedDuration) ? finalTempMarker : null;
           state.autoWaveGain = 1.0;
           state.autoBoostGain = 1.0;
 
@@ -3556,13 +3935,29 @@
           audioEl.mozPreservesPitch = true;
           audioEl.webkitPreservesPitch = true;
           audioEl.playbackRate = state.playbackRate;
+          if (state.currentTime > 0.05) {
+            const restoreT = state.currentTime;
+            audioEl.addEventListener('loadedmetadata', () => {
+              if (!isCancelled() && audioEl.readyState >= 1) {
+                try { audioEl.currentTime = Math.min(audioEl.duration || restoreT, restoreT); } catch (_) {}
+              }
+            }, { once: true });
+          }
 
           state.hasAudio = true;
           startupOverlay.classList.add('hidden');
           btnSaveWav.disabled = false;
           btnToggleSectionSkip.disabled = false;
           btnCutYellowSection.disabled = !(preDecodedBuffer || wavMeta);
-          trackTitleEl.textContent = title;
+          trackTitleEl.textContent = finalDisplayName;
+
+          if (state.playlist[state.currentTrackIndex]) {
+            state.playlist[state.currentTrackIndex].name = finalDisplayName;
+            state.playlist[state.currentTrackIndex].origName = origName;
+            state.playlist[state.currentTrackIndex].markers = cloneMarkerList(state.markers);
+            state.playlist[state.currentTrackIndex].startSectionEnabled = state.startSectionEnabled;
+            state.playlist[state.currentTrackIndex].isUnsavedRecording = isUnsavedRec;
+          }
 
           updateWaveGainUI();
           applyMasterBoost();
@@ -3571,6 +3966,16 @@
           updatePinButtonsUI();
           updateSectionBarUI();
           renderAllCanvases();
+
+          // Persist current file memory immediately (skipped automatically if unsaved recording)
+          saveCurrentFileMemory(true);
+          if (opts.persistSession !== false) {
+            saveSessionAudioToIDB(blob, origName, finalDisplayName, isUnsavedRec);
+          }
+          if (restoredFromMem && !opts.silentRestoreToast) {
+            const pinMsg = state.markers.length > 0 ? `黄色ピン ${state.markers.length}個・` : '';
+            showToast(`前回の状態を復元しました（${pinMsg}${formatTime(state.currentTime)}）`);
+          }
 
           if (autoPlay) startPlayback();
 
@@ -3881,7 +4286,25 @@
           a.click();
           document.body.removeChild(a);
           URL.revokeObjectURL(url);
-          showToast(`保存しました: ${name}`);
+
+          // Now that the file has been saved, enable pin memory for this file under the saved filename & size
+          const wasUnsaved = state.isUnsavedRecording;
+          state.isUnsavedRecording = false;
+          state.currentFileOrigName = name;
+          state.currentFileSize = blob.size || state.currentFileSize;
+          trackTitleEl.textContent = name;
+          if (state.playlist[state.currentTrackIndex]) {
+            state.playlist[state.currentTrackIndex].name = name;
+            state.playlist[state.currentTrackIndex].origName = name;
+            state.playlist[state.currentTrackIndex].blob = blob;
+            state.playlist[state.currentTrackIndex].isUnsavedRecording = false;
+          }
+          saveCurrentFileMemory(true);
+          saveSessionAudioToIDB(blob, name, name, false);
+          updateHeaderSubInfo();
+          updateMemoryCountBadge();
+
+          showToast(wasUnsaved ? `保存しました: ${name}（ピン情報を記憶）` : `保存しました: ${name}`);
         }, 30);
       }
 
@@ -4108,12 +4531,17 @@
 
         const wavBlob = encodeWavFromAudioBuffer(recBuffer);
         const title = makeRecordingFilename();
-        state.playlist.push({ name: title, blob: wavBlob, markers: capturedMarkers, startSectionEnabled: true });
+        state.playlist.push({ name: title, origName: title, blob: wavBlob, markers: capturedMarkers, startSectionEnabled: true, isUnsavedRecording: true });
         state.currentTrackIndex = state.playlist.length - 1;
 
-        await loadAudioBlob(wavBlob, title, capturedMarkers, false, recBuffer, true);
+        await loadAudioBlob(wavBlob, title, capturedMarkers, false, recBuffer, true, {
+          origName: title,
+          restoreFromMemory: false,
+          persistSession: true,
+          isUnsavedRecording: true
+        });
         const normNote = normGain > 1.04 ? `・自動最適化(${normGain.toFixed(1)}x)` : '';
-        showToast(`録音完了（黄色ピン ${capturedMarkers.length}個${normNote}）`);
+        showToast(`録音完了（黄色ピン ${capturedMarkers.length}個${normNote} • 未保存）`);
       }
 
       // ==================== PIN (MARKER) & BIDIRECTIONAL GREEN <-> YELLOW LOGIC ====================
@@ -4366,6 +4794,7 @@
           state.playlist[state.currentTrackIndex].markers = cloneMarkerList(state.markers);
           state.playlist[state.currentTrackIndex].startSectionEnabled = state.startSectionEnabled;
         }
+        saveCurrentFileMemory(true);
       }
 
       function updateHeaderSubInfo() {
@@ -4377,7 +4806,8 @@
           return;
         }
         const mb = state.rawBlob ? `${(state.rawBlob.size / (1024 * 1024)).toFixed(1)}MB` : '';
-        trackSubtitleEl.textContent = `${mb} • ${curIdx}/${totalTracks} • 黄色ピン ${state.markers.length}個`;
+        const unsavedPrefix = state.isUnsavedRecording ? '未保存 • ' : '';
+        trackSubtitleEl.textContent = `${unsavedPrefix}${mb} • ${curIdx}/${totalTracks} • 黄色ピン ${state.markers.length}個`;
       }
 
       // ==================== SECTION SKIP & YELLOW-TO-YELLOW AUDIO CUT ====================
@@ -4565,7 +4995,7 @@
             state.playlist[state.currentTrackIndex].startSectionEnabled = nextStartEnabled;
           }
 
-          await loadAudioBlob(newBlob, trackTitleEl.textContent.trim(), updatedMarkers, false, null, nextStartEnabled);
+          await loadAudioBlob(newBlob, trackTitleEl.textContent.trim(), updatedMarkers, false, null, nextStartEnabled, { origName: state.currentFileOrigName || trackTitleEl.textContent.trim(), restoreFromMemory: false, persistSession: true, isUnsavedRecording: state.isUnsavedRecording });
           seekTo(Math.min(state.duration, spliceTime), { setGreenPin: false });
           showToast(`区間を削除しました (-${formatTime(cutDuration)})`);
           return;
@@ -4653,11 +5083,13 @@
 
         state.audioBuffer = newBuf;
         state.rawBlob = newBlob;
+        state.currentFileSize = newBlob.size;
         state.waveformPyramid = buildPcmPyramid(newBuf);
         state.duration = newBuf.duration;
         state.markers = updatedMarkers;
         state.tempMarker = null;
         state.numRows = computeRows(state.duration);
+        saveSessionAudioToIDB(newBlob, state.currentFileOrigName, trackTitleEl.textContent.trim(), state.isUnsavedRecording);
 
         if (audioEl.dataset.url) {
           URL.revokeObjectURL(audioEl.dataset.url);
@@ -4672,6 +5104,7 @@
         }
 
         seekTo(Math.min(state.duration, spliceTime), { setGreenPin: false });
+        syncCurrentPlaylistMarkers();
         updateHeaderSubInfo();
         updatePinButtonsUI();
         updateSectionBarUI();
@@ -4909,6 +5342,7 @@
         updatePinButtonsUI();
         updateSectionBarUI();
         renderAllCanvases();
+        saveCurrentFileMemory(false);
       }
 
       function startPlayback() {
@@ -4960,6 +5394,7 @@
         stopTapeSource();
         if (!audioEl.paused) audioEl.pause();
         updatePlayUI();
+        saveCurrentFileMemory(true);
       }
 
       function togglePlayPause() {
@@ -4998,6 +5433,7 @@
           const v = parseFloat(btn.dataset.speed);
           btn.classList.toggle('active-star', Math.abs(v - clamped) < 0.005);
         });
+        saveCurrentFileMemory(false);
       }
 
       function setPitch(semi) {
@@ -5014,6 +5450,7 @@
         pitchBadgeText.classList.toggle('shifted', clamped !== 0);
         document.getElementById('modalPitchVal').textContent = txt;
         document.getElementById('pitchSlider').value = clamped;
+        saveCurrentFileMemory(false);
       }
 
       function setOrderMode(mode) {
@@ -5023,6 +5460,7 @@
         document.getElementById('btnOrderStopEnd').classList.toggle('active', mode === 'stop');
         document.getElementById('btnOrderShuffle').classList.toggle('active', mode === 'shuffle');
         const names = { loop1: '1曲リピート', loopAll: '全曲リピート', stop: '曲末で停止', shuffle: 'シャッフル' };
+        saveAppPrefs();
         showToast(`再生順: ${names[mode]}`);
       }
 
@@ -5031,6 +5469,7 @@
         btnSectionRepeat.classList.toggle('active-green', state.sectionRepeat);
         sectionRepeatLabel.textContent = state.sectionRepeat ? '区間ON' : '区間OFF';
         renderAllCanvases();
+        saveCurrentFileMemory(true);
         showToast(state.sectionRepeat ? 'マーカー区間リピート: ON' : 'マーカー区間リピート: OFF');
       }
 
@@ -5040,7 +5479,7 @@
         const safeIdx = ((idx % state.playlist.length) + state.playlist.length) % state.playlist.length;
         state.currentTrackIndex = safeIdx;
         const item = state.playlist[safeIdx];
-        await loadAudioBlob(item.blob, item.name, item.markers || [], autoPlay, null, item.startSectionEnabled !== false);
+        await loadAudioBlob(item.blob, item.name, item.markers || [], autoPlay, null, item.startSectionEnabled !== false, { origName: item.origName || item.name, restoreFromMemory: !item.isUnsavedRecording, persistSession: true, isUnsavedRecording: Boolean(item.isUnsavedRecording) });
         showToast(`トラック ${safeIdx + 1}/${state.playlist.length}: ${item.name}`);
       }
 
@@ -5586,6 +6025,8 @@
       function setZoomSpan(sec) {
         state.zoomWindowSeconds = Math.max(0.03, Math.min(60.0, sec));
         updateZoomSpanLabel();
+        saveCurrentFileMemory(false);
+        saveAppPrefs();
       }
 
       zoomCanvas.addEventListener('touchstart', (e) => {
@@ -5808,6 +6249,9 @@
           updatePinButtonsUI();
           updateSectionBarUI();
           renderAllCanvases();
+          if (performance.now() - lastPeriodicSavePerf > 2500) {
+            saveCurrentFileMemory(true);
+          }
         }
         requestAnimationFrame(animationLoop);
       }
@@ -5965,6 +6409,7 @@
         applyMasterBoost();
         setMicGain(state.micGain);
         updateLowpassFilter();
+        updateMemoryCountBadge();
         renderMarkerList();
         renderPlaylist();
         switchModalTab(initialTab);
@@ -5984,13 +6429,33 @@
           fileInput.value = '';
           return;
         }
-        const startIdx = state.playlist.length;
-        for (const f of valid) {
-          state.playlist.push({ name: f.name, blob: f, markers: [], startSectionEnabled: true });
+        let targetIdx = -1;
+        for (let k = 0; k < valid.length; k++) {
+          const f = valid[k];
+          const existingIdx = state.playlist.findIndex(item => (item.origName || item.name) === f.name && item.blob && item.blob.size === f.size);
+          if (existingIdx >= 0) {
+            state.playlist[existingIdx].blob = f;
+            if (k === 0) targetIdx = existingIdx;
+          } else {
+            const mem = lookupFileMemory(f.name, f.size);
+            const newIdx = state.playlist.length;
+            state.playlist.push({
+              name: mem?.displayName || f.name,
+              origName: f.name,
+              blob: f,
+              markers: mem ? cloneMarkerList(mem.markers) : [],
+              startSectionEnabled: mem ? (mem.startSectionEnabled !== false) : true
+            });
+            if (k === 0) targetIdx = newIdx;
+          }
         }
-        state.currentTrackIndex = startIdx;
-        await loadAudioBlob(valid[0], valid[0].name, [], false, null, true);
-        showToast(valid.length > 1 ? `${valid.length}個のローカルファイルを読み込みました` : `読込完了: ${valid[0].name}`);
+        state.currentTrackIndex = targetIdx >= 0 ? targetIdx : 0;
+        const firstFile = valid[0];
+        const hasMem = Boolean(lookupFileMemory(firstFile.name, firstFile.size));
+        await loadAudioBlob(firstFile, firstFile.name, [], false, null, true, { origName: firstFile.name, restoreFromMemory: true, persistSession: true });
+        if (!hasMem) {
+          showToast(valid.length > 1 ? `${valid.length}個のローカルファイルを読み込みました` : `読込完了: ${firstFile.name}`);
+        }
         fileInput.value = '';
         settingsModal.classList.add('hidden');
       });
@@ -6028,12 +6493,14 @@
         state.zoomVisible = false;
         zoomPane.classList.add('hidden');
         zoomCollapsedBar.classList.remove('hidden');
+        saveAppPrefs();
         renderOverviewCanvas();
       });
       document.getElementById('btnOpenZoom').addEventListener('click', () => {
         state.zoomVisible = true;
         zoomPane.classList.remove('hidden');
         zoomCollapsedBar.classList.add('hidden');
+        saveAppPrefs();
         renderAllCanvases();
       });
       btnZoomSpanReset.addEventListener('click', (e) => {
@@ -6050,6 +6517,7 @@
         const next = seq[(idx + 1) % seq.length];
         state.waveGainMode = next;
         updateWaveGainUI();
+        saveAppPrefs();
         renderAllCanvases();
         showToast(next === 'auto' ? `波形倍率: 自動 (${state.autoWaveGain.toFixed(1)}x)` : `波形倍率: ${next}x`);
       });
@@ -6062,6 +6530,7 @@
         const idx = seq.findIndex(v => String(v) === String(state.boostMode));
         state.boostMode = seq[(idx + 1) % seq.length];
         applyMasterBoost();
+        saveAppPrefs();
         showToast(`再生音量ブースト: ${Math.round(getEffectiveBoost() * 100)}%`);
       });
       btnEngineQuick.addEventListener('click', () => {
@@ -6154,6 +6623,7 @@
           if (state.playlist[state.currentTrackIndex]) {
             state.playlist[state.currentTrackIndex].name = newName;
           }
+          saveCurrentFileMemory(true);
         }
         settingsModal.classList.add('hidden');
       };
@@ -6183,12 +6653,14 @@
         b.textContent = state.lpfEnabled ? 'ON' : 'OFF';
         b.classList.toggle('on', state.lpfEnabled);
         updateLowpassFilter();
+        saveAppPrefs();
       });
 
       document.querySelectorAll('.wave-gain-opt').forEach(btn => {
         btn.addEventListener('click', () => {
           state.waveGainMode = btn.dataset.waveGain === 'auto' ? 'auto' : parseFloat(btn.dataset.waveGain);
           updateWaveGainUI();
+          saveAppPrefs();
           renderAllCanvases();
         });
       });
@@ -6198,11 +6670,30 @@
           initAudioGraph();
           state.boostMode = btn.dataset.boost === 'auto' ? 'auto' : parseFloat(btn.dataset.boost);
           applyMasterBoost();
+          saveAppPrefs();
         });
       });
 
       document.querySelectorAll('.mic-gain-opt').forEach(btn => {
-        btn.addEventListener('click', () => setMicGain(btn.dataset.micGain));
+        btn.addEventListener('click', () => {
+          setMicGain(btn.dataset.micGain);
+          saveAppPrefs();
+        });
+      });
+
+      document.getElementById('btnClearSessionCache').addEventListener('click', async () => {
+        await clearSessionAudioFromIDB();
+        showToast('一時音源キャッシュを削除しました（ピン記憶は保持されます）');
+      });
+
+      document.getElementById('btnClearPinMemory').addEventListener('click', () => {
+        try {
+          localStorage.removeItem(LS_FILE_MEM_KEY);
+          localStorage.removeItem(LS_LAST_SESSION_KEY);
+        } catch (_) {}
+        updateMemoryCountBadge();
+        updateStartupLastFileHint();
+        showToast('記憶していたすべてのファイルピン情報を初期化しました');
       });
 
       document.getElementById('btnAddMarkerFromModal').addEventListener('click', () => {
@@ -6222,15 +6713,72 @@
         showToast('すべてのマーカーを削除しました');
       });
 
-      // Resize & Startup Render
+      // Lifecycle persistence: save immediately when switching apps or closing browser, and redraw canvas on return
+      document.addEventListener('visibilitychange', () => {
+        if (document.hidden) {
+          saveCurrentFileMemory(true);
+          saveAppPrefs();
+        } else {
+          renderAllCanvases();
+          updateTimeUI();
+          updatePinButtonsUI();
+          updateSectionBarUI();
+        }
+      });
+
+      window.addEventListener('pagehide', () => {
+        saveCurrentFileMemory(true);
+        saveAppPrefs();
+      });
+
+      window.addEventListener('beforeunload', () => {
+        saveCurrentFileMemory(true);
+        saveAppPrefs();
+      });
+
+      window.addEventListener('pageshow', () => {
+        renderAllCanvases();
+      });
+
+      // Resize & Startup Render + Automatic Session Restore
       window.addEventListener('resize', renderAllCanvases);
-      window.onload = () => {
+      window.onload = async () => {
+        loadAppPrefs();
         updateWaveGainUI();
         applyMasterBoost();
         setMicGain(state.micGain);
         updateSectionBarUI();
+        updateStartupLastFileHint();
         renderAllCanvases();
         requestAnimationFrame(animationLoop);
+
+        // Automatically restore the previous audio file, markers, and playhead after browser close / OS tab discard
+        const cached = await loadSessionAudioFromIDB();
+        if (cached && cached.blob && !state.hasAudio && !state.isRecording) {
+          const origName = cached.origName || cached.displayName || '前回の音源.wav';
+          const dispName = cached.displayName || origName;
+          const isUnsaved = Boolean(cached.isUnsavedRecording);
+          const mem = isUnsaved ? null : lookupFileMemory(origName, cached.blob.size);
+          state.playlist = [{
+            name: mem?.displayName || dispName,
+            origName,
+            blob: cached.blob,
+            markers: mem ? cloneMarkerList(mem.markers) : [],
+            startSectionEnabled: mem ? (mem.startSectionEnabled !== false) : true,
+            isUnsavedRecording: isUnsaved
+          }];
+          state.currentTrackIndex = 0;
+          await loadAudioBlob(cached.blob, dispName, [], false, null, true, {
+            origName,
+            restoreFromMemory: !isUnsaved,
+            persistSession: false,
+            silentRestoreToast: true,
+            isUnsavedRecording: isUnsaved
+          });
+          const pinNote = state.markers.length > 0 ? `・黄色ピン ${state.markers.length}個` : '';
+          const unsavedNote = isUnsaved ? ' • 未保存録音' : '';
+          showToast(`前回の画面を自動復元しました (${formatTime(state.currentTime)}${pinNote}${unsavedNote})`);
+        }
       };
     })();
   </script>
