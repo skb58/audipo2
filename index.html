@@ -7,6 +7,8 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <title>Audipo風 練習プレイヤー＆レコーダー</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='bg' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%231b2030'/%3E%3Cstop offset='100%25' stop-color='%230d0f15'/%3E%3C/linearGradient%3E%3ClinearGradient id='wv' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0%25' stop-color='%2360c5ff'/%3E%3Cstop offset='100%25' stop-color='%232563eb'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='url(%23bg)'/%3E%3Crect x='1' y='1' width='62' height='62' rx='15' fill='none' stroke='%233b82f6' stroke-opacity='0.3' stroke-width='2'/%3E%3Cg fill='url(%23wv)'%3E%3Crect x='10' y='28' width='4.5' height='12' rx='2.25' opacity='0.6'/%3E%3Crect x='18' y='22' width='4.5' height='24' rx='2.25' opacity='0.85'/%3E%3Crect x='26' y='15' width='4.5' height='36' rx='2.25'/%3E%3Crect x='34' y='21' width='4.5' height='25' rx='2.25' opacity='0.9'/%3E%3Crect x='42' y='26' width='4.5' height='16' rx='2.25' opacity='0.75'/%3E%3Crect x='50' y='30' width='4.5' height='9' rx='2.25' opacity='0.5'/%3E%3C/g%3E%3Cpath d='M36.25 10.5c0-1.4 1.1-2.5 2.5-2.5h5.5c1.4 0 2.5 1.1 2.5 2.5v2.4c0 .8-.3 1.5-.9 2.1l-3.2 3.1c-.6.6-1.6.6-2.2 0l-3.2-3.1c-.6-.6-.9-1.3-.9-2.1v-2.4z' fill='%23facc15'/%3E%3C/svg%3E">
+  <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%2312151f'/%3E%3Cg fill='%2342a5f5'%3E%3Crect x='10' y='28' width='4.5' height='12' rx='2.25' opacity='0.6'/%3E%3Crect x='18' y='22' width='4.5' height='24' rx='2.25' opacity='0.85'/%3E%3Crect x='26' y='15' width='4.5' height='36' rx='2.25'/%3E%3Crect x='34' y='21' width='4.5' height='25' rx='2.25' opacity='0.9'/%3E%3Crect x='42' y='26' width='4.5' height='16' rx='2.25' opacity='0.75'/%3E%3Crect x='50' y='30' width='4.5' height='9' rx='2.25' opacity='0.5'/%3E%3C/g%3E%3Cpath d='M36.25 10.5c0-1.4 1.1-2.5 2.5-2.5h5.5c1.4 0 2.5 1.1 2.5 2.5v2.4c0 .8-.3 1.5-.9 2.1l-3.2 3.1c-.6.6-1.6.6-2.2 0l-3.2-3.1c-.6-.6-.9-1.3-.9-2.1v-2.4z' fill='%23facc15'/%3E%3C/svg%3E">
   <style>
     /* ==================== DESIGN TOKENS & RESET (ZERO EXTERNAL CDN) ==================== */
     :root {
@@ -222,7 +224,7 @@
       overflow: hidden;
     }
 
-    /* Upper Area Home-Screen-Style 2-Page Swipe Pager (Left: Full Waveform / Right: Pin List) */
+    /* Upper Area Home-Screen-Style 3-Page Swipe Pager (Left: Metronome / Center [Default]: Waveform / Right: Pin List) */
     .upper-pager-viewport {
       position: relative;
       flex: 1;
@@ -234,9 +236,9 @@
 
     .upper-pager-track {
       display: flex;
-      width: 200%;
+      width: 300%;
       height: 100%;
-      transform: translate3d(0%, 0, 0);
+      transform: translate3d(-33.333333%, 0, 0);
       transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
       will-change: transform;
     }
@@ -245,16 +247,291 @@
       transition: none;
     }
 
-    .upper-pager-track.show-pins {
-      transform: translate3d(-50%, 0, 0);
+    .upper-pager-track.page-metro {
+      transform: translate3d(0%, 0, 0);
+    }
+
+    .upper-pager-track.page-wave {
+      transform: translate3d(-33.333333%, 0, 0);
+    }
+
+    .upper-pager-track.page-pins {
+      transform: translate3d(-66.666667%, 0, 0);
     }
 
     .upper-page {
-      width: 50%;
+      width: 33.333333%;
       height: 100%;
       flex-shrink: 0;
       position: relative;
       overflow: hidden;
+    }
+
+    .upper-page-metro {
+      display: flex;
+      flex-direction: column;
+      background: radial-gradient(circle at 50% 0%, rgba(66, 165, 245, 0.08) 0%, #111113 62%);
+      overflow-y: auto;
+      overflow-x: hidden;
+      -webkit-overflow-scrolling: touch;
+      touch-action: pan-y;
+      padding: 8px 10px 18px;
+    }
+
+    .metro-panel {
+      width: 100%;
+      max-width: 440px;
+      margin: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .metro-top-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .metro-title-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11.5px;
+      font-weight: 700;
+      color: #93c5fd;
+      letter-spacing: 0.3px;
+    }
+
+    .metro-led-strip {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: #17171c;
+      border: 1px solid var(--border-subtle);
+    }
+
+    .metro-led {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #2b2b34;
+      border: 1px solid #3f3f4a;
+      transition: transform 0.06s ease, background-color 0.06s ease, box-shadow 0.06s ease;
+    }
+
+    .metro-led.lit-accent {
+      background: #facc15;
+      border-color: #fef08a;
+      box-shadow: 0 0 10px rgba(250, 204, 21, 0.85);
+      transform: scale(1.25);
+    }
+
+    .metro-led.lit-beat {
+      background: #38bdf8;
+      border-color: #bae6fd;
+      box-shadow: 0 0 9px rgba(56, 189, 248, 0.8);
+      transform: scale(1.18);
+    }
+
+    .metro-bpm-card {
+      background: #17171c;
+      border: 1px solid var(--border-subtle);
+      border-radius: 14px;
+      padding: 9px 10px 8px;
+    }
+
+    .metro-bpm-controls {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 5px;
+      margin-bottom: 6px;
+    }
+
+    .metro-step-btn {
+      height: 36px;
+      min-width: 38px;
+      padding: 0 7px;
+      border-radius: 9px;
+      background: #222229;
+      border: 1px solid var(--border-strong);
+      color: #e4e4e7;
+      font-size: 12px;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.08s ease, background-color 0.1s ease;
+    }
+
+    .metro-step-btn:active {
+      transform: scale(0.93);
+      background: #2e2e38;
+    }
+
+    .metro-bpm-input-wrap {
+      flex: 1;
+      display: flex;
+      align-items: baseline;
+      justify-content: center;
+      gap: 4px;
+      background: #111115;
+      border: 1px solid var(--border-strong);
+      border-radius: 10px;
+      padding: 2px 8px;
+      height: 40px;
+    }
+
+    .metro-bpm-input-wrap:focus-within {
+      border-color: var(--accent-blue);
+      box-shadow: 0 0 0 2px rgba(66, 165, 245, 0.2);
+    }
+
+    .metro-bpm-input {
+      width: 68px;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: #ffffff;
+      font-size: 24px;
+      font-weight: 800;
+      text-align: center;
+      padding: 0;
+      -moz-appearance: textfield;
+    }
+
+    .metro-bpm-input::-webkit-outer-spin-button,
+    .metro-bpm-input::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+
+    .metro-bpm-unit {
+      font-size: 10.5px;
+      font-weight: 700;
+      color: var(--text-sub);
+    }
+
+    .metro-action-row {
+      display: grid;
+      grid-template-columns: 1.15fr 1fr;
+      gap: 8px;
+    }
+
+    .metro-main-btn {
+      height: 44px;
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: 800;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      border: 1px solid var(--border-strong);
+      transition: transform 0.08s ease, background-color 0.14s ease, border-color 0.14s ease, box-shadow 0.14s ease;
+    }
+
+    .metro-main-btn:active {
+      transform: scale(0.96);
+    }
+
+    .metro-start-btn {
+      background: linear-gradient(180deg, #272731 0%, #1e1e26 100%);
+      color: #ffffff;
+    }
+
+    .metro-start-btn.running {
+      background: linear-gradient(180deg, rgba(66, 165, 245, 0.3) 0%, rgba(37, 99, 235, 0.24) 100%);
+      border-color: var(--accent-blue);
+      color: #bae6fd;
+      box-shadow: 0 0 14px rgba(66, 165, 245, 0.28);
+    }
+
+    .metro-tap-btn {
+      background: linear-gradient(180deg, rgba(250, 204, 21, 0.14) 0%, rgba(250, 204, 21, 0.08) 100%);
+      border-color: rgba(250, 204, 21, 0.45);
+      color: #fef08a;
+    }
+
+    .metro-tap-btn.tap-flash {
+      background: rgba(250, 204, 21, 0.34);
+      border-color: #facc15;
+      color: #ffffff;
+      transform: scale(0.96);
+    }
+
+    .metro-group {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .metro-sub-label {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 10.5px;
+      font-weight: 700;
+      color: var(--text-sub);
+      padding: 0 2px;
+    }
+
+    .metro-sound-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 4px;
+    }
+
+    .metro-beat-grid {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 4px;
+    }
+
+    .metro-chip {
+      height: 28px;
+      border-radius: 8px;
+      background: #1a1a20;
+      border: 1px solid var(--border-subtle);
+      color: #a1a1aa;
+      font-size: 10.5px;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.08s ease, background-color 0.12s ease, border-color 0.12s ease, color 0.12s ease;
+    }
+
+    .metro-chip:active {
+      transform: scale(0.94);
+    }
+
+    .metro-chip.active-blue {
+      background: var(--accent-blue-bg);
+      border-color: rgba(66, 165, 245, 0.78);
+      color: #bae6fd;
+    }
+
+    .metro-chip.active-yellow {
+      background: var(--accent-yellow-bg);
+      border-color: rgba(250, 204, 21, 0.75);
+      color: #fef08a;
+    }
+
+    .metro-vol-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 2px 2px 0;
+    }
+
+    .metro-vol-row input[type="range"] {
+      margin: 0;
+      flex: 1;
     }
 
     .upper-page-wave {
@@ -280,13 +557,13 @@
     .upper-pin-footer {
       display: flex;
       gap: 8px;
-      padding: 5px 8px 12px;
+      padding: 5px 8px 14px;
       background: #141418;
       border-top: 1px solid var(--border-subtle);
       flex-shrink: 0;
     }
 
-    /* Minimal Home-Screen-Style 2-Dot Page Indicator (non-blocking, zero vertical bloat) */
+    /* Minimal Home-Screen-Style 3-Dot Page Indicator (non-blocking, zero vertical bloat) */
     .upper-page-dots {
       position: absolute;
       left: 50%;
@@ -294,12 +571,13 @@
       transform: translateX(-50%);
       display: inline-flex;
       align-items: center;
-      gap: 6px;
-      padding: 2px 7px;
+      gap: 7px;
+      padding: 2.5px 9px;
       border-radius: 999px;
-      background: rgba(12, 12, 15, 0.55);
+      background: rgba(12, 12, 15, 0.62);
+      border: 1px solid rgba(255, 255, 255, 0.06);
       pointer-events: none;
-      z-index: 8;
+      z-index: 18;
     }
 
     .upper-dot {
@@ -307,17 +585,46 @@
       height: 5px;
       border-radius: 50%;
       background: rgba(255, 255, 255, 0.28);
-      transition: background-color 0.2s ease, transform 0.2s ease;
+      transition: background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .upper-dot.active-metro {
+      background: #38bdf8;
+      transform: scale(1.3);
+      box-shadow: 0 0 6px rgba(56, 189, 248, 0.8);
+    }
+
+    .upper-dot.metro-running-hint {
+      background: #22c55e;
+      animation: pulseDot 0.9s infinite ease-in-out;
     }
 
     .upper-dot.active {
       background: var(--accent-blue);
-      transform: scale(1.25);
+      transform: scale(1.28);
     }
 
     .upper-dot.active-pins {
       background: var(--accent-yellow);
-      transform: scale(1.25);
+      transform: scale(1.28);
+    }
+
+    .pad-btn {
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+    }
+
+    .speed-dot {
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: currentColor;
+      opacity: 0.45;
+      margin-bottom: 1px;
+    }
+
+    .speed-preset-btn.active-star .speed-dot {
+      opacity: 1;
+      box-shadow: 0 0 6px rgba(250, 204, 21, 0.9);
     }
 
     #overviewCanvas {
@@ -1582,17 +1889,17 @@
       </button>
 
       <label for="fileInput" class="hdr-btn hdr-btn-open btn-like" title="ローカル音声ファイルを開く">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M3 7v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-6l-2-2H5a2 2 0 0 0-2 2z"/>
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.95" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 20h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2Z"/>
         </svg>
         <span>開く</span>
       </label>
 
       <button id="btnSaveWav" type="button" disabled class="hdr-btn hdr-btn-save" title="WAV形式で保存">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#42a5f5" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
-          <polyline points="17 21 17 13 7 13 7 21"/>
-          <polyline points="7 3 7 8 15 8"/>
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#60b8ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 3v12"/>
+          <path d="m7 11 5 5 5-5"/>
+          <path d="M5 20h14"/>
         </svg>
         <span>保存</span>
       </button>
@@ -1601,16 +1908,156 @@
 
   <!-- ==================== 2. WAVEFORM WORKSPACE ==================== -->
   <main class="waveform-workspace">
-    <!-- Upper Pane: Home-Screen-Style 2-Page Swipe Area (Left [Default]: Full Waveform / Right: Pin List) -->
+    <!-- Upper Pane: Home-Screen-Style 3-Page Swipe Area (Left: Metronome / Center [Default]: Full Waveform / Right: Pin List) -->
     <div class="overview-wrap">
       <div id="upperPagerViewport" class="upper-pager-viewport">
-        <div id="upperPagerTrack" class="upper-pager-track">
-          <!-- Left Page (Default): Full Multi-Row Overview Waveform -->
-          <div class="upper-page upper-page-wave">
-            <canvas id="overviewCanvas"></canvas>
+        <div id="upperPagerTrack" class="upper-pager-track page-wave">
+          <!-- Page 0 (Left): Precision Metronome -->
+          <div id="upperPageMetro" class="upper-page upper-page-metro">
+            <div class="metro-panel">
+              <div class="metro-top-row">
+                <div class="metro-title-badge">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M5.5 20h13L14.8 4.5a2.88 2.88 0 0 0-5.6 0L5.5 20Z"/>
+                    <path d="M12 16 17.5 7.5"/>
+                    <circle cx="12" cy="16" r="1.4" fill="currentColor" stroke="none"/>
+                  </svg>
+                  <span>メトロノーム</span>
+                </div>
+                <div id="metroLedStrip" class="metro-led-strip" aria-label="拍インジケーター"></div>
+              </div>
+
+              <!-- BPM Numeric Input + Step Buttons + Slider -->
+              <div class="metro-bpm-card">
+                <div class="metro-bpm-controls">
+                  <button id="btnMetroM5" type="button" class="metro-step-btn mono">-5</button>
+                  <button id="btnMetroM1" type="button" class="metro-step-btn mono">-1</button>
+                  <div class="metro-bpm-input-wrap">
+                    <input id="metroBpmInput" type="number" inputmode="numeric" min="20" max="300" step="1" value="120" class="metro-bpm-input mono" aria-label="テンポBPM入力">
+                    <span class="metro-bpm-unit mono">BPM</span>
+                  </div>
+                  <button id="btnMetroP1" type="button" class="metro-step-btn mono">+1</button>
+                  <button id="btnMetroP5" type="button" class="metro-step-btn mono">+5</button>
+                </div>
+                <input id="metroBpmSlider" type="range" min="20" max="300" step="1" value="120" aria-label="テンポスライダー">
+              </div>
+
+              <!-- Start/Stop + TAP TEMPO -->
+              <div class="metro-action-row">
+                <button id="btnMetroToggle" type="button" class="metro-main-btn metro-start-btn">
+                  <svg id="metroIconPlay" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M7 5.5v13a1.5 1.5 0 0 0 2.26 1.29l10.5-6.5a1.5 1.5 0 0 0 0-2.58l-10.5-6.5A1.5 1.5 0 0 0 7 5.5Z"/>
+                  </svg>
+                  <svg id="metroIconStop" class="hidden" width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+                    <rect x="5.5" y="5.5" width="13" height="13" rx="3"/>
+                  </svg>
+                  <span id="metroToggleLabel">スタート</span>
+                </button>
+
+                <button id="btnMetroTap" type="button" class="metro-main-btn metro-tap-btn">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="3"/>
+                    <path d="M12 2v3M12 19v3M2 12h3M19 12h3"/>
+                  </svg>
+                  <span id="metroTapLabel">タップイン</span>
+                </button>
+              </div>
+
+              <!-- Sound Selector -->
+              <div class="metro-group">
+                <div class="metro-sub-label">
+                  <span>音色</span>
+                  <span id="metroSoundName" style="color:#93c5fd;">機械式</span>
+                </div>
+                <div class="metro-sound-grid">
+                  <button type="button" data-metro-sound="mechanical" class="metro-chip metro-sound-btn active-blue">機械式</button>
+                  <button type="button" data-metro-sound="woodblock" class="metro-chip metro-sound-btn">ウッド</button>
+                  <button type="button" data-metro-sound="digital" class="metro-chip metro-sound-btn">電子音</button>
+                  <button type="button" data-metro-sound="rim" class="metro-chip metro-sound-btn">リム</button>
+                  <button type="button" data-metro-sound="hihat" class="metro-chip metro-sound-btn">ハット</button>
+                </div>
+              </div>
+
+              <!-- Beats / Accent Selector -->
+              <div class="metro-group">
+                <div class="metro-sub-label">
+                  <span>拍子（1拍目アクセント）</span>
+                  <span id="metroBeatLabel" class="mono" style="color:#fde047;">4拍子</span>
+                </div>
+                <div class="metro-beat-grid">
+                  <button type="button" data-metro-beats="1" class="metro-chip metro-beat-btn">等拍</button>
+                  <button type="button" data-metro-beats="2" class="metro-chip metro-beat-btn mono">2/4</button>
+                  <button type="button" data-metro-beats="3" class="metro-chip metro-beat-btn mono">3/4</button>
+                  <button type="button" data-metro-beats="4" class="metro-chip metro-beat-btn mono active-yellow">4/4</button>
+                  <button type="button" data-metro-beats="5" class="metro-chip metro-beat-btn mono">5/4</button>
+                  <button type="button" data-metro-beats="6" class="metro-chip metro-beat-btn mono">6/8</button>
+                </div>
+              </div>
+
+              <!-- Volume -->
+              <div class="metro-vol-row">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#a1a1aa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;">
+                  <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+                  <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+                  <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
+                </svg>
+                <input id="metroVolSlider" type="range" min="0" max="100" step="1" value="75" aria-label="メトロノーム音量">
+                <span id="metroVolVal" class="mono" style="font-size:11px;color:#d4d4d8;min-width:34px;text-align:right;">75%</span>
+              </div>
+            </div>
           </div>
 
-          <!-- Right Page: Audipo-style Pin List -->
+          <!-- Page 1 (Center / Default): Full Multi-Row Overview Waveform + Startup Overlay -->
+          <div class="upper-page upper-page-wave">
+            <canvas id="overviewCanvas"></canvas>
+
+            <!-- Startup Quick-Start Card (NO auto demo load on startup; swipe right anytime for Metronome!) -->
+            <div id="startupOverlay" class="startup-overlay">
+              <div class="startup-card">
+                <div class="startup-icon">
+                  <svg width="26" height="26" viewBox="0 0 24 24" fill="none">
+                    <rect x="3" y="10" width="2.4" height="6" rx="1.2" fill="#42a5f5" opacity="0.6"/>
+                    <rect x="7.4" y="6.5" width="2.4" height="13" rx="1.2" fill="#42a5f5" opacity="0.9"/>
+                    <rect x="11.8" y="4" width="2.4" height="16" rx="1.2" fill="#60c5ff"/>
+                    <rect x="16.2" y="8" width="2.4" height="10" rx="1.2" fill="#42a5f5" opacity="0.8"/>
+                    <path d="M18.6 3.5h2.2c.65 0 1.2.55 1.2 1.2v1.3c0 .35-.15.7-.4.95l-1.35 1.3a.75.75 0 0 1-1.05 0l-1.35-1.3a1.3 1.3 0 0 1-.4-.95V4.7c0-.65.55-1.2 1.2-1.2z" fill="#facc15"/>
+                  </svg>
+                </div>
+                <h2 class="startup-title">Audipo風 練習プレイヤー＆レコーダー</h2>
+                <p class="startup-desc">
+                  高音質スロー再生・区間リピート・24bit録音・メトロノームがスマホ単体で完結します。
+                </p>
+                <div class="startup-btn-stack">
+                  <label for="fileInput" class="start-btn start-btn-local btn-like">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M4 20h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2Z"/>
+                    </svg>
+                    <span>ローカルファイルを開く (.m4a / .mp3 / .wav 等)</span>
+                  </label>
+
+                  <button id="btnStartRecord" type="button" class="start-btn start-btn-rec">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+                      <rect x="9" y="2" width="6" height="12" rx="3"/>
+                      <path d="M5 10a7 7 0 0 0 14 0"/>
+                      <line x1="12" y1="17" x2="12" y2="22"/>
+                    </svg>
+                    <span>マイクで録音する</span>
+                  </button>
+
+                  <button id="btnOpenMetroFromStart" type="button" class="start-btn start-btn-demo">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#60c5ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M5.5 20h13L14.8 4.5a2.88 2.88 0 0 0-5.6 0L5.5 20Z"/>
+                      <path d="M12 16 17.5 7.5"/>
+                    </svg>
+                    <span>メトロノームを開く（左ページ）</span>
+                  </button>
+                </div>
+                <div id="startupLastHint" class="startup-last-hint hidden"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Page 2 (Right): Audipo-style Pin List -->
           <div id="upperPagePins" class="upper-page upper-page-pins">
             <div id="upperMarkerListWrap" class="upper-pin-list"></div>
             <div class="upper-pin-footer">
@@ -1621,6 +2068,7 @@
         </div>
 
         <div class="upper-page-dots" aria-hidden="true">
+          <span id="dotUpperMetro" class="upper-dot"></span>
           <span id="dotUpperWave" class="upper-dot active"></span>
           <span id="dotUpperPins" class="upper-dot"></span>
         </div>
@@ -1634,37 +2082,6 @@
         <div class="wave-progress-pill mono">
           <span class="wave-progress-dot"></span>
           <span id="waveProgressText">波形解析中 0%</span>
-        </div>
-      </div>
-
-      <!-- Startup Quick-Start Card (NO auto demo load on startup) -->
-      <div id="startupOverlay" class="startup-overlay">
-        <div class="startup-card">
-          <div class="startup-icon">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M9 18V5l12-2v13"/>
-              <circle cx="6" cy="18" r="3"/>
-              <circle cx="18" cy="16" r="3"/>
-            </svg>
-          </div>
-          <h2 class="startup-title">Audipo風 練習プレイヤー＆レコーダー</h2>
-          <p class="startup-desc">
-            高音質フェーズボコーダでのスロー再生・区間リピート・録音中マーカー打ちがスマホ単体で完結します。
-          </p>
-          <div class="startup-btn-stack">
-            <label for="fileInput" class="start-btn start-btn-local btn-like">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M3 7v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-6l-2-2H5a2 2 0 0 0-2 2z"/>
-              </svg>
-              <span>ローカルファイルを開く (.m4a / .mp3 / .wav 等)</span>
-            </label>
-
-            <button id="btnStartRecord" type="button" class="start-btn start-btn-rec">
-              <span style="width:10px;height:10px;border-radius:50%;background:#fff;display:inline-block;"></span>
-              <span>マイクで録音する</span>
-            </button>
-          </div>
-          <div id="startupLastHint" class="startup-last-hint hidden"></div>
         </div>
       </div>
 
@@ -1724,31 +2141,33 @@
     <div class="status-right">
       <!-- Loop 1 Track -->
       <button id="btnOrderLoop1" type="button" class="order-btn" title="1曲リピート">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <polyline points="17 2 21 6 17 10"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/>
-          <polyline points="7 22 3 18 7 14"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/>
-          <text x="10" y="15" font-size="8.5" font-weight="bold" fill="currentColor" stroke="none">1</text>
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.95" stroke-linecap="round" stroke-linejoin="round">
+          <path d="m17 2 4 4-4 4"/><path d="M3 11v-1a4 4 0 0 1 4-4h14"/>
+          <path d="m7 22-4-4 4-4"/><path d="M21 13v1a4 4 0 0 1-4 4H3"/>
+          <path d="M11 10h1v4"/>
         </svg>
       </button>
       <!-- Loop All Tracks -->
       <button id="btnOrderLoopAll" type="button" class="order-btn" title="全曲リピート">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <polyline points="17 2 21 6 17 10"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/>
-          <polyline points="7 22 3 18 7 14"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/>
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.95" stroke-linecap="round" stroke-linejoin="round">
+          <path d="m17 2 4 4-4 4"/><path d="M3 11v-1a4 4 0 0 1 4-4h14"/>
+          <path d="m7 22-4-4 4-4"/><path d="M21 13v1a4 4 0 0 1-4 4H3"/>
         </svg>
       </button>
       <!-- Stop at End (Default) -->
       <button id="btnOrderStopEnd" type="button" class="order-btn active" title="曲末で停止 / 順番再生">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1">
-          <line x1="4" y1="12" x2="18" y2="12"/><polyline points="13 7 18 12 13 17"/><line x1="21" y1="6" x2="21" y2="18"/>
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 12h12"/><path d="m11 7 5 5-5 5"/><path d="M20 6v12"/>
         </svg>
       </button>
       <!-- Shuffle -->
       <button id="btnOrderShuffle" type="button" class="order-btn" title="シャッフル再生">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <polyline points="16 3 21 3 21 8"/><line x1="4" y1="20" x2="21" y2="3"/>
-          <polyline points="21 16 21 21 16 21"/><line x1="15" y1="15" x2="21" y2="21"/>
-          <line x1="4" y1="4" x2="9" y2="9"/>
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.95" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M2 18h1.4c1.3 0 2.5-.6 3.3-1.7l6.1-8.6c.7-1.1 2-1.7 3.3-1.7H22"/>
+          <path d="m18 2 4 4-4 4"/>
+          <path d="M2 6h1.9c1.5 0 2.9.9 3.6 2.2"/>
+          <path d="M22 18h-5.9c-1.3 0-2.6-.7-3.3-1.8l-.5-.8"/>
+          <path d="m18 14 4 4-4 4"/>
         </svg>
       </button>
     </div>
@@ -1761,60 +2180,67 @@
     </div>
     <div class="sec-act-group">
       <button id="btnToggleSectionSkip" type="button" disabled class="sec-act-btn" title="手前の黄色〜次の黄色までを再生時に自動スキップ">
-        <span>⏭ 区間スキップ</span>
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 17V7l8 5-8 5Z"/><path d="M14 17V7l6 5-6 5Z"/><path d="M21 7v10"/>
+        </svg>
+        <span>区間スキップ</span>
       </button>
       <button id="btnCutYellowSection" type="button" disabled class="sec-act-btn cut-btn" title="手前の黄色〜次の黄色までの音声データを削除して詰める">
-        <span>✂ 区間削除</span>
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="6" cy="6" r="2.8"/><circle cx="6" cy="18" r="2.8"/>
+          <path d="M20 4 8.12 15.88"/><path d="M14.47 14.48 20 20"/><path d="M8.12 8.12 12 12"/>
+        </svg>
+        <span>区間削除</span>
       </button>
     </div>
   </section>
 
   <!-- ==================== 4. BOTTOM 3x7 AUDIPO CONTROL GRID ==================== -->
   <footer class="control-footer">
-    <!-- ROW 1: Pin Controls (Exact Spec), Speed/Pitch, Local Folder -->
+    <!-- ROW 1: Sleek Pin Controls, Speed/Pitch, Local Folder -->
     <div class="ctrl-row">
       <!-- Col 1: Bidirectional Green <-> Yellow Convert -->
       <button id="btnPromoteTemp" type="button" class="pad-btn dimmed" title="緑一時ピン⇔黄色確定ピンを相互変換">
-        <svg id="svgConvertPin" width="26" height="26" viewBox="0 0 28 28" fill="none">
-          <polygon id="convPinFrom" points="3,4 13,4 8,12" fill="#22c55e"/>
-          <path d="M15 7h4v5" stroke="#e4e4e7" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/>
-          <polyline points="16.8,9.8 19,12.2 21.2,9.8" stroke="#e4e4e7" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/>
-          <polygon id="convPinTo" points="14,16 24,16 19,24" fill="#facc15"/>
+        <svg id="svgConvertPin" width="25" height="25" viewBox="0 0 24 24" fill="none">
+          <path id="convPinFrom" d="M3.6 3.5h5.8a1.4 1.4 0 0 1 1.4 1.4v2.6c0 .45-.2.88-.55 1.18l-2.9 2.4a1.2 1.2 0 0 1-1.5 0l-2.9-2.4A1.5 1.5 0 0 1 2.2 7.5V4.9A1.4 1.4 0 0 1 3.6 3.5Z" fill="#22c55e"/>
+          <path d="M13.5 6.2h2.2A2.5 2.5 0 0 1 18.2 8.7v2.1" stroke="#d4d4d8" stroke-width="1.75" stroke-linecap="round"/>
+          <path d="m16.2 9.4 2 2 2-2" stroke="#d4d4d8" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/>
+          <path id="convPinTo" d="M14.6 13.4h5.8a1.4 1.4 0 0 1 1.4 1.4v2.6c0 .45-.2.88-.55 1.18l-2.9 2.4a1.2 1.2 0 0 1-1.5 0l-2.9-2.4a1.5 1.5 0 0 1-.55-1.18v-2.6a1.4 1.4 0 0 1 1.4-1.4Z" fill="#facc15"/>
         </svg>
       </button>
 
-      <!-- Col 2: Jump to Green Temporary Pin (Green ▼←) -->
+      <!-- Col 2: Jump to Green Temporary Pin -->
       <button id="btnJumpTemp" type="button" class="pad-btn dimmed" title="緑の一時ピンへジャンプ（緑ピンは消えません）">
-        <svg width="26" height="26" viewBox="0 0 28 28" fill="none">
-          <polygon points="4,9 14,9 9,18" fill="#22c55e"/>
-          <path d="M24 13.5H16" stroke="#f4f4f6" stroke-width="2.1" stroke-linecap="round"/>
-          <polyline points="19,10.5 16,13.5 19,16.5" stroke="#f4f4f6" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/>
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+          <path d="M4.2 6.5h6.2a1.6 1.6 0 0 1 1.6 1.6v3.2c0 .55-.24 1.07-.66 1.43l-3.15 2.7a1.4 1.4 0 0 1-1.78 0l-3.15-2.7A1.88 1.88 0 0 1 2.6 11.3V8.1a1.6 1.6 0 0 1 1.6-1.6Z" fill="#22c55e"/>
+          <path d="M21 11.5h-6.5" stroke="#f4f4f6" stroke-width="1.9" stroke-linecap="round"/>
+          <path d="m17.3 8.7-2.8 2.8 2.8 2.8" stroke="#f4f4f6" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
       </button>
 
-      <!-- Col 3: Prev Yellow Confirmed Pin (▼←) -->
+      <!-- Col 3: Prev Yellow Confirmed Pin -->
       <button id="btnPrevYellow" type="button" class="pad-btn" title="前の黄色マーカーへ移動">
-        <svg width="26" height="26" viewBox="0 0 28 28" fill="none">
-          <polygon points="4,9 14,9 9,18" fill="#facc15"/>
-          <path d="M24 13.5H16" stroke="#f4f4f6" stroke-width="2.1" stroke-linecap="round"/>
-          <polyline points="19,10.5 16,13.5 19,16.5" stroke="#f4f4f6" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/>
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+          <path d="M4.2 6.5h6.2a1.6 1.6 0 0 1 1.6 1.6v3.2c0 .55-.24 1.07-.66 1.43l-3.15 2.7a1.4 1.4 0 0 1-1.78 0l-3.15-2.7A1.88 1.88 0 0 1 2.6 11.3V8.1a1.6 1.6 0 0 1 1.6-1.6Z" fill="#facc15"/>
+          <path d="M21 11.5h-6.5" stroke="#f4f4f6" stroke-width="1.9" stroke-linecap="round"/>
+          <path d="m17.3 8.7-2.8 2.8 2.8 2.8" stroke="#f4f4f6" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
       </button>
 
-      <!-- Col 4: Add Yellow Confirmed Pin (▼+) -->
+      <!-- Col 4: Add Yellow Confirmed Pin -->
       <button id="btnAddYellow" type="button" class="pad-btn" title="現在位置に黄色マーカーを追加">
-        <svg width="26" height="26" viewBox="0 0 28 28" fill="none">
-          <polygon points="4,9 14,9 9,18" fill="#facc15"/>
-          <path d="M20 9.5V17.5M16 13.5H24" stroke="#f4f4f6" stroke-width="2.2" stroke-linecap="round"/>
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+          <path d="M4.2 6.5h6.2a1.6 1.6 0 0 1 1.6 1.6v3.2c0 .55-.24 1.07-.66 1.43l-3.15 2.7a1.4 1.4 0 0 1-1.78 0l-3.15-2.7A1.88 1.88 0 0 1 2.6 11.3V8.1a1.6 1.6 0 0 1 1.6-1.6Z" fill="#facc15"/>
+          <path d="M18 8.3v6.4M14.8 11.5h6.4" stroke="#f4f4f6" stroke-width="2" stroke-linecap="round"/>
         </svg>
       </button>
 
-      <!-- Col 5: Next Yellow Confirmed Pin (→▼) -->
+      <!-- Col 5: Next Yellow Confirmed Pin -->
       <button id="btnNextYellow" type="button" class="pad-btn" title="次の黄色マーカーへ移動">
-        <svg width="26" height="26" viewBox="0 0 28 28" fill="none">
-          <path d="M4 13.5H12" stroke="#f4f4f6" stroke-width="2.1" stroke-linecap="round"/>
-          <polyline points="9,10.5 12,13.5 9,16.5" stroke="#f4f4f6" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/>
-          <polygon points="14,9 24,9 19,18" fill="#facc15"/>
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+          <path d="M3 11.5h6.5" stroke="#f4f4f6" stroke-width="1.9" stroke-linecap="round"/>
+          <path d="m6.7 8.7 2.8 2.8-2.8 2.8" stroke="#f4f4f6" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M13.6 6.5h6.2a1.6 1.6 0 0 1 1.6 1.6v3.2c0 .55-.24 1.07-.66 1.43l-3.15 2.7a1.4 1.4 0 0 1-1.78 0l-3.15-2.7A1.88 1.88 0 0 1 12 11.3V8.1a1.6 1.6 0 0 1 1.6-1.6Z" fill="#facc15"/>
         </svg>
       </button>
 
@@ -1824,118 +2250,123 @@
         <span id="pitchBadgeText" class="pitch-val-text mono">#:±0</span>
       </button>
 
-      <!-- Col 7: Local Folder Icon -->
+      <!-- Col 7: Modern Rounded Outline Folder Icon -->
       <label for="fileInput" class="pad-btn btn-like" title="スマホ内のローカル音声ファイルを開く">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="#f4f4f6">
-          <path d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/>
+        <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#e4e4e7" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 20h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2Z"/>
+          <path d="M2 10h20" opacity="0.35"/>
         </svg>
       </label>
     </div>
 
-    <!-- ROW 2: Section A-B Repeat, Transport, Acoustic Reverb -->
+    <!-- ROW 2: Section A-B Repeat, Modern Transport, Acoustic Reverb -->
     <div class="ctrl-row ctrl-row-transport">
       <!-- Col 1: Marker Section Repeat (A-B) -->
       <button id="btnSectionRepeat" type="button" class="pad-btn" title="マーカー区間リピートON/OFF">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <line x1="4" y1="4" x2="4" y2="11"/><line x1="20" y1="13" x2="20" y2="20"/>
-          <path d="M7 7h10l-2.5-2.5M17 17H7l2.5 2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 6v4"/><path d="M20 14v4"/>
+          <path d="M7 8h10a3 3 0 0 1 3 3"/><path d="m14.5 5.5 2.5 2.5-2.5 2.5"/>
+          <path d="M17 16H7a3 3 0 0 1-3-3"/><path d="m9.5 13.5-2.5 2.5 2.5 2.5"/>
         </svg>
         <span id="sectionRepeatLabel" class="pad-sub-xs">区間OFF</span>
       </button>
 
-      <!-- Col 2: Prev Track (|<) -->
-      <button id="btnPrevTrack" type="button" class="pad-btn" title="曲頭 / 前の曲">
+      <!-- Col 2: Prev Track / Section Start -->
+      <button id="btnPrevTrack" type="button" class="pad-btn" title="曲頭 / 前のマーカー">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-          <rect x="4" y="5" width="2.6" height="14" rx="1"/>
-          <polygon points="19,5 8,12 19,19"/>
+          <rect x="4.5" y="5.5" width="2.5" height="13" rx="1.25"/>
+          <path d="M18.5 6.4v11.2a1.2 1.2 0 0 1-1.84 1.01l-8.6-5.6a1.2 1.2 0 0 1 0-2.02l8.6-5.6a1.2 1.2 0 0 1 1.84 1.01Z"/>
         </svg>
       </button>
 
-      <!-- Col 3: Rewind 3s (<< 3) -->
+      <!-- Col 3: Modern Circular Rewind 3s -->
       <button id="btnRewind3" type="button" class="pad-btn" title="3秒戻る">
-        <svg width="19" height="19" viewBox="0 0 24 24" fill="currentColor">
-          <polygon points="11,6 3,12 11,18"/>
-          <polygon points="20,6 12,12 20,18"/>
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+          <path d="M5.2 9.4A7.5 7.5 0 1 1 5 14.5" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/>
+          <path d="M5.2 5.4v4.2h4.2" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/>
+          <text x="12.2" y="15.4" text-anchor="middle" font-size="9.5" font-weight="800" fill="currentColor" font-family="ui-monospace, SFMono-Regular, Menlo, sans-serif">3</text>
         </svg>
-        <span class="pad-sub mono">3</span>
       </button>
 
-      <!-- Col 4: Large Play / Pause -->
+      <!-- Col 4: Large Rounded Play / Pause -->
       <button id="btnPlayPause" type="button" class="pad-btn pad-btn-play" title="再生 / 一時停止">
         <svg id="iconPlay" width="26" height="26" viewBox="0 0 24 24" fill="#ffffff" style="margin-left:2px;">
-          <polygon points="6,4 20,12 6,20"/>
+          <path d="M6.8 5.2v13.6a1.6 1.6 0 0 0 2.42 1.37l11.1-6.8a1.6 1.6 0 0 0 0-2.74l-11.1-6.8A1.6 1.6 0 0 0 6.8 5.2Z"/>
         </svg>
-        <svg id="iconPause" class="hidden" width="26" height="26" viewBox="0 0 24 24" fill="#42a5f5">
-          <rect x="6" y="4" width="4.2" height="16" rx="1"/>
-          <rect x="13.8" y="4" width="4.2" height="16" rx="1"/>
+        <svg id="iconPause" class="hidden" width="26" height="26" viewBox="0 0 24 24" fill="#60b8ff">
+          <rect x="6" y="4.5" width="4.4" height="15" rx="2.2"/>
+          <rect x="13.6" y="4.5" width="4.4" height="15" rx="2.2"/>
         </svg>
       </button>
 
-      <!-- Col 5: Forward 3s (>> 3) -->
+      <!-- Col 5: Modern Circular Forward 3s -->
       <button id="btnForward3" type="button" class="pad-btn" title="3秒進む">
-        <svg width="19" height="19" viewBox="0 0 24 24" fill="currentColor">
-          <polygon points="4,6 12,12 4,18"/>
-          <polygon points="13,6 21,12 13,18"/>
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+          <path d="M18.8 9.4A7.5 7.5 0 1 0 19 14.5" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/>
+          <path d="M18.8 5.4v4.2h-4.2" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/>
+          <text x="11.8" y="15.4" text-anchor="middle" font-size="9.5" font-weight="800" fill="currentColor" font-family="ui-monospace, SFMono-Regular, Menlo, sans-serif">3</text>
         </svg>
-        <span class="pad-sub mono">3</span>
       </button>
 
-      <!-- Col 6: Next Track (>|) -->
+      <!-- Col 6: Next Track -->
       <button id="btnNextTrack" type="button" class="pad-btn" title="次の曲">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-          <polygon points="5,5 16,12 5,19"/>
-          <rect x="17.4" y="5" width="2.6" height="14" rx="1"/>
+          <path d="M5.5 6.4v11.2a1.2 1.2 0 0 0 1.84 1.01l8.6-5.6a1.2 1.2 0 0 0 0-2.02l-8.6-5.6A1.2 1.2 0 0 0 5.5 6.4Z"/>
+          <rect x="17" y="5.5" width="2.5" height="13" rx="1.25"/>
         </svg>
       </button>
 
-      <!-- Col 7: Reverb Environment Cycler -->
+      <!-- Col 7: Sleek Acoustic Reverb Waves Icon -->
       <button id="btnReverbCycle" type="button" class="pad-btn" title="音響リバーブ切替 (なし/部屋/ホール/風呂場)">
-        <svg id="reverbIcon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <rect x="4" y="3" width="16" height="18" rx="2"/>
-          <circle cx="12" cy="14" r="3.5"/>
-          <circle cx="12" cy="7" r="1" fill="currentColor"/>
+        <svg id="reverbIcon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="2.2" fill="currentColor" stroke="none"/>
+          <path d="M8.5 8.5a5 5 0 0 0 0 7"/>
+          <path d="M15.5 8.5a5 5 0 0 1 0 7"/>
+          <path d="M5.5 5.5a9.2 9.2 0 0 0 0 13" opacity="0.65"/>
+          <path d="M18.5 5.5a9.2 9.2 0 0 1 0 13" opacity="0.65"/>
         </svg>
         <span id="reverbLabel" class="pad-sub-xs">なし</span>
       </button>
     </div>
 
-    <!-- ROW 3: 5 Star Speed Presets, Marker Delete/Manager, Pencil Settings -->
+    <!-- ROW 3: Clean Speed Presets, Marker Delete/List, Pro Audio Settings -->
     <div class="ctrl-row">
       <button type="button" data-speed="0.30" class="pad-btn pad-btn-sm speed-preset-btn">
-        <span style="font-size:11px;line-height:1;">★<sub style="font-size:8px;">s</sub></span>
-        <span class="pad-sub mono">0.30x</span>
+        <span class="speed-dot"></span>
+        <span class="pad-sub mono" style="font-size:11px;font-weight:700;">0.30x</span>
       </button>
       <button type="button" data-speed="0.50" class="pad-btn pad-btn-sm speed-preset-btn">
-        <span style="font-size:11px;line-height:1;">★<sub style="font-size:8px;">s</sub></span>
-        <span class="pad-sub mono">0.50x</span>
+        <span class="speed-dot"></span>
+        <span class="pad-sub mono" style="font-size:11px;font-weight:700;">0.50x</span>
       </button>
       <button type="button" data-speed="1.00" class="pad-btn pad-btn-sm speed-preset-btn active-star">
-        <span style="font-size:11px;line-height:1;">★<sub style="font-size:8px;">s</sub></span>
-        <span class="pad-sub mono">1.00x</span>
+        <span class="speed-dot"></span>
+        <span class="pad-sub mono" style="font-size:11px;font-weight:700;">1.00x</span>
       </button>
       <button type="button" data-speed="1.35" class="pad-btn pad-btn-sm speed-preset-btn">
-        <span style="font-size:11px;line-height:1;">★<sub style="font-size:8px;">s</sub></span>
-        <span class="pad-sub mono">1.35x</span>
+        <span class="speed-dot"></span>
+        <span class="pad-sub mono" style="font-size:11px;font-weight:700;">1.35x</span>
       </button>
       <button type="button" data-speed="1.70" class="pad-btn pad-btn-sm speed-preset-btn">
-        <span style="font-size:11px;line-height:1;">★<sub style="font-size:8px;">s</sub></span>
-        <span class="pad-sub mono">1.70x</span>
+        <span class="speed-dot"></span>
+        <span class="pad-sub mono" style="font-size:11px;font-weight:700;">1.70x</span>
       </button>
 
       <!-- Col 6: Delete Closest Yellow Pin / Open Marker List -->
       <button id="btnDeleteOrListMarker" type="button" class="pad-btn pad-btn-sm" title="現在位置付近の黄色ピンを削除（近くに無ければ一覧表示）">
-        <svg width="18" height="16" viewBox="0 0 28 24" fill="none">
-          <polygon points="14,5 25,5 19.5,15" fill="#facc15"/>
-          <path d="M4 7L11 14M11 7L4 14" stroke="#f87171" stroke-width="2.4" stroke-linecap="round"/>
+        <svg width="20" height="18" viewBox="0 0 24 22" fill="none">
+          <path d="M12.8 3.5h5.8a1.4 1.4 0 0 1 1.4 1.4v3c0 .48-.21.93-.58 1.24l-2.9 2.45a1.25 1.25 0 0 1-1.64 0l-2.9-2.45A1.63 1.63 0 0 1 11.4 7.9v-3a1.4 1.4 0 0 1 1.4-1.4Z" fill="#facc15"/>
+          <path d="m3.5 6 5 5M8.5 6l-5 5" stroke="#f87171" stroke-width="2" stroke-linecap="round"/>
         </svg>
         <span class="pad-sub-xs">削除/一覧</span>
       </button>
 
-      <!-- Col 7: Pencil Settings Modal -->
+      <!-- Col 7: Pro Audio Sliders Settings Icon -->
       <button id="btnOpenSettings" type="button" class="pad-btn pad-btn-sm" title="詳細設定（速度・ピッチ・音質エンジン・音量・ピン一覧）">
-        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M12 20h9"/>
-          <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="4" y1="6" x2="20" y2="6"/><circle cx="9" cy="6" r="2" fill="#1f1f24"/>
+          <line x1="4" y1="12" x2="20" y2="12"/><circle cx="15" cy="12" r="2" fill="#1f1f24"/>
+          <line x1="4" y1="18" x2="20" y2="18"/><circle cx="10" cy="18" r="2" fill="#1f1f24"/>
         </svg>
         <span class="pad-sub-xs">設定</span>
       </button>
@@ -2145,14 +2576,16 @@
 
       <button id="btnEditMarkPreview" type="button" class="mark-action-block">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-          <polygon points="6,4 20,12 6,20"/>
+          <path d="M7 5.5v13a1.4 1.4 0 0 0 2.13 1.2l10.2-6.5a1.4 1.4 0 0 0 0-2.4L9.13 4.3A1.4 1.4 0 0 0 7 5.5Z"/>
         </svg>
         <span>試しにここから再生</span>
       </button>
 
-      <button id="btnEditMarkDelete" type="button" class="mark-action-block">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+      <button id="btnEditMarkDelete" type="button" class="mark-action-block" style="color:#fca5a5;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 6h18"/><path d="M8 6V4a1.5 1.5 0 0 1 1.5-1.5h5A1.5 1.5 0 0 1 16 4v2"/>
+          <path d="M19 6v13a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/>
+          <path d="M10 11v6M14 11v6"/>
         </svg>
         <span>このマークを削除</span>
       </button>
@@ -2255,8 +2688,22 @@
       const startupLastHint = document.getElementById('startupLastHint');
       const upperPagerViewport = document.getElementById('upperPagerViewport');
       const upperPagerTrack = document.getElementById('upperPagerTrack');
+      const dotUpperMetro = document.getElementById('dotUpperMetro');
       const dotUpperWave = document.getElementById('dotUpperWave');
       const dotUpperPins = document.getElementById('dotUpperPins');
+      const metroLedStrip = document.getElementById('metroLedStrip');
+      const metroBpmInput = document.getElementById('metroBpmInput');
+      const metroBpmSlider = document.getElementById('metroBpmSlider');
+      const btnMetroToggle = document.getElementById('btnMetroToggle');
+      const metroIconPlay = document.getElementById('metroIconPlay');
+      const metroIconStop = document.getElementById('metroIconStop');
+      const metroToggleLabel = document.getElementById('metroToggleLabel');
+      const btnMetroTap = document.getElementById('btnMetroTap');
+      const metroTapLabel = document.getElementById('metroTapLabel');
+      const metroSoundName = document.getElementById('metroSoundName');
+      const metroBeatLabel = document.getElementById('metroBeatLabel');
+      const metroVolSlider = document.getElementById('metroVolSlider');
+      const metroVolVal = document.getElementById('metroVolVal');
       const upperPagePins = document.getElementById('upperPagePins');
       const upperMarkerListWrap = document.getElementById('upperMarkerListWrap');
 
@@ -2320,7 +2767,12 @@
         loadToken: 0,
 
         // Visual layout & zoom
-        upperPage: 'wave', // 'wave' (Left/Default) | 'pins' (Right)
+        upperPage: 'wave', // 'metro' (Left) | 'wave' (Center/Default) | 'pins' (Right)
+        metroBpm: 120,
+        metroSound: 'mechanical', // 'mechanical' | 'woodblock' | 'digital' | 'rim' | 'hihat'
+        metroBeats: 4, // 1..6
+        metroVolume: 0.75, // 0..1
+        metroRunning: false,
         numRows: 12,
         zoomVisible: true,
         zoomWindowSeconds: 8.0,
@@ -2698,7 +3150,11 @@
             micDeviceId: state.micDeviceId,
             reverbIndex: state.reverbIndex,
             zoomVisible: state.zoomVisible,
-            zoomWindowSeconds: state.zoomWindowSeconds
+            zoomWindowSeconds: state.zoomWindowSeconds,
+            metroBpm: state.metroBpm,
+            metroSound: state.metroSound,
+            metroBeats: state.metroBeats,
+            metroVolume: state.metroVolume
           }));
         } catch (_) {}
       }
@@ -2768,6 +3224,18 @@
           }
           if (typeof p.zoomWindowSeconds === 'number' && isFinite(p.zoomWindowSeconds)) {
             setZoomSpan(p.zoomWindowSeconds);
+          }
+          if (typeof p.metroBpm === 'number' && isFinite(p.metroBpm)) {
+            state.metroBpm = Math.max(20, Math.min(300, Math.round(p.metroBpm)));
+          }
+          if (['mechanical', 'woodblock', 'digital', 'rim', 'hihat'].includes(p.metroSound)) {
+            state.metroSound = p.metroSound;
+          }
+          if (typeof p.metroBeats === 'number' && p.metroBeats >= 1 && p.metroBeats <= 6) {
+            state.metroBeats = Math.round(p.metroBeats);
+          }
+          if (typeof p.metroVolume === 'number' && isFinite(p.metroVolume)) {
+            state.metroVolume = Math.max(0, Math.min(1, p.metroVolume));
           }
         } catch (_) {}
       }
@@ -5284,11 +5752,13 @@
       }
 
       // ==================== SECTION SKIP & YELLOW-TO-YELLOW AUDIO CUT ====================
+      const SKIP_ICON_SVG = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M4 17V7l8 5-8 5Z"/><path d="M14 17V7l6 5-6 5Z"/><path d="M21 7v10"/></svg>';
+
       function updateSectionBarUI() {
         if (!state.hasAudio) {
           currentSectionInfo.innerHTML = '区間: 0:00 〜 0:00';
           btnToggleSectionSkip.classList.remove('skip-active');
-          btnToggleSectionSkip.innerHTML = '<span>⏭ 区間スキップ</span>';
+          btnToggleSectionSkip.innerHTML = `${SKIP_ICON_SVG}<span>区間スキップ</span>`;
           btnToggleSectionSkip.disabled = true;
           btnCutYellowSection.disabled = true;
           return;
@@ -5306,10 +5776,10 @@
 
         if (!sec.sectionEnabled) {
           btnToggleSectionSkip.classList.add('skip-active');
-          btnToggleSectionSkip.innerHTML = '<span>⏭ スキップ中</span>';
+          btnToggleSectionSkip.innerHTML = `${SKIP_ICON_SVG}<span>スキップ中</span>`;
         } else {
           btnToggleSectionSkip.classList.remove('skip-active');
-          btnToggleSectionSkip.innerHTML = '<span>⏭ 区間スキップ</span>';
+          btnToggleSectionSkip.innerHTML = `${SKIP_ICON_SVG}<span>区間スキップ</span>`;
         }
         syncActiveSectionHighlightInLists(sec);
       }
@@ -6442,10 +6912,11 @@
         return rIdx * rowDur + frac * rowDur;
       }
 
-      // Home-Screen-Style Horizontal Swipe Pager + Tap-Only Cursor Move on Main Overview Waveform
+      // Home-Screen-Style 3-Page Horizontal Swipe Pager (Left: Metronome / Center: Waveform / Right: Pin List)
+      const UPPER_PAGES = ['metro', 'wave', 'pins'];
+
       const pagerDrag = {
         active: false,
-        pointerId: null,
         sourceType: null, // 'touch' | 'mouse'
         startedOnCanvas: false,
         startX: 0,
@@ -6457,22 +6928,31 @@
         suppressClickUntil: 0
       };
 
+      function getCurrentPageIndex() {
+        const idx = UPPER_PAGES.indexOf(state.upperPage);
+        return idx >= 0 ? idx : 1;
+      }
+
       function applyPagerDragOffset(dx) {
         const vw = Math.max(1, upperPagerViewport.clientWidth);
-        const baseOffset = state.upperPage === 'pins' ? -vw : 0;
+        const maxOffset = -(UPPER_PAGES.length - 1) * vw;
+        const baseOffset = -getCurrentPageIndex() * vw;
         let targetPx = baseOffset + dx;
-        // Soft rubber-band resistance past left edge (page 0) or right edge (page 1)
+        // Soft rubber-band resistance past left edge (page 0: metro) or right edge (page 2: pins)
         if (targetPx > 0) {
           targetPx = targetPx * 0.28;
-        } else if (targetPx < -vw) {
-          targetPx = -vw + (targetPx + vw) * 0.28;
+        } else if (targetPx < maxOffset) {
+          targetPx = maxOffset + (targetPx - maxOffset) * 0.28;
         }
         upperPagerViewport.scrollLeft = 0;
         upperPagerTrack.style.transform = `translate3d(${targetPx.toFixed(1)}px, 0, 0)`;
       }
 
       function beginPagerGesture(clientX, clientY, targetEl, sourceType) {
-        if (!state.hasAudio) return false;
+        // Never hijack range sliders or numeric/text inputs inside the metronome page!
+        if (targetEl && targetEl.closest && targetEl.closest('input, select, textarea')) {
+          return false;
+        }
         pagerDrag.active = true;
         pagerDrag.sourceType = sourceType;
         pagerDrag.startedOnCanvas = (targetEl === overviewCanvas);
@@ -6539,13 +7019,16 @@
         if (wasHorizontal) {
           pagerDrag.suppressClickUntil = performance.now() + 260;
           const vw = Math.max(1, upperPagerViewport.clientWidth);
-          const distThreshold = vw * 0.22;
+          const distThreshold = vw * 0.20;
           const velThreshold = 0.35;
+          const curIdx = getCurrentPageIndex();
 
-          if (state.upperPage === 'wave' && (dx < -distThreshold || (dx < -24 && vel < -velThreshold))) {
-            setUpperPage('pins');
-          } else if (state.upperPage === 'pins' && (dx > distThreshold || (dx > 24 && vel > velThreshold))) {
-            setUpperPage('wave');
+          if (dx < -distThreshold || (dx < -24 && vel < -velThreshold)) {
+            const nextIdx = Math.min(UPPER_PAGES.length - 1, curIdx + 1);
+            setUpperPage(UPPER_PAGES[nextIdx]);
+          } else if (dx > distThreshold || (dx > 24 && vel > velThreshold)) {
+            const prevIdx = Math.max(0, curIdx - 1);
+            setUpperPage(UPPER_PAGES[prevIdx]);
           } else {
             setUpperPage(state.upperPage, { scrollActive: false });
           }
@@ -6553,12 +7036,12 @@
         }
 
         // Tap ONLY on the main overview waveform moves the cursor (no seek when dragging!)
-        if (startedOnCanvas && wasUndecided && state.upperPage === 'wave' && Math.hypot(dx, dy) <= 12) {
+        if (state.hasAudio && startedOnCanvas && wasUndecided && state.upperPage === 'wave' && Math.hypot(dx, dy) <= 12) {
           seekTo(overviewCoordsToTime(pagerDrag.startX, pagerDrag.startY), { setGreenPin: true });
         }
       }
 
-      // Suppress accidental click on pin rows immediately after finishing a horizontal swipe
+      // Suppress accidental click on buttons/rows immediately after finishing a horizontal swipe
       upperPagerViewport.addEventListener('click', (e) => {
         if (performance.now() < pagerDrag.suppressClickUntil) {
           e.preventDefault();
@@ -6566,7 +7049,7 @@
         }
       }, true);
 
-      // Mobile Touch Events on Upper Pager Viewport (both Waveform Page & Pin List Page)
+      // Mobile Touch Events on Upper Pager Viewport (Metronome, Waveform & Pin List)
       upperPagerViewport.addEventListener('touchstart', (e) => {
         if (e.touches.length !== 1) return;
         const t = e.touches[0];
@@ -6593,7 +7076,6 @@
       // Desktop Mouse Support on Upper Pager Viewport
       upperPagerViewport.addEventListener('mousedown', (e) => {
         if (e.button !== 0) return;
-        // Let buttons inside pin list work normally unless dragged horizontally
         beginPagerGesture(e.clientX, e.clientY, e.target, 'mouse');
       });
 
@@ -6901,29 +7383,387 @@
         panelPlaylist.classList.toggle('hidden', tab !== 'playlist');
       }
 
-      // ==================== UPPER AREA 2-PAGE SWITCHER (LEFT: FULL WAVEFORM / RIGHT: PIN LIST) ====================
+      // ==================== UPPER AREA 3-PAGE SWITCHER (LEFT: METRONOME / CENTER: WAVEFORM / RIGHT: PIN LIST) ====================
+      function updateUpperDotsUI() {
+        const isMetro = state.upperPage === 'metro';
+        const isWave = state.upperPage === 'wave';
+        const isPins = state.upperPage === 'pins';
+
+        dotUpperMetro.classList.toggle('active-metro', isMetro);
+        dotUpperMetro.classList.toggle('metro-running-hint', !isMetro && state.metroRunning);
+        dotUpperWave.classList.toggle('active', isWave);
+        dotUpperPins.classList.toggle('active-pins', isPins);
+      }
+
       function setUpperPage(page, opts = {}) {
-        const nextPage = page === 'pins' ? 'pins' : 'wave';
+        const nextPage = UPPER_PAGES.includes(page) ? page : 'wave';
         state.upperPage = nextPage;
-        const isPins = nextPage === 'pins';
 
         // Always lock horizontal scrollLeft to 0 so the viewport can never drift sideways
         upperPagerViewport.scrollLeft = 0;
         upperPagerTrack.classList.remove('dragging');
         upperPagerTrack.style.transform = '';
-        upperPagerTrack.classList.toggle('show-pins', isPins);
+        upperPagerTrack.classList.toggle('page-metro', nextPage === 'metro');
+        upperPagerTrack.classList.toggle('page-wave', nextPage === 'wave');
+        upperPagerTrack.classList.toggle('page-pins', nextPage === 'pins');
 
-        dotUpperWave.classList.toggle('active', !isPins);
-        dotUpperPins.classList.toggle('active-pins', isPins);
+        updateUpperDotsUI();
 
-        if (isPins) {
+        if (nextPage === 'pins') {
           renderMarkerList();
           if (opts.scrollActive !== false) {
             requestAnimationFrame(() => scrollActiveMarkerIntoView(upperMarkerListWrap));
           }
-        } else {
+        } else if (nextPage === 'wave') {
           renderOverviewCanvas();
         }
+      }
+
+      // ==================== PRECISION WEB AUDIO METRONOME + TAP TEMPO ====================
+      const METRO_SOUND_NAMES = {
+        mechanical: '機械式',
+        woodblock: 'ウッド',
+        digital: '電子音',
+        rim: 'リム',
+        hihat: 'ハット'
+      };
+      const METRO_BEAT_LABELS = {
+        1: '等拍（アクセントなし）',
+        2: '2/4拍子',
+        3: '3/4拍子',
+        4: '4/4拍子',
+        5: '5/4拍子',
+        6: '6/8拍子'
+      };
+
+      const metro = {
+        timerId: null,
+        nextNoteTime: 0,
+        currentBeat: 0,
+        noiseBuffer: null,
+        tapTimes: [],
+        tapResetTimer: null,
+        ledTimers: []
+      };
+
+      function ensureMetroNoiseBuffer() {
+        if (!audioCtx) return null;
+        if (metro.noiseBuffer && metro.noiseBuffer.sampleRate === audioCtx.sampleRate) {
+          return metro.noiseBuffer;
+        }
+        const sr = audioCtx.sampleRate;
+        const len = Math.floor(sr * 0.12);
+        const buf = audioCtx.createBuffer(1, len, sr);
+        const data = buf.getChannelData(0);
+        for (let i = 0; i < len; i++) {
+          data[i] = Math.random() * 2 - 1;
+        }
+        metro.noiseBuffer = buf;
+        return buf;
+      }
+
+      function renderMetroLeds(activeBeatIdx = -1) {
+        const count = Math.max(1, state.metroBeats);
+        if (metroLedStrip.children.length !== count) {
+          metroLedStrip.innerHTML = '';
+          for (let i = 0; i < count; i++) {
+            const dot = document.createElement('span');
+            dot.className = 'metro-led';
+            metroLedStrip.appendChild(dot);
+          }
+        }
+        for (let i = 0; i < count; i++) {
+          const el = metroLedStrip.children[i];
+          el.classList.remove('lit-accent', 'lit-beat');
+          if (i === activeBeatIdx) {
+            if (i === 0 && count > 1) el.classList.add('lit-accent');
+            else el.classList.add('lit-beat');
+          }
+        }
+      }
+
+      function scheduleMetroClick(time, beatIdx) {
+        if (!audioCtx || state.metroVolume <= 0.001) return;
+        const isAccent = (beatIdx === 0 && state.metroBeats > 1);
+        const vol = state.metroVolume * (isAccent ? 1.0 : 0.72);
+        const sound = state.metroSound;
+
+        const out = audioCtx.createGain();
+        out.gain.value = vol;
+        out.connect(audioCtx.destination);
+
+        if (sound === 'mechanical') {
+          // Crisp Wittner-style mechanical wood tick-tock
+          const osc = audioCtx.createOscillator();
+          const g = audioCtx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(isAccent ? 1850 : 1320, time);
+          osc.frequency.exponentialRampToValueAtTime(isAccent ? 680 : 480, time + 0.018);
+          g.gain.setValueAtTime(0.001, time);
+          g.gain.linearRampToValueAtTime(0.95, time + 0.0012);
+          g.gain.exponentialRampToValueAtTime(0.0008, time + 0.028);
+          osc.connect(g);
+          g.connect(out);
+          osc.start(time);
+          osc.stop(time + 0.032);
+
+          const nb = ensureMetroNoiseBuffer();
+          if (nb) {
+            const nSrc = audioCtx.createBufferSource();
+            nSrc.buffer = nb;
+            const bp = audioCtx.createBiquadFilter();
+            bp.type = 'bandpass';
+            bp.frequency.setValueAtTime(isAccent ? 3200 : 2200, time);
+            bp.Q.value = 3.2;
+            const ng = audioCtx.createGain();
+            ng.gain.setValueAtTime(0.7, time);
+            ng.gain.exponentialRampToValueAtTime(0.001, time + 0.016);
+            nSrc.connect(bp);
+            bp.connect(ng);
+            ng.connect(out);
+            nSrc.start(time);
+            nSrc.stop(time + 0.02);
+          }
+        } else if (sound === 'woodblock') {
+          // Warm resonant woodblock (pleasant for classical flute / acoustic practice)
+          const f0 = isAccent ? 980 : 740;
+          const osc1 = audioCtx.createOscillator();
+          const osc2 = audioCtx.createOscillator();
+          const g1 = audioCtx.createGain();
+          const g2 = audioCtx.createGain();
+          osc1.type = 'sine';
+          osc2.type = 'triangle';
+          osc1.frequency.setValueAtTime(f0, time);
+          osc1.frequency.exponentialRampToValueAtTime(f0 * 0.96, time + 0.055);
+          osc2.frequency.setValueAtTime(f0 * 2.42, time);
+          g1.gain.setValueAtTime(0.001, time);
+          g1.gain.linearRampToValueAtTime(0.9, time + 0.002);
+          g1.gain.exponentialRampToValueAtTime(0.001, time + 0.068);
+          g2.gain.setValueAtTime(0.32, time);
+          g2.gain.exponentialRampToValueAtTime(0.001, time + 0.022);
+          osc1.connect(g1); g1.connect(out);
+          osc2.connect(g2); g2.connect(out);
+          osc1.start(time); osc1.stop(time + 0.075);
+          osc2.start(time); osc2.stop(time + 0.028);
+        } else if (sound === 'digital') {
+          // Clean SEIKO-style quartz electronic beep
+          const osc = audioCtx.createOscillator();
+          const g = audioCtx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(isAccent ? 1568 : 1046.5, time);
+          g.gain.setValueAtTime(0.001, time);
+          g.gain.linearRampToValueAtTime(0.75, time + 0.002);
+          g.gain.exponentialRampToValueAtTime(0.0008, time + 0.052);
+          osc.connect(g);
+          g.connect(out);
+          osc.start(time);
+          osc.stop(time + 0.058);
+        } else if (sound === 'rim') {
+          // Tight snare rimshot click
+          const osc = audioCtx.createOscillator();
+          const g = audioCtx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(isAccent ? 560 : 410, time);
+          osc.frequency.exponentialRampToValueAtTime(190, time + 0.028);
+          g.gain.setValueAtTime(0.85, time);
+          g.gain.exponentialRampToValueAtTime(0.001, time + 0.036);
+          osc.connect(g); g.connect(out);
+          osc.start(time); osc.stop(time + 0.042);
+
+          const nb = ensureMetroNoiseBuffer();
+          if (nb) {
+            const nSrc = audioCtx.createBufferSource();
+            nSrc.buffer = nb;
+            const hp = audioCtx.createBiquadFilter();
+            hp.type = 'bandpass';
+            hp.frequency.setValueAtTime(isAccent ? 2400 : 1700, time);
+            hp.Q.value = 1.6;
+            const ng = audioCtx.createGain();
+            ng.gain.setValueAtTime(0.85, time);
+            ng.gain.exponentialRampToValueAtTime(0.001, time + 0.026);
+            nSrc.connect(hp); hp.connect(ng); ng.connect(out);
+            nSrc.start(time); nSrc.stop(time + 0.032);
+          }
+        } else {
+          // Crisp metallic closed hi-hat tick
+          const nb = ensureMetroNoiseBuffer();
+          if (nb) {
+            const nSrc = audioCtx.createBufferSource();
+            nSrc.buffer = nb;
+            const hp = audioCtx.createBiquadFilter();
+            hp.type = 'highpass';
+            hp.frequency.setValueAtTime(isAccent ? 6500 : 8200, time);
+            const ng = audioCtx.createGain();
+            ng.gain.setValueAtTime(0.95, time);
+            ng.gain.exponentialRampToValueAtTime(0.001, time + (isAccent ? 0.062 : 0.034));
+            nSrc.connect(hp); hp.connect(ng); ng.connect(out);
+            nSrc.start(time); nSrc.stop(time + 0.07);
+          }
+        }
+      }
+
+      function runMetroScheduler() {
+        if (!state.metroRunning || !audioCtx) return;
+        const scheduleAheadSec = 0.12;
+        while (metro.nextNoteTime < audioCtx.currentTime + scheduleAheadSec) {
+          const beatToPlay = metro.currentBeat;
+          const playAt = metro.nextNoteTime;
+          scheduleMetroClick(playAt, beatToPlay);
+
+          // Schedule visual LED pulse accurately matched to audioCtx time
+          const delayMs = Math.max(0, (playAt - audioCtx.currentTime) * 1000);
+          const beatDurMs = (60 / state.metroBpm) * 1000;
+          const tOn = setTimeout(() => {
+            if (!state.metroRunning) return;
+            renderMetroLeds(beatToPlay);
+            const tOff = setTimeout(() => {
+              if (state.metroRunning) renderMetroLeds(-1);
+            }, Math.min(130, beatDurMs * 0.45));
+            metro.ledTimers.push(tOff);
+          }, delayMs);
+          metro.ledTimers.push(tOn);
+
+          metro.nextNoteTime += 60.0 / state.metroBpm;
+          metro.currentBeat = (metro.currentBeat + 1) % Math.max(1, state.metroBeats);
+        }
+      }
+
+      function startMetronome() {
+        initAudioGraph();
+        if (state.metroRunning) return;
+        state.metroRunning = true;
+        metro.currentBeat = 0;
+        metro.nextNoteTime = audioCtx.currentTime + 0.03;
+        runMetroScheduler();
+        metro.timerId = setInterval(runMetroScheduler, 25);
+        updateMetroUI();
+        updateUpperDotsUI();
+      }
+
+      function stopMetronome() {
+        state.metroRunning = false;
+        if (metro.timerId) {
+          clearInterval(metro.timerId);
+          metro.timerId = null;
+        }
+        metro.ledTimers.forEach(id => clearTimeout(id));
+        metro.ledTimers = [];
+        renderMetroLeds(-1);
+        updateMetroUI();
+        updateUpperDotsUI();
+      }
+
+      function toggleMetronome() {
+        if (state.metroRunning) stopMetronome();
+        else startMetronome();
+      }
+
+      function setMetroBpm(val, save = true) {
+        const clamped = Math.max(20, Math.min(300, Math.round(Number(val) || 120)));
+        state.metroBpm = clamped;
+        if (document.activeElement !== metroBpmInput) {
+          metroBpmInput.value = String(clamped);
+        }
+        metroBpmSlider.value = String(clamped);
+        if (save) saveAppPrefs();
+      }
+
+      function setMetroSound(soundKey, preview = false) {
+        if (!METRO_SOUND_NAMES[soundKey]) return;
+        state.metroSound = soundKey;
+        metroSoundName.textContent = METRO_SOUND_NAMES[soundKey];
+        document.querySelectorAll('.metro-sound-btn').forEach(btn => {
+          btn.classList.toggle('active-blue', btn.dataset.metroSound === soundKey);
+        });
+        saveAppPrefs();
+        if (preview && !state.metroRunning) {
+          initAudioGraph();
+          scheduleMetroClick(audioCtx.currentTime + 0.01, 0);
+        }
+      }
+
+      function setMetroBeats(beats) {
+        const clamped = Math.max(1, Math.min(6, parseInt(beats, 10) || 4));
+        state.metroBeats = clamped;
+        if (metro.currentBeat >= clamped) metro.currentBeat = 0;
+        metroBeatLabel.textContent = METRO_BEAT_LABELS[clamped] || `${clamped}拍子`;
+        document.querySelectorAll('.metro-beat-btn').forEach(btn => {
+          btn.classList.toggle('active-yellow', parseInt(btn.dataset.metroBeats, 10) === clamped);
+        });
+        renderMetroLeds(-1);
+        saveAppPrefs();
+      }
+
+      function setMetroVolume(pct) {
+        const p = Math.max(0, Math.min(100, Math.round(Number(pct) || 0)));
+        state.metroVolume = p / 100;
+        metroVolSlider.value = String(p);
+        metroVolVal.textContent = `${p}%`;
+        saveAppPrefs();
+      }
+
+      function handleMetroTapTempo() {
+        const now = performance.now();
+        btnMetroTap.classList.add('tap-flash');
+        setTimeout(() => btnMetroTap.classList.remove('tap-flash'), 110);
+
+        // Give instant subtle audible feedback on tap if metronome isn't currently running
+        if (!state.metroRunning) {
+          initAudioGraph();
+          scheduleMetroClick(audioCtx.currentTime + 0.005, 1);
+        }
+
+        if (metro.tapTimes.length > 0 && (now - metro.tapTimes[metro.tapTimes.length - 1]) > 2200) {
+          metro.tapTimes = [];
+        }
+        metro.tapTimes.push(now);
+        if (metro.tapTimes.length > 7) {
+          metro.tapTimes.shift();
+        }
+
+        clearTimeout(metro.tapResetTimer);
+        metro.tapResetTimer = setTimeout(() => {
+          metro.tapTimes = [];
+          metroTapLabel.textContent = 'タップイン';
+        }, 2300);
+
+        if (metro.tapTimes.length >= 2) {
+          let sumDiff = 0;
+          for (let i = 1; i < metro.tapTimes.length; i++) {
+            sumDiff += (metro.tapTimes[i] - metro.tapTimes[i - 1]);
+          }
+          const avgMs = sumDiff / (metro.tapTimes.length - 1);
+          if (avgMs > 150) {
+            const bpm = Math.max(20, Math.min(300, Math.round(60000 / avgMs)));
+            setMetroBpm(bpm, true);
+            metroBpmInput.value = String(bpm);
+            metroTapLabel.textContent = `TAP ${bpm}`;
+          }
+        } else {
+          metroTapLabel.textContent = 'もう一度タップ';
+        }
+      }
+
+      function updateMetroUI() {
+        metroBpmInput.value = String(state.metroBpm);
+        metroBpmSlider.value = String(state.metroBpm);
+        metroSoundName.textContent = METRO_SOUND_NAMES[state.metroSound] || '機械式';
+        metroBeatLabel.textContent = METRO_BEAT_LABELS[state.metroBeats] || `${state.metroBeats}拍子`;
+        metroVolSlider.value = String(Math.round(state.metroVolume * 100));
+        metroVolVal.textContent = `${Math.round(state.metroVolume * 100)}%`;
+
+        document.querySelectorAll('.metro-sound-btn').forEach(btn => {
+          btn.classList.toggle('active-blue', btn.dataset.metroSound === state.metroSound);
+        });
+        document.querySelectorAll('.metro-beat-btn').forEach(btn => {
+          btn.classList.toggle('active-yellow', parseInt(btn.dataset.metroBeats, 10) === state.metroBeats);
+        });
+
+        btnMetroToggle.classList.toggle('running', state.metroRunning);
+        metroIconPlay.classList.toggle('hidden', state.metroRunning);
+        metroIconStop.classList.toggle('hidden', !state.metroRunning);
+        metroToggleLabel.textContent = state.metroRunning ? 'ストップ' : 'スタート';
+        if (!state.metroRunning) renderMetroLeds(-1);
       }
 
       function populateMarkerListContainer(wrap, opts = {}) {
@@ -6938,7 +7778,9 @@
         const activeSec = getCurrentYellowSection(state.currentTime);
         const activeKey = activeSec ? (activeSec.markerId === null ? '__start__' : activeSec.markerId) : '';
 
-        const pencilSvg = '<svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1.003 1.003 0 0 0 0-1.42l-2.34-2.34a1.003 1.003 0 0 0-1.42 0l-1.83 1.83 3.75 3.75 1.84-1.82z"/></svg>';
+        const pencilSvg = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.83 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>';
+        const pinBadgeSvg = '<svg width="13" height="13" viewBox="0 0 24 24" fill="#facc15" style="vertical-align:-2px;margin-right:7px;"><path d="M6.5 4h11a2 2 0 0 1 2 2v4.8c0 .8-.36 1.56-.98 2.08l-5.2 4.35a2 2 0 0 1-2.64 0l-5.2-4.35A2.7 2.7 0 0 1 4.5 10.8V6a2 2 0 0 1 2-2Z"/></svg>';
+        const skipBadgeSvg = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#a1a1aa" stroke-width="2.4" stroke-linecap="round" style="vertical-align:-2px;margin-right:7px;"><path d="M8 5v14M16 5v14"/></svg>';
 
         // Row 0: Start of track (0:00)
         const isStartActive = activeKey === '__start__';
@@ -6948,9 +7790,7 @@
 
         const startMain = document.createElement('div');
         startMain.className = 'list-item-main';
-        const startIcon = state.startSectionEnabled !== false
-          ? '<span style="color:#facc15;font-weight:900;margin-right:8px;">▼</span>'
-          : '<span style="color:#d4d4d8;font-weight:900;margin-right:8px;letter-spacing:1px;">||</span>';
+        const startIcon = state.startSectionEnabled !== false ? pinBadgeSvg : skipBadgeSvg;
         const startSkipNote = state.startSectionEnabled !== false ? '' : ' <span style="color:#fcd34d;font-size:10px;">(スキップ)</span>';
         const startNowBadge = `<span class="active-section-badge${isStartActive ? '' : ' hidden'}">現在区間</span>`;
         startMain.innerHTML = `<div class="list-item-title mono">${startIcon}0:00${startSkipNote}${startNowBadge}</div>`;
@@ -6984,9 +7824,7 @@
 
           const main = document.createElement('div');
           main.className = 'list-item-main';
-          const iconHtml = mk.sectionEnabled === false
-            ? '<span style="color:#d4d4d8;font-weight:900;margin-right:8px;letter-spacing:1px;">||</span>'
-            : '<span style="color:#facc15;font-weight:900;margin-right:8px;">▼</span>';
+          const iconHtml = mk.sectionEnabled === false ? skipBadgeSvg : pinBadgeSvg;
           const nameHtml = mk.name ? ` <span style="font-weight:700;color:#ffffff;">${escapeHtml(mk.name)}</span>` : '';
           const skipBadge = mk.sectionEnabled === false ? ' <span style="color:#fcd34d;font-size:10px;">(スキップ)</span>' : '';
           const nowBadge = `<span class="active-section-badge${isCurSec ? '' : ' hidden'}">現在区間</span>`;
@@ -7150,6 +7988,49 @@
       // Header & Startup Actions
       btnRecordHeader.addEventListener('click', () => state.isRecording ? stopRecording() : startRecording());
       document.getElementById('btnStartRecord').addEventListener('click', startRecording);
+      document.getElementById('btnOpenMetroFromStart').addEventListener('click', () => setUpperPage('metro', { scrollActive: false }));
+
+      // Precision Metronome Listeners
+      btnMetroToggle.addEventListener('click', toggleMetronome);
+      btnMetroTap.addEventListener('click', handleMetroTapTempo);
+      document.getElementById('btnMetroM5').addEventListener('click', () => setMetroBpm(state.metroBpm - 5));
+      document.getElementById('btnMetroM1').addEventListener('click', () => setMetroBpm(state.metroBpm - 1));
+      document.getElementById('btnMetroP1').addEventListener('click', () => setMetroBpm(state.metroBpm + 1));
+      document.getElementById('btnMetroP5').addEventListener('click', () => setMetroBpm(state.metroBpm + 5));
+
+      metroBpmSlider.addEventListener('input', (e) => {
+        setMetroBpm(parseInt(e.target.value, 10), false);
+        metroBpmInput.value = String(state.metroBpm);
+      });
+      metroBpmSlider.addEventListener('change', () => saveAppPrefs());
+
+      metroBpmInput.addEventListener('input', (e) => {
+        const v = parseInt(e.target.value, 10);
+        if (isFinite(v) && v >= 20 && v <= 300) {
+          state.metroBpm = v;
+          metroBpmSlider.value = String(v);
+        }
+      });
+      const commitMetroBpmInput = () => {
+        setMetroBpm(metroBpmInput.value, true);
+        metroBpmInput.value = String(state.metroBpm);
+      };
+      metroBpmInput.addEventListener('change', commitMetroBpmInput);
+      metroBpmInput.addEventListener('blur', commitMetroBpmInput);
+      metroBpmInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          commitMetroBpmInput();
+          metroBpmInput.blur();
+        }
+      });
+
+      document.querySelectorAll('.metro-sound-btn').forEach(btn => {
+        btn.addEventListener('click', () => setMetroSound(btn.dataset.metroSound, true));
+      });
+      document.querySelectorAll('.metro-beat-btn').forEach(btn => {
+        btn.addEventListener('click', () => setMetroBeats(btn.dataset.metroBeats));
+      });
+      metroVolSlider.addEventListener('input', (e) => setMetroVolume(e.target.value));
       document.getElementById('btnRecStop').addEventListener('click', stopRecording);
       document.getElementById('btnRecAddMarker').addEventListener('click', addMarkerDuringRecording);
       btnSaveWav.addEventListener('click', exportCurrentWav);
@@ -7484,6 +8365,7 @@
         setMicGain(state.micGain);
         updateRecSettingsUI();
         refreshMicDeviceList();
+        updateMetroUI();
         setUpperPage('wave', { scrollActive: false });
         updateSectionBarUI();
         updateStartupLastFileHint();
