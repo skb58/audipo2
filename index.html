@@ -217,7 +217,121 @@
       flex: 1;
       min-height: 0;
       width: 100%;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* Upper Area 2-Page Switcher Bar (Left: Full Waveform / Right: Pin List) */
+    .upper-pager-bar {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      background: #141418;
+      border-bottom: 1px solid var(--border-subtle);
+      flex-shrink: 0;
+      z-index: 5;
+    }
+
+    .upper-page-tab {
+      position: relative;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      font-size: 11.5px;
+      font-weight: 700;
+      color: var(--text-dim);
+      transition: color 0.14s ease, background-color 0.14s ease;
+    }
+
+    .upper-page-tab:active {
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    .upper-page-tab.active {
+      color: #ffffff;
+      background: rgba(66, 165, 245, 0.08);
+    }
+
+    .upper-page-tab.active::after {
+      content: '';
+      position: absolute;
+      left: 16%;
+      right: 16%;
+      bottom: 0;
+      height: 2px;
+      border-radius: 2px 2px 0 0;
+      background: var(--accent-blue);
+    }
+
+    .upper-page-tab[data-page="pins"].active::after {
+      background: var(--accent-yellow);
+    }
+
+    .upper-tab-count {
+      font-size: 10px;
+      padding: 0 5px;
+      border-radius: 999px;
+      background: rgba(250, 204, 21, 0.16);
+      color: #fde047;
+      line-height: 1.5;
+    }
+
+    .upper-pager-viewport {
+      position: relative;
+      flex: 1;
+      min-height: 0;
+      width: 100%;
+      overflow: hidden;
+    }
+
+    .upper-pager-track {
+      display: flex;
+      width: 200%;
+      height: 100%;
+      transform: translateX(0%);
+      transition: transform 0.24s cubic-bezier(0.22, 1, 0.36, 1);
+      will-change: transform;
+    }
+
+    .upper-pager-track.show-pins {
+      transform: translateX(-50%);
+    }
+
+    .upper-page {
+      width: 50%;
+      height: 100%;
+      flex-shrink: 0;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .upper-page-wave {
       padding: 4px 6px;
+    }
+
+    .upper-page-pins {
+      display: flex;
+      flex-direction: column;
+      background: var(--bg-base);
+    }
+
+    .upper-pin-list {
+      flex: 1;
+      min-height: 0;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      padding: 6px 8px 4px;
+    }
+
+    .upper-pin-footer {
+      display: flex;
+      gap: 8px;
+      padding: 5px 8px 6px;
+      background: #141418;
+      border-top: 1px solid var(--border-subtle);
+      flex-shrink: 0;
     }
 
     #overviewCanvas {
@@ -231,7 +345,7 @@
     /* Non-intrusive Waveform Analysis Progress Bar & Pill */
     .wave-progress-wrap {
       position: absolute;
-      top: 0;
+      top: 28px;
       left: 0;
       right: 0;
       z-index: 12;
@@ -1501,9 +1615,35 @@
 
   <!-- ==================== 2. WAVEFORM WORKSPACE ==================== -->
   <main class="waveform-workspace">
-    <!-- Upper Pane: Multi-Row Overview Waveform -->
+    <!-- Upper Pane: 2-Page Workspace (Left [Default]: Full Overview Waveform / Right: Pin List) -->
     <div class="overview-wrap">
-      <canvas id="overviewCanvas"></canvas>
+      <div id="upperPagerBar" class="upper-pager-bar" role="tablist" aria-label="上段表示切替">
+        <button id="btnUpperPageWave" type="button" data-page="wave" role="tab" aria-selected="true" class="upper-page-tab active">
+          <span>全体波形</span>
+        </button>
+        <button id="btnUpperPagePins" type="button" data-page="pins" role="tab" aria-selected="false" class="upper-page-tab">
+          <span>ピン一覧</span>
+          <span id="upperPinTabCount" class="upper-tab-count mono">0</span>
+        </button>
+      </div>
+
+      <div class="upper-pager-viewport">
+        <div id="upperPagerTrack" class="upper-pager-track">
+          <!-- Left Page (Default): Full Multi-Row Overview Waveform -->
+          <div class="upper-page upper-page-wave">
+            <canvas id="overviewCanvas"></canvas>
+          </div>
+
+          <!-- Right Page: Audipo-style Pin List -->
+          <div id="upperPagePins" class="upper-page upper-page-pins">
+            <div id="upperMarkerListWrap" class="upper-pin-list"></div>
+            <div class="upper-pin-footer">
+              <button id="btnAddMarkerFromUpper" type="button" class="step-btn" style="flex:1;color:#fde047;border-color:rgba(250,204,21,0.5);">＋ 現在位置に黄色ピン追加</button>
+              <button id="btnClearAllMarkersUpper" type="button" class="step-btn" style="color:#fca5a5;border-color:rgba(239,68,68,0.5);">全削除</button>
+            </div>
+          </div>
+        </div>
+      </div>
 
       <!-- Non-intrusive Waveform Analysis Progress Indicator (never blocks touch/playback) -->
       <div id="waveProgressWrap" class="wave-progress-wrap hidden" aria-live="polite">
@@ -2105,6 +2245,13 @@
       const waveProgressFill = document.getElementById('waveProgressFill');
       const waveProgressText = document.getElementById('waveProgressText');
       const startupLastHint = document.getElementById('startupLastHint');
+      const upperPagerBar = document.getElementById('upperPagerBar');
+      const upperPagerTrack = document.getElementById('upperPagerTrack');
+      const btnUpperPageWave = document.getElementById('btnUpperPageWave');
+      const btnUpperPagePins = document.getElementById('btnUpperPagePins');
+      const upperPinTabCount = document.getElementById('upperPinTabCount');
+      const upperPagePins = document.getElementById('upperPagePins');
+      const upperMarkerListWrap = document.getElementById('upperMarkerListWrap');
 
       // ==================== APPLICATION STATE ====================
       let nextMarkerUid = 1;
@@ -2166,6 +2313,7 @@
         loadToken: 0,
 
         // Visual layout & zoom
+        upperPage: 'wave', // 'wave' (Left/Default) | 'pins' (Right)
         numRows: 12,
         zoomVisible: true,
         zoomWindowSeconds: 8.0,
@@ -3965,6 +4113,7 @@
           updateTimeUI();
           updatePinButtonsUI();
           updateSectionBarUI();
+          renderMarkerList();
           renderAllCanvases();
 
           // Persist current file memory immediately (skipped automatically if unsaved recording)
@@ -4739,7 +4888,7 @@
       function deleteNearestYellowOrOpenList() {
         if (!state.hasAudio) return;
         if (state.markers.length === 0) {
-          openSettingsModal('markers');
+          setUpperPage('pins');
           return;
         }
         let bestIdx = -1;
@@ -4761,7 +4910,7 @@
           const lbl = removed.name ? `${formatTime(removed.time)} (${removed.name})` : formatTime(removed.time);
           showToast(`黄色ピン削除: ${lbl}`);
         } else {
-          openSettingsModal('markers');
+          setUpperPage('pins');
         }
       }
 
@@ -4794,6 +4943,7 @@
           state.playlist[state.currentTrackIndex].markers = cloneMarkerList(state.markers);
           state.playlist[state.currentTrackIndex].startSectionEnabled = state.startSectionEnabled;
         }
+        renderMarkerList();
         saveCurrentFileMemory(true);
       }
 
@@ -4838,6 +4988,7 @@
           btnToggleSectionSkip.classList.remove('skip-active');
           btnToggleSectionSkip.innerHTML = '<span>⏭ 区間スキップ</span>';
         }
+        syncActiveSectionHighlightInLists(sec);
       }
 
       function escapeHtml(str) {
@@ -6278,10 +6429,31 @@
         panelPlaylist.classList.toggle('hidden', tab !== 'playlist');
       }
 
-      // Audipo-style Marker List with 0:00 row, ▼ / || icon, Name, Current-Section highlight, and Pencil edit button
-      function renderMarkerList() {
-        document.getElementById('markerTabCount').textContent = String(state.markers.length);
-        const wrap = document.getElementById('markerListWrap');
+      // ==================== UPPER AREA 2-PAGE SWITCHER (LEFT: FULL WAVEFORM / RIGHT: PIN LIST) ====================
+      function setUpperPage(page, opts = {}) {
+        const nextPage = page === 'pins' ? 'pins' : 'wave';
+        state.upperPage = nextPage;
+        const isPins = nextPage === 'pins';
+
+        upperPagerTrack.classList.toggle('show-pins', isPins);
+        btnUpperPageWave.classList.toggle('active', !isPins);
+        btnUpperPagePins.classList.toggle('active', isPins);
+        btnUpperPageWave.setAttribute('aria-selected', String(!isPins));
+        btnUpperPagePins.setAttribute('aria-selected', String(isPins));
+
+        if (isPins) {
+          renderMarkerList();
+          if (opts.scrollActive !== false) {
+            setTimeout(() => scrollActiveMarkerIntoView(upperMarkerListWrap), 60);
+          }
+        } else {
+          renderOverviewCanvas();
+        }
+      }
+
+      function populateMarkerListContainer(wrap, opts = {}) {
+        if (!wrap) return;
+        const { closeSettingsOnSeek = false } = opts;
         wrap.innerHTML = '';
         if (!state.hasAudio) {
           wrap.innerHTML = '<div style="text-align:center;color:#71717a;font-size:12px;padding:24px 0;">音声ファイルが読み込まれていません</div>';
@@ -6289,29 +6461,34 @@
         }
 
         const activeSec = getCurrentYellowSection(state.currentTime);
-        const isStartActive = Boolean(activeSec && activeSec.markerId === null);
+        const activeKey = activeSec ? (activeSec.markerId === null ? '__start__' : activeSec.markerId) : '';
+
+        const pencilSvg = '<svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1.003 1.003 0 0 0 0-1.42l-2.34-2.34a1.003 1.003 0 0 0-1.42 0l-1.83 1.83 3.75 3.75 1.84-1.82z"/></svg>';
 
         // Row 0: Start of track (0:00)
+        const isStartActive = activeKey === '__start__';
         const startItem = document.createElement('div');
         startItem.className = 'list-item' + (isStartActive ? ' active-section' : '');
+        startItem.dataset.secKey = '__start__';
+
         const startMain = document.createElement('div');
         startMain.className = 'list-item-main';
         const startIcon = state.startSectionEnabled !== false
           ? '<span style="color:#facc15;font-weight:900;margin-right:8px;">▼</span>'
           : '<span style="color:#d4d4d8;font-weight:900;margin-right:8px;letter-spacing:1px;">||</span>';
         const startSkipNote = state.startSectionEnabled !== false ? '' : ' <span style="color:#fcd34d;font-size:10px;">(スキップ)</span>';
-        const startNowBadge = isStartActive ? '<span class="active-section-badge">現在区間</span>' : '';
+        const startNowBadge = `<span class="active-section-badge${isStartActive ? '' : ' hidden'}">現在区間</span>`;
         startMain.innerHTML = `<div class="list-item-title mono">${startIcon}0:00${startSkipNote}${startNowBadge}</div>`;
         startMain.addEventListener('click', () => {
           seekTo(0, { setGreenPin: false });
-          settingsModal.classList.add('hidden');
+          if (closeSettingsOnSeek) settingsModal.classList.add('hidden');
         });
 
         const startPencil = document.createElement('button');
         startPencil.type = 'button';
         startPencil.className = 'marker-row-pencil';
         startPencil.title = '0:00の区間設定を編集';
-        startPencil.innerHTML = `<svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1.003 1.003 0 0 0 0-1.42l-2.34-2.34a1.003 1.003 0 0 0-1.42 0l-1.83 1.83 3.75 3.75 1.84-1.82z"/></svg>`;
+        startPencil.innerHTML = pencilSvg;
         startPencil.addEventListener('click', (e) => {
           e.stopPropagation();
           openMarkEditModal(null);
@@ -6322,9 +6499,10 @@
 
         // Yellow Markers
         state.markers.forEach((mk) => {
-          const isCurSec = Boolean(activeSec && activeSec.markerId === mk.id);
+          const isCurSec = activeKey === mk.id;
           const item = document.createElement('div');
           item.className = 'list-item' + (isCurSec ? ' active-section' : '');
+          item.dataset.secKey = mk.id;
           if (mk.enabled === false) {
             item.style.opacity = '0.52';
           }
@@ -6336,18 +6514,18 @@
             : '<span style="color:#facc15;font-weight:900;margin-right:8px;">▼</span>';
           const nameHtml = mk.name ? ` <span style="font-weight:700;color:#ffffff;">${escapeHtml(mk.name)}</span>` : '';
           const skipBadge = mk.sectionEnabled === false ? ' <span style="color:#fcd34d;font-size:10px;">(スキップ)</span>' : '';
-          const nowBadge = isCurSec ? '<span class="active-section-badge">現在区間</span>' : '';
+          const nowBadge = `<span class="active-section-badge${isCurSec ? '' : ' hidden'}">現在区間</span>`;
           main.innerHTML = `<div class="list-item-title mono">${iconHtml}${formatTime(mk.time)}${nameHtml}${skipBadge}${nowBadge}</div>`;
           main.addEventListener('click', () => {
             seekTo(mk.time, { setGreenPin: false });
-            settingsModal.classList.add('hidden');
+            if (closeSettingsOnSeek) settingsModal.classList.add('hidden');
           });
 
           const pencilBtn = document.createElement('button');
           pencilBtn.type = 'button';
           pencilBtn.className = 'marker-row-pencil';
           pencilBtn.title = 'マークの名前・設定を編集';
-          pencilBtn.innerHTML = `<svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1.003 1.003 0 0 0 0-1.42l-2.34-2.34a1.003 1.003 0 0 0-1.42 0l-1.83 1.83 3.75 3.75 1.84-1.82z"/></svg>`;
+          pencilBtn.innerHTML = pencilSvg;
           pencilBtn.addEventListener('click', (e) => {
             e.stopPropagation();
             openMarkEditModal(mk.id);
@@ -6359,8 +6537,34 @@
         });
       }
 
-      function scrollActiveMarkerIntoView() {
-        const activeEl = document.querySelector('#markerListWrap .list-item.active-section');
+      // Audipo-style Marker List synced to BOTH Upper Right Page and Settings Modal tab
+      function renderMarkerList() {
+        const countStr = String(state.markers.length);
+        document.getElementById('markerTabCount').textContent = countStr;
+        if (upperPinTabCount) upperPinTabCount.textContent = countStr;
+        populateMarkerListContainer(upperMarkerListWrap, { closeSettingsOnSeek: false });
+        populateMarkerListContainer(document.getElementById('markerListWrap'), { closeSettingsOnSeek: true });
+      }
+
+      // Lightweight active-section highlight update (runs during playback/seek without resetting list scroll)
+      function syncActiveSectionHighlightInLists(sec) {
+        const activeKey = sec ? (sec.markerId === null ? '__start__' : sec.markerId) : '';
+        [upperMarkerListWrap, document.getElementById('markerListWrap')].forEach((wrap) => {
+          if (!wrap) return;
+          const items = wrap.querySelectorAll('.list-item[data-sec-key]');
+          items.forEach((item) => {
+            const isAct = item.dataset.secKey === activeKey;
+            item.classList.toggle('active-section', isAct);
+            const badge = item.querySelector('.active-section-badge');
+            if (badge) badge.classList.toggle('hidden', !isAct);
+          });
+        });
+      }
+
+      function scrollActiveMarkerIntoView(containerEl = null) {
+        const targetContainer = containerEl || document.getElementById('markerListWrap');
+        if (!targetContainer) return;
+        const activeEl = targetContainer.querySelector('.list-item.active-section');
         if (activeEl) {
           requestAnimationFrame(() => {
             activeEl.scrollIntoView({ block: 'center', behavior: 'smooth' });
@@ -6468,10 +6672,62 @@
       btnSaveWav.addEventListener('click', exportCurrentWav);
       document.getElementById('headerInfo').addEventListener('click', () => openSettingsModal('settings'));
 
-      // Section Action Bar Listeners
+      // Upper Area 2-Page Switcher Listeners (Left: Full Waveform / Right: Pin List)
+      btnUpperPageWave.addEventListener('click', () => setUpperPage('wave'));
+      btnUpperPagePins.addEventListener('click', () => setUpperPage('pins'));
+
+      // Swipe right on Pin List page -> return smoothly to Left Page (Full Waveform)
+      let upperPinSwipeStartX = 0;
+      let upperPinSwipeStartY = 0;
+      let upperPinSwipeTracking = false;
+      upperPagePins.addEventListener('touchstart', (e) => {
+        if (e.touches.length !== 1) return;
+        upperPinSwipeStartX = e.touches[0].clientX;
+        upperPinSwipeStartY = e.touches[0].clientY;
+        upperPinSwipeTracking = true;
+      }, { passive: true });
+      upperPagePins.addEventListener('touchend', (e) => {
+        if (!upperPinSwipeTracking || e.changedTouches.length === 0) return;
+        upperPinSwipeTracking = false;
+        const dx = e.changedTouches[0].clientX - upperPinSwipeStartX;
+        const dy = e.changedTouches[0].clientY - upperPinSwipeStartY;
+        if (dx > 60 && Math.abs(dx) > Math.abs(dy) * 1.45) {
+          setUpperPage('wave');
+        }
+      }, { passive: true });
+
+      // Swipe left/right on the thin top switcher bar itself
+      let barSwipeStartX = 0;
+      upperPagerBar.addEventListener('touchstart', (e) => {
+        if (e.touches.length === 1) barSwipeStartX = e.touches[0].clientX;
+      }, { passive: true });
+      upperPagerBar.addEventListener('touchend', (e) => {
+        if (e.changedTouches.length === 0) return;
+        const dx = e.changedTouches[0].clientX - barSwipeStartX;
+        if (dx < -40) setUpperPage('pins');
+        else if (dx > 40) setUpperPage('wave');
+      }, { passive: true });
+
+      document.getElementById('btnAddMarkerFromUpper').addEventListener('click', () => {
+        addYellowPinAtCurrent();
+        scrollActiveMarkerIntoView(upperMarkerListWrap);
+      });
+      document.getElementById('btnClearAllMarkersUpper').addEventListener('click', () => {
+        state.markers = [];
+        state.startSectionEnabled = true;
+        state.tempMarker = null;
+        syncCurrentPlaylistMarkers();
+        updateHeaderSubInfo();
+        updatePinButtonsUI();
+        updateSectionBarUI();
+        renderAllCanvases();
+        showToast('すべてのマーカーを削除しました');
+      });
+
+      // Section Action Bar Listeners: tapping section bar jumps to Upper Right Page (Pin List) & scrolls to current section
       currentSectionInfo.addEventListener('click', () => {
         if (!state.hasAudio) return;
-        openSettingsModal('markers');
+        setUpperPage('pins');
       });
       btnToggleSectionSkip.addEventListener('click', toggleCurrentSectionSkip);
       btnCutYellowSection.addEventListener('click', openCutSectionModal);
@@ -6747,8 +7003,10 @@
         updateWaveGainUI();
         applyMasterBoost();
         setMicGain(state.micGain);
+        setUpperPage('wave', { scrollActive: false });
         updateSectionBarUI();
         updateStartupLastFileHint();
+        renderMarkerList();
         renderAllCanvases();
         requestAnimationFrame(animationLoop);
 
