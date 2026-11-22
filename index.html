@@ -1,0 +1,4377 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#111113">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>Audipo風 練習プレイヤー＆レコーダー</title>
+  <style>
+    /* ==================== DESIGN TOKENS & RESET (ZERO EXTERNAL CDN) ==================== */
+    :root {
+      --bg-base: #111113;
+      --bg-surface: #18181b;
+      --bg-panel: #1d1d21;
+      --bg-btn: #1f1f24;
+      --bg-btn-active: #2e2e36;
+      --border-subtle: #2b2b33;
+      --border-strong: #3c3c46;
+      --text-main: #f4f4f6;
+      --text-sub: #a1a1aa;
+      --text-dim: #71717a;
+      --accent-blue: #42a5f5;
+      --accent-blue-bg: rgba(66, 165, 245, 0.18);
+      --accent-yellow: #facc15;
+      --accent-yellow-bg: rgba(250, 204, 21, 0.18);
+      --accent-green: #22c55e;
+      --accent-green-bg: rgba(34, 197, 94, 0.18);
+      --accent-red: #ef4444;
+      --accent-red-bg: rgba(239, 68, 68, 0.2);
+      --accent-amber: #f59e0b;
+      --accent-amber-bg: rgba(245, 158, 11, 0.18);
+      --font-sans: -apple-system, BlinkMacSystemFont, "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Noto Sans JP", "Segoe UI", Roboto, sans-serif;
+      --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Roboto Mono", monospace;
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100dvh;
+      margin: 0;
+      padding: 0;
+      background-color: var(--bg-base);
+      color: var(--text-main);
+      font-family: var(--font-sans);
+      overflow: hidden;
+      overscroll-behavior: none;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    body {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    .mono {
+      font-family: var(--font-mono);
+      font-variant-numeric: tabular-nums;
+    }
+
+    button, label.btn-like {
+      font-family: inherit;
+      color: inherit;
+      cursor: pointer;
+      touch-action: manipulation;
+      outline: none;
+      border: none;
+      background: none;
+    }
+
+    /* ==================== 1. TOP HEADER BAR ==================== */
+    .app-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 7px 10px;
+      background-color: var(--bg-surface);
+      border-bottom: 1px solid var(--border-subtle);
+      flex-shrink: 0;
+    }
+
+    .header-info {
+      flex: 1;
+      min-width: 0;
+      cursor: pointer;
+    }
+
+    .track-title {
+      margin: 0;
+      font-size: 14px;
+      font-weight: 700;
+      color: #ffffff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      line-height: 1.25;
+    }
+
+    .track-subtitle {
+      margin: 2px 0 0;
+      font-size: 11px;
+      color: var(--text-sub);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+
+    .hdr-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      height: 32px;
+      padding: 0 10px;
+      border-radius: 9px;
+      font-size: 12px;
+      font-weight: 700;
+      border: 1px solid var(--border-subtle);
+      transition: transform 0.08s ease, background-color 0.12s ease, opacity 0.12s ease;
+    }
+
+    .hdr-btn:active {
+      transform: scale(0.95);
+    }
+
+    .hdr-btn:disabled {
+      opacity: 0.35;
+      pointer-events: none;
+    }
+
+    .hdr-btn-rec {
+      background: var(--accent-red-bg);
+      border-color: rgba(239, 68, 68, 0.55);
+      color: #fca5a5;
+    }
+
+    .hdr-btn-rec.recording {
+      background: var(--accent-red);
+      border-color: #f87171;
+      color: #ffffff;
+    }
+
+    .hdr-btn-open {
+      background: var(--accent-amber-bg);
+      border-color: rgba(245, 158, 11, 0.55);
+      color: #fcd34d;
+    }
+
+    .hdr-btn-save {
+      background: #232329;
+      border-color: var(--border-strong);
+      color: #e4e4e7;
+    }
+
+    .rec-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: var(--accent-red);
+      display: inline-block;
+      flex-shrink: 0;
+    }
+
+    .hdr-btn-rec.recording .rec-dot {
+      background: #ffffff;
+      animation: pulseDot 1s infinite ease-in-out;
+    }
+
+    @keyframes pulseDot {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.35; transform: scale(1.2); }
+    }
+
+    /* ==================== 2. WAVEFORM MAIN WORKSPACE ==================== */
+    .waveform-workspace {
+      position: relative;
+      flex: 1;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      background-color: var(--bg-base);
+      overflow: hidden;
+    }
+
+    .overview-wrap {
+      position: relative;
+      flex: 1;
+      min-height: 0;
+      width: 100%;
+      padding: 4px 6px;
+    }
+
+    #overviewCanvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+      touch-action: none;
+      cursor: pointer;
+    }
+
+    /* Startup Overlay Card */
+    .startup-overlay {
+      position: absolute;
+      inset: 0;
+      z-index: 15;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      background: rgba(17, 17, 19, 0.94);
+    }
+
+    .startup-card {
+      width: 100%;
+      max-width: 330px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-strong);
+      border-radius: 18px;
+      padding: 20px 18px;
+      text-align: center;
+      box-shadow: 0 20px 48px rgba(0, 0, 0, 0.65);
+    }
+
+    .startup-icon {
+      width: 48px;
+      height: 48px;
+      margin: 0 auto 12px;
+      border-radius: 14px;
+      background: var(--accent-blue-bg);
+      border: 1px solid rgba(66, 165, 245, 0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--accent-blue);
+    }
+
+    .startup-title {
+      margin: 0 0 6px;
+      font-size: 16px;
+      font-weight: 700;
+      color: #ffffff;
+    }
+
+    .startup-desc {
+      margin: 0 0 16px;
+      font-size: 12px;
+      line-height: 1.5;
+      color: var(--text-sub);
+    }
+
+    .startup-btn-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 9px;
+    }
+
+    .start-btn {
+      width: 100%;
+      min-height: 42px;
+      padding: 10px 14px;
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: transform 0.08s ease, filter 0.12s ease;
+    }
+
+    .start-btn:active {
+      transform: scale(0.97);
+    }
+
+    .start-btn-local {
+      background: var(--accent-blue);
+      color: #09131d;
+    }
+
+    .start-btn-rec {
+      background: #dc2626;
+      color: #ffffff;
+    }
+
+    .start-btn-demo {
+      background: #25252c;
+      border: 1px solid var(--border-strong);
+      color: #e4e4e7;
+    }
+
+    /* Live Recording Overlay Banner */
+    .rec-overlay {
+      position: absolute;
+      left: 8px;
+      right: 8px;
+      top: 8px;
+      z-index: 25;
+      background: rgba(30, 16, 18, 0.96);
+      border: 1px solid rgba(239, 68, 68, 0.7);
+      border-radius: 14px;
+      padding: 12px;
+      box-shadow: 0 16px 36px rgba(0, 0, 0, 0.7);
+    }
+
+    .rec-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+
+    .rec-label-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      font-weight: 700;
+      color: #f87171;
+    }
+
+    .rec-timer {
+      font-size: 17px;
+      font-weight: 700;
+      color: #ffffff;
+    }
+
+    .rec-meter-wrap {
+      width: 100%;
+      height: 8px;
+      border-radius: 999px;
+      background: #0d0d0f;
+      border: 1px solid #352326;
+      overflow: hidden;
+      margin-bottom: 8px;
+    }
+
+    .rec-meter-bar {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #22c55e 0%, #facc15 70%, #ef4444 100%);
+      transition: width 0.05s linear;
+    }
+
+    #recLiveWaveCanvas {
+      width: 100%;
+      height: 40px;
+      display: block;
+      background: #120c0d;
+      border-radius: 8px;
+      border: 1px solid #342124;
+      margin-bottom: 10px;
+    }
+
+    .rec-controls {
+      display: flex;
+      gap: 8px;
+    }
+
+    .rec-add-marker-btn {
+      flex: 1;
+      height: 40px;
+      border-radius: 11px;
+      background: rgba(250, 204, 21, 0.18);
+      border: 1px solid rgba(250, 204, 21, 0.65);
+      color: #fde047;
+      font-size: 12px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .rec-add-marker-btn:active {
+      transform: scale(0.97);
+    }
+
+    .rec-badge-count {
+      background: var(--accent-yellow);
+      color: #111113;
+      padding: 1px 6px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    .rec-stop-btn {
+      height: 40px;
+      padding: 0 14px;
+      border-radius: 11px;
+      background: #dc2626;
+      color: #ffffff;
+      font-size: 12px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .rec-stop-btn:active {
+      transform: scale(0.96);
+    }
+
+    /* ==================== 3. LOWER ZOOM DETAIL WAVEFORM ==================== */
+    .zoom-pane {
+      position: relative;
+      height: 102px;
+      width: 100%;
+      background-color: #151518;
+      border-top: 1px solid var(--border-subtle);
+      border-bottom: 1px solid var(--border-subtle);
+      flex-shrink: 0;
+    }
+
+    #zoomCanvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+      touch-action: none;
+      cursor: ew-resize;
+    }
+
+    .zoom-badge-left {
+      position: absolute;
+      top: 5px;
+      left: 7px;
+      pointer-events: none;
+      font-size: 10px;
+      color: #b4b4be;
+      background: rgba(12, 12, 14, 0.72);
+      padding: 2px 6px;
+      border-radius: 6px;
+    }
+
+    .zoom-badges-right {
+      position: absolute;
+      top: 4px;
+      right: 6px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .zoom-pill {
+      height: 24px;
+      padding: 0 7px;
+      border-radius: 7px;
+      font-size: 10px;
+      font-weight: 700;
+      background: rgba(12, 12, 14, 0.78);
+      border: 1px solid var(--border-strong);
+      color: var(--text-main);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .zoom-pill:active {
+      transform: scale(0.94);
+    }
+
+    .zoom-pill-gain {
+      border-color: rgba(34, 197, 94, 0.55);
+      color: #86efac;
+    }
+
+    .zoom-pill-span {
+      border-color: rgba(66, 165, 245, 0.55);
+      color: #93c5fd;
+    }
+
+    .zoom-close-btn {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: rgba(12, 12, 14, 0.78);
+      border: 1px solid var(--border-strong);
+      color: #d4d4d8;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+    }
+
+    .zoom-collapsed-bar {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      padding: 4px 10px;
+      background: #151518;
+      border-top: 1px solid var(--border-subtle);
+      border-bottom: 1px solid var(--border-subtle);
+      flex-shrink: 0;
+    }
+
+    .zoom-reopen-btn {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--accent-blue);
+      padding: 3px 8px;
+      border-radius: 6px;
+      background: var(--accent-blue-bg);
+    }
+
+    /* ==================== 4. PLAYBACK STATUS & LOOP BAR ==================== */
+    .status-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+      padding: 5px 8px;
+      background: var(--bg-surface);
+      border-bottom: 1px solid var(--border-subtle);
+      flex-shrink: 0;
+    }
+
+    .status-left {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      min-width: 0;
+      flex: 1;
+    }
+
+    .track-idx-btn {
+      font-size: 11px;
+      font-weight: 700;
+      color: #d4d4d8;
+      background: #25252b;
+      border: 1px solid var(--border-subtle);
+      padding: 2px 6px;
+      border-radius: 6px;
+      flex-shrink: 0;
+    }
+
+    .time-readout {
+      font-size: 13px;
+      font-weight: 700;
+      color: #ffffff;
+      white-space: nowrap;
+    }
+
+    .time-readout .slash {
+      color: var(--text-dim);
+      margin: 0 2px;
+    }
+
+    .time-readout .total {
+      color: #b4b4be;
+    }
+
+    .status-pill {
+      height: 22px;
+      padding: 0 6px;
+      border-radius: 6px;
+      font-size: 10px;
+      font-weight: 700;
+      white-space: nowrap;
+      flex-shrink: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid var(--border-strong);
+    }
+
+    .status-pill:active {
+      transform: scale(0.94);
+    }
+
+    .pill-boost {
+      background: var(--accent-amber-bg);
+      border-color: rgba(245, 158, 11, 0.55);
+      color: #fcd34d;
+    }
+
+    .pill-engine {
+      background: var(--accent-blue-bg);
+      border-color: rgba(66, 165, 245, 0.55);
+      color: #93c5fd;
+    }
+
+    .status-right {
+      display: flex;
+      align-items: center;
+      gap: 3px;
+      flex-shrink: 0;
+    }
+
+    .order-btn {
+      width: 28px;
+      height: 26px;
+      border-radius: 7px;
+      background: var(--bg-btn);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-dim);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.08s ease, border-color 0.12s ease, color 0.12s ease;
+    }
+
+    .order-btn:active {
+      transform: scale(0.92);
+    }
+
+    .order-btn.active {
+      background: var(--accent-blue-bg);
+      border-color: rgba(66, 165, 245, 0.7);
+      color: var(--accent-blue);
+    }
+
+    /* ==================== 5. AUDIPO 3x7 CONTROL GRID ==================== */
+    .control-footer {
+      background: var(--bg-base);
+      padding: 6px 6px calc(7px + env(safe-area-inset-bottom));
+      flex-shrink: 0;
+    }
+
+    .ctrl-row {
+      display: grid;
+      grid-template-columns: repeat(7, minmax(0, 1fr));
+      gap: 4px;
+      margin-bottom: 4px;
+    }
+
+    .ctrl-row:last-child {
+      margin-bottom: 0;
+    }
+
+    .ctrl-row-transport {
+      grid-template-columns: 1fr 1fr 1fr 1.32fr 1fr 1fr 1fr;
+    }
+
+    .pad-btn {
+      position: relative;
+      height: 46px;
+      background: var(--bg-btn);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 1px;
+      color: var(--text-main);
+      transition: transform 0.08s ease, background-color 0.12s ease, border-color 0.12s ease, box-shadow 0.12s ease, opacity 0.12s ease;
+    }
+
+    .pad-btn:active {
+      transform: scale(0.94);
+      background: var(--bg-btn-active);
+    }
+
+    .pad-btn-sm {
+      height: 43px;
+    }
+
+    .pad-btn-play {
+      background: #282830;
+      border-color: #42424f;
+    }
+
+    .pad-btn-play.playing {
+      background: rgba(66, 165, 245, 0.2);
+      border-color: var(--accent-blue);
+    }
+
+    .pad-btn.dimmed {
+      opacity: 0.4;
+    }
+
+    .pad-btn.active-blue {
+      background: var(--accent-blue-bg);
+      border-color: rgba(66, 165, 245, 0.75);
+      color: #93c5fd;
+    }
+
+    .pad-btn.active-green {
+      background: var(--accent-green-bg);
+      border-color: rgba(34, 197, 94, 0.75);
+      color: #86efac;
+    }
+
+    .pad-btn.active-yellow-glow {
+      background: rgba(250, 204, 21, 0.24);
+      border-color: var(--accent-yellow);
+      box-shadow: 0 0 12px rgba(250, 204, 21, 0.45), inset 0 0 6px rgba(250, 204, 21, 0.22);
+    }
+
+    .pad-btn.active-star {
+      background: var(--accent-yellow-bg);
+      border-color: rgba(250, 204, 21, 0.75);
+      color: #fde047;
+    }
+
+    .pad-sub {
+      font-size: 10px;
+      line-height: 1.05;
+      color: #d4d4d8;
+      white-space: nowrap;
+    }
+
+    .pad-sub-xs {
+      font-size: 9px;
+      line-height: 1.05;
+      color: var(--text-sub);
+      white-space: nowrap;
+    }
+
+    .speed-val-text {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--accent-blue);
+      line-height: 1.15;
+    }
+
+    .pitch-val-text {
+      font-size: 9.5px;
+      color: #d4d4d8;
+      line-height: 1.1;
+    }
+
+    .pitch-val-text.shifted {
+      color: #4ade80;
+      font-weight: 700;
+    }
+
+    /* ==================== 6. MODALS & TOAST ==================== */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 60;
+      background: rgba(0, 0, 0, 0.76);
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      padding: 10px;
+    }
+
+    @media (min-width: 560px) {
+      .modal-backdrop {
+        align-items: center;
+      }
+    }
+
+    .modal-card {
+      width: 100%;
+      max-width: 440px;
+      max-height: 88dvh;
+      background: #1c1c21;
+      border: 1px solid var(--border-strong);
+      border-radius: 18px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      box-shadow: 0 24px 56px rgba(0, 0, 0, 0.75);
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+      flex-shrink: 0;
+    }
+
+    .modal-title {
+      margin: 0;
+      font-size: 14px;
+      font-weight: 700;
+      color: #ffffff;
+    }
+
+    .modal-close {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: #2a2a32;
+      color: #d4d4d8;
+      font-size: 14px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-body {
+      flex: 1;
+      overflow-y: auto;
+      padding-right: 2px;
+      display: flex;
+      flex-direction: column;
+      gap: 11px;
+    }
+
+    .modal-section {
+      background: #141418;
+      border: 1px solid var(--border-subtle);
+      border-radius: 13px;
+      padding: 11px;
+    }
+
+    .sec-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .sec-title {
+      font-size: 12px;
+      font-weight: 700;
+      color: #ffffff;
+    }
+
+    .sec-value {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--accent-blue);
+    }
+
+    .opt-grid-5 {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 5px;
+    }
+
+    .opt-grid-6 {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 4px;
+    }
+
+    .opt-grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+    }
+
+    .opt-pill {
+      height: 32px;
+      border-radius: 8px;
+      background: #1e1e24;
+      border: 1px solid var(--border-subtle);
+      color: #d4d4d8;
+      font-size: 11px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .opt-pill.active-green {
+      background: var(--accent-green-bg);
+      border-color: var(--accent-green);
+      color: #86efac;
+    }
+
+    .opt-pill.active-amber {
+      background: var(--accent-amber-bg);
+      border-color: var(--accent-amber);
+      color: #fcd34d;
+    }
+
+    .opt-pill.active-red {
+      background: var(--accent-red-bg);
+      border-color: var(--accent-red);
+      color: #fca5a5;
+    }
+
+    .engine-card {
+      width: 100%;
+      text-align: left;
+      padding: 9px 10px;
+      border-radius: 10px;
+      background: #1c1c22;
+      border: 1px solid var(--border-subtle);
+      margin-bottom: 6px;
+    }
+
+    .engine-card:last-child {
+      margin-bottom: 0;
+    }
+
+    .engine-card.active {
+      background: rgba(66, 165, 245, 0.14);
+      border-color: var(--accent-blue);
+    }
+
+    .engine-card.active-tape {
+      background: rgba(245, 158, 11, 0.14);
+      border-color: var(--accent-amber);
+    }
+
+    .engine-name {
+      font-size: 12px;
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 3px;
+    }
+
+    .engine-desc {
+      font-size: 11px;
+      color: var(--text-sub);
+      line-height: 1.35;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      height: 6px;
+      border-radius: 999px;
+      background: #2b2b33;
+      appearance: none;
+      -webkit-appearance: none;
+      outline: none;
+      margin: 6px 0;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: var(--accent-blue);
+      border: 2px solid #ffffff;
+      cursor: pointer;
+    }
+
+    .step-row {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 6px;
+    }
+
+    .step-btn {
+      padding: 5px 11px;
+      border-radius: 8px;
+      background: #25252d;
+      border: 1px solid var(--border-strong);
+      color: #ffffff;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-top: 8px;
+      padding-top: 8px;
+      border-top: 1px solid var(--border-subtle);
+    }
+
+    .toggle-pill {
+      padding: 6px 14px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 700;
+      background: #27272f;
+      border: 1px solid var(--border-strong);
+      color: #a1a1aa;
+    }
+
+    .toggle-pill.on {
+      background: var(--accent-green-bg);
+      border-color: var(--accent-green);
+      color: #86efac;
+    }
+
+    .text-input {
+      width: 100%;
+      height: 36px;
+      padding: 0 10px;
+      border-radius: 9px;
+      background: #111114;
+      border: 1px solid var(--border-strong);
+      color: #ffffff;
+      font-size: 13px;
+      outline: none;
+    }
+
+    .text-input:focus {
+      border-color: var(--accent-blue);
+    }
+
+    .list-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 8px 10px;
+      border-radius: 10px;
+      background: #1b1b20;
+      border: 1px solid var(--border-subtle);
+      margin-bottom: 6px;
+    }
+
+    .list-item.current {
+      background: rgba(66, 165, 245, 0.14);
+      border-color: rgba(66, 165, 245, 0.6);
+    }
+
+    .list-item-main {
+      flex: 1;
+      min-width: 0;
+      cursor: pointer;
+    }
+
+    .list-item-title {
+      font-size: 12px;
+      font-weight: 700;
+      color: #ffffff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .list-item-sub {
+      font-size: 11px;
+      color: var(--text-sub);
+      margin-top: 2px;
+    }
+
+    .mini-act-btn {
+      padding: 5px 9px;
+      border-radius: 7px;
+      font-size: 11px;
+      font-weight: 700;
+      background: #2a2a33;
+      color: #f4f4f6;
+      flex-shrink: 0;
+    }
+
+    .mini-act-del {
+      background: rgba(239, 68, 68, 0.18);
+      color: #fca5a5;
+    }
+
+    .modal-footer-btn {
+      margin-top: 12px;
+      width: 100%;
+      height: 40px;
+      border-radius: 11px;
+      background: var(--accent-blue);
+      color: #08131d;
+      font-size: 13px;
+      font-weight: 800;
+      flex-shrink: 0;
+    }
+
+    .tab-bar {
+      display: flex;
+      gap: 6px;
+      background: #131317;
+      padding: 4px;
+      border-radius: 10px;
+      border: 1px solid var(--border-subtle);
+    }
+
+    .tab-btn {
+      padding: 5px 12px;
+      border-radius: 7px;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-sub);
+    }
+
+    .tab-btn.active {
+      background: var(--accent-blue);
+      color: #08131d;
+    }
+
+    /* Toast Notification (never uses alert/confirm) */
+    .toast-banner {
+      position: fixed;
+      top: 52px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-6px);
+      z-index: 90;
+      max-width: calc(100vw - 24px);
+      padding: 7px 14px;
+      border-radius: 999px;
+      background: rgba(20, 20, 24, 0.96);
+      border: 1px solid var(--border-strong);
+      color: #ffffff;
+      font-size: 12px;
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.18s ease, transform 0.18s ease;
+      box-shadow: 0 10px 28px rgba(0, 0, 0, 0.6);
+    }
+
+    .toast-banner.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Hidden Audio Element for OS Standard engine & extreme-large fallback -->
+  <audio id="audioEl" preload="auto"></audio>
+
+  <!-- Plain multi-file input with NO restrictive accept filter so Android opens native storage/SD picker -->
+  <input type="file" id="fileInput" multiple class="sr-only">
+
+  <!-- ==================== 1. TOP HEADER BAR ==================== -->
+  <header class="app-header">
+    <div id="headerInfo" class="header-info" title="タップして曲名・詳細設定を開く">
+      <h1 id="trackTitle" class="track-title">Audipo風 練習プレイヤー</h1>
+      <p id="trackSubtitle" class="track-subtitle mono">待機中 • 0/0 • 黄色ピン 0個</p>
+    </div>
+
+    <div class="header-actions">
+      <button id="btnRecordHeader" type="button" class="hdr-btn hdr-btn-rec" title="マイク録音を開始/停止">
+        <span class="rec-dot"></span>
+        <span id="recHeaderLabel">録音</span>
+      </button>
+
+      <label for="fileInput" class="hdr-btn hdr-btn-open btn-like" title="ローカル音声ファイルを開く">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 7v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-6l-2-2H5a2 2 0 0 0-2 2z"/>
+        </svg>
+        <span>開く</span>
+      </label>
+
+      <button id="btnSaveWav" type="button" disabled class="hdr-btn hdr-btn-save" title="WAV形式で保存">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#42a5f5" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+          <polyline points="17 21 17 13 7 13 7 21"/>
+          <polyline points="7 3 7 8 15 8"/>
+        </svg>
+        <span>保存</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- ==================== 2. WAVEFORM WORKSPACE ==================== -->
+  <main class="waveform-workspace">
+    <!-- Upper Pane: Multi-Row Overview Waveform -->
+    <div class="overview-wrap">
+      <canvas id="overviewCanvas"></canvas>
+
+      <!-- Startup Quick-Start Card (NO auto demo load on startup) -->
+      <div id="startupOverlay" class="startup-overlay">
+        <div class="startup-card">
+          <div class="startup-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9 18V5l12-2v13"/>
+              <circle cx="6" cy="18" r="3"/>
+              <circle cx="18" cy="16" r="3"/>
+            </svg>
+          </div>
+          <h2 class="startup-title">Audipo風 練習プレイヤー＆レコーダー</h2>
+          <p class="startup-desc">
+            高音質フェーズボコーダでのスロー再生・区間リピート・録音中マーカー打ちがスマホ単体で完結します。
+          </p>
+          <div class="startup-btn-stack">
+            <label for="fileInput" class="start-btn start-btn-local btn-like">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 7v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-6l-2-2H5a2 2 0 0 0-2 2z"/>
+              </svg>
+              <span>ローカルファイルを開く (.m4a / .mp3 / .wav 等)</span>
+            </label>
+
+            <button id="btnStartRecord" type="button" class="start-btn start-btn-rec">
+              <span style="width:10px;height:10px;border-radius:50%;background:#fff;display:inline-block;"></span>
+              <span>マイクで録音する</span>
+            </button>
+
+            <button id="btnLoadDemo" type="button" class="start-btn start-btn-demo">
+              <span>デモ練習音源を試す</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Live Recording Bar Overlay -->
+      <div id="recOverlay" class="rec-overlay hidden">
+        <div class="rec-head">
+          <div class="rec-label-group">
+            <span class="rec-dot" style="animation: pulseDot 1s infinite ease-in-out;"></span>
+            <span>録音中 (PCM高音質・ゲイン <span id="recLiveGainLabel">4.0x</span>)</span>
+          </div>
+          <span id="recTimerText" class="rec-timer mono">00:00.0</span>
+        </div>
+        <div class="rec-meter-wrap">
+          <div id="recMeterBar" class="rec-meter-bar"></div>
+        </div>
+        <canvas id="recLiveWaveCanvas"></canvas>
+        <div class="rec-controls">
+          <button id="btnRecAddMarker" type="button" class="rec-add-marker-btn">
+            <span>▼+ 録音中マーカー追加</span>
+            <span id="recMarkerCountBadge" class="rec-badge-count mono">0</span>
+          </button>
+          <button id="btnRecStop" type="button" class="rec-stop-btn">
+            <span style="width:10px;height:10px;background:#fff;border-radius:2px;display:inline-block;"></span>
+            <span>停止して波形化</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Lower Pane: Closeable Zoomed Detail Waveform -->
+    <section id="zoomPane" class="zoom-pane">
+      <canvas id="zoomCanvas"></canvas>
+      <div class="zoom-badge-left">拡大波形 (ドラッグ移動 / 2本指ズーム)</div>
+      <div class="zoom-badges-right">
+        <button id="btnWaveGainQuick" type="button" class="zoom-pill zoom-pill-gain mono" title="波形縦倍率を切替 (自動/1x/2x/4x/8x)">波形:自動</button>
+        <button id="btnZoomSpanReset" type="button" class="zoom-pill zoom-pill-span mono" title="タップで8.0sにリセット">8.0s</button>
+        <button id="btnCloseZoom" type="button" class="zoom-close-btn" title="拡大波形を閉じる">×</button>
+      </div>
+    </section>
+
+    <!-- Re-open Zoom Bar (when lower pane is collapsed) -->
+    <div id="zoomCollapsedBar" class="zoom-collapsed-bar hidden">
+      <button id="btnOpenZoom" type="button" class="zoom-reopen-btn">＋ 拡大波形を表示</button>
+    </div>
+  </main>
+
+  <!-- ==================== 3. PLAYBACK STATUS & LOOP MODE BAR ==================== -->
+  <section class="status-bar">
+    <div class="status-left">
+      <button id="btnPlaylistIndex" type="button" class="track-idx-btn mono" title="読込ファイル・プレイリスト一覧">1/1</button>
+      <div class="time-readout mono">
+        <span id="currentTimeText">0:00</span><span class="slash">/</span><span id="totalTimeText" class="total">0:00</span>
+      </div>
+      <button id="btnBoostQuick" type="button" class="status-pill pill-boost mono" title="再生音量ブースト切替">音量:自動</button>
+      <button id="btnEngineQuick" type="button" class="status-pill pill-engine" title="スロー再生エンジン切替 (ボコーダ/OS標準/テープ)">ボコーダ</button>
+    </div>
+
+    <div class="status-right">
+      <!-- Loop 1 Track -->
+      <button id="btnOrderLoop1" type="button" class="order-btn" title="1曲リピート">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="17 2 21 6 17 10"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/>
+          <polyline points="7 22 3 18 7 14"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/>
+          <text x="10" y="15" font-size="8.5" font-weight="bold" fill="currentColor" stroke="none">1</text>
+        </svg>
+      </button>
+      <!-- Loop All Tracks -->
+      <button id="btnOrderLoopAll" type="button" class="order-btn" title="全曲リピート">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="17 2 21 6 17 10"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/>
+          <polyline points="7 22 3 18 7 14"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/>
+        </svg>
+      </button>
+      <!-- Stop at End (Default) -->
+      <button id="btnOrderStopEnd" type="button" class="order-btn active" title="曲末で停止 / 順番再生">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1">
+          <line x1="4" y1="12" x2="18" y2="12"/><polyline points="13 7 18 12 13 17"/><line x1="21" y1="6" x2="21" y2="18"/>
+        </svg>
+      </button>
+      <!-- Shuffle -->
+      <button id="btnOrderShuffle" type="button" class="order-btn" title="シャッフル再生">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="16 3 21 3 21 8"/><line x1="4" y1="20" x2="21" y2="3"/>
+          <polyline points="21 16 21 21 16 21"/><line x1="15" y1="15" x2="21" y2="21"/>
+          <line x1="4" y1="4" x2="9" y2="9"/>
+        </svg>
+      </button>
+    </div>
+  </section>
+
+  <!-- ==================== 4. BOTTOM 3x7 AUDIPO CONTROL GRID ==================== -->
+  <footer class="control-footer">
+    <!-- ROW 1: Pin Controls (Exact Spec), Speed/Pitch, Local Folder -->
+    <div class="ctrl-row">
+      <!-- Col 1: Green-to-Yellow Convert (Green ▼ arrow down to Yellow ▼) -->
+      <button id="btnPromoteTemp" type="button" class="pad-btn dimmed" title="現在位置の緑一時ピンを黄色確定ピンに変換">
+        <svg width="26" height="26" viewBox="0 0 28 28" fill="none">
+          <polygon points="3,4 13,4 8,12" fill="#22c55e"/>
+          <path d="M15 7h4v5" stroke="#e4e4e7" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/>
+          <polyline points="16.8,9.8 19,12.2 21.2,9.8" stroke="#e4e4e7" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/>
+          <polygon points="14,16 24,16 19,24" fill="#facc15"/>
+        </svg>
+      </button>
+
+      <!-- Col 2: Jump to Green Temporary Pin (Green ▼←) -->
+      <button id="btnJumpTemp" type="button" class="pad-btn dimmed" title="緑の一時ピンへジャンプ（緑ピンは消えません）">
+        <svg width="26" height="26" viewBox="0 0 28 28" fill="none">
+          <polygon points="4,9 14,9 9,18" fill="#22c55e"/>
+          <path d="M24 13.5H16" stroke="#f4f4f6" stroke-width="2.1" stroke-linecap="round"/>
+          <polyline points="19,10.5 16,13.5 19,16.5" stroke="#f4f4f6" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+
+      <!-- Col 3: Prev Yellow Confirmed Pin (▼←) -->
+      <button id="btnPrevYellow" type="button" class="pad-btn" title="前の黄色マーカーへ移動">
+        <svg width="26" height="26" viewBox="0 0 28 28" fill="none">
+          <polygon points="4,9 14,9 9,18" fill="#facc15"/>
+          <path d="M24 13.5H16" stroke="#f4f4f6" stroke-width="2.1" stroke-linecap="round"/>
+          <polyline points="19,10.5 16,13.5 19,16.5" stroke="#f4f4f6" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+
+      <!-- Col 4: Add Yellow Confirmed Pin (▼+) -->
+      <button id="btnAddYellow" type="button" class="pad-btn" title="現在位置に黄色マーカーを追加">
+        <svg width="26" height="26" viewBox="0 0 28 28" fill="none">
+          <polygon points="4,9 14,9 9,18" fill="#facc15"/>
+          <path d="M20 9.5V17.5M16 13.5H24" stroke="#f4f4f6" stroke-width="2.2" stroke-linecap="round"/>
+        </svg>
+      </button>
+
+      <!-- Col 5: Next Yellow Confirmed Pin (→▼) -->
+      <button id="btnNextYellow" type="button" class="pad-btn" title="次の黄色マーカーへ移動">
+        <svg width="26" height="26" viewBox="0 0 28 28" fill="none">
+          <path d="M4 13.5H12" stroke="#f4f4f6" stroke-width="2.1" stroke-linecap="round"/>
+          <polyline points="9,10.5 12,13.5 9,16.5" stroke="#f4f4f6" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/>
+          <polygon points="14,9 24,9 19,18" fill="#facc15"/>
+        </svg>
+      </button>
+
+      <!-- Col 6: Speed & Pitch Readout -->
+      <button id="btnSpeedPitch" type="button" class="pad-btn" title="速度・ピッチ微調整を開く">
+        <span id="speedBadgeText" class="speed-val-text mono">1.00x</span>
+        <span id="pitchBadgeText" class="pitch-val-text mono">#:±0</span>
+      </button>
+
+      <!-- Col 7: Local Folder Icon -->
+      <label for="fileInput" class="pad-btn btn-like" title="スマホ内のローカル音声ファイルを開く">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="#f4f4f6">
+          <path d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/>
+        </svg>
+      </label>
+    </div>
+
+    <!-- ROW 2: Section A-B Repeat, Transport, Acoustic Reverb -->
+    <div class="ctrl-row ctrl-row-transport">
+      <!-- Col 1: Marker Section Repeat (A-B) -->
+      <button id="btnSectionRepeat" type="button" class="pad-btn" title="マーカー区間リピートON/OFF">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="4" y1="4" x2="4" y2="11"/><line x1="20" y1="13" x2="20" y2="20"/>
+          <path d="M7 7h10l-2.5-2.5M17 17H7l2.5 2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span id="sectionRepeatLabel" class="pad-sub-xs">区間OFF</span>
+      </button>
+
+      <!-- Col 2: Prev Track (|<) -->
+      <button id="btnPrevTrack" type="button" class="pad-btn" title="曲頭 / 前の曲">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+          <rect x="4" y="5" width="2.6" height="14" rx="1"/>
+          <polygon points="19,5 8,12 19,19"/>
+        </svg>
+      </button>
+
+      <!-- Col 3: Rewind 3s (<< 3) -->
+      <button id="btnRewind3" type="button" class="pad-btn" title="3秒戻る">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="currentColor">
+          <polygon points="11,6 3,12 11,18"/>
+          <polygon points="20,6 12,12 20,18"/>
+        </svg>
+        <span class="pad-sub mono">3</span>
+      </button>
+
+      <!-- Col 4: Large Play / Pause -->
+      <button id="btnPlayPause" type="button" class="pad-btn pad-btn-play" title="再生 / 一時停止">
+        <svg id="iconPlay" width="26" height="26" viewBox="0 0 24 24" fill="#ffffff" style="margin-left:2px;">
+          <polygon points="6,4 20,12 6,20"/>
+        </svg>
+        <svg id="iconPause" class="hidden" width="26" height="26" viewBox="0 0 24 24" fill="#42a5f5">
+          <rect x="6" y="4" width="4.2" height="16" rx="1"/>
+          <rect x="13.8" y="4" width="4.2" height="16" rx="1"/>
+        </svg>
+      </button>
+
+      <!-- Col 5: Forward 3s (>> 3) -->
+      <button id="btnForward3" type="button" class="pad-btn" title="3秒進む">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="currentColor">
+          <polygon points="4,6 12,12 4,18"/>
+          <polygon points="13,6 21,12 13,18"/>
+        </svg>
+        <span class="pad-sub mono">3</span>
+      </button>
+
+      <!-- Col 6: Next Track (>|) -->
+      <button id="btnNextTrack" type="button" class="pad-btn" title="次の曲">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+          <polygon points="5,5 16,12 5,19"/>
+          <rect x="17.4" y="5" width="2.6" height="14" rx="1"/>
+        </svg>
+      </button>
+
+      <!-- Col 7: Reverb Environment Cycler -->
+      <button id="btnReverbCycle" type="button" class="pad-btn" title="音響リバーブ切替 (なし/部屋/ホール/風呂場)">
+        <svg id="reverbIcon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="4" y="3" width="16" height="18" rx="2"/>
+          <circle cx="12" cy="14" r="3.5"/>
+          <circle cx="12" cy="7" r="1" fill="currentColor"/>
+        </svg>
+        <span id="reverbLabel" class="pad-sub-xs">なし</span>
+      </button>
+    </div>
+
+    <!-- ROW 3: 5 Star Speed Presets, Marker Delete/Manager, Pencil Settings -->
+    <div class="ctrl-row">
+      <button type="button" data-speed="0.30" class="pad-btn pad-btn-sm speed-preset-btn">
+        <span style="font-size:11px;line-height:1;">★<sub style="font-size:8px;">s</sub></span>
+        <span class="pad-sub mono">0.30x</span>
+      </button>
+      <button type="button" data-speed="0.50" class="pad-btn pad-btn-sm speed-preset-btn">
+        <span style="font-size:11px;line-height:1;">★<sub style="font-size:8px;">s</sub></span>
+        <span class="pad-sub mono">0.50x</span>
+      </button>
+      <button type="button" data-speed="1.00" class="pad-btn pad-btn-sm speed-preset-btn active-star">
+        <span style="font-size:11px;line-height:1;">★<sub style="font-size:8px;">s</sub></span>
+        <span class="pad-sub mono">1.00x</span>
+      </button>
+      <button type="button" data-speed="1.35" class="pad-btn pad-btn-sm speed-preset-btn">
+        <span style="font-size:11px;line-height:1;">★<sub style="font-size:8px;">s</sub></span>
+        <span class="pad-sub mono">1.35x</span>
+      </button>
+      <button type="button" data-speed="1.70" class="pad-btn pad-btn-sm speed-preset-btn">
+        <span style="font-size:11px;line-height:1;">★<sub style="font-size:8px;">s</sub></span>
+        <span class="pad-sub mono">1.70x</span>
+      </button>
+
+      <!-- Col 6: Delete Closest Yellow Pin / Open Marker List -->
+      <button id="btnDeleteOrListMarker" type="button" class="pad-btn pad-btn-sm" title="現在位置付近の黄色ピンを削除（近くに無ければ一覧表示）">
+        <svg width="18" height="16" viewBox="0 0 28 24" fill="none">
+          <polygon points="14,5 25,5 19.5,15" fill="#facc15"/>
+          <path d="M4 7L11 14M11 7L4 14" stroke="#f87171" stroke-width="2.4" stroke-linecap="round"/>
+        </svg>
+        <span class="pad-sub-xs">削除/一覧</span>
+      </button>
+
+      <!-- Col 7: Pencil Settings Modal -->
+      <button id="btnOpenSettings" type="button" class="pad-btn pad-btn-sm" title="詳細設定（速度・ピッチ・音質エンジン・音量・ピン一覧）">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 20h9"/>
+          <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+        </svg>
+        <span class="pad-sub-xs">設定</span>
+      </button>
+    </div>
+  </footer>
+
+  <!-- ==================== 5. SETTINGS & MARKER MANAGER MODAL ==================== -->
+  <div id="settingsModal" class="modal-backdrop hidden">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="tab-bar">
+          <button id="tabSettings" type="button" class="tab-btn active">再生・音質設定</button>
+          <button id="tabMarkers" type="button" class="tab-btn">黄色ピン一覧 (<span id="markerTabCount">0</span>)</button>
+          <button id="tabPlaylist" type="button" class="tab-btn">曲一覧 (<span id="playlistTabCount">0</span>)</button>
+        </div>
+        <button id="btnCloseSettings" type="button" class="modal-close">✕</button>
+      </div>
+
+      <!-- TAB 1: SETTINGS -->
+      <div id="panelSettings" class="modal-body">
+        <!-- Speed Fine Control -->
+        <div class="modal-section">
+          <div class="sec-head">
+            <span class="sec-title">再生速度 (0.25x 〜 2.00x)</span>
+            <span id="modalSpeedVal" class="sec-value mono">1.00x</span>
+          </div>
+          <input type="range" id="speedSlider" min="0.25" max="2.00" step="0.01" value="1.00">
+          <div class="step-row">
+            <button id="btnSpeedM05" type="button" class="step-btn mono">-0.05x</button>
+            <button id="btnSpeedM01" type="button" class="step-btn mono">-0.01x</button>
+            <button id="btnSpeedReset" type="button" class="step-btn mono" style="color:#42a5f5;">1.00x</button>
+            <button id="btnSpeedP01" type="button" class="step-btn mono">+0.01x</button>
+            <button id="btnSpeedP05" type="button" class="step-btn mono">+0.05x</button>
+          </div>
+        </div>
+
+        <!-- Pitch Shift Control -->
+        <div class="modal-section">
+          <div class="sec-head">
+            <span class="sec-title">ピッチ（半音キー変更 -6 〜 +6）</span>
+            <span id="modalPitchVal" class="sec-value mono" style="color:#4ade80;">#:±0</span>
+          </div>
+          <input type="range" id="pitchSlider" min="-6" max="6" step="1" value="0">
+          <div class="step-row">
+            <button id="btnPitchM1" type="button" class="step-btn mono">-1 半音</button>
+            <button id="btnPitchReset" type="button" class="step-btn mono" style="color:#4ade80;">±0 原曲</button>
+            <button id="btnPitchP1" type="button" class="step-btn mono">+1 半音</button>
+          </div>
+        </div>
+
+        <!-- Slow-down Audio Engine Selector -->
+        <div class="modal-section">
+          <div class="sec-head">
+            <span class="sec-title">スロー再生エンジン（再生中も切替可）</span>
+          </div>
+
+          <button id="btnEngVocoder" type="button" class="engine-card active">
+            <div class="engine-name">● ボコーダ（同一位相ロック・ロボット声対策 / 標準）</div>
+            <div class="engine-desc">FFT 2048・75%重複ハニング窓＋スペクトルピーク位相ロックにより、0.30x低速でも音程を保ったまま機械的なビリビリ感を抑えます（半音ピッチ変更対応）。</div>
+          </button>
+
+          <button id="btnEngNative" type="button" class="engine-card">
+            <div class="engine-name">○ OS標準（端末内蔵ストレッチ）</div>
+            <div class="engine-desc">ブラウザ/OS標準の音程維持再生を使用します。省電力再生や超大容量ファイル向けです。</div>
+          </button>
+
+          <button id="btnEngTape" type="button" class="engine-card">
+            <div class="engine-name">○ テープ再生（音程連動・DSP加工ゼロ）</div>
+            <div class="engine-desc">純粋な可変速リサンプリング再生です。速度に合わせて音程も変わりますが、タイムストレッチ由来のデジタルノイズが原理上0%になります。</div>
+          </button>
+
+          <div class="toggle-row">
+            <div>
+              <div class="sec-title">高域スムージングフィルター</div>
+              <div id="lpfStatusText" class="engine-desc mono">速度連動ローパス (現在: 18.0kHz)</div>
+            </div>
+            <button id="btnToggleLpf" type="button" class="toggle-pill on">ON</button>
+          </div>
+        </div>
+
+        <!-- Waveform Vertical Scale, Playback Boost & Mic Gain -->
+        <div class="modal-section">
+          <div class="sec-head">
+            <span class="sec-title">波形の縦高さ倍率</span>
+            <span id="modalWaveGainVal" class="sec-value mono" style="color:#86efac;">自動 (1.0x)</span>
+          </div>
+          <div class="opt-grid-5">
+            <button type="button" data-wave-gain="auto" class="opt-pill wave-gain-opt active-green">自動</button>
+            <button type="button" data-wave-gain="1" class="opt-pill wave-gain-opt mono">1x</button>
+            <button type="button" data-wave-gain="2" class="opt-pill wave-gain-opt mono">2x</button>
+            <button type="button" data-wave-gain="4" class="opt-pill wave-gain-opt mono">4x</button>
+            <button type="button" data-wave-gain="8" class="opt-pill wave-gain-opt mono">8x</button>
+          </div>
+
+          <div class="sec-head" style="margin-top:12px;">
+            <span class="sec-title">再生音量ブースト（リミッター保護付）</span>
+            <span id="modalBoostVal" class="sec-value mono" style="color:#fcd34d;">自動 (100%)</span>
+          </div>
+          <div class="opt-grid-6">
+            <button type="button" data-boost="auto" class="opt-pill boost-opt active-amber">自動</button>
+            <button type="button" data-boost="1" class="opt-pill boost-opt mono">100%</button>
+            <button type="button" data-boost="1.5" class="opt-pill boost-opt mono">150%</button>
+            <button type="button" data-boost="2" class="opt-pill boost-opt mono">200%</button>
+            <button type="button" data-boost="3" class="opt-pill boost-opt mono">300%</button>
+            <button type="button" data-boost="4" class="opt-pill boost-opt mono">400%</button>
+          </div>
+
+          <div class="sec-head" style="margin-top:12px;">
+            <span class="sec-title">マイク録音入力ゲイン（停止後自動最適化）</span>
+            <span id="modalMicGainVal" class="sec-value mono" style="color:#fca5a5;">4.0x (+12dB)</span>
+          </div>
+          <div class="opt-grid-5">
+            <button type="button" data-mic-gain="1" class="opt-pill mic-gain-opt mono">1x</button>
+            <button type="button" data-mic-gain="2" class="opt-pill mic-gain-opt mono">2x</button>
+            <button type="button" data-mic-gain="4" class="opt-pill mic-gain-opt active-red mono">4x</button>
+            <button type="button" data-mic-gain="6" class="opt-pill mic-gain-opt mono">6x</button>
+            <button type="button" data-mic-gain="8" class="opt-pill mic-gain-opt mono">8x</button>
+          </div>
+        </div>
+
+        <!-- Track Name Rename -->
+        <div class="modal-section">
+          <div class="sec-head">
+            <span class="sec-title">トラック / 保存ファイル名</span>
+          </div>
+          <input type="text" id="inputTrackName" class="text-input" placeholder="トラック名を入力">
+        </div>
+      </div>
+
+      <!-- TAB 2: YELLOW MARKER LIST -->
+      <div id="panelMarkers" class="modal-body hidden">
+        <div id="markerListWrap"></div>
+        <div style="display:flex;gap:8px;margin-top:4px;">
+          <button id="btnAddMarkerFromModal" type="button" class="step-btn" style="flex:1;color:#fde047;border-color:rgba(250,204,21,0.5);">＋ 現在位置に黄色ピン追加</button>
+          <button id="btnClearAllMarkers" type="button" class="step-btn" style="color:#fca5a5;border-color:rgba(239,68,68,0.5);">全削除</button>
+        </div>
+      </div>
+
+      <!-- TAB 3: PLAYLIST -->
+      <div id="panelPlaylist" class="modal-body hidden">
+        <div id="playlistWrap"></div>
+        <label for="fileInput" class="start-btn start-btn-demo btn-like" style="min-height:38px;font-size:12px;">
+          ＋ ローカル音声ファイルを追加
+        </label>
+      </div>
+
+      <button id="btnDoneSettings" type="button" class="modal-footer-btn">完了</button>
+    </div>
+  </div>
+
+  <!-- Toast Banner -->
+  <div id="toastBanner" class="toast-banner"></div>
+
+  <script>
+    (() => {
+      'use strict';
+
+      // ==================== DOM ELEMENTS ====================
+      const audioEl = document.getElementById('audioEl');
+      const fileInput = document.getElementById('fileInput');
+      const overviewCanvas = document.getElementById('overviewCanvas');
+      const overviewCtx = overviewCanvas.getContext('2d');
+      const zoomCanvas = document.getElementById('zoomCanvas');
+      const zoomCtx = zoomCanvas.getContext('2d');
+      const recLiveWaveCanvas = document.getElementById('recLiveWaveCanvas');
+      const recLiveWaveCtx = recLiveWaveCanvas.getContext('2d');
+
+      const trackTitleEl = document.getElementById('trackTitle');
+      const trackSubtitleEl = document.getElementById('trackSubtitle');
+      const startupOverlay = document.getElementById('startupOverlay');
+      const recOverlay = document.getElementById('recOverlay');
+      const zoomPane = document.getElementById('zoomPane');
+      const zoomCollapsedBar = document.getElementById('zoomCollapsedBar');
+
+      const btnRecordHeader = document.getElementById('btnRecordHeader');
+      const recHeaderLabel = document.getElementById('recHeaderLabel');
+      const btnSaveWav = document.getElementById('btnSaveWav');
+      const recTimerText = document.getElementById('recTimerText');
+      const recMeterBar = document.getElementById('recMeterBar');
+      const recMarkerCountBadge = document.getElementById('recMarkerCountBadge');
+      const recLiveGainLabel = document.getElementById('recLiveGainLabel');
+
+      const btnWaveGainQuick = document.getElementById('btnWaveGainQuick');
+      const btnZoomSpanReset = document.getElementById('btnZoomSpanReset');
+      const btnPlaylistIndex = document.getElementById('btnPlaylistIndex');
+      const currentTimeText = document.getElementById('currentTimeText');
+      const totalTimeText = document.getElementById('totalTimeText');
+      const btnBoostQuick = document.getElementById('btnBoostQuick');
+      const btnEngineQuick = document.getElementById('btnEngineQuick');
+
+      const btnPromoteTemp = document.getElementById('btnPromoteTemp');
+      const btnJumpTemp = document.getElementById('btnJumpTemp');
+      const speedBadgeText = document.getElementById('speedBadgeText');
+      const pitchBadgeText = document.getElementById('pitchBadgeText');
+      const btnSectionRepeat = document.getElementById('btnSectionRepeat');
+      const sectionRepeatLabel = document.getElementById('sectionRepeatLabel');
+      const btnPlayPause = document.getElementById('btnPlayPause');
+      const iconPlay = document.getElementById('iconPlay');
+      const iconPause = document.getElementById('iconPause');
+      const reverbLabel = document.getElementById('reverbLabel');
+      const reverbIcon = document.getElementById('reverbIcon');
+      const toastBanner = document.getElementById('toastBanner');
+
+      // ==================== APPLICATION STATE ====================
+      const state = {
+        hasAudio: false,
+        isPlaying: false,
+        duration: 0,
+        currentTime: 0,
+        playbackRate: 1.0,
+        pitchSemitones: 0,
+        engine: 'vocoder', // 'vocoder' | 'native' | 'tape'
+        lpfEnabled: true,
+
+        // Track order mode & independent A-B section repeat toggle
+        orderMode: 'stop', // 'loop1' | 'loopAll' | 'stop' | 'shuffle'
+        sectionRepeat: false,
+
+        // Markers: Yellow Confirmed Pins (permanent) & Green Temporary Pin (max 1)
+        markers: [],
+        tempMarker: null,
+
+        // Real PCM Buffer & Multi-Resolution Min/Max Pyramid
+        audioBuffer: null,
+        waveformPyramid: null,
+        rawBlob: null,
+        isFallbackLargeFile: false,
+
+        // Visual layout & zoom
+        numRows: 12,
+        zoomVisible: true,
+        zoomWindowSeconds: 8.0,
+        waveGainMode: 'auto', // 'auto' | 1 | 2 | 4 | 8
+        autoWaveGain: 1.0,
+
+        // Playback Boost & Mic Input Gain
+        boostMode: 'auto', // 'auto' | 1 | 1.5 | 2 | 3 | 4
+        autoBoostGain: 1.0,
+        micGain: 4.0, // Default +12dB
+
+        // Acoustic Reverb Presets
+        reverbPresets: [
+          { name: 'なし', wet: 0.0, decay: 0.1, duration: 0.1 },
+          { name: '部屋', wet: 0.24, decay: 2.8, duration: 0.75 },
+          { name: 'ホール', wet: 0.40, decay: 2.0, duration: 1.85 },
+          { name: '風呂場', wet: 0.56, decay: 1.35, duration: 2.45 }
+        ],
+        reverbIndex: 0,
+
+        // Playlist
+        playlist: [], // { name, blob, markers, durationHint }
+        currentTrackIndex: 0,
+
+        // High-precision playhead interpolation for zero-jitter 60/120fps scrolling
+        lastSyncTime: 0,
+        lastSyncPerf: 0,
+
+        // Scrubbing, Momentum & Pinch-Zoom state
+        isDraggingOverview: false,
+        isDraggingZoom: false,
+        isPinchingZoom: false,
+        zoomDragStartX: 0,
+        zoomDragStartY: 0,
+        zoomDragStartTime: 0,
+        zoomTapStartPerf: 0,
+        zoomMoved: false,
+        zoomLastX: 0,
+        zoomLastPerf: 0,
+        zoomVelSecPerMs: 0,
+        isInertiaActive: false,
+        inertiaRafId: null,
+        pinchStartDist: 0,
+        pinchStartWinSec: 8.0,
+        pinchAnchorTime: 0,
+
+        // Live PCM Recording state
+        isRecording: false,
+        recStream: null,
+        recSourceNode: null,
+        recGainNode: null,
+        recLimiterNode: null,
+        recAnalyser: null,
+        recProcessor: null,
+        recSilentGain: null,
+        recBuffersL: [],
+        recBuffersR: [],
+        recSampleRate: 44100,
+        recStartPerf: 0,
+        recPendingMarkers: [],
+        recAnimId: null
+      };
+
+      // ==================== UTILITIES ====================
+      let toastTimer = null;
+      function showToast(message) {
+        toastBanner.textContent = message;
+        toastBanner.classList.add('show');
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => {
+          toastBanner.classList.remove('show');
+        }, 2100);
+      }
+
+      function formatTime(sec, withTenths = false) {
+        if (!isFinite(sec) || sec < 0) sec = 0;
+        const hrs = Math.floor(sec / 3600);
+        const mins = Math.floor((sec % 3600) / 60);
+        const secs = Math.floor(sec % 60);
+        const tenths = Math.floor((sec % 1) * 10);
+        const mm = hrs > 0 ? String(mins).padStart(2, '0') : String(mins);
+        const ss = String(secs).padStart(2, '0');
+        const base = hrs > 0 ? `${hrs}:${mm}:${ss}` : `${mm}:${ss}`;
+        return withTenths ? `${base}.${tenths}` : base;
+      }
+
+      function formatRowTime(sec) {
+        if (!isFinite(sec) || sec < 0) sec = 0;
+        const hrs = Math.floor(sec / 3600);
+        const mins = Math.floor((sec % 3600) / 60);
+        const secs = Math.floor(sec % 60);
+        if (hrs > 0) {
+          return `${hrs}:${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+        }
+        return `${mins}:${String(secs).padStart(2, '0')}`;
+      }
+
+      function makeRecordingFilename() {
+        const d = new Date();
+        const pad = (n) => String(n).padStart(2, '0');
+        return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}_${pad(d.getHours())}-${pad(d.getMinutes())}-${pad(d.getSeconds())}.wav`;
+      }
+
+      function isAudioCandidate(file) {
+        if (!file) return false;
+        if (file.type && (file.type.startsWith('audio/') || file.type === 'video/mp4' || file.type === 'video/webm' || file.type === 'application/ogg')) {
+          return true;
+        }
+        return /\.(m4a|mp3|wav|aac|flac|ogg|opus|wma|aif|aiff|caf|3gp|mp4|webm)$/i.test(file.name);
+      }
+
+      // ==================== WEB AUDIO GRAPH & 3 PLAYBACK ENGINES ====================
+      let audioCtx = null;
+      let vocoderNode = null;
+      let mediaElSource = null;
+      let tapeSourceNode = null;
+      let tapeAnchorCtxTime = 0;
+      let tapeAnchorOffset = 0;
+      let lowpassNode = null;
+      let dryGainNode = null;
+      let wetGainNode = null;
+      let convolverNode = null;
+      let masterBoostNode = null;
+      let masterLimiterNode = null;
+      let audioGraphReady = false;
+
+      // ---------- Identity Phase-Locked Phase Vocoder (Laroche & Dolson, FFT 2048, Hop 512) ----------
+      const PV_N = 2048;
+      const PV_HALF = 1025;
+      const PV_HOP_SYN = 512; // 75% overlap
+      const PV_TWO_PI = 2 * Math.PI;
+      const PV_COLA = 1.0 / 1.5; // Exact Hann^2 COLA factor at 75% overlap
+
+      const pvHann = new Float32Array(PV_N);
+      const pvBitRev = new Uint16Array(PV_N);
+      const pvCos = new Float32Array(PV_N >> 1);
+      const pvSin = new Float32Array(PV_N >> 1);
+
+      (() => {
+        for (let i = 0; i < PV_N; i++) {
+          pvHann[i] = 0.5 * (1.0 - Math.cos((PV_TWO_PI * i) / PV_N));
+          let x = i, y = 0;
+          for (let b = 0; b < 11; b++) {
+            y = (y << 1) | (x & 1);
+            x >>= 1;
+          }
+          pvBitRev[i] = y;
+        }
+        for (let i = 0; i < (PV_N >> 1); i++) {
+          const ang = (-PV_TWO_PI * i) / PV_N;
+          pvCos[i] = Math.cos(ang);
+          pvSin[i] = Math.sin(ang);
+        }
+      })();
+
+      function fft2048(re, im, inverse) {
+        const N = PV_N;
+        for (let i = 0; i < N; i++) {
+          const j = pvBitRev[i];
+          if (i < j) {
+            const tr = re[i]; re[i] = re[j]; re[j] = tr;
+            const ti = im[i]; im[i] = im[j]; im[j] = ti;
+          }
+        }
+        const sign = inverse ? -1.0 : 1.0;
+        for (let len = 2; len <= N; len <<= 1) {
+          const half = len >> 1;
+          const step = N / len;
+          for (let i = 0; i < N; i += len) {
+            let tidx = 0;
+            for (let j = 0; j < half; j++) {
+              const wr = pvCos[tidx];
+              const wi = sign * pvSin[tidx];
+              tidx += step;
+
+              const e = i + j;
+              const o = e + half;
+              const oRe = re[o], oIm = im[o];
+              const tRe = wr * oRe - wi * oIm;
+              const tIm = wr * oIm + wi * oRe;
+              re[o] = re[e] - tRe;
+              im[o] = im[e] - tIm;
+              re[e] += tRe;
+              im[e] += tIm;
+            }
+          }
+        }
+        if (inverse) {
+          const invN = 1.0 / N;
+          for (let i = 0; i < N; i++) {
+            re[i] *= invN;
+            im[i] *= invN;
+          }
+        }
+      }
+
+      const pv = {
+        analysisPos: 0,
+        needsPhaseReset: true,
+        pendingEnd: false,
+        olaL: new Float32Array(PV_N),
+        olaR: new Float32Array(PV_N),
+        olaReadPos: PV_HOP_SYN,
+        reL: new Float32Array(PV_N),
+        imL: new Float32Array(PV_N),
+        reR: new Float32Array(PV_N),
+        imR: new Float32Array(PV_N),
+        magL: new Float32Array(PV_HALF),
+        magR: new Float32Array(PV_HALF),
+        magMono: new Float32Array(PV_HALF),
+        anaPhaseL: new Float32Array(PV_HALF),
+        anaPhaseR: new Float32Array(PV_HALF),
+        prevAnaL: new Float32Array(PV_HALF),
+        prevAnaR: new Float32Array(PV_HALF),
+        synPhaseL: new Float32Array(PV_HALF),
+        synPhaseR: new Float32Array(PV_HALF),
+        peaks: new Uint16Array(PV_HALF),
+        rotL: new Float32Array(PV_HALF),
+        rotR: new Float32Array(PV_HALF)
+      };
+
+      function wrapPi(p) {
+        p = p % PV_TWO_PI;
+        if (p > Math.PI) p -= PV_TWO_PI;
+        else if (p <= -Math.PI) p += PV_TWO_PI;
+        return p;
+      }
+
+      function resetVocoderAtSample(sampleIdx) {
+        const maxS = state.audioBuffer ? Math.max(0, state.audioBuffer.length - 1) : 0;
+        pv.analysisPos = Math.max(0, Math.min(maxS, sampleIdx));
+        pv.olaL.fill(0);
+        pv.olaR.fill(0);
+        pv.olaReadPos = PV_HOP_SYN;
+        pv.needsPhaseReset = true;
+      }
+
+      function readLinear(arr, pos) {
+        const len = arr.length;
+        if (pos <= 0) return arr[0] || 0;
+        const idx = Math.floor(pos);
+        if (idx >= len - 1) return arr[len - 1] || 0;
+        const frac = pos - idx;
+        return arr[idx] * (1.0 - frac) + arr[idx + 1] * frac;
+      }
+
+      function synthVocoderHop(bufL, bufR, srRatio) {
+        const totalSamples = bufL.length;
+        const pitchRatio = Math.pow(2, state.pitchSemitones / 12);
+        const resampleStep = srRatio * pitchRatio;
+        const unitResample = Math.abs(resampleStep - 1.0) < 1e-5;
+
+        const hopAnaResampled = Math.max(1e-4, (PV_HOP_SYN * state.playbackRate) / pitchRatio);
+        const inputAdvance = PV_HOP_SYN * state.playbackRate * srRatio;
+
+        pv.olaL.copyWithin(0, PV_HOP_SYN, PV_N);
+        pv.olaR.copyWithin(0, PV_HOP_SYN, PV_N);
+        pv.olaL.fill(0, PV_N - PV_HOP_SYN, PV_N);
+        pv.olaR.fill(0, PV_N - PV_HOP_SYN, PV_N);
+
+        const startPos = pv.analysisPos;
+        const reL = pv.reL, imL = pv.imL, reR = pv.reR, imR = pv.imR;
+
+        if (unitResample) {
+          const base = Math.floor(startPos);
+          for (let n = 0; n < PV_N; n++) {
+            const idx = base + n;
+            const w = pvHann[n];
+            if (idx >= 0 && idx < totalSamples) {
+              reL[n] = bufL[idx] * w;
+              reR[n] = bufR[idx] * w;
+            } else {
+              reL[n] = 0;
+              reR[n] = 0;
+            }
+            imL[n] = 0;
+            imR[n] = 0;
+          }
+        } else {
+          for (let n = 0; n < PV_N; n++) {
+            const p = startPos + n * resampleStep;
+            const w = pvHann[n];
+            if (p >= 0 && p < totalSamples) {
+              reL[n] = readLinear(bufL, p) * w;
+              reR[n] = readLinear(bufR, p) * w;
+            } else {
+              reL[n] = 0;
+              reR[n] = 0;
+            }
+            imL[n] = 0;
+            imR[n] = 0;
+          }
+        }
+
+        pv.analysisPos += inputAdvance;
+
+        fft2048(reL, imL, false);
+        fft2048(reR, imR, false);
+
+        const magL = pv.magL, magR = pv.magR, magMono = pv.magMono;
+        const anaL = pv.anaPhaseL, anaR = pv.anaPhaseR;
+
+        for (let k = 0; k < PV_HALF; k++) {
+          const rL = reL[k], iL = imL[k];
+          const rR = reR[k], iR = imR[k];
+          const mL = Math.hypot(rL, iL);
+          const mR = Math.hypot(rR, iR);
+          magL[k] = mL;
+          magR[k] = mR;
+          magMono[k] = mL + mR;
+          anaL[k] = Math.atan2(iL, rL);
+          anaR[k] = Math.atan2(iR, rR);
+        }
+
+        const prevL = pv.prevAnaL, prevR = pv.prevAnaR;
+        const synL = pv.synPhaseL, synR = pv.synPhaseR;
+
+        if (pv.needsPhaseReset) {
+          pv.needsPhaseReset = false;
+          prevL.set(anaL);
+          prevR.set(anaR);
+          synL.set(anaL);
+          synR.set(anaR);
+        } else {
+          // Spectral peak detection
+          const peaks = pv.peaks;
+          let numPeaks = 0;
+          peaks[numPeaks++] = 0;
+          for (let k = 1; k < PV_HALF - 1; k++) {
+            const m = magMono[k];
+            if (m >= magMono[k - 1] && m >= magMono[k + 1] && m > 1e-9) {
+              peaks[numPeaks++] = k;
+            }
+          }
+          if (peaks[numPeaks - 1] !== PV_HALF - 1) {
+            peaks[numPeaks++] = PV_HALF - 1;
+          }
+
+          const rotL = pv.rotL, rotR = pv.rotR;
+          const binStep = PV_TWO_PI / PV_N;
+          const invHopAna = 1.0 / hopAnaResampled;
+
+          // Advance true instantaneous phase at peaks
+          for (let i = 0; i < numPeaks; i++) {
+            const p = peaks[i];
+            const omega = p * binStep;
+            const expAdv = omega * hopAnaResampled;
+
+            const devL = wrapPi((anaL[p] - prevL[p]) - expAdv);
+            const nextSynL = wrapPi(synL[p] + (omega + devL * invHopAna) * PV_HOP_SYN);
+            synL[p] = nextSynL;
+            rotL[p] = nextSynL - anaL[p];
+
+            const devR = wrapPi((anaR[p] - prevR[p]) - expAdv);
+            const nextSynR = wrapPi(synR[p] + (omega + devR * invHopAna) * PV_HOP_SYN);
+            synR[p] = nextSynR;
+            rotR[p] = nextSynR - anaR[p];
+          }
+
+          // Identity phase-locking around each peak
+          for (let i = 0; i < numPeaks; i++) {
+            const p = peaks[i];
+            const rStart = i === 0 ? 0 : ((peaks[i - 1] + p) >> 1) + 1;
+            const rEnd = i === numPeaks - 1 ? PV_HALF - 1 : ((p + peaks[i + 1]) >> 1);
+            const rL = rotL[p], rR = rotR[p];
+            for (let k = rStart; k <= rEnd; k++) {
+              if (k !== p) {
+                synL[k] = wrapPi(anaL[k] + rL);
+                synR[k] = wrapPi(anaR[k] + rR);
+              }
+            }
+          }
+
+          prevL.set(anaL);
+          prevR.set(anaR);
+        }
+
+        // Reconstruct Hermitian-symmetric complex spectrum
+        reL[0] = magL[0] * Math.cos(synL[0]); imL[0] = 0;
+        reR[0] = magR[0] * Math.cos(synR[0]); imR[0] = 0;
+        const nyq = PV_N >> 1;
+        reL[nyq] = magL[nyq] * Math.cos(synL[nyq]); imL[nyq] = 0;
+        reR[nyq] = magR[nyq] * Math.cos(synR[nyq]); imR[nyq] = 0;
+
+        for (let k = 1; k < nyq; k++) {
+          const sL = synL[k], mL = magL[k];
+          const cReL = mL * Math.cos(sL), cImL = mL * Math.sin(sL);
+          reL[k] = cReL; imL[k] = cImL;
+          reL[PV_N - k] = cReL; imL[PV_N - k] = -cImL;
+
+          const sR = synR[k], mR = magR[k];
+          const cReR = mR * Math.cos(sR), cImR = mR * Math.sin(sR);
+          reR[k] = cReR; imR[k] = cImR;
+          reR[PV_N - k] = cReR; imR[PV_N - k] = -cImR;
+        }
+
+        fft2048(reL, imL, true);
+        fft2048(reR, imR, true);
+
+        for (let n = 0; n < PV_N; n++) {
+          const s = pvHann[n] * PV_COLA;
+          pv.olaL[n] += reL[n] * s;
+          pv.olaR[n] += reR[n] * s;
+        }
+        pv.olaReadPos = 0;
+      }
+
+      function onVocoderProcess(event) {
+        const outL = event.outputBuffer.getChannelData(0);
+        const outR = event.outputBuffer.getChannelData(1);
+        if (!state.isPlaying || !state.hasAudio || !state.audioBuffer || state.isFallbackLargeFile || state.engine !== 'vocoder') {
+          outL.fill(0);
+          outR.fill(0);
+          return;
+        }
+
+        const buf = state.audioBuffer;
+        const bufL = buf.getChannelData(0);
+        const bufR = buf.numberOfChannels > 1 ? buf.getChannelData(1) : bufL;
+        const totalSamples = buf.length;
+        const bufSr = buf.sampleRate;
+        const srRatio = bufSr / audioCtx.sampleRate;
+
+        let loopStartS = 0;
+        let loopEndS = totalSamples;
+        const useSectionLoop = state.sectionRepeat;
+        if (useSectionLoop) {
+          const sec = getActiveLoopSection();
+          if (sec.end - sec.start > 0.15) {
+            loopStartS = Math.floor(sec.start * bufSr);
+            loopEndS = Math.min(totalSamples, Math.floor(sec.end * bufSr));
+          }
+        }
+
+        const len = outL.length;
+        for (let i = 0; i < len; i++) {
+          if (useSectionLoop && pv.analysisPos >= loopEndS) {
+            resetVocoderAtSample(loopStartS);
+          }
+          if (pv.analysisPos >= totalSamples) {
+            outL[i] = 0;
+            outR[i] = 0;
+            pv.pendingEnd = true;
+            continue;
+          }
+          if (pv.olaReadPos >= PV_HOP_SYN) {
+            synthVocoderHop(bufL, bufR, srRatio);
+          }
+          outL[i] = pv.olaL[pv.olaReadPos];
+          outR[i] = pv.olaR[pv.olaReadPos];
+          pv.olaReadPos++;
+        }
+
+        state.currentTime = Math.min(state.duration, pv.analysisPos / bufSr);
+        state.lastSyncTime = state.currentTime;
+        state.lastSyncPerf = performance.now();
+
+        if (pv.pendingEnd) {
+          pv.pendingEnd = false;
+          setTimeout(handleTrackEnded, 0);
+        }
+      }
+
+      function initAudioGraph() {
+        if (!audioCtx) {
+          const Ctx = window.AudioContext || window.webkitAudioContext;
+          audioCtx = new Ctx();
+        }
+        if (audioCtx.state === 'suspended') {
+          audioCtx.resume();
+        }
+        if (audioGraphReady) return;
+
+        try {
+          vocoderNode = audioCtx.createScriptProcessor(2048, 0, 2);
+          vocoderNode.onaudioprocess = onVocoderProcess;
+
+          lowpassNode = audioCtx.createBiquadFilter();
+          lowpassNode.type = 'lowpass';
+          lowpassNode.frequency.value = 18000;
+          lowpassNode.Q.value = 0.65;
+
+          dryGainNode = audioCtx.createGain();
+          wetGainNode = audioCtx.createGain();
+          convolverNode = audioCtx.createConvolver();
+          dryGainNode.gain.value = 1.0;
+          wetGainNode.gain.value = 0.0;
+
+          // Master Volume Boost + Soft Limiter
+          masterBoostNode = audioCtx.createGain();
+          masterBoostNode.gain.value = getEffectiveBoost();
+
+          masterLimiterNode = audioCtx.createDynamicsCompressor();
+          masterLimiterNode.threshold.value = -1.5;
+          masterLimiterNode.knee.value = 5.0;
+          masterLimiterNode.ratio.value = 16.0;
+          masterLimiterNode.attack.value = 0.002;
+          masterLimiterNode.release.value = 0.08;
+
+          vocoderNode.connect(lowpassNode);
+
+          mediaElSource = audioCtx.createMediaElementSource(audioEl);
+          mediaElSource.connect(lowpassNode);
+
+          lowpassNode.connect(dryGainNode);
+          dryGainNode.connect(masterBoostNode);
+
+          lowpassNode.connect(convolverNode);
+          convolverNode.connect(wetGainNode);
+          wetGainNode.connect(masterBoostNode);
+
+          masterBoostNode.connect(masterLimiterNode);
+          masterLimiterNode.connect(audioCtx.destination);
+
+          audioGraphReady = true;
+          updateLowpassFilter();
+          applyMasterBoost();
+        } catch (err) {
+          console.warn('AudioGraph init issue:', err);
+        }
+      }
+
+      // ---------- Pure AudioBufferSourceNode Tape Mode Helpers ----------
+      function stopTapeSource() {
+        if (tapeSourceNode) {
+          try {
+            tapeSourceNode.onended = null;
+            tapeSourceNode.stop();
+            tapeSourceNode.disconnect();
+          } catch (_) {}
+          tapeSourceNode = null;
+        }
+      }
+
+      function startTapeSourceAt(offsetSec) {
+        stopTapeSource();
+        if (!state.audioBuffer || !audioCtx || !lowpassNode) return;
+        const clamped = Math.max(0, Math.min(Math.max(0, state.duration - 0.01), offsetSec));
+        const src = audioCtx.createBufferSource();
+        src.buffer = state.audioBuffer;
+        src.playbackRate.setValueAtTime(state.playbackRate, audioCtx.currentTime);
+        src.connect(lowpassNode);
+        src.onended = () => {
+          if (tapeSourceNode === src && state.isPlaying && state.engine === 'tape') {
+            tapeSourceNode = null;
+            handleTrackEnded();
+          }
+        };
+        tapeAnchorCtxTime = audioCtx.currentTime;
+        tapeAnchorOffset = clamped;
+        src.start(0, clamped);
+        tapeSourceNode = src;
+      }
+
+      function getTapeCurrentTime() {
+        if (!audioCtx || !tapeSourceNode) return state.currentTime;
+        const elapsed = Math.max(0, audioCtx.currentTime - tapeAnchorCtxTime);
+        return Math.min(state.duration, tapeAnchorOffset + elapsed * state.playbackRate);
+      }
+
+      // ==================== REVERB, FILTER, GAIN & BOOST CONTROLS ====================
+      function createReverbIR(durationSec, decay) {
+        if (!audioCtx) return null;
+        const sr = audioCtx.sampleRate;
+        const len = Math.max(1, Math.floor(sr * durationSec));
+        const ir = audioCtx.createBuffer(2, len, sr);
+        for (let ch = 0; ch < 2; ch++) {
+          const d = ir.getChannelData(ch);
+          for (let i = 0; i < len; i++) {
+            d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, decay);
+          }
+        }
+        return ir;
+      }
+
+      function applyReverb(idx) {
+        state.reverbIndex = idx % state.reverbPresets.length;
+        const p = state.reverbPresets[state.reverbIndex];
+        reverbLabel.textContent = p.name;
+        const active = state.reverbIndex > 0;
+        reverbLabel.style.color = active ? '#42a5f5' : '';
+        reverbIcon.style.color = active ? '#42a5f5' : '';
+
+        if (audioCtx && audioGraphReady) {
+          if (p.wet <= 0.001) {
+            wetGainNode.gain.setTargetAtTime(0, audioCtx.currentTime, 0.02);
+            dryGainNode.gain.setTargetAtTime(1.0, audioCtx.currentTime, 0.02);
+          } else {
+            convolverNode.buffer = createReverbIR(p.duration, p.decay);
+            wetGainNode.gain.setTargetAtTime(p.wet, audioCtx.currentTime, 0.03);
+            dryGainNode.gain.setTargetAtTime(1.0 - p.wet * 0.25, audioCtx.currentTime, 0.03);
+          }
+        }
+        showToast(`音響エフェクト: ${p.name}`);
+      }
+
+      function updateLowpassFilter() {
+        let cutoff = 18000;
+        if (state.lpfEnabled) {
+          if (state.playbackRate < 0.98) {
+            cutoff = Math.max(4600, Math.min(18000, 3600 + 13500 * state.playbackRate));
+          }
+        } else {
+          cutoff = 20000;
+        }
+        if (audioCtx && lowpassNode) {
+          lowpassNode.frequency.setTargetAtTime(cutoff, audioCtx.currentTime, 0.025);
+        }
+        const el = document.getElementById('lpfStatusText');
+        if (el) {
+          el.textContent = state.lpfEnabled
+            ? `速度連動ローパス (現在: ${(cutoff / 1000).toFixed(1)}kHz)`
+            : 'フィルターOFF（原音帯域スルー）';
+        }
+      }
+
+      function getEffectiveWaveGain() {
+        return state.waveGainMode === 'auto' ? state.autoWaveGain : (Number(state.waveGainMode) || 1.0);
+      }
+
+      function getEffectiveBoost() {
+        return state.boostMode === 'auto' ? state.autoBoostGain : (Number(state.boostMode) || 1.0);
+      }
+
+      function updateWaveGainUI() {
+        const eff = getEffectiveWaveGain();
+        if (state.waveGainMode === 'auto') {
+          btnWaveGainQuick.textContent = eff > 1.08 ? `波形:自動(${eff.toFixed(1)}x)` : '波形:自動';
+          document.getElementById('modalWaveGainVal').textContent = `自動 (${eff.toFixed(1)}x)`;
+        } else {
+          btnWaveGainQuick.textContent = `波形:${state.waveGainMode}x`;
+          document.getElementById('modalWaveGainVal').textContent = `手動 (${state.waveGainMode}x)`;
+        }
+        document.querySelectorAll('.wave-gain-opt').forEach(btn => {
+          btn.classList.toggle('active-green', btn.dataset.waveGain === String(state.waveGainMode));
+        });
+      }
+
+      function applyMasterBoost() {
+        const eff = getEffectiveBoost();
+        if (audioCtx && masterBoostNode) {
+          masterBoostNode.gain.setTargetAtTime(eff, audioCtx.currentTime, 0.02);
+        }
+        const pct = Math.round(eff * 100);
+        if (state.boostMode === 'auto') {
+          btnBoostQuick.textContent = pct > 103 ? `音量:自動(${pct}%)` : '音量:自動';
+          document.getElementById('modalBoostVal').textContent = `自動 (${pct}%)`;
+        } else {
+          btnBoostQuick.textContent = `音量:${pct}%`;
+          document.getElementById('modalBoostVal').textContent = `手動 (${pct}%)`;
+        }
+        document.querySelectorAll('.boost-opt').forEach(btn => {
+          btn.classList.toggle('active-amber', btn.dataset.boost === String(state.boostMode));
+        });
+      }
+
+      function setMicGain(val) {
+        const clamped = Math.max(1, Math.min(8, parseFloat(val) || 4));
+        state.micGain = clamped;
+        const db = Math.round(20 * Math.log10(clamped));
+        document.getElementById('modalMicGainVal').textContent = `${clamped.toFixed(1)}x (+${db}dB)`;
+        recLiveGainLabel.textContent = `${clamped.toFixed(1)}x`;
+        if (audioCtx && state.recGainNode) {
+          state.recGainNode.gain.setTargetAtTime(clamped, audioCtx.currentTime, 0.02);
+        }
+        document.querySelectorAll('.mic-gain-opt').forEach(btn => {
+          btn.classList.toggle('active-red', Math.abs(parseFloat(btn.dataset.micGain) - clamped) < 0.05);
+        });
+      }
+
+      function setEngine(nextEngine) {
+        const valid = ['vocoder', 'native', 'tape'];
+        if (!valid.includes(nextEngine)) return;
+
+        // If no decoded PCM buffer (extreme large fallback), force native
+        if (state.hasAudio && (!state.audioBuffer || state.isFallbackLargeFile) && nextEngine !== 'native') {
+          showToast('超大容量ファイルのためOS標準エンジンを使用します');
+          nextEngine = 'native';
+        }
+
+        const wasPlaying = state.isPlaying;
+        const curT = getLivePlayheadTime();
+        state.currentTime = curT;
+
+        // Cleanly stop previous engine
+        stopTapeSource();
+        if (!audioEl.paused) audioEl.pause();
+
+        state.engine = nextEngine;
+        const labels = { vocoder: 'ボコーダ', native: 'OS標準', tape: 'テープ' };
+        btnEngineQuick.textContent = labels[nextEngine];
+
+        // Update Settings modal engine cards
+        const cVoc = document.getElementById('btnEngVocoder');
+        const cNat = document.getElementById('btnEngNative');
+        const cTap = document.getElementById('btnEngTape');
+        cVoc.className = 'engine-card' + (nextEngine === 'vocoder' ? ' active' : '');
+        cNat.className = 'engine-card' + (nextEngine === 'native' ? ' active' : '');
+        cTap.className = 'engine-card' + (nextEngine === 'tape' ? ' active-tape' : '');
+
+        cVoc.querySelector('.engine-name').textContent = (nextEngine === 'vocoder' ? '● ' : '○ ') + 'ボコーダ（同一位相ロック・ロボット声対策 / 標準）';
+        cNat.querySelector('.engine-name').textContent = (nextEngine === 'native' ? '● ' : '○ ') + 'OS標準（端末内蔵ストレッチ）';
+        cTap.querySelector('.engine-name').textContent = (nextEngine === 'tape' ? '● ' : '○ ') + 'テープ再生（音程連動・DSP加工ゼロ）';
+
+        // Re-sync new engine seamlessly
+        if (state.hasAudio) {
+          if (nextEngine === 'vocoder' && state.audioBuffer) {
+            resetVocoderAtSample(Math.floor(curT * state.audioBuffer.sampleRate));
+          } else if (nextEngine === 'native') {
+            audioEl.preservesPitch = true;
+            audioEl.mozPreservesPitch = true;
+            audioEl.webkitPreservesPitch = true;
+            audioEl.playbackRate = state.playbackRate;
+            audioEl.currentTime = curT;
+            if (wasPlaying) audioEl.play().catch(() => {});
+          } else if (nextEngine === 'tape' && state.audioBuffer) {
+            if (wasPlaying) startTapeSourceAt(curT);
+          }
+          state.lastSyncTime = curT;
+          state.lastSyncPerf = performance.now();
+        }
+      }
+
+      // ==================== REAL PCM PYRAMID BUILDER ====================
+      function buildPcmPyramid(audioBuffer) {
+        const numCh = audioBuffer.numberOfChannels;
+        const totalSamples = audioBuffer.length;
+        const sr = audioBuffer.sampleRate;
+        const ch0 = audioBuffer.getChannelData(0);
+        const ch1 = numCh > 1 ? audioBuffer.getChannelData(1) : null;
+
+        const baseBin = 16;
+        const count0 = Math.max(1, Math.ceil(totalSamples / baseBin));
+        const min0 = new Float32Array(count0);
+        const max0 = new Float32Array(count0);
+        let peak = 0;
+
+        for (let b = 0; b < count0; b++) {
+          const s = b * baseBin;
+          const e = Math.min(totalSamples, s + baseBin);
+          let lo = 1.0, hi = -1.0;
+          for (let i = s; i < e; i++) {
+            const v0 = ch0[i];
+            if (v0 < lo) lo = v0;
+            if (v0 > hi) hi = v0;
+            if (ch1) {
+              const v1 = ch1[i];
+              if (v1 < lo) lo = v1;
+              if (v1 > hi) hi = v1;
+            }
+          }
+          if (lo > hi) { lo = 0; hi = 0; }
+          min0[b] = lo;
+          max0[b] = hi;
+          const a = Math.max(Math.abs(lo), Math.abs(hi));
+          if (a > peak) peak = a;
+        }
+
+        const levels = [{ binSize: baseBin, min: min0, max: max0 }];
+        const factor = 8;
+        for (let lvl = 1; lvl <= 3; lvl++) {
+          const prev = levels[lvl - 1];
+          const pLen = prev.min.length;
+          const nLen = Math.max(1, Math.ceil(pLen / factor));
+          const nMin = new Float32Array(nLen);
+          const nMax = new Float32Array(nLen);
+          for (let b = 0; b < nLen; b++) {
+            const s = b * factor;
+            const e = Math.min(pLen, s + factor);
+            let lo = 1.0, hi = -1.0;
+            for (let j = s; j < e; j++) {
+              if (prev.min[j] < lo) lo = prev.min[j];
+              if (prev.max[j] > hi) hi = prev.max[j];
+            }
+            if (lo > hi) { lo = 0; hi = 0; }
+            nMin[b] = lo;
+            nMax[b] = hi;
+          }
+          levels.push({ binSize: prev.binSize * factor, min: nMin, max: nMax });
+        }
+
+        return { sampleRate: sr, totalSamples, duration: audioBuffer.duration, peak, levels };
+      }
+
+      function queryPyramid(pyramid, t0, t1) {
+        if (!pyramid || pyramid.totalSamples === 0) return { min: 0, max: 0 };
+        const sr = pyramid.sampleRate;
+        const maxS = pyramid.totalSamples - 1;
+        const s0 = Math.max(0, Math.min(maxS, Math.floor(t0 * sr)));
+        const s1 = Math.max(s0, Math.min(maxS, Math.ceil(t1 * sr)));
+        const span = Math.max(1, s1 - s0 + 1);
+
+        let lvl = pyramid.levels[pyramid.levels.length - 1];
+        for (let i = 0; i < pyramid.levels.length; i++) {
+          if (span / pyramid.levels[i].binSize <= 16) {
+            lvl = pyramid.levels[i];
+            break;
+          }
+        }
+        const b0 = Math.max(0, Math.min(lvl.min.length - 1, Math.floor(s0 / lvl.binSize)));
+        const b1 = Math.max(b0, Math.min(lvl.min.length - 1, Math.floor(s1 / lvl.binSize)));
+        let lo = 1.0, hi = -1.0;
+        for (let b = b0; b <= b1; b++) {
+          if (lvl.min[b] < lo) lo = lvl.min[b];
+          if (lvl.max[b] > hi) hi = lvl.max[b];
+        }
+        if (lo > hi) return { min: 0, max: 0 };
+        return { min: lo, max: hi };
+      }
+
+      // ==================== AUDIO LOADING & WAV ENCODING ====================
+      function probeDuration(url) {
+        return new Promise(resolve => {
+          const a = document.createElement('audio');
+          a.preload = 'metadata';
+          a.onloadedmetadata = () => {
+            const d = isFinite(a.duration) && a.duration > 0 ? a.duration : 0;
+            a.removeAttribute('src');
+            resolve(d);
+          };
+          a.onerror = () => {
+            a.removeAttribute('src');
+            resolve(0);
+          };
+          a.src = url;
+        });
+      }
+
+      function computeRows(duration) {
+        if (duration <= 30) return 10;
+        if (duration <= 180) return 12;
+        return 14;
+      }
+
+      async function loadAudioBlob(blob, title, initialMarkers = [], autoPlay = false, preDecodedBuffer = null) {
+        try {
+          pausePlayback();
+          stopInertia();
+
+          const url = URL.createObjectURL(blob);
+          state.rawBlob = blob;
+          state.audioBuffer = null;
+          state.waveformPyramid = null;
+          state.isFallbackLargeFile = false;
+
+          let resolvedDuration = preDecodedBuffer ? preDecodedBuffer.duration : await probeDuration(url);
+
+          if (preDecodedBuffer) {
+            state.audioBuffer = preDecodedBuffer;
+            state.waveformPyramid = buildPcmPyramid(preDecodedBuffer);
+          } else if (blob.size <= 140 * 1024 * 1024) {
+            try {
+              initAudioGraph();
+              const ab = await blob.arrayBuffer();
+              const decoded = await audioCtx.decodeAudioData(ab);
+              state.audioBuffer = decoded;
+              resolvedDuration = decoded.duration || resolvedDuration;
+              state.waveformPyramid = buildPcmPyramid(decoded);
+            } catch (decErr) {
+              console.warn('decodeAudioData fallback:', decErr);
+              state.isFallbackLargeFile = true;
+            }
+          } else {
+            state.isFallbackLargeFile = true;
+          }
+
+          if (state.waveformPyramid && state.waveformPyramid.peak > 0.0005) {
+            const pk = state.waveformPyramid.peak;
+            state.autoWaveGain = Math.min(12.0, Math.max(1.0, 0.88 / pk));
+            state.autoBoostGain = Math.min(4.0, Math.max(1.0, 0.71 / pk));
+          } else {
+            state.autoWaveGain = 1.0;
+            state.autoBoostGain = 1.0;
+          }
+
+          if (state.isFallbackLargeFile) {
+            setEngine('native');
+          }
+
+          if (!resolvedDuration || resolvedDuration <= 0) resolvedDuration = 30;
+
+          state.duration = resolvedDuration;
+          state.currentTime = 0;
+          state.lastSyncTime = 0;
+          state.lastSyncPerf = performance.now();
+          state.numRows = computeRows(resolvedDuration);
+          state.markers = initialMarkers.filter(t => t > 0.1 && t < resolvedDuration - 0.1).sort((a, b) => a - b);
+          state.tempMarker = null;
+
+          if (state.audioBuffer) {
+            resetVocoderAtSample(0);
+          }
+
+          if (audioEl.dataset.url) {
+            URL.revokeObjectURL(audioEl.dataset.url);
+          }
+          audioEl.dataset.url = url;
+          audioEl.src = url;
+          audioEl.preservesPitch = true;
+          audioEl.mozPreservesPitch = true;
+          audioEl.webkitPreservesPitch = true;
+          audioEl.playbackRate = state.playbackRate;
+
+          state.hasAudio = true;
+          startupOverlay.classList.add('hidden');
+          btnSaveWav.disabled = false;
+          trackTitleEl.textContent = title;
+
+          updateWaveGainUI();
+          applyMasterBoost();
+          updateHeaderSubInfo();
+          updateTimeUI();
+          updatePinButtonsUI();
+          renderAllCanvases();
+
+          if (autoPlay) startPlayback();
+        } catch (err) {
+          console.error('loadAudioBlob error:', err);
+          showToast('音声ファイルの読み込みに失敗しました');
+        }
+      }
+
+      function encodeWavFromAudioBuffer(buffer) {
+        const numCh = Math.min(2, buffer.numberOfChannels);
+        const sr = buffer.sampleRate;
+        const len = buffer.length;
+        const blockAlign = numCh * 2;
+        const dataSize = len * blockAlign;
+        const ab = new ArrayBuffer(44 + dataSize);
+        const v = new DataView(ab);
+
+        const wStr = (off, s) => { for (let i = 0; i < s.length; i++) v.setUint8(off + i, s.charCodeAt(i)); };
+        wStr(0, 'RIFF');
+        v.setUint32(4, 36 + dataSize, true);
+        wStr(8, 'WAVE');
+        wStr(12, 'fmt ');
+        v.setUint32(16, 16, true);
+        v.setUint16(20, 1, true);
+        v.setUint16(22, numCh, true);
+        v.setUint32(24, sr, true);
+        v.setUint32(28, sr * blockAlign, true);
+        v.setUint16(32, blockAlign, true);
+        v.setUint16(34, 16, true);
+        wStr(36, 'data');
+        v.setUint32(40, dataSize, true);
+
+        const chs = [];
+        for (let c = 0; c < numCh; c++) chs.push(buffer.getChannelData(c));
+        let off = 44;
+        for (let i = 0; i < len; i++) {
+          for (let c = 0; c < numCh; c++) {
+            const s = Math.max(-1, Math.min(1, chs[c][i]));
+            v.setInt16(off, s < 0 ? s * 0x8000 : s * 0x7fff, true);
+            off += 2;
+          }
+        }
+        return new Blob([ab], { type: 'audio/wav' });
+      }
+
+      function exportCurrentWav() {
+        if (!state.audioBuffer && !state.rawBlob) return;
+        showToast('WAVファイルを書き出し中...');
+        setTimeout(() => {
+          let blob = state.rawBlob;
+          let name = trackTitleEl.textContent.trim() || makeRecordingFilename();
+          if (state.audioBuffer) {
+            blob = encodeWavFromAudioBuffer(state.audioBuffer);
+            if (!name.toLowerCase().endsWith('.wav')) {
+              name = name.replace(/\.[^/.]+$/, '') + '.wav';
+            }
+          }
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = name;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+          showToast(`保存しました: ${name}`);
+        }, 30);
+      }
+
+      // ==================== REALISTIC MUSICAL DEMO GENERATOR ====================
+      async function loadDemoTrack() {
+        showToast('デモ練習音源を生成中...');
+        initAudioGraph();
+        const sr = 22050;
+        const duration = 32;
+        const total = sr * duration;
+        const buf = audioCtx.createBuffer(2, total, sr);
+        const outL = buf.getChannelData(0);
+        const outR = buf.getChannelData(1);
+
+        // Warm piano accompaniment + expressive flute-like melody with clear phrasing & dynamics
+        const chordProg = [
+          [261.63, 329.63, 392.00], // C
+          [220.00, 261.63, 329.63], // Am
+          [174.61, 220.00, 261.63], // F
+          [196.00, 246.94, 293.66]  // G
+        ];
+        const flutePhrase = [
+          { t: 0.2, d: 1.4, f: 523.25 }, { t: 1.7, d: 0.7, f: 587.33 }, { t: 2.5, d: 1.3, f: 659.25 },
+          { t: 4.1, d: 1.5, f: 783.99 }, { t: 5.7, d: 0.8, f: 659.25 }, { t: 6.6, d: 1.1, f: 587.33 },
+          { t: 8.2, d: 1.4, f: 523.25 }, { t: 9.8, d: 0.8, f: 440.00 }, { t: 10.7, d: 1.2, f: 523.25 },
+          { t: 12.1, d: 1.8, f: 659.25 }, { t: 14.1, d: 1.5, f: 587.33 },
+          { t: 16.2, d: 1.2, f: 698.46 }, { t: 17.5, d: 0.6, f: 783.99 }, { t: 18.2, d: 1.5, f: 880.00 },
+          { t: 20.1, d: 1.4, f: 783.99 }, { t: 21.6, d: 0.9, f: 659.25 }, { t: 22.6, d: 1.2, f: 587.33 },
+          { t: 24.2, d: 1.3, f: 659.25 }, { t: 25.6, d: 1.1, f: 587.33 }, { t: 26.8, d: 1.4, f: 523.25 },
+          { t: 28.4, d: 2.8, f: 523.25 }
+        ];
+
+        for (let i = 0; i < total; i++) {
+          const t = i / sr;
+          // Distinct phrasing dynamics across 4 sections (8s each)
+          let dyn = 0.75;
+          if (t >= 8 && t < 16) dyn = 0.48;       // Soft piano-like mp passage
+          else if (t >= 16 && t < 24) dyn = 0.95; // Forte climax
+          else if (t >= 24) dyn = 0.78;
+
+          // Piano arpeggio chords (2s per bar)
+          const barIdx = Math.floor(t / 2) % chordProg.length;
+          const barPhase = t % 2;
+          const chord = chordProg[barIdx];
+          let piano = 0;
+          for (let n = 0; n < chord.length; n++) {
+            const noteT = barPhase - n * 0.16;
+            if (noteT > 0) {
+              const env = Math.exp(-noteT * 2.4) * Math.min(1, noteT / 0.012);
+              const f = chord[n];
+              piano += (Math.sin(2 * Math.PI * f * t) * 0.75 + Math.sin(4 * Math.PI * f * t) * 0.25) * env * 0.14;
+            }
+          }
+
+          // Flute-like expressive melody with subtle vibrato & breath attack
+          let flute = 0;
+          for (let k = 0; k < flutePhrase.length; k++) {
+            const note = flutePhrase[k];
+            if (t >= note.t && t < note.t + note.d) {
+              const nt = t - note.t;
+              const attack = Math.min(1, nt / 0.09);
+              const release = Math.min(1, (note.d - nt) / 0.14);
+              const vib = 1 + 0.005 * Math.sin(2 * Math.PI * 5.2 * nt);
+              const f = note.f * vib;
+              const wave = Math.sin(2 * Math.PI * f * t) * 0.76
+                         + Math.sin(4 * Math.PI * f * t) * 0.19
+                         + Math.sin(6 * Math.PI * f * t) * 0.05;
+              flute += wave * attack * release * 0.34;
+              break;
+            }
+          }
+
+          const valL = Math.max(-0.94, Math.min(0.94, (piano * 0.95 + flute * 1.05) * dyn));
+          const valR = Math.max(-0.94, Math.min(0.94, (piano * 1.05 + flute * 0.95) * dyn));
+          outL[i] = valL;
+          outR[i] = valR;
+        }
+
+        const wavBlob = encodeWavFromAudioBuffer(buf);
+        const demoTrack = {
+          name: 'デモ練習曲_フルート＆ピアノ.wav',
+          blob: wavBlob,
+          markers: [8.0, 16.0, 24.0]
+        };
+        state.playlist = [demoTrack];
+        state.currentTrackIndex = 0;
+        await loadAudioBlob(wavBlob, demoTrack.name, demoTrack.markers, false, buf);
+        showToast('デモ練習音源を読み込みました（黄色ピン3箇所付）');
+      }
+
+      // ==================== HIGH-GAIN PCM RECORDING + AUTO-NORMALIZE ====================
+      async function startRecording() {
+        if (state.isRecording) return;
+        try {
+          if (state.isPlaying) pausePlayback();
+          initAudioGraph();
+
+          let stream;
+          try {
+            stream = await navigator.mediaDevices.getUserMedia({
+              audio: {
+                echoCancellation: false,
+                noiseSuppression: false,
+                autoGainControl: false
+              }
+            });
+          } catch (_) {
+            stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+          }
+
+          state.isRecording = true;
+          state.recStream = stream;
+          state.recBuffersL = [];
+          state.recBuffersR = [];
+          state.recPendingMarkers = [];
+          state.recSampleRate = audioCtx.sampleRate;
+          state.recStartPerf = performance.now();
+
+          const src = audioCtx.createMediaStreamSource(stream);
+          const gainNode = audioCtx.createGain();
+          gainNode.gain.value = state.micGain;
+
+          // Hard-knee brickwall limiter to prevent clipping at high mic gain
+          const limiter = audioCtx.createDynamicsCompressor();
+          limiter.threshold.value = -2.0;
+          limiter.knee.value = 2.0;
+          limiter.ratio.value = 20.0;
+          limiter.attack.value = 0.001;
+          limiter.release.value = 0.07;
+
+          const analyser = audioCtx.createAnalyser();
+          analyser.fftSize = 512;
+
+          // Direct Float32 PCM capture via ScriptProcessorNode (zero codec artifacts)
+          const processor = audioCtx.createScriptProcessor(4096, 2, 1);
+          processor.onaudioprocess = (ev) => {
+            if (!state.isRecording) return;
+            const inL = ev.inputBuffer.getChannelData(0);
+            const inR = ev.inputBuffer.numberOfChannels > 1 ? ev.inputBuffer.getChannelData(1) : inL;
+            state.recBuffersL.push(new Float32Array(inL));
+            state.recBuffersR.push(new Float32Array(inR));
+          };
+
+          // Silent sink prevents speaker feedback while keeping ScriptProcessor active
+          const silentGain = audioCtx.createGain();
+          silentGain.gain.value = 0;
+
+          src.connect(gainNode);
+          gainNode.connect(limiter);
+          limiter.connect(analyser);
+          limiter.connect(processor);
+          processor.connect(silentGain);
+          silentGain.connect(audioCtx.destination);
+
+          state.recSourceNode = src;
+          state.recGainNode = gainNode;
+          state.recLimiterNode = limiter;
+          state.recAnalyser = analyser;
+          state.recProcessor = processor;
+          state.recSilentGain = silentGain;
+
+          startupOverlay.classList.add('hidden');
+          recOverlay.classList.remove('hidden');
+          btnRecordHeader.classList.add('recording');
+          recHeaderLabel.textContent = '停止';
+          recMarkerCountBadge.textContent = '0';
+          recLiveGainLabel.textContent = `${state.micGain.toFixed(1)}x`;
+
+          renderLiveRecordingLoop();
+          showToast(`PCM録音開始（マイクゲイン ${state.micGain.toFixed(1)}x）`);
+        } catch (err) {
+          console.error('Recording start failed:', err);
+          showToast('マイクの使用が許可されていません');
+        }
+      }
+
+      function renderLiveRecordingLoop() {
+        if (!state.isRecording) return;
+        const elapsed = (performance.now() - state.recStartPerf) / 1000;
+        recTimerText.textContent = formatTime(elapsed, true);
+
+        if (state.recAnalyser) {
+          const bufLen = state.recAnalyser.fftSize;
+          const timeData = new Uint8Array(bufLen);
+          state.recAnalyser.getByteTimeDomainData(timeData);
+
+          let sumSq = 0;
+          for (let i = 0; i < bufLen; i++) {
+            const v = (timeData[i] - 128) / 128;
+            sumSq += v * v;
+          }
+          const rms = Math.sqrt(sumSq / bufLen);
+          recMeterBar.style.width = `${Math.min(100, Math.round(rms * 320))}%`;
+
+          // Draw live oscilloscope preview
+          const dpr = window.devicePixelRatio || 1;
+          const rect = recLiveWaveCanvas.getBoundingClientRect();
+          if (rect.width > 0 && rect.height > 0) {
+            if (recLiveWaveCanvas.width !== Math.round(rect.width * dpr) || recLiveWaveCanvas.height !== Math.round(rect.height * dpr)) {
+              recLiveWaveCanvas.width = Math.round(rect.width * dpr);
+              recLiveWaveCanvas.height = Math.round(rect.height * dpr);
+            }
+            const ctx = recLiveWaveCtx;
+            ctx.save();
+            ctx.scale(dpr, dpr);
+            ctx.fillStyle = '#120c0d';
+            ctx.fillRect(0, 0, rect.width, rect.height);
+            ctx.strokeStyle = 'rgba(255,255,255,0.12)';
+            ctx.beginPath();
+            ctx.moveTo(0, rect.height / 2);
+            ctx.lineTo(rect.width, rect.height / 2);
+            ctx.stroke();
+
+            ctx.strokeStyle = '#f87171';
+            ctx.lineWidth = 1.6;
+            ctx.beginPath();
+            for (let i = 0; i < bufLen; i++) {
+              const x = (i / (bufLen - 1)) * rect.width;
+              const y = ((timeData[i] - 128) / 128) * (rect.height * 0.44) + rect.height / 2;
+              if (i === 0) ctx.moveTo(x, y);
+              else ctx.lineTo(x, y);
+            }
+            ctx.stroke();
+            ctx.restore();
+          }
+        }
+        state.recAnimId = requestAnimationFrame(renderLiveRecordingLoop);
+      }
+
+      function addMarkerDuringRecording() {
+        if (!state.isRecording) return;
+        const t = (performance.now() - state.recStartPerf) / 1000;
+        if (t > 0.15) {
+          state.recPendingMarkers.push(t);
+          recMarkerCountBadge.textContent = String(state.recPendingMarkers.length);
+          showToast(`録音中に黄色ピン追加 (${formatTime(t)})`);
+        }
+      }
+
+      async function stopRecording() {
+        if (!state.isRecording) return;
+        state.isRecording = false;
+        if (state.recAnimId) cancelAnimationFrame(state.recAnimId);
+
+        const chunksL = state.recBuffersL;
+        const chunksR = state.recBuffersR;
+        const sr = state.recSampleRate;
+        const capturedMarkers = [...state.recPendingMarkers];
+
+        // Cleanup recording audio nodes
+        try {
+          if (state.recProcessor) { state.recProcessor.onaudioprocess = null; state.recProcessor.disconnect(); }
+          if (state.recSourceNode) state.recSourceNode.disconnect();
+          if (state.recGainNode) state.recGainNode.disconnect();
+          if (state.recLimiterNode) state.recLimiterNode.disconnect();
+          if (state.recSilentGain) state.recSilentGain.disconnect();
+          if (state.recStream) state.recStream.getTracks().forEach(t => t.stop());
+        } catch (_) {}
+
+        state.recSourceNode = null;
+        state.recGainNode = null;
+        state.recLimiterNode = null;
+        state.recAnalyser = null;
+        state.recProcessor = null;
+        state.recSilentGain = null;
+        state.recStream = null;
+        state.recBuffersL = [];
+        state.recBuffersR = [];
+
+        recOverlay.classList.add('hidden');
+        btnRecordHeader.classList.remove('recording');
+        recHeaderLabel.textContent = '録音';
+        recMeterBar.style.width = '0%';
+
+        let totalSamples = 0;
+        for (const c of chunksL) totalSamples += c.length;
+
+        if (totalSamples < Math.floor(sr * 0.1)) {
+          if (!state.hasAudio) startupOverlay.classList.remove('hidden');
+          showToast('録音時間が短すぎます');
+          return;
+        }
+
+        // Merge captured Float32 PCM chunks into AudioBuffer
+        const recBuffer = audioCtx.createBuffer(2, totalSamples, sr);
+        const dstL = recBuffer.getChannelData(0);
+        const dstR = recBuffer.getChannelData(1);
+        let offset = 0;
+        let maxAbs = 0;
+
+        for (let i = 0; i < chunksL.length; i++) {
+          const cL = chunksL[i];
+          const cR = chunksR[i];
+          dstL.set(cL, offset);
+          dstR.set(cR, offset);
+          for (let j = 0; j < cL.length; j++) {
+            const a = Math.max(Math.abs(cL[j]), Math.abs(cR[j]));
+            if (a > maxAbs) maxAbs = a;
+          }
+          offset += cL.length;
+        }
+
+        // Auto-Normalize up to -1 dBFS (0.89 peak, capped at 8x gain)
+        let normGain = 1.0;
+        if (maxAbs > 0.001 && maxAbs < 0.89) {
+          normGain = Math.min(8.0, 0.89 / maxAbs);
+          if (normGain > 1.04) {
+            for (let i = 0; i < totalSamples; i++) {
+              dstL[i] = Math.max(-0.98, Math.min(0.98, dstL[i] * normGain));
+              dstR[i] = Math.max(-0.98, Math.min(0.98, dstR[i] * normGain));
+            }
+          } else {
+            normGain = 1.0;
+          }
+        }
+
+        const wavBlob = encodeWavFromAudioBuffer(recBuffer);
+        const title = makeRecordingFilename();
+        state.playlist.push({ name: title, blob: wavBlob, markers: capturedMarkers });
+        state.currentTrackIndex = state.playlist.length - 1;
+
+        await loadAudioBlob(wavBlob, title, capturedMarkers, false, recBuffer);
+        const normNote = normGain > 1.04 ? `・自動最適化(${normGain.toFixed(1)}x)` : '';
+        showToast(`録音完了（黄色ピン ${capturedMarkers.length}個${normNote}）`);
+      }
+
+      // ==================== PIN (MARKER) & SECTION REPEAT LOGIC ====================
+      function isAtGreenTempPin() {
+        if (!state.hasAudio || state.tempMarker === null) return false;
+        return Math.abs(state.currentTime - state.tempMarker) <= 0.5;
+      }
+
+      function updatePinButtonsUI() {
+        if (state.tempMarker === null) {
+          btnJumpTemp.classList.add('dimmed');
+          btnJumpTemp.classList.remove('active-green');
+          btnPromoteTemp.classList.add('dimmed');
+          btnPromoteTemp.classList.remove('active-yellow-glow');
+        } else {
+          btnJumpTemp.classList.remove('dimmed');
+          btnJumpTemp.classList.add('active-green');
+          if (isAtGreenTempPin()) {
+            btnPromoteTemp.classList.remove('dimmed');
+            btnPromoteTemp.classList.add('active-yellow-glow');
+          } else {
+            btnPromoteTemp.classList.add('dimmed');
+            btnPromoteTemp.classList.remove('active-yellow-glow');
+          }
+        }
+      }
+
+      function jumpToGreenPin() {
+        if (!state.hasAudio) return;
+        if (state.tempMarker === null) {
+          showToast('緑の一時ピンがありません（波形タッチで緑▼が付きます）');
+          return;
+        }
+        // Jump to green pin WITHOUT erasing it
+        seekTo(state.tempMarker, { setGreenPin: false });
+        showToast(`緑の一時ピンへ移動: ${formatTime(state.tempMarker)}`);
+      }
+
+      function promoteGreenToYellow() {
+        if (!state.hasAudio) return;
+        if (state.tempMarker === null) {
+          showToast('緑の一時ピンがありません');
+          return;
+        }
+        if (!isAtGreenTempPin()) {
+          showToast('現在位置が緑▼ではありません（緑▼←で移動してから変換してください）');
+          return;
+        }
+        const t = state.tempMarker;
+        state.tempMarker = null;
+
+        if (t > 0.1 && t < state.duration - 0.1) {
+          const exists = state.markers.some(m => Math.abs(m - t) < 0.2);
+          if (!exists) {
+            state.markers.push(t);
+            state.markers.sort((a, b) => a - b);
+          }
+          syncCurrentPlaylistMarkers();
+          updateHeaderSubInfo();
+          updatePinButtonsUI();
+          renderAllCanvases();
+          showToast(`緑▼を黄色ピンに確定: ${formatTime(t)}`);
+        } else {
+          updatePinButtonsUI();
+          renderAllCanvases();
+          showToast('曲の端には確定ピンを追加できません');
+        }
+      }
+
+      function addYellowPinAtCurrent() {
+        if (state.isRecording) {
+          addMarkerDuringRecording();
+          return;
+        }
+        if (!state.hasAudio) return;
+        const t = state.currentTime;
+        if (t <= 0.1 || t >= state.duration - 0.1) {
+          showToast('曲の開始・終了付近には追加できません');
+          return;
+        }
+        if (state.markers.some(m => Math.abs(m - t) < 0.2)) {
+          showToast('すぐ近くに黄色ピンが存在します');
+          return;
+        }
+        state.markers.push(t);
+        state.markers.sort((a, b) => a - b);
+        syncCurrentPlaylistMarkers();
+        updateHeaderSubInfo();
+        renderAllCanvases();
+        showToast(`黄色ピン追加: ${formatTime(t)}`);
+      }
+
+      function jumpPrevYellowPin() {
+        if (!state.hasAudio) return;
+        const ref = state.currentTime - 0.35;
+        let target = 0;
+        for (let i = state.markers.length - 1; i >= 0; i--) {
+          if (state.markers[i] < ref) {
+            target = state.markers[i];
+            break;
+          }
+        }
+        seekTo(target, { setGreenPin: false });
+      }
+
+      function jumpNextYellowPin() {
+        if (!state.hasAudio) return;
+        const ref = state.currentTime + 0.15;
+        let target = state.duration;
+        for (let i = 0; i < state.markers.length; i++) {
+          if (state.markers[i] > ref) {
+            target = state.markers[i];
+            break;
+          }
+        }
+        seekTo(target, { setGreenPin: false });
+      }
+
+      function deleteNearestYellowOrOpenList() {
+        if (!state.hasAudio) return;
+        if (state.markers.length === 0) {
+          openSettingsModal('markers');
+          return;
+        }
+        let bestIdx = -1;
+        let bestDiff = Infinity;
+        for (let i = 0; i < state.markers.length; i++) {
+          const d = Math.abs(state.markers[i] - state.currentTime);
+          if (d < bestDiff) {
+            bestDiff = d;
+            bestIdx = i;
+          }
+        }
+        if (bestIdx >= 0 && bestDiff <= 2.5) {
+          const removed = state.markers.splice(bestIdx, 1)[0];
+          syncCurrentPlaylistMarkers();
+          updateHeaderSubInfo();
+          renderAllCanvases();
+          showToast(`黄色ピン削除: ${formatTime(removed)}`);
+        } else {
+          openSettingsModal('markers');
+        }
+      }
+
+      function getActiveLoopSection() {
+        if (!state.hasAudio || state.duration <= 0) return { start: 0, end: 0 };
+        const bounds = [0, ...state.markers, state.duration];
+        const t = state.currentTime;
+        let segStart = 0;
+        let segEnd = state.duration;
+        for (let i = 0; i < bounds.length - 1; i++) {
+          if (t >= bounds[i] - 0.03 && t < bounds[i + 1]) {
+            segStart = bounds[i];
+            segEnd = bounds[i + 1];
+            break;
+          }
+          if (i === bounds.length - 2) {
+            segStart = bounds[i];
+            segEnd = bounds[i + 1];
+          }
+        }
+        // If green temp pin lies inside this yellow section and playhead is at/after it, loop from green pin to next yellow pin
+        if (state.tempMarker !== null && state.tempMarker > segStart + 0.05 && state.tempMarker < segEnd - 0.2 && t >= state.tempMarker - 0.05) {
+          segStart = state.tempMarker;
+        }
+        return { start: segStart, end: segEnd };
+      }
+
+      function syncCurrentPlaylistMarkers() {
+        if (state.playlist[state.currentTrackIndex]) {
+          state.playlist[state.currentTrackIndex].markers = [...state.markers];
+        }
+      }
+
+      function updateHeaderSubInfo() {
+        const totalTracks = Math.max(1, state.playlist.length);
+        const curIdx = Math.min(totalTracks, state.currentTrackIndex + 1);
+        btnPlaylistIndex.textContent = `${curIdx}/${totalTracks}`;
+        if (!state.hasAudio) {
+          trackSubtitleEl.textContent = '待機中 • 0/0 • 黄色ピン 0個';
+          return;
+        }
+        const mb = state.rawBlob ? `${(state.rawBlob.size / (1024 * 1024)).toFixed(1)}MB` : '';
+        trackSubtitleEl.textContent = `${mb} • ${curIdx}/${totalTracks} • 黄色ピン ${state.markers.length}個`;
+      }
+
+      // ==================== TRANSPORT, PLAYHEAD INTERPOLATION & PLAYLIST ====================
+      function getLivePlayheadTime() {
+        if (!state.hasAudio) return 0;
+        if (state.isPlaying && state.engine === 'tape' && tapeSourceNode) {
+          return getTapeCurrentTime();
+        }
+        if (state.isPlaying && state.engine === 'native') {
+          return audioEl.currentTime;
+        }
+        return state.currentTime;
+      }
+
+      function getSmoothPlayheadTime() {
+        if (!state.hasAudio) return 0;
+        if (!state.isPlaying || state.isDraggingOverview || state.isDraggingZoom || state.isPinchingZoom || state.isInertiaActive) {
+          return state.currentTime;
+        }
+        if (state.engine === 'tape' && tapeSourceNode) {
+          return getTapeCurrentTime();
+        }
+        // Smoothly interpolate between audio callbacks at 60/120fps to prevent visual jitter
+        const dtSec = Math.max(0, (performance.now() - state.lastSyncPerf) / 1000);
+        const adv = Math.min(0.06, dtSec) * state.playbackRate;
+        let t = state.lastSyncTime + adv;
+        if (state.sectionRepeat) {
+          const sec = getActiveLoopSection();
+          if (sec.end - sec.start > 0.15 && t >= sec.end) {
+            t = sec.start;
+          }
+        }
+        return Math.min(state.duration, Math.max(0, t));
+      }
+
+      function seekTo(timeSec, opts = {}) {
+        if (!state.hasAudio) return;
+        const { keepInertia = false, setGreenPin = false } = opts;
+        if (!keepInertia) stopInertia();
+
+        const clamped = Math.max(0, Math.min(state.duration, timeSec));
+        state.currentTime = clamped;
+        state.lastSyncTime = clamped;
+        state.lastSyncPerf = performance.now();
+
+        if (setGreenPin) {
+          state.tempMarker = clamped;
+        }
+
+        if (state.engine === 'vocoder' && state.audioBuffer && !state.isFallbackLargeFile) {
+          resetVocoderAtSample(Math.floor(clamped * state.audioBuffer.sampleRate));
+        } else if (state.engine === 'tape' && state.audioBuffer) {
+          if (state.isPlaying) {
+            startTapeSourceAt(clamped);
+          }
+        } else {
+          audioEl.currentTime = clamped;
+        }
+
+        updateTimeUI();
+        updatePinButtonsUI();
+        renderAllCanvases();
+      }
+
+      function startPlayback() {
+        if (!state.hasAudio) return;
+        stopInertia();
+        initAudioGraph();
+
+        if (state.currentTime >= state.duration - 0.05) {
+          seekTo(0, { setGreenPin: false });
+        }
+
+        state.isPlaying = true;
+        state.lastSyncTime = state.currentTime;
+        state.lastSyncPerf = performance.now();
+
+        if (state.engine === 'vocoder' && state.audioBuffer && !state.isFallbackLargeFile) {
+          resetVocoderAtSample(Math.floor(state.currentTime * state.audioBuffer.sampleRate));
+        } else if (state.engine === 'tape' && state.audioBuffer) {
+          startTapeSourceAt(state.currentTime);
+        } else {
+          audioEl.currentTime = state.currentTime;
+          audioEl.playbackRate = state.playbackRate;
+          audioEl.play().catch(() => {});
+        }
+        updatePlayUI();
+      }
+
+      function pausePlayback() {
+        if (state.isPlaying) {
+          state.currentTime = getLivePlayheadTime();
+        }
+        state.isPlaying = false;
+        state.lastSyncTime = state.currentTime;
+        state.lastSyncPerf = performance.now();
+        stopTapeSource();
+        if (!audioEl.paused) audioEl.pause();
+        updatePlayUI();
+      }
+
+      function togglePlayPause() {
+        if (!state.hasAudio) return;
+        if (state.isPlaying) pausePlayback();
+        else startPlayback();
+      }
+
+      function updatePlayUI() {
+        iconPlay.classList.toggle('hidden', state.isPlaying);
+        iconPause.classList.toggle('hidden', !state.isPlaying);
+        btnPlayPause.classList.toggle('playing', state.isPlaying);
+      }
+
+      function updateTimeUI() {
+        currentTimeText.textContent = formatTime(state.currentTime);
+        totalTimeText.textContent = formatTime(state.duration);
+      }
+
+      function setPlaybackSpeed(rate) {
+        const clamped = Math.max(0.25, Math.min(2.0, Math.round(rate * 100) / 100));
+
+        // Keep tape mode offset seamlessly synced when changing speed mid-play
+        if (state.isPlaying && state.engine === 'tape' && tapeSourceNode && audioCtx) {
+          tapeAnchorOffset = getTapeCurrentTime();
+          tapeAnchorCtxTime = audioCtx.currentTime;
+          tapeSourceNode.playbackRate.setValueAtTime(clamped, audioCtx.currentTime);
+        }
+
+        state.playbackRate = clamped;
+        audioEl.playbackRate = clamped;
+        updateLowpassFilter();
+
+        const txt = `${clamped.toFixed(2)}x`;
+        speedBadgeText.textContent = txt;
+        document.getElementById('modalSpeedVal').textContent = txt;
+        document.getElementById('speedSlider').value = clamped;
+
+        document.querySelectorAll('.speed-preset-btn').forEach(btn => {
+          const v = parseFloat(btn.dataset.speed);
+          btn.classList.toggle('active-star', Math.abs(v - clamped) < 0.005);
+        });
+      }
+
+      function setPitch(semi) {
+        const clamped = Math.max(-6, Math.min(6, Math.round(semi)));
+        state.pitchSemitones = clamped;
+        const txt = clamped === 0 ? '#:±0' : (clamped > 0 ? `#:+${clamped}` : `#:${clamped}`);
+        pitchBadgeText.textContent = txt;
+        pitchBadgeText.classList.toggle('shifted', clamped !== 0);
+        document.getElementById('modalPitchVal').textContent = txt;
+        document.getElementById('pitchSlider').value = clamped;
+      }
+
+      function setOrderMode(mode) {
+        state.orderMode = mode;
+        document.getElementById('btnOrderLoop1').classList.toggle('active', mode === 'loop1');
+        document.getElementById('btnOrderLoopAll').classList.toggle('active', mode === 'loopAll');
+        document.getElementById('btnOrderStopEnd').classList.toggle('active', mode === 'stop');
+        document.getElementById('btnOrderShuffle').classList.toggle('active', mode === 'shuffle');
+        const names = { loop1: '1曲リピート', loopAll: '全曲リピート', stop: '曲末で停止', shuffle: 'シャッフル' };
+        showToast(`再生順: ${names[mode]}`);
+      }
+
+      function toggleSectionRepeat() {
+        state.sectionRepeat = !state.sectionRepeat;
+        btnSectionRepeat.classList.toggle('active-green', state.sectionRepeat);
+        sectionRepeatLabel.textContent = state.sectionRepeat ? '区間ON' : '区間OFF';
+        renderAllCanvases();
+        showToast(state.sectionRepeat ? 'マーカー区間リピート: ON' : 'マーカー区間リピート: OFF');
+      }
+
+      async function switchTrack(idx, autoPlay = true) {
+        if (state.playlist.length === 0) return;
+        syncCurrentPlaylistMarkers();
+        const safeIdx = ((idx % state.playlist.length) + state.playlist.length) % state.playlist.length;
+        state.currentTrackIndex = safeIdx;
+        const item = state.playlist[safeIdx];
+        await loadAudioBlob(item.blob, item.name, item.markers || [], autoPlay);
+        showToast(`トラック ${safeIdx + 1}/${state.playlist.length}: ${item.name}`);
+      }
+
+      function handleTrackEnded() {
+        if (!state.hasAudio) return;
+        if (state.sectionRepeat) {
+          const sec = getActiveLoopSection();
+          seekTo(sec.start, { setGreenPin: false });
+          startPlayback();
+          return;
+        }
+        if (state.orderMode === 'loop1') {
+          seekTo(0, { setGreenPin: false });
+          startPlayback();
+        } else if (state.orderMode === 'shuffle' && state.playlist.length > 1) {
+          let next = state.currentTrackIndex;
+          while (next === state.currentTrackIndex) {
+            next = Math.floor(Math.random() * state.playlist.length);
+          }
+          switchTrack(next, true);
+        } else if (state.orderMode === 'loopAll') {
+          if (state.playlist.length > 1) {
+            switchTrack(state.currentTrackIndex + 1, true);
+          } else {
+            seekTo(0, { setGreenPin: false });
+            startPlayback();
+          }
+        } else {
+          // Stop at end
+          pausePlayback();
+          state.currentTime = state.duration;
+          updateTimeUI();
+          renderAllCanvases();
+        }
+      }
+
+      // ==================== CANVAS RENDERING: MULTI-ROW OVERVIEW ====================
+      function renderOverviewCanvas() {
+        const dpr = window.devicePixelRatio || 1;
+        const rect = overviewCanvas.getBoundingClientRect();
+        if (rect.width <= 0 || rect.height <= 0) return;
+        const pw = Math.round(rect.width * dpr);
+        const ph = Math.round(rect.height * dpr);
+        if (overviewCanvas.width !== pw || overviewCanvas.height !== ph) {
+          overviewCanvas.width = pw;
+          overviewCanvas.height = ph;
+        }
+
+        const ctx = overviewCtx;
+        ctx.save();
+        ctx.scale(dpr, dpr);
+
+        const W = rect.width;
+        const H = rect.height;
+        ctx.fillStyle = '#111113';
+        ctx.fillRect(0, 0, W, H);
+
+        const rows = state.numRows;
+        const labelW = state.duration >= 3600 ? 48 : 38;
+        const waveX = labelW + 5;
+        const waveW = Math.max(20, W - waveX - 3);
+        const slotH = H / rows;
+        const barH = Math.max(6, slotH * 0.74);
+
+        const dur = state.hasAudio ? state.duration : 120;
+        const rowDur = dur / rows;
+        const pyr = state.waveformPyramid;
+        const displayTime = getSmoothPlayheadTime();
+        const waveGain = getEffectiveWaveGain();
+        const loopSec = state.sectionRepeat ? getActiveLoopSection() : null;
+
+        ctx.font = '500 10px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace';
+        ctx.textAlign = 'right';
+        ctx.textBaseline = 'middle';
+
+        for (let r = 0; r < rows; r++) {
+          const rStart = r * rowDur;
+          const rEnd = (r + 1) * rowDur;
+          const barTop = r * slotH + (slotH - barH) / 2;
+          const midY = barTop + barH * 0.5;
+          const halfH = barH * 0.46;
+
+          // Left timestamp
+          ctx.fillStyle = '#9ca3af';
+          ctx.fillText(formatRowTime(rStart), labelW - 1, midY);
+
+          // Row track background
+          ctx.fillStyle = '#1c1c21';
+          ctx.fillRect(waveX, barTop, waveW, barH);
+
+          // Active Section Repeat highlight
+          if (state.hasAudio && loopSec) {
+            const ovS = Math.max(rStart, loopSec.start);
+            const ovE = Math.min(rEnd, loopSec.end);
+            if (ovE > ovS) {
+              const hx = waveX + ((ovS - rStart) / rowDur) * waveW;
+              const hw = ((ovE - ovS) / rowDur) * waveW;
+              ctx.fillStyle = 'rgba(34, 197, 94, 0.2)';
+              ctx.fillRect(hx, barTop, hw, barH);
+            }
+          }
+
+          // Real PCM Min/Max waveform
+          if (state.hasAudio && pyr) {
+            const step = 1.5;
+            for (let px = 0; px < waveW; px += step) {
+              const t0 = rStart + (px / waveW) * rowDur;
+              const t1 = rStart + (Math.min(waveW, px + step) / waveW) * rowDur;
+              const { min, max } = queryPyramid(pyr, t0, t1);
+
+              const sMax = Math.max(-1, Math.min(1, max * waveGain));
+              const sMin = Math.max(-1, Math.min(1, min * waveGain));
+              const yTop = midY - Math.max(0, sMax) * halfH;
+              const yBot = midY - Math.min(0, sMin) * halfH;
+
+              ctx.fillStyle = t0 <= displayTime ? '#42a5f5' : '#6b7280';
+              ctx.fillRect(waveX + px, yTop, Math.max(1.0, step - 0.35), Math.max(1.0, yBot - yTop));
+            }
+          } else if (state.hasAudio) {
+            // Simple progress bar when extreme large file skips PCM decode
+            ctx.fillStyle = '#3f3f46';
+            ctx.fillRect(waveX, midY - 1, waveW, 2);
+            if (displayTime > rStart) {
+              const frac = Math.min(1, (displayTime - rStart) / rowDur);
+              ctx.fillStyle = '#42a5f5';
+              ctx.fillRect(waveX, midY - 1.5, frac * waveW, 3);
+            }
+          }
+
+          // Yellow Confirmed Pins (▼)
+          if (state.hasAudio && state.markers.length > 0) {
+            ctx.fillStyle = '#facc15';
+            for (const mT of state.markers) {
+              if (mT >= rStart && mT <= rEnd) {
+                const mx = waveX + ((mT - rStart) / rowDur) * waveW;
+                ctx.beginPath();
+                ctx.moveTo(mx - 4.8, barTop - 2);
+                ctx.lineTo(mx + 4.8, barTop - 2);
+                ctx.lineTo(mx, barTop + 5);
+                ctx.closePath();
+                ctx.fill();
+              }
+            }
+          }
+
+          // Single Green Temporary Pin (▼, max 1)
+          if (state.hasAudio && state.tempMarker !== null && state.tempMarker >= rStart && state.tempMarker <= rEnd) {
+            const gx = waveX + ((state.tempMarker - rStart) / rowDur) * waveW;
+            ctx.fillStyle = '#22c55e';
+            ctx.strokeStyle = '#052e16';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(gx - 5.4, barTop - 2.5);
+            ctx.lineTo(gx + 5.4, barTop - 2.5);
+            ctx.lineTo(gx, barTop + 5.8);
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
+          }
+
+          // White Vertical Playhead Bar
+          if (state.hasAudio && displayTime >= rStart && displayTime <= rEnd) {
+            const cx = waveX + ((displayTime - rStart) / rowDur) * waveW;
+            ctx.fillStyle = '#ffffff';
+            ctx.shadowColor = 'rgba(0,0,0,0.9)';
+            ctx.shadowBlur = 4;
+            ctx.fillRect(cx - 2, barTop - 2, 4, barH + 4);
+            ctx.shadowBlur = 0;
+          }
+        }
+
+        ctx.restore();
+      }
+
+      // ==================== CANVAS RENDERING: JITTER-FREE TRUE PCM ZOOM WAVEFORM ====================
+      function updateZoomSpanLabel() {
+        const s = state.zoomWindowSeconds;
+        if (s < 0.1) btnZoomSpanReset.textContent = `${Math.round(s * 1000)}ms`;
+        else if (s < 1.0) btnZoomSpanReset.textContent = `${s.toFixed(2)}s`;
+        else if (s < 10.0) btnZoomSpanReset.textContent = `${s.toFixed(1)}s`;
+        else btnZoomSpanReset.textContent = `${Math.round(s)}s`;
+      }
+
+      function drawZoomWaveformClip(ctx, W, H, midY, halfH, winStart, winEnd, pxPerSec, clipLeft, clipRight, fillColor, strokeColor) {
+        if (clipRight <= clipLeft || !state.waveformPyramid) return;
+        const pyr = state.waveformPyramid;
+        const buf = state.audioBuffer;
+        const sr = pyr.sampleRate;
+        const visStart = Math.max(0, winStart);
+        const visEnd = Math.min(state.duration, winEnd);
+        if (visEnd <= visStart) return;
+
+        ctx.save();
+        ctx.beginPath();
+        ctx.rect(clipLeft, 0, clipRight - clipLeft, H);
+        ctx.clip();
+
+        const visSamples = (winEnd - winStart) * sr;
+        const samplesPerPx = visSamples / W;
+        const waveGain = getEffectiveWaveGain();
+
+        // Deep Zoom: Raw sample-by-sample PCM curve
+        if (buf && samplesPerPx <= 2.5) {
+          const ch0 = buf.getChannelData(0);
+          const s0 = Math.max(0, Math.floor(visStart * sr) - 1);
+          const s1 = Math.min(ch0.length - 1, Math.ceil(visEnd * sr) + 1);
+          if (s1 >= s0) {
+            ctx.beginPath();
+            ctx.moveTo(((s0 / sr) - winStart) * pxPerSec, midY);
+            for (let s = s0; s <= s1; s++) {
+              const x = ((s / sr) - winStart) * pxPerSec;
+              const y = midY - Math.max(-1, Math.min(1, ch0[s] * waveGain)) * halfH;
+              ctx.lineTo(x, y);
+            }
+            ctx.lineTo(((s1 / sr) - winStart) * pxPerSec, midY);
+            ctx.closePath();
+            ctx.fillStyle = fillColor;
+            ctx.fill();
+
+            ctx.beginPath();
+            for (let s = s0; s <= s1; s++) {
+              const x = ((s / sr) - winStart) * pxPerSec;
+              const y = midY - Math.max(-1, Math.min(1, ch0[s] * waveGain)) * halfH;
+              if (s === s0) ctx.moveTo(x, y);
+              else ctx.lineTo(x, y);
+            }
+            ctx.strokeStyle = strokeColor;
+            ctx.lineWidth = 1.6;
+            ctx.stroke();
+
+            if (samplesPerPx <= 0.35) {
+              ctx.fillStyle = '#ffffff';
+              for (let s = s0; s <= s1; s++) {
+                const x = ((s / sr) - winStart) * pxPerSec;
+                const y = midY - Math.max(-1, Math.min(1, ch0[s] * waveGain)) * halfH;
+                ctx.beginPath();
+                ctx.arc(x, y, 2.0, 0, Math.PI * 2);
+                ctx.fill();
+              }
+            }
+          }
+          ctx.restore();
+          return;
+        }
+
+        // Standard Zoom: World-locked sub-pixel Min/Max polygon (zero pixel-grid shimmer)
+        let lvl = pyr.levels[pyr.levels.length - 1];
+        for (let i = 0; i < pyr.levels.length; i++) {
+          if (visSamples / pyr.levels[i].binSize >= W * 0.75 || i === 0) {
+            lvl = pyr.levels[i];
+            break;
+          }
+        }
+        const binDur = lvl.binSize / sr;
+        const b0 = Math.max(0, Math.floor(visStart / binDur) - 1);
+        const b1 = Math.min(lvl.min.length - 1, Math.ceil(visEnd / binDur) + 1);
+
+        if (b1 >= b0) {
+          ctx.beginPath();
+          for (let b = b0; b <= b1; b++) {
+            const x = ((b + 0.5) * binDur - winStart) * pxPerSec;
+            const yTop = midY - Math.max(-1, Math.min(1, lvl.max[b] * waveGain)) * halfH;
+            if (b === b0) ctx.moveTo(x, yTop);
+            else ctx.lineTo(x, yTop);
+          }
+          for (let b = b1; b >= b0; b--) {
+            const x = ((b + 0.5) * binDur - winStart) * pxPerSec;
+            const yBot = midY - Math.max(-1, Math.min(1, lvl.min[b] * waveGain)) * halfH;
+            ctx.lineTo(x, yBot);
+          }
+          ctx.closePath();
+          ctx.fillStyle = fillColor;
+          ctx.fill();
+          ctx.strokeStyle = strokeColor;
+          ctx.lineWidth = 0.85;
+          ctx.stroke();
+        }
+        ctx.restore();
+      }
+
+      function renderZoomCanvas() {
+        if (!state.zoomVisible) return;
+        const dpr = window.devicePixelRatio || 1;
+        const rect = zoomCanvas.getBoundingClientRect();
+        if (rect.width <= 0 || rect.height <= 0) return;
+        const pw = Math.round(rect.width * dpr);
+        const ph = Math.round(rect.height * dpr);
+        if (zoomCanvas.width !== pw || zoomCanvas.height !== ph) {
+          zoomCanvas.width = pw;
+          zoomCanvas.height = ph;
+        }
+
+        const ctx = zoomCtx;
+        ctx.save();
+        ctx.scale(dpr, dpr);
+
+        const W = rect.width;
+        const H = rect.height;
+        ctx.fillStyle = '#151518';
+        ctx.fillRect(0, 0, W, H);
+
+        const centerX = W * 0.5;
+        const midY = H * 0.54;
+        const halfH = H * 0.40;
+
+        // Zero amplitude center baseline
+        ctx.strokeStyle = 'rgba(148, 163, 184, 0.22)';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(0, midY);
+        ctx.lineTo(W, midY);
+        ctx.stroke();
+
+        const displayTime = getSmoothPlayheadTime();
+        const halfWin = state.zoomWindowSeconds * 0.5;
+        const winStart = displayTime - halfWin;
+        const winEnd = displayTime + halfWin;
+        const pxPerSec = W / state.zoomWindowSeconds;
+
+        // Active Section Repeat highlight on zoom pane
+        if (state.hasAudio && state.sectionRepeat) {
+          const sec = getActiveLoopSection();
+          const sX = Math.max(0, (sec.start - winStart) * pxPerSec);
+          const eX = Math.min(W, (sec.end - winStart) * pxPerSec);
+          if (eX > sX) {
+            ctx.fillStyle = 'rgba(34, 197, 94, 0.14)';
+            ctx.fillRect(sX, 0, eX - sX, H);
+          }
+        }
+
+        // Draw Played (left of center playhead, blue) & Unplayed (right, muted gray)
+        if (state.hasAudio && state.waveformPyramid) {
+          drawZoomWaveformClip(ctx, W, H, midY, halfH, winStart, winEnd, pxPerSec, 0, centerX, 'rgba(66, 165, 245, 0.85)', '#60b8ff');
+          drawZoomWaveformClip(ctx, W, H, midY, halfH, winStart, winEnd, pxPerSec, centerX, W, 'rgba(107, 114, 128, 0.78)', '#9ca3af');
+        }
+
+        // Draw Yellow Confirmed Pins in zoom window
+        if (state.hasAudio) {
+          for (const mT of state.markers) {
+            if (mT >= winStart && mT <= winEnd) {
+              const mx = (mT - winStart) * pxPerSec;
+              ctx.strokeStyle = 'rgba(250, 204, 21, 0.8)';
+              ctx.lineWidth = 1.5;
+              ctx.beginPath();
+              ctx.moveTo(mx, 0);
+              ctx.lineTo(mx, H);
+              ctx.stroke();
+
+              ctx.fillStyle = '#facc15';
+              ctx.beginPath();
+              ctx.moveTo(mx - 6, 0);
+              ctx.lineTo(mx + 6, 0);
+              ctx.lineTo(mx, 9.5);
+              ctx.closePath();
+              ctx.fill();
+            }
+          }
+
+          // Draw Single Green Temporary Pin in zoom window
+          if (state.tempMarker !== null && state.tempMarker >= winStart && state.tempMarker <= winEnd) {
+            const gx = (state.tempMarker - winStart) * pxPerSec;
+            ctx.strokeStyle = 'rgba(34, 197, 94, 0.88)';
+            ctx.lineWidth = 1.6;
+            ctx.beginPath();
+            ctx.moveTo(gx, 0);
+            ctx.lineTo(gx, H);
+            ctx.stroke();
+
+            ctx.fillStyle = '#22c55e';
+            ctx.beginPath();
+            ctx.moveTo(gx - 6.5, 0);
+            ctx.lineTo(gx + 6.5, 0);
+            ctx.lineTo(gx, 10.5);
+            ctx.closePath();
+            ctx.fill();
+          }
+        }
+
+        // Fixed Center White Playhead
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(centerX, 0);
+        ctx.lineTo(centerX, H);
+        ctx.stroke();
+
+        ctx.restore();
+      }
+
+      function renderAllCanvases() {
+        renderOverviewCanvas();
+        renderZoomCanvas();
+      }
+
+      // ==================== INTERACTIVE TOUCH: OVERVIEW SCRUB, ZOOM MOMENTUM & PINCH ====================
+      function overviewCoordsToTime(clientX, clientY) {
+        const rect = overviewCanvas.getBoundingClientRect();
+        const x = clientX - rect.left;
+        const y = clientY - rect.top;
+        const rows = state.numRows;
+        const labelW = state.duration >= 3600 ? 48 : 38;
+        const waveX = labelW + 5;
+        const waveW = Math.max(20, rect.width - waveX - 3);
+        const slotH = rect.height / rows;
+
+        const rIdx = Math.max(0, Math.min(rows - 1, Math.floor(y / slotH)));
+        const frac = Math.max(0, Math.min(1, (x - waveX) / waveW));
+        const rowDur = state.duration / rows;
+        return rIdx * rowDur + frac * rowDur;
+      }
+
+      overviewCanvas.addEventListener('pointerdown', (e) => {
+        if (!state.hasAudio) return;
+        state.isDraggingOverview = true;
+        overviewCanvas.setPointerCapture(e.pointerId);
+        seekTo(overviewCoordsToTime(e.clientX, e.clientY), { setGreenPin: true });
+      });
+
+      overviewCanvas.addEventListener('pointermove', (e) => {
+        if (!state.isDraggingOverview || !state.hasAudio) return;
+        seekTo(overviewCoordsToTime(e.clientX, e.clientY), { setGreenPin: true });
+      });
+
+      const stopOverviewDrag = () => { state.isDraggingOverview = false; };
+      overviewCanvas.addEventListener('pointerup', stopOverviewDrag);
+      overviewCanvas.addEventListener('pointercancel', stopOverviewDrag);
+
+      // Momentum / Inertia Scroll for Zoom Canvas
+      function stopInertia() {
+        state.isInertiaActive = false;
+        state.zoomVelSecPerMs = 0;
+        if (state.inertiaRafId) {
+          cancelAnimationFrame(state.inertiaRafId);
+          state.inertiaRafId = null;
+        }
+      }
+
+      function startInertia(velSecPerMs) {
+        stopInertia();
+        if (!state.hasAudio || Math.abs(velSecPerMs) < 0.00014) return;
+        state.isInertiaActive = true;
+        state.zoomVelSecPerMs = velSecPerMs;
+        let lastTs = performance.now();
+
+        const tick = (now) => {
+          if (!state.isInertiaActive || !state.hasAudio) return;
+          const dt = Math.min(40, Math.max(1, now - lastTs));
+          lastTs = now;
+
+          const nextT = state.currentTime + state.zoomVelSecPerMs * dt;
+          if (nextT <= 0 || nextT >= state.duration) {
+            seekTo(Math.max(0, Math.min(state.duration, nextT)), { keepInertia: false, setGreenPin: true });
+            return;
+          }
+          seekTo(nextT, { keepInertia: true, setGreenPin: true });
+
+          state.zoomVelSecPerMs *= Math.pow(0.91, dt / 16.67);
+          if (Math.abs(state.zoomVelSecPerMs) < 0.000045) {
+            stopInertia();
+            return;
+          }
+          state.inertiaRafId = requestAnimationFrame(tick);
+        };
+        state.inertiaRafId = requestAnimationFrame(tick);
+      }
+
+      function setZoomSpan(sec) {
+        state.zoomWindowSeconds = Math.max(0.03, Math.min(60.0, sec));
+        updateZoomSpanLabel();
+      }
+
+      // Touch handlers on Zoom Canvas (1-finger scrub/tap + 2-finger midpoint-anchored pinch zoom)
+      zoomCanvas.addEventListener('touchstart', (e) => {
+        if (!state.hasAudio) return;
+        e.preventDefault();
+        stopInertia();
+
+        if (e.touches.length === 1) {
+          const t = e.touches[0];
+          state.isPinchingZoom = false;
+          state.isDraggingZoom = true;
+          state.zoomDragStartX = t.clientX;
+          state.zoomDragStartY = t.clientY;
+          state.zoomDragStartTime = state.currentTime;
+          state.zoomTapStartPerf = performance.now();
+          state.zoomMoved = false;
+          state.zoomLastX = t.clientX;
+          state.zoomLastPerf = performance.now();
+          state.zoomVelSecPerMs = 0;
+        } else if (e.touches.length >= 2) {
+          state.isDraggingZoom = false;
+          state.isPinchingZoom = true;
+          state.zoomMoved = true;
+          const t0 = e.touches[0], t1 = e.touches[1];
+          const rect = zoomCanvas.getBoundingClientRect();
+
+          state.pinchStartDist = Math.max(10, Math.hypot(t1.clientX - t0.clientX, t1.clientY - t0.clientY));
+          state.pinchStartWinSec = state.zoomWindowSeconds;
+          const midX = (t0.clientX + t1.clientX) * 0.5 - rect.left;
+          const ratio = Math.max(0, Math.min(1, midX / Math.max(1, rect.width)));
+          state.pinchAnchorTime = state.currentTime + (ratio - 0.5) * state.pinchStartWinSec;
+        }
+      }, { passive: false });
+
+      zoomCanvas.addEventListener('touchmove', (e) => {
+        if (!state.hasAudio) return;
+        e.preventDefault();
+        const rect = zoomCanvas.getBoundingClientRect();
+        const W = Math.max(1, rect.width);
+
+        if (state.isPinchingZoom && e.touches.length >= 2) {
+          const t0 = e.touches[0], t1 = e.touches[1];
+          const dist = Math.max(10, Math.hypot(t1.clientX - t0.clientX, t1.clientY - t0.clientY));
+          const scale = dist / state.pinchStartDist;
+          const newWin = Math.max(0.03, Math.min(60.0, state.pinchStartWinSec / scale));
+          setZoomSpan(newWin);
+
+          const midX = (t0.clientX + t1.clientX) * 0.5 - rect.left;
+          const ratio = Math.max(0, Math.min(1, midX / W));
+          const anchoredCenter = state.pinchAnchorTime - (ratio - 0.5) * newWin;
+          seekTo(anchoredCenter, { keepInertia: false, setGreenPin: false });
+        } else if (state.isDraggingZoom && e.touches.length === 1) {
+          const t = e.touches[0];
+          if (Math.hypot(t.clientX - state.zoomDragStartX, t.clientY - state.zoomDragStartY) > 6) {
+            state.zoomMoved = true;
+          }
+          const now = performance.now();
+          const dt = Math.max(1, now - state.zoomLastPerf);
+          const dxStep = t.clientX - state.zoomLastX;
+          const instVel = -(dxStep / W) * state.zoomWindowSeconds / dt;
+          state.zoomVelSecPerMs = state.zoomVelSecPerMs * 0.55 + instVel * 0.45;
+          state.zoomLastX = t.clientX;
+          state.zoomLastPerf = now;
+
+          const totalDx = t.clientX - state.zoomDragStartX;
+          const deltaSec = -(totalDx / W) * state.zoomWindowSeconds;
+          seekTo(state.zoomDragStartTime + deltaSec, { keepInertia: false, setGreenPin: true });
+        }
+      }, { passive: false });
+
+      zoomCanvas.addEventListener('touchend', (e) => {
+        if (e.touches.length === 1 && state.isPinchingZoom) {
+          const t = e.touches[0];
+          state.isPinchingZoom = false;
+          state.isDraggingZoom = true;
+          state.zoomDragStartX = t.clientX;
+          state.zoomDragStartY = t.clientY;
+          state.zoomDragStartTime = state.currentTime;
+          state.zoomMoved = true;
+          state.zoomLastX = t.clientX;
+          state.zoomLastPerf = performance.now();
+          state.zoomVelSecPerMs = 0;
+        } else if (e.touches.length === 0) {
+          const wasDrag = state.isDraggingZoom;
+          const wasTap = wasDrag && !state.zoomMoved && (performance.now() - state.zoomTapStartPerf) < 280;
+          const recent = (performance.now() - state.zoomLastPerf) < 85;
+          state.isDraggingZoom = false;
+          state.isPinchingZoom = false;
+
+          if (wasTap) {
+            const rect = zoomCanvas.getBoundingClientRect();
+            const W = Math.max(1, rect.width);
+            const offsetFrac = ((state.zoomDragStartX - rect.left) - W * 0.5) / W;
+            seekTo(state.zoomDragStartTime + offsetFrac * state.zoomWindowSeconds, { setGreenPin: true });
+          } else if (wasDrag && recent) {
+            startInertia(state.zoomVelSecPerMs);
+          }
+        }
+      });
+
+      zoomCanvas.addEventListener('touchcancel', () => {
+        state.isDraggingZoom = false;
+        state.isPinchingZoom = false;
+      });
+
+      // Desktop Mouse Drag, Click-to-Jump & Wheel Cursor-Anchored Zoom
+      zoomCanvas.addEventListener('mousedown', (e) => {
+        if (!state.hasAudio || e.button !== 0) return;
+        stopInertia();
+        state.isDraggingZoom = true;
+        state.zoomDragStartX = e.clientX;
+        state.zoomDragStartY = e.clientY;
+        state.zoomDragStartTime = state.currentTime;
+        state.zoomTapStartPerf = performance.now();
+        state.zoomMoved = false;
+        state.zoomLastX = e.clientX;
+        state.zoomLastPerf = performance.now();
+        state.zoomVelSecPerMs = 0;
+      });
+
+      window.addEventListener('mousemove', (e) => {
+        if (!state.isDraggingZoom || !state.hasAudio) return;
+        if (Math.hypot(e.clientX - state.zoomDragStartX, e.clientY - state.zoomDragStartY) > 5) {
+          state.zoomMoved = true;
+        }
+        const rect = zoomCanvas.getBoundingClientRect();
+        const W = Math.max(1, rect.width);
+        const now = performance.now();
+        const dt = Math.max(1, now - state.zoomLastPerf);
+        const dxStep = e.clientX - state.zoomLastX;
+        const instVel = -(dxStep / W) * state.zoomWindowSeconds / dt;
+        state.zoomVelSecPerMs = state.zoomVelSecPerMs * 0.55 + instVel * 0.45;
+        state.zoomLastX = e.clientX;
+        state.zoomLastPerf = now;
+
+        const deltaSec = -((e.clientX - state.zoomDragStartX) / W) * state.zoomWindowSeconds;
+        seekTo(state.zoomDragStartTime + deltaSec, { keepInertia: false, setGreenPin: true });
+      });
+
+      window.addEventListener('mouseup', () => {
+        if (!state.isDraggingZoom) return;
+        const wasClick = !state.zoomMoved && (performance.now() - state.zoomTapStartPerf) < 280;
+        const recent = (performance.now() - state.zoomLastPerf) < 85;
+        state.isDraggingZoom = false;
+
+        if (wasClick) {
+          const rect = zoomCanvas.getBoundingClientRect();
+          const W = Math.max(1, rect.width);
+          const offsetFrac = ((state.zoomDragStartX - rect.left) - W * 0.5) / W;
+          seekTo(state.zoomDragStartTime + offsetFrac * state.zoomWindowSeconds, { setGreenPin: true });
+        } else if (recent) {
+          startInertia(state.zoomVelSecPerMs);
+        }
+      });
+
+      zoomCanvas.addEventListener('wheel', (e) => {
+        if (!state.hasAudio) return;
+        e.preventDefault();
+        stopInertia();
+        const rect = zoomCanvas.getBoundingClientRect();
+        const W = Math.max(1, rect.width);
+        const ratio = Math.max(0, Math.min(1, (e.clientX - rect.left) / W));
+        const anchorT = state.currentTime + (ratio - 0.5) * state.zoomWindowSeconds;
+        const factor = e.deltaY > 0 ? 1.18 : 1 / 1.18;
+        const newWin = Math.max(0.03, Math.min(60.0, state.zoomWindowSeconds * factor));
+        setZoomSpan(newWin);
+        seekTo(anchorT - (ratio - 0.5) * newWin, { keepInertia: false, setGreenPin: false });
+      }, { passive: false });
+
+      // ==================== 60/120FPS ANIMATION & PLAYBACK SYNC LOOP ====================
+      function animationLoop() {
+        if (state.hasAudio && state.isPlaying && !state.isDraggingOverview && !state.isDraggingZoom && !state.isPinchingZoom) {
+          if (state.engine === 'tape' && tapeSourceNode) {
+            state.currentTime = getTapeCurrentTime();
+            if (state.sectionRepeat) {
+              const sec = getActiveLoopSection();
+              if (sec.end - sec.start > 0.15 && state.currentTime >= sec.end - 0.025) {
+                startTapeSourceAt(sec.start);
+                state.currentTime = sec.start;
+              }
+            }
+          } else if (state.engine === 'native') {
+            if (Math.abs(audioEl.currentTime - state.lastSyncTime) > 0.002) {
+              state.lastSyncTime = audioEl.currentTime;
+              state.lastSyncPerf = performance.now();
+            }
+            state.currentTime = audioEl.currentTime;
+            if (state.sectionRepeat) {
+              const sec = getActiveLoopSection();
+              if (sec.end - sec.start > 0.15 && state.currentTime >= sec.end - 0.03) {
+                audioEl.currentTime = sec.start;
+                state.currentTime = sec.start;
+                state.lastSyncTime = sec.start;
+                state.lastSyncPerf = performance.now();
+              }
+            }
+          }
+          updateTimeUI();
+          updatePinButtonsUI();
+          renderAllCanvases();
+        }
+        requestAnimationFrame(animationLoop);
+      }
+
+      audioEl.addEventListener('ended', () => {
+        if (state.engine === 'native') handleTrackEnded();
+      });
+
+      // ==================== SETTINGS / MARKER / PLAYLIST MODAL ====================
+      const settingsModal = document.getElementById('settingsModal');
+      const tabSettings = document.getElementById('tabSettings');
+      const tabMarkers = document.getElementById('tabMarkers');
+      const tabPlaylist = document.getElementById('tabPlaylist');
+      const panelSettings = document.getElementById('panelSettings');
+      const panelMarkers = document.getElementById('panelMarkers');
+      const panelPlaylist = document.getElementById('panelPlaylist');
+
+      function switchModalTab(tab) {
+        tabSettings.classList.toggle('active', tab === 'settings');
+        tabMarkers.classList.toggle('active', tab === 'markers');
+        tabPlaylist.classList.toggle('active', tab === 'playlist');
+        panelSettings.classList.toggle('hidden', tab !== 'settings');
+        panelMarkers.classList.toggle('hidden', tab !== 'markers');
+        panelPlaylist.classList.toggle('hidden', tab !== 'playlist');
+      }
+
+      function renderMarkerList() {
+        document.getElementById('markerTabCount').textContent = String(state.markers.length);
+        const wrap = document.getElementById('markerListWrap');
+        wrap.innerHTML = '';
+        if (!state.hasAudio || state.markers.length === 0) {
+          wrap.innerHTML = '<div style="text-align:center;color:#71717a;font-size:12px;padding:24px 0;">黄色ピンはまだありません</div>';
+          return;
+        }
+        state.markers.forEach((mT, idx) => {
+          const item = document.createElement('div');
+          item.className = 'list-item';
+          const main = document.createElement('div');
+          main.className = 'list-item-main';
+          main.innerHTML = `<div class="list-item-title">黄色ピン #${idx + 1}</div><div class="list-item-sub mono">${formatTime(mT, true)}</div>`;
+          main.addEventListener('click', () => {
+            seekTo(mT, { setGreenPin: false });
+            settingsModal.classList.add('hidden');
+          });
+
+          const jumpBtn = document.createElement('button');
+          jumpBtn.type = 'button';
+          jumpBtn.className = 'mini-act-btn';
+          jumpBtn.textContent = '移動';
+          jumpBtn.addEventListener('click', () => {
+            seekTo(mT, { setGreenPin: false });
+            settingsModal.classList.add('hidden');
+          });
+
+          const delBtn = document.createElement('button');
+          delBtn.type = 'button';
+          delBtn.className = 'mini-act-btn mini-act-del';
+          delBtn.textContent = '削除';
+          delBtn.addEventListener('click', () => {
+            state.markers.splice(idx, 1);
+            syncCurrentPlaylistMarkers();
+            updateHeaderSubInfo();
+            renderAllCanvases();
+            renderMarkerList();
+          });
+
+          item.appendChild(main);
+          item.appendChild(jumpBtn);
+          item.appendChild(delBtn);
+          wrap.appendChild(item);
+        });
+      }
+
+      function renderPlaylist() {
+        document.getElementById('playlistTabCount').textContent = String(state.playlist.length);
+        const wrap = document.getElementById('playlistWrap');
+        wrap.innerHTML = '';
+        if (state.playlist.length === 0) {
+          wrap.innerHTML = '<div style="text-align:center;color:#71717a;font-size:12px;padding:24px 0;">ファイルが読み込まれていません</div>';
+          return;
+        }
+        state.playlist.forEach((tr, idx) => {
+          const isCur = idx === state.currentTrackIndex;
+          const mb = tr.blob ? `${(tr.blob.size / (1024 * 1024)).toFixed(1)}MB` : '';
+          const item = document.createElement('div');
+          item.className = 'list-item' + (isCur ? ' current' : '');
+          const main = document.createElement('div');
+          main.className = 'list-item-main';
+          main.innerHTML = `<div class="list-item-title">${idx + 1}. ${tr.name}</div><div class="list-item-sub mono">${mb} • 黄色ピン ${(tr.markers || []).length}個</div>`;
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'mini-act-btn';
+          btn.textContent = isCur ? '再生中' : '開く';
+          const openHandler = async () => {
+            settingsModal.classList.add('hidden');
+            if (!isCur) await switchTrack(idx, true);
+          };
+          main.addEventListener('click', openHandler);
+          btn.addEventListener('click', openHandler);
+          item.appendChild(main);
+          item.appendChild(btn);
+          wrap.appendChild(item);
+        });
+      }
+
+      function openSettingsModal(initialTab = 'settings') {
+        document.getElementById('inputTrackName').value = trackTitleEl.textContent.trim();
+        document.getElementById('speedSlider').value = state.playbackRate;
+        document.getElementById('modalSpeedVal').textContent = `${state.playbackRate.toFixed(2)}x`;
+        document.getElementById('pitchSlider').value = state.pitchSemitones;
+        updateWaveGainUI();
+        applyMasterBoost();
+        setMicGain(state.micGain);
+        updateLowpassFilter();
+        renderMarkerList();
+        renderPlaylist();
+        switchModalTab(initialTab);
+        settingsModal.classList.remove('hidden');
+      }
+
+      // ==================== WIRE ALL EVENT LISTENERS ====================
+      // Local File Picker (single & multi-file support)
+      fileInput.addEventListener('change', async (e) => {
+        const files = e.target.files ? Array.from(e.target.files) : [];
+        if (files.length === 0) return;
+        const valid = files.filter(isAudioCandidate);
+        if (valid.length === 0) {
+          showToast('音声ファイル（.m4a / .mp3 / .wav 等）を選択してください');
+          fileInput.value = '';
+          return;
+        }
+        if (state.playlist.length === 1 && state.playlist[0].name.startsWith('デモ練習曲_')) {
+          state.playlist = [];
+        }
+        const startIdx = state.playlist.length;
+        for (const f of valid) {
+          state.playlist.push({ name: f.name, blob: f, markers: [] });
+        }
+        state.currentTrackIndex = startIdx;
+        await loadAudioBlob(valid[0], valid[0].name, [], false);
+        showToast(valid.length > 1 ? `${valid.length}個のローカルファイルを読み込みました` : `読込完了: ${valid[0].name}`);
+        fileInput.value = '';
+        settingsModal.classList.add('hidden');
+      });
+
+      // Header & Startup Actions
+      btnRecordHeader.addEventListener('click', () => state.isRecording ? stopRecording() : startRecording());
+      document.getElementById('btnStartRecord').addEventListener('click', startRecording);
+      document.getElementById('btnRecStop').addEventListener('click', stopRecording);
+      document.getElementById('btnRecAddMarker').addEventListener('click', addMarkerDuringRecording);
+      document.getElementById('btnLoadDemo').addEventListener('click', loadDemoTrack);
+      btnSaveWav.addEventListener('click', exportCurrentWav);
+      document.getElementById('headerInfo').addEventListener('click', () => openSettingsModal('settings'));
+
+      // Zoom Pane Overlay Buttons
+      document.getElementById('btnCloseZoom').addEventListener('click', () => {
+        state.zoomVisible = false;
+        zoomPane.classList.add('hidden');
+        zoomCollapsedBar.classList.remove('hidden');
+        renderOverviewCanvas();
+      });
+      document.getElementById('btnOpenZoom').addEventListener('click', () => {
+        state.zoomVisible = true;
+        zoomPane.classList.remove('hidden');
+        zoomCollapsedBar.classList.add('hidden');
+        renderAllCanvases();
+      });
+      btnZoomSpanReset.addEventListener('click', (e) => {
+        e.stopPropagation();
+        stopInertia();
+        setZoomSpan(8.0);
+        renderZoomCanvas();
+        showToast('拡大波形を 8.0s にリセットしました');
+      });
+      btnWaveGainQuick.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const seq = ['auto', 1, 2, 4, 8];
+        const idx = seq.findIndex(v => String(v) === String(state.waveGainMode));
+        const next = seq[(idx + 1) % seq.length];
+        state.waveGainMode = next;
+        updateWaveGainUI();
+        renderAllCanvases();
+        showToast(next === 'auto' ? `波形倍率: 自動 (${state.autoWaveGain.toFixed(1)}x)` : `波形倍率: ${next}x`);
+      });
+
+      // Status Bar Quick Buttons
+      btnPlaylistIndex.addEventListener('click', () => openSettingsModal('playlist'));
+      btnBoostQuick.addEventListener('click', () => {
+        initAudioGraph();
+        const seq = ['auto', 1, 1.5, 2, 3, 4];
+        const idx = seq.findIndex(v => String(v) === String(state.boostMode));
+        state.boostMode = seq[(idx + 1) % seq.length];
+        applyMasterBoost();
+        showToast(`再生音量ブースト: ${Math.round(getEffectiveBoost() * 100)}%`);
+      });
+      btnEngineQuick.addEventListener('click', () => {
+        initAudioGraph();
+        const seq = ['vocoder', 'native', 'tape'];
+        const next = seq[(seq.indexOf(state.engine) + 1) % seq.length];
+        setEngine(next);
+        const names = { vocoder: 'ボコーダ（標準）', native: 'OS標準', tape: 'テープ再生（加工ゼロ）' };
+        showToast(`再生エンジン: ${names[state.engine]}`);
+      });
+
+      // Order Mode Buttons
+      document.getElementById('btnOrderLoop1').addEventListener('click', () => setOrderMode('loop1'));
+      document.getElementById('btnOrderLoopAll').addEventListener('click', () => setOrderMode('loopAll'));
+      document.getElementById('btnOrderStopEnd').addEventListener('click', () => setOrderMode('stop'));
+      document.getElementById('btnOrderShuffle').addEventListener('click', () => setOrderMode('shuffle'));
+
+      // Row 1: Pin & Marker Controls
+      btnPromoteTemp.addEventListener('click', promoteGreenToYellow);
+      btnJumpTemp.addEventListener('click', jumpToGreenPin);
+      document.getElementById('btnPrevYellow').addEventListener('click', jumpPrevYellowPin);
+      document.getElementById('btnAddYellow').addEventListener('click', addYellowPinAtCurrent);
+      document.getElementById('btnNextYellow').addEventListener('click', jumpNextYellowPin);
+      document.getElementById('btnSpeedPitch').addEventListener('click', () => openSettingsModal('settings'));
+
+      // Row 2: Section Repeat, Transport & Reverb
+      btnSectionRepeat.addEventListener('click', toggleSectionRepeat);
+      document.getElementById('btnPrevTrack').addEventListener('click', () => {
+        if (!state.hasAudio) return;
+        if (state.currentTime > 2.0 || state.playlist.length <= 1) {
+          seekTo(0, { setGreenPin: false });
+        } else {
+          switchTrack(state.currentTrackIndex - 1, state.isPlaying);
+        }
+      });
+      document.getElementById('btnRewind3').addEventListener('click', () => seekTo(state.currentTime - 3, { setGreenPin: false }));
+      btnPlayPause.addEventListener('click', togglePlayPause);
+      document.getElementById('btnForward3').addEventListener('click', () => seekTo(state.currentTime + 3, { setGreenPin: false }));
+      document.getElementById('btnNextTrack').addEventListener('click', () => {
+        if (!state.hasAudio) return;
+        if (state.playlist.length > 1) switchTrack(state.currentTrackIndex + 1, state.isPlaying);
+        else seekTo(state.duration, { setGreenPin: false });
+      });
+      document.getElementById('btnReverbCycle').addEventListener('click', () => {
+        initAudioGraph();
+        applyReverb(state.reverbIndex + 1);
+      });
+
+      // Row 3: Speed Presets, Marker Delete/List, Settings
+      document.querySelectorAll('.speed-preset-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const spd = parseFloat(btn.dataset.speed);
+          setPlaybackSpeed(spd);
+          showToast(`再生速度: ${spd.toFixed(2)}x`);
+        });
+      });
+      document.getElementById('btnDeleteOrListMarker').addEventListener('click', deleteNearestYellowOrOpenList);
+      document.getElementById('btnOpenSettings').addEventListener('click', () => openSettingsModal('settings'));
+
+      // Settings Modal Controls
+      tabSettings.addEventListener('click', () => switchModalTab('settings'));
+      tabMarkers.addEventListener('click', () => { renderMarkerList(); switchModalTab('markers'); });
+      tabPlaylist.addEventListener('click', () => { renderPlaylist(); switchModalTab('playlist'); });
+
+      const closeModal = () => {
+        const newName = document.getElementById('inputTrackName').value.trim();
+        if (newName && state.hasAudio) {
+          trackTitleEl.textContent = newName;
+          if (state.playlist[state.currentTrackIndex]) {
+            state.playlist[state.currentTrackIndex].name = newName;
+          }
+        }
+        settingsModal.classList.add('hidden');
+      };
+      document.getElementById('btnCloseSettings').addEventListener('click', closeModal);
+      document.getElementById('btnDoneSettings').addEventListener('click', closeModal);
+      settingsModal.addEventListener('click', (e) => { if (e.target === settingsModal) closeModal(); });
+
+      document.getElementById('speedSlider').addEventListener('input', (e) => setPlaybackSpeed(parseFloat(e.target.value)));
+      document.getElementById('btnSpeedM05').addEventListener('click', () => setPlaybackSpeed(state.playbackRate - 0.05));
+      document.getElementById('btnSpeedM01').addEventListener('click', () => setPlaybackSpeed(state.playbackRate - 0.01));
+      document.getElementById('btnSpeedReset').addEventListener('click', () => setPlaybackSpeed(1.0));
+      document.getElementById('btnSpeedP01').addEventListener('click', () => setPlaybackSpeed(state.playbackRate + 0.01));
+      document.getElementById('btnSpeedP05').addEventListener('click', () => setPlaybackSpeed(state.playbackRate + 0.05));
+
+      document.getElementById('pitchSlider').addEventListener('input', (e) => setPitch(parseInt(e.target.value, 10)));
+      document.getElementById('btnPitchM1').addEventListener('click', () => setPitch(state.pitchSemitones - 1));
+      document.getElementById('btnPitchReset').addEventListener('click', () => setPitch(0));
+      document.getElementById('btnPitchP1').addEventListener('click', () => setPitch(state.pitchSemitones + 1));
+
+      document.getElementById('btnEngVocoder').addEventListener('click', () => { initAudioGraph(); setEngine('vocoder'); });
+      document.getElementById('btnEngNative').addEventListener('click', () => { initAudioGraph(); setEngine('native'); });
+      document.getElementById('btnEngTape').addEventListener('click', () => { initAudioGraph(); setEngine('tape'); });
+
+      document.getElementById('btnToggleLpf').addEventListener('click', () => {
+        state.lpfEnabled = !state.lpfEnabled;
+        const b = document.getElementById('btnToggleLpf');
+        b.textContent = state.lpfEnabled ? 'ON' : 'OFF';
+        b.classList.toggle('on', state.lpfEnabled);
+        updateLowpassFilter();
+      });
+
+      document.querySelectorAll('.wave-gain-opt').forEach(btn => {
+        btn.addEventListener('click', () => {
+          state.waveGainMode = btn.dataset.waveGain === 'auto' ? 'auto' : parseFloat(btn.dataset.waveGain);
+          updateWaveGainUI();
+          renderAllCanvases();
+        });
+      });
+
+      document.querySelectorAll('.boost-opt').forEach(btn => {
+        btn.addEventListener('click', () => {
+          initAudioGraph();
+          state.boostMode = btn.dataset.boost === 'auto' ? 'auto' : parseFloat(btn.dataset.boost);
+          applyMasterBoost();
+        });
+      });
+
+      document.querySelectorAll('.mic-gain-opt').forEach(btn => {
+        btn.addEventListener('click', () => setMicGain(btn.dataset.micGain));
+      });
+
+      document.getElementById('btnAddMarkerFromModal').addEventListener('click', () => {
+        addYellowPinAtCurrent();
+        renderMarkerList();
+      });
+      document.getElementById('btnClearAllMarkers').addEventListener('click', () => {
+        state.markers = [];
+        state.tempMarker = null;
+        syncCurrentPlaylistMarkers();
+        updateHeaderSubInfo();
+        updatePinButtonsUI();
+        renderAllCanvases();
+        renderMarkerList();
+        showToast('すべてのマーカーを削除しました');
+      });
+
+      // Resize & Startup Render
+      window.addEventListener('resize', renderAllCanvases);
+      window.onload = () => {
+        updateWaveGainUI();
+        applyMasterBoost();
+        setMicGain(state.micGain);
+        renderAllCanvases();
+        requestAnimationFrame(animationLoop);
+      };
+    })();
+  </script>
+</body>
+</html>
