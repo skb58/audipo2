@@ -8,7 +8,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="Audipo2">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="app-version" content="v21">
+  <meta name="app-version" content="v22">
   <link rel="manifest" href="./manifest.json">
   <title>Audipo風 練習プレイヤー＆レコーダー</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='bg' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%231b2030'/%3E%3Cstop offset='100%25' stop-color='%230d0f15'/%3E%3C/linearGradient%3E%3ClinearGradient id='wv' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0%25' stop-color='%2360c5ff'/%3E%3Cstop offset='100%25' stop-color='%232563eb'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='url(%23bg)'/%3E%3Crect x='1' y='1' width='62' height='62' rx='15' fill='none' stroke='%233b82f6' stroke-opacity='0.3' stroke-width='2'/%3E%3Cg fill='url(%23wv)'%3E%3Crect x='10' y='28' width='4.5' height='12' rx='2.25' opacity='0.6'/%3E%3Crect x='18' y='22' width='4.5' height='24' rx='2.25' opacity='0.85'/%3E%3Crect x='26' y='15' width='4.5' height='36' rx='2.25'/%3E%3Crect x='34' y='21' width='4.5' height='25' rx='2.25' opacity='0.9'/%3E%3Crect x='42' y='26' width='4.5' height='16' rx='2.25' opacity='0.75'/%3E%3Crect x='50' y='30' width='4.5' height='9' rx='2.25' opacity='0.5'/%3E%3C/g%3E%3Cpath d='M36.25 10.5c0-1.4 1.1-2.5 2.5-2.5h5.5c1.4 0 2.5 1.1 2.5 2.5v2.4c0 .8-.3 1.5-.9 2.1l-3.2 3.1c-.6.6-1.6.6-2.2 0l-3.2-3.1c-.6-.6-.9-1.3-.9-2.1v-2.4z' fill='%23facc15'/%3E%3C/svg%3E">
@@ -444,6 +444,33 @@
       cursor: pointer;
     }
 
+    /* Slightly prominent Octave switcher */
+    .kbd-stepper-oct {
+      height: 29px;
+      background: rgba(56, 189, 248, 0.13);
+      border-color: rgba(56, 189, 248, 0.55);
+      box-shadow: 0 0 9px rgba(56, 189, 248, 0.16);
+      padding: 2px 3.5px;
+    }
+
+    .kbd-stepper-oct .kbd-step-btn {
+      width: 24px;
+      height: 23px;
+      background: rgba(56, 189, 248, 0.24);
+      color: #e0f2fe;
+    }
+
+    .kbd-stepper-oct .kbd-step-btn:active {
+      background: rgba(56, 189, 248, 0.42);
+    }
+
+    .kbd-stepper-oct .kbd-step-val {
+      color: #bae6fd;
+      font-size: 11px;
+      font-weight: 800;
+      padding: 0 5px;
+    }
+
     .kbd-toggle-btn {
       height: 27px;
       padding: 0 9px;
@@ -463,10 +490,39 @@
       transform: scale(0.94);
     }
 
+    /* Slightly prominent Hold (持続) button */
+    .kbd-toggle-btn-hold {
+      height: 29px;
+      padding: 0 11px;
+      border-radius: 8px;
+      background: rgba(250, 204, 21, 0.12);
+      border: 1px solid rgba(250, 204, 21, 0.52);
+      color: #fde68a;
+      font-size: 11px;
+      font-weight: 800;
+      box-shadow: 0 0 9px rgba(250, 204, 21, 0.14);
+      gap: 5px;
+    }
+
+    .kbd-hold-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: rgba(250, 204, 21, 0.45);
+      transition: background-color 0.12s ease, box-shadow 0.12s ease;
+      flex-shrink: 0;
+    }
+
     .kbd-toggle-btn.active-hold {
-      background: rgba(250, 204, 21, 0.22);
+      background: rgba(250, 204, 21, 0.30);
       border-color: var(--accent-yellow);
-      color: #fef08a;
+      color: #ffffff;
+      box-shadow: 0 0 13px rgba(250, 204, 21, 0.48);
+    }
+
+    .kbd-toggle-btn.active-hold .kbd-hold-dot {
+      background: #facc15;
+      box-shadow: 0 0 7px #facc15;
     }
 
     /* Prominent Large "横にする（2オクターブ）" CTA Button in Portrait Mode */
@@ -684,6 +740,20 @@
 
     body.kbd-immersive .kbd-key-black .kbd-key-label {
       font-size: 8.5px;
+    }
+
+    /* Hardware-independent landscape lock fallback (stays horizontal even if OS auto-rotate returns to portrait) */
+    body.kbd-immersive.kbd-rotated-landscape {
+      position: fixed;
+      top: 0;
+      left: var(--app-width, 100vw);
+      right: auto;
+      bottom: auto;
+      width: var(--app-height, 100%);
+      height: var(--app-width, 100vw);
+      max-height: none;
+      transform-origin: 0 0;
+      transform: rotate(90deg);
     }
 
     .upper-page-metro {
@@ -2758,21 +2828,27 @@
                     <button id="btnKbdKeyUp" type="button" class="kbd-step-btn" aria-label="キーを上げる">+</button>
                   </div>
 
-                  <!-- Octave Switcher (オクターブ切替) -->
-                  <div class="kbd-stepper" title="オクターブ切替／中央タップでOct:4に戻す">
-                    <button id="btnKbdOctDown" type="button" class="kbd-step-btn" aria-label="オクターブを下げる">-</button>
-                    <span id="kbdOctVal" class="kbd-step-val mono">Oct:4</span>
-                    <button id="btnKbdOctUp" type="button" class="kbd-step-btn" aria-label="オクターブを上げる">+</button>
-                  </div>
-
-                  <!-- Concert Pitch A4 Reference (基準ピッチ) -->
+                  <!-- Concert Pitch A4 Reference (基準ピッチ - right next to キー:C) -->
                   <div class="kbd-stepper" title="基準ピッチ A4 (430〜450Hz)／中央タップで440Hzに戻す">
                     <button id="btnKbdA4Down" type="button" class="kbd-step-btn" aria-label="基準ピッチを下げる">-</button>
                     <span id="kbdA4Val" class="kbd-step-val mono">440Hz</span>
                     <button id="btnKbdA4Up" type="button" class="kbd-step-btn" aria-label="基準ピッチを上げる">+</button>
                   </div>
+                </div>
 
-                  <button id="btnKbdHold" type="button" class="kbd-toggle-btn" title="持続モード（離しても音が鳴り続けます・基準音出しに便利）">持続</button>
+                <div class="kbd-bar-group">
+                  <!-- Octave Switcher (オクターブ切替 - slightly prominent) -->
+                  <div class="kbd-stepper kbd-stepper-oct" title="オクターブ切替／中央タップでOct:4に戻す">
+                    <button id="btnKbdOctDown" type="button" class="kbd-step-btn" aria-label="オクターブを下げる">-</button>
+                    <span id="kbdOctVal" class="kbd-step-val mono">Oct:4</span>
+                    <button id="btnKbdOctUp" type="button" class="kbd-step-btn" aria-label="オクターブを上げる">+</button>
+                  </div>
+
+                  <!-- Hold Button (持続 - slightly prominent) -->
+                  <button id="btnKbdHold" type="button" class="kbd-toggle-btn kbd-toggle-btn-hold" title="持続モード（離しても音が鳴り続けます・基準音出しに便利）">
+                    <span class="kbd-hold-dot" aria-hidden="true"></span>
+                    <span>持続</span>
+                  </button>
                 </div>
               </div>
             </div>
@@ -3584,12 +3660,16 @@
         }
       } catch (_) {}
 
-      // Lock app height strictly to real visible viewport so reload in Android Chrome/PWA never hides the bottom buttons
+      // Lock app height & width strictly to real visible viewport so reload in Android Chrome/PWA never hides the bottom buttons
       let lastAppliedViewportH = 0;
+      let lastAppliedViewportW = 0;
       function syncAppViewportHeight(forceRedraw = false) {
         const innerH = window.innerHeight || document.documentElement.clientHeight || 0;
         const clientH = document.documentElement.clientHeight || innerH;
+        const innerW = window.innerWidth || document.documentElement.clientWidth || 0;
+        const clientW = document.documentElement.clientWidth || innerW;
         let targetH = Math.min(innerH || clientH, clientH || innerH);
+        let targetW = Math.min(innerW || clientW, clientW || innerW);
 
         const vv = window.visualViewport;
         if (vv && vv.height > 0) {
@@ -3598,14 +3678,24 @@
           // Clamp to visualViewport height unless the soft keyboard is actively open for text entry
           if (!isEditingText) {
             targetH = Math.min(targetH, Math.floor(vv.height));
+            if (vv.width > 0) {
+              targetW = Math.min(targetW, Math.floor(vv.width));
+            }
           }
         }
 
         if (targetH > 120) {
-          const rounded = Math.floor(targetH);
-          if (rounded !== lastAppliedViewportH || forceRedraw) {
-            lastAppliedViewportH = rounded;
-            document.documentElement.style.setProperty('--app-height', `${rounded}px`);
+          const roundedH = Math.floor(targetH);
+          if (roundedH !== lastAppliedViewportH || forceRedraw) {
+            lastAppliedViewportH = roundedH;
+            document.documentElement.style.setProperty('--app-height', `${roundedH}px`);
+          }
+        }
+        if (targetW > 120) {
+          const roundedW = Math.floor(targetW);
+          if (roundedW !== lastAppliedViewportW || forceRedraw) {
+            lastAppliedViewportW = roundedW;
+            document.documentElement.style.setProperty('--app-width', `${roundedW}px`);
           }
         }
 
@@ -8624,7 +8714,8 @@
         mouseDownKey: null,
         keyEls: new Map(), // keyIndex -> DOM element
         renderedOctaves: 0, // 1 in portrait, 2 in landscape
-        forceImmersive: false,
+        landscapeLocked: false,
+        enteringLandscape: false,
         forcePortrait: false,
         orientationLockedByKbd: false,
         fullscreenByKbd: false
@@ -9148,14 +9239,43 @@
         updateKbdNoteReadout();
       }
 
+      async function tryLockLandscapeOrientation() {
+        if (!screen.orientation || !screen.orientation.lock) return false;
+        try {
+          await screen.orientation.lock('landscape');
+          kbd.orientationLockedByKbd = true;
+          return true;
+        } catch (_) {
+          try {
+            await screen.orientation.lock('landscape-primary');
+            kbd.orientationLockedByKbd = true;
+            return true;
+          } catch (__) {
+            return false;
+          }
+        }
+      }
+
       function syncKbdImmersiveLayout() {
         const isLand = window.innerWidth > window.innerHeight;
-        // Once the device actually returns to portrait, release the manual portrait override
+        // Once the device physically returns to portrait, clear manual portrait override
         if (!isLand) {
           kbd.forcePortrait = false;
         }
-        const wantLandscapeMode = (state.upperPage === 'kbd') && !kbd.forcePortrait && (isLand || kbd.forceImmersive);
+
+        // If user rotates the phone to landscape while on the keyboard page, latch landscape lock so Auto-Rotate won't flip it back!
+        if (state.upperPage === 'kbd' && isLand && !kbd.forcePortrait && !kbd.landscapeLocked) {
+          kbd.landscapeLocked = true;
+          tryLockLandscapeOrientation();
+        }
+
+        const wantLandscapeMode = (state.upperPage === 'kbd') && !kbd.forcePortrait && (isLand || kbd.landscapeLocked);
+        // Hardware-independent safety net: if OS auto-rotate reverted viewport to portrait while locked in landscape, hold horizontal 2-octave via 90deg CSS rotation
+        const needCssRotate = wantLandscapeMode && !isLand && !kbd.enteringLandscape;
+
         document.body.classList.toggle('kbd-immersive', wantLandscapeMode);
+        document.body.classList.toggle('kbd-rotated-landscape', needCssRotate);
+
         // Portrait = 1 octave (8 white + 5 black), Landscape = 2 octaves (15 white + 10 black)
         buildKeyboardDOM(wantLandscapeMode ? 2 : 1);
         if (state.upperPage === 'kbd') {
@@ -9165,9 +9285,16 @@
 
       async function enterKbdLandscapeMode() {
         kbd.forcePortrait = false;
-        kbd.forceImmersive = true;
+        kbd.landscapeLocked = true;
+        kbd.enteringLandscape = true;
         syncKbdImmersiveLayout();
+
+        let locked = false;
         try {
+          // 1. Try direct orientation lock first (works in installed PWA without requiring fullscreen on many Android devices)
+          locked = await tryLockLandscapeOrientation();
+
+          // 2. Enter fullscreen (hides system bars & unlocks Chrome's Screen Orientation Lock API in browser tabs)
           if (!isInFullscreen()) {
             const el = document.documentElement;
             if (el.requestFullscreen) {
@@ -9178,25 +9305,42 @@
               kbd.fullscreenByKbd = true;
             }
           }
-          if (screen.orientation && screen.orientation.lock) {
-            await screen.orientation.lock('landscape');
-            kbd.orientationLockedByKbd = true;
+
+          // 3. Lock orientation after fullscreen settles (with retry in case transition is still running)
+          if (!locked) {
+            locked = await tryLockLandscapeOrientation();
           }
-        } catch (_) {
-          if (window.innerWidth <= window.innerHeight) {
-            showToast('2オクターブ横モード表示中（端末を横向きにするとさらに広くなります）');
+          if (!locked) {
+            await new Promise((r) => setTimeout(r, 140));
+            locked = await tryLockLandscapeOrientation();
           }
-        }
+        } catch (_) {}
+
+        kbd.enteringLandscape = false;
+        syncAppViewportHeight(true);
         syncKbdImmersiveLayout();
+
+        // Final check after OS rotation animation completes
+        setTimeout(() => {
+          if (state.upperPage === 'kbd' && kbd.landscapeLocked) {
+            if (window.innerWidth <= window.innerHeight) {
+              tryLockLandscapeOrientation();
+            }
+            syncAppViewportHeight(true);
+            syncKbdImmersiveLayout();
+          }
+        }, 280);
       }
 
       async function exitKbdLandscapeMode() {
-        kbd.forceImmersive = false;
+        kbd.landscapeLocked = false;
+        kbd.enteringLandscape = false;
         kbd.forcePortrait = true;
+        document.body.classList.remove('kbd-rotated-landscape');
         syncKbdImmersiveLayout();
         try {
           if (screen.orientation && screen.orientation.lock) {
-            // Attempt to rotate back to portrait cleanly before unlocking
+            // Rotate back to portrait before unlocking so phone stands upright cleanly
             try { await screen.orientation.lock('portrait'); } catch (_) {}
           }
           if (screen.orientation && screen.orientation.unlock) {
@@ -9211,7 +9355,11 @@
           }
         } catch (_) {}
         kbd.fullscreenByKbd = false;
-        syncKbdImmersiveLayout();
+        setTimeout(() => {
+          syncAppViewportHeight(true);
+          syncKbdImmersiveLayout();
+          renderAllCanvases();
+        }, 120);
       }
 
       // ==================== PRECISION WEB AUDIO METRONOME (LOUD BUS + PENDULUM NEEDLE) + CHROMATIC TUNER ====================
@@ -10430,12 +10578,18 @@
       const onFullscreenStateChanged = () => {
         updateFullscreenUI();
         syncAppViewportHeight(true);
+        if (state.upperPage === 'kbd' && kbd.landscapeLocked) {
+          tryLockLandscapeOrientation();
+          syncKbdImmersiveLayout();
+        }
         setTimeout(() => {
           syncAppViewportHeight(true);
+          syncKbdImmersiveLayout();
           renderAllCanvases();
         }, 80);
         setTimeout(() => {
           syncAppViewportHeight(true);
+          syncKbdImmersiveLayout();
           renderAllCanvases();
         }, 260);
       };
@@ -10443,7 +10597,7 @@
       document.addEventListener('webkitfullscreenchange', onFullscreenStateChanged);
 
       // ==================== GITHUB / PWA SOFTWARE UPDATE CHECK & APPLY ====================
-      const APP_VERSION = 'v21';
+      const APP_VERSION = 'v22';
       const appUpdateState = {
         checking: false,
         available: false,
@@ -11043,6 +11197,9 @@
       }
       if (screen.orientation && screen.orientation.addEventListener) {
         screen.orientation.addEventListener('change', () => {
+          if (state.upperPage === 'kbd' && kbd.landscapeLocked && window.innerWidth <= window.innerHeight) {
+            tryLockLandscapeOrientation();
+          }
           setTimeout(() => {
             syncAppViewportHeight(true);
             refreshViewportAndLayout();
