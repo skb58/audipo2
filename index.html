@@ -524,9 +524,13 @@
       background: linear-gradient(180deg, #f59e0b 0%, #fbbf24 55%, #d97706 100%);
       box-shadow: 0 0 10px rgba(245, 158, 11, 0.35);
       transform-origin: 50% 96%;
-      transform: rotate(0deg);
+      transform: rotate(0deg) translateZ(0);
       will-change: transform;
       margin-bottom: 4px;
+    }
+
+    .metro-pendulum-arm.resting {
+      transition: transform 0.26s cubic-bezier(0.22, 1, 0.36, 1);
     }
 
     .metro-pendulum-weight {
@@ -7793,11 +7797,15 @@
         tapTimes: [],
         tapResetTimer: null,
         ledTimers: [],
-        // Pendulum needle phase tracking synced to audioCtx.currentTime
+        // Pendulum needle phase tracking synced to audioCtx.currentTime with 120fps perf interpolation
         scheduledBeats: [], // { time, dur, seqIdx }
         seqCounter: 0,
         pendulumRafId: null,
-        pendulumAngle: 0
+        pendulumAngle: 0,
+        clockAnchorAudio: 0,
+        clockAnchorPerf: 0,
+        lastRawAudioTime: -1,
+        lastSmoothTime: 0
       };
 
       function ensureMetroAudioBus() {
@@ -7862,8 +7870,47 @@
       function setPendulumAngle(deg) {
         metro.pendulumAngle = deg;
         if (metroPendulumArm) {
-          metroPendulumArm.style.transform = `rotate(${deg.toFixed(2)}deg)`;
+          metroPendulumArm.style.transform = `rotate(${deg.toFixed(3)}deg) translateZ(0)`;
         }
+      }
+
+      // Smooth high-resolution audio clock (eliminates Android WebAudio buffer-quantum stepping at 60/120Hz)
+      function getSmoothMetroAudioTime() {
+        const raw = audioCtx.currentTime;
+        const perfNow = performance.now();
+        if (metro.clockAnchorPerf === 0) {
+          metro.clockAnchorAudio = raw;
+          metro.clockAnchorPerf = perfNow;
+          metro.lastRawAudioTime = raw;
+          metro.lastSmoothTime = raw;
+          return raw;
+        }
+        const est = metro.clockAnchorAudio + (perfNow - metro.clockAnchorPerf) / 1000;
+        const diff = raw - est;
+
+        if (Math.abs(diff) > 0.08) {
+          // Resync immediately after background pause or tab resume
+          metro.clockAnchorAudio = raw;
+          metro.clockAnchorPerf = perfNow;
+          metro.lastRawAudioTime = raw;
+          metro.lastSmoothTime = raw;
+          return raw;
+        }
+
+        let smooth = est;
+        if (raw !== metro.lastRawAudioTime) {
+          metro.lastRawAudioTime = raw;
+          smooth = est + diff * 0.25;
+          metro.clockAnchorAudio = smooth;
+          metro.clockAnchorPerf = perfNow;
+        }
+        // Keep monotonically non-decreasing so the needle never micro-jitters backward
+        if (smooth < metro.lastSmoothTime) {
+          smooth = metro.lastSmoothTime;
+        } else {
+          metro.lastSmoothTime = smooth;
+        }
+        return smooth;
       }
 
       function renderPendulumLoop() {
@@ -7871,16 +7918,19 @@
           metro.pendulumRafId = null;
           return;
         }
-        const now = audioCtx.currentTime;
+        const now = getSmoothMetroAudioTime();
         const q = metro.scheduledBeats;
-        // Prune old beats keeping the most recent beat <= now
-        while (q.length > 2 && q[1].time <= now) {
+        // Advance to the latest beat <= now (fixed: > 1 so beat transitions happen immediately with zero freeze!)
+        while (q.length > 1 && q[1].time <= now) {
           q.shift();
         }
         if (q.length > 0) {
           const cur = q[0];
-          const phase = Math.max(0, Math.min(1, (now - cur.time) / Math.max(0.05, cur.dur)));
-          // Smooth pendulum swing between -32deg and +32deg; hits exact extreme at each beat click
+          const beatDur = (q.length > 1)
+            ? Math.max(0.05, q[1].time - cur.time)
+            : Math.max(0.05, cur.dur);
+          const phase = Math.max(0, Math.min(1, (now - cur.time) / beatDur));
+          // Exact simple harmonic motion between -32deg and +32deg synced to every beat click
           const dir = (cur.seqIdx % 2 === 0) ? 1 : -1;
           const angle = dir * (-Math.cos(Math.PI * phase)) * 32;
           setPendulumAngle(angle);
@@ -8052,7 +8102,7 @@
 
       function runMetroScheduler() {
         if (!state.metroRunning || !audioCtx) return;
-        const scheduleAheadSec = 0.12;
+        const scheduleAheadSec = 0.16;
         while (metro.nextNoteTime < audioCtx.currentTime + scheduleAheadSec) {
           const beatToPlay = metro.currentBeat;
           const playAt = metro.nextNoteTime;
@@ -8090,6 +8140,11 @@
         metro.currentBeat = 0;
         metro.seqCounter = 0;
         metro.scheduledBeats = [];
+        metro.clockAnchorAudio = 0;
+        metro.clockAnchorPerf = 0;
+        metro.lastRawAudioTime = -1;
+        metro.lastSmoothTime = 0;
+        if (metroPendulumArm) metroPendulumArm.classList.remove('resting');
         metro.nextNoteTime = audioCtx.currentTime + 0.03;
         runMetroScheduler();
         metro.timerId = setInterval(runMetroScheduler, 25);
@@ -8111,8 +8166,10 @@
           metro.pendulumRafId = null;
         }
         metro.scheduledBeats = [];
+        metro.clockAnchorPerf = 0;
         metro.ledTimers.forEach(id => clearTimeout(id));
         metro.ledTimers = [];
+        if (metroPendulumArm) metroPendulumArm.classList.add('resting');
         setPendulumAngle(0);
         renderMetroLeds(-1);
         updateMetroUI();
