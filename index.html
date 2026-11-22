@@ -8,7 +8,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="Audipo2">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="app-version" content="v27">
+  <meta name="app-version" content="v28">
   <link rel="manifest" href="./manifest.json">
   <title>Audipo風 練習プレイヤー＆レコーダー</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='bg' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%231b2030'/%3E%3Cstop offset='100%25' stop-color='%230d0f15'/%3E%3C/linearGradient%3E%3ClinearGradient id='wv' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0%25' stop-color='%2360c5ff'/%3E%3Cstop offset='100%25' stop-color='%232563eb'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='url(%23bg)'/%3E%3Crect x='1' y='1' width='62' height='62' rx='15' fill='none' stroke='%233b82f6' stroke-opacity='0.3' stroke-width='2'/%3E%3Cg fill='url(%23wv)'%3E%3Crect x='10' y='28' width='4.5' height='12' rx='2.25' opacity='0.6'/%3E%3Crect x='18' y='22' width='4.5' height='24' rx='2.25' opacity='0.85'/%3E%3Crect x='26' y='15' width='4.5' height='36' rx='2.25'/%3E%3Crect x='34' y='21' width='4.5' height='25' rx='2.25' opacity='0.9'/%3E%3Crect x='42' y='26' width='4.5' height='16' rx='2.25' opacity='0.75'/%3E%3Crect x='50' y='30' width='4.5' height='9' rx='2.25' opacity='0.5'/%3E%3C/g%3E%3Cpath d='M36.25 10.5c0-1.4 1.1-2.5 2.5-2.5h5.5c1.4 0 2.5 1.1 2.5 2.5v2.4c0 .8-.3 1.5-.9 2.1l-3.2 3.1c-.6.6-1.6.6-2.2 0l-3.2-3.1c-.6-.6-.9-1.3-.9-2.1v-2.4z' fill='%23facc15'/%3E%3C/svg%3E">
@@ -3161,6 +3161,215 @@
       pointer-events: none;
     }
 
+    /* ==================== SAVE / EXPORT OPTIONS MODAL ==================== */
+    .save-modal-card {
+      width: 100%;
+      max-width: 420px;
+      max-height: 88dvh;
+      background: #1c1c22;
+      border: 1px solid rgba(96, 165, 250, 0.48);
+      border-radius: 18px;
+      padding: 16px 16px 14px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.85), 0 0 24px rgba(66, 165, 245, 0.14);
+    }
+
+    .save-name-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .save-name-row .text-input {
+      flex: 1;
+      min-width: 0;
+      height: 38px;
+      font-size: 13.5px;
+    }
+
+    .save-ext-badge {
+      height: 38px;
+      padding: 0 10px;
+      border-radius: 9px;
+      background: #23232c;
+      border: 1px solid var(--border-strong);
+      color: #93c5fd;
+      font-size: 12.5px;
+      font-weight: 800;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .save-fmt-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 6px;
+    }
+
+    .save-fmt-grid.has-orig {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .save-fmt-btn {
+      padding: 8px 6px;
+      border-radius: 10px;
+      background: #1d1d24;
+      border: 1px solid var(--border-subtle);
+      color: #d4d4d8;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2px;
+      text-align: center;
+      transition: transform 0.08s ease, background-color 0.12s ease, border-color 0.12s ease;
+    }
+
+    .save-fmt-btn:active {
+      transform: scale(0.96);
+    }
+
+    .save-fmt-btn.active {
+      background: rgba(66, 165, 245, 0.2);
+      border-color: var(--accent-blue);
+      color: #ffffff;
+      box-shadow: 0 0 12px rgba(66, 165, 245, 0.22);
+    }
+
+    .save-fmt-btn:disabled {
+      opacity: 0.36;
+      pointer-events: none;
+    }
+
+    .save-fmt-main {
+      font-size: 12.5px;
+      font-weight: 800;
+      line-height: 1.2;
+    }
+
+    .save-fmt-sub {
+      font-size: 10px;
+      color: var(--text-sub);
+      line-height: 1.2;
+    }
+
+    .save-fmt-btn.active .save-fmt-sub {
+      color: #bae6fd;
+    }
+
+    .save-qual-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 6px;
+    }
+
+    .save-qual-grid.cols-3 {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .save-qual-grid.cols-1 {
+      grid-template-columns: 1fr;
+    }
+
+    .save-qual-btn {
+      padding: 8px 7px;
+      border-radius: 9px;
+      background: #1d1d24;
+      border: 1px solid var(--border-subtle);
+      color: #d4d4d8;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2px;
+      text-align: center;
+      transition: transform 0.08s ease, background-color 0.12s ease, border-color 0.12s ease;
+    }
+
+    .save-qual-btn:active {
+      transform: scale(0.96);
+    }
+
+    .save-qual-btn.active {
+      background: rgba(34, 197, 94, 0.18);
+      border-color: var(--accent-green);
+      color: #dcfce7;
+    }
+
+    .save-qual-title {
+      font-size: 11.5px;
+      font-weight: 800;
+      line-height: 1.2;
+    }
+
+    .save-qual-sub {
+      font-size: 10px;
+      color: var(--text-sub);
+      line-height: 1.2;
+    }
+
+    .save-qual-btn.active .save-qual-sub {
+      color: #86efac;
+    }
+
+    .save-preview-box {
+      background: #121318;
+      border: 1px solid var(--border-subtle);
+      border-radius: 11px;
+      padding: 9px 11px;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .save-preview-spec {
+      font-size: 11px;
+      color: var(--text-sub);
+    }
+
+    .save-preview-size {
+      font-size: 13px;
+      font-weight: 800;
+      color: #fde68a;
+    }
+
+    .save-progress-box {
+      background: #14161e;
+      border: 1px solid rgba(66, 165, 245, 0.42);
+      border-radius: 10px;
+      padding: 8px 10px;
+    }
+
+    .save-progress-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 11px;
+      font-weight: 700;
+      color: #bae6fd;
+      margin-bottom: 6px;
+    }
+
+    .save-progress-track {
+      width: 100%;
+      height: 6px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.08);
+      overflow: hidden;
+    }
+
+    .save-progress-bar {
+      height: 100%;
+      width: 0%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #38bdf8 0%, #2563eb 100%);
+      transition: width 0.1s linear;
+    }
+
     /* Toast Notification (never uses alert/confirm) */
     .toast-banner {
       position: fixed;
@@ -3219,7 +3428,7 @@
         <span>開く</span>
       </label>
 
-      <button id="btnSaveWav" type="button" disabled class="hdr-btn hdr-btn-save" title="WAV形式で保存">
+      <button id="btnSaveWav" type="button" disabled class="hdr-btn hdr-btn-save" title="形式・音質・ファイル名を選んで保存">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#60b8ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M12 3v12"/>
           <path d="m7 11 5 5 5-5"/>
@@ -4043,7 +4252,7 @@
         <div class="modal-section" style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
           <div>
             <div class="sec-title">バージョン情報</div>
-            <div id="settingsVersionLabel" class="engine-desc mono">現在: v27</div>
+            <div id="settingsVersionLabel" class="engine-desc mono">現在: v28</div>
           </div>
           <button id="btnShowReleaseHistory" type="button" class="step-btn" style="color:#93c5fd;border-color:rgba(66,165,245,0.45);">更新履歴を見る</button>
         </div>
@@ -4176,7 +4385,7 @@
           </div>
           <div>
             <h3 id="whatsNewTitle" class="whats-new-title">アップデートのお知らせ</h3>
-            <p id="whatsNewSub" class="whats-new-sub mono">v27 に更新されました</p>
+            <p id="whatsNewSub" class="whats-new-sub mono">v28 に更新されました</p>
           </div>
         </div>
         <button id="btnCloseWhatsNewX" type="button" class="modal-close" aria-label="閉じる">✕</button>
@@ -4230,6 +4439,103 @@
       <div id="clearPinMemoryFooterStep2" class="danger-footer-stack hidden" style="justify-content:space-between;">
         <button id="btnClearPinMemExecute" type="button" class="danger-btn-execute" disabled>本当に初期化する (2)</button>
         <button id="btnClearPinMemCancel2" type="button" class="danger-btn-safe" style="background:#3b82f6;border-color:#93c5fd;color:#ffffff;">やめる</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== 11. SAVE / EXPORT OPTIONS MODAL ==================== -->
+  <div id="saveExportModal" class="modal-backdrop hidden" style="z-index:78;">
+    <div class="save-modal-card" role="dialog" aria-modal="true" aria-labelledby="saveExportTitle">
+      <div class="whats-new-head">
+        <div class="whats-new-title-wrap">
+          <div class="whats-new-icon" aria-hidden="true">
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 3v12"/>
+              <path d="m7 11 5 5 5-5"/>
+              <path d="M5 20h14"/>
+            </svg>
+          </div>
+          <div>
+            <h3 id="saveExportTitle" class="whats-new-title">音声ファイルを保存</h3>
+            <p id="saveExportSub" class="whats-new-sub">形式・音質・ファイル名を選択</p>
+          </div>
+        </div>
+        <button id="btnCloseSaveExportX" type="button" class="modal-close" aria-label="閉じる">✕</button>
+      </div>
+
+      <div class="modal-body" style="gap:10px;">
+        <!-- File Name -->
+        <div class="modal-section">
+          <div class="sec-head" style="margin-bottom:6px;">
+            <span class="sec-title">ファイル名</span>
+            <button id="btnSaveResetTimestamp" type="button" class="step-btn" style="padding:2px 8px;font-size:10px;">日時名にする</button>
+          </div>
+          <div class="save-name-row">
+            <input type="text" id="saveFileNameInput" class="text-input" placeholder="ファイル名を入力" autocomplete="off">
+            <span id="saveFileExtBadge" class="save-ext-badge mono">.wav</span>
+          </div>
+        </div>
+
+        <!-- Format Selector -->
+        <div class="modal-section">
+          <div class="sec-head" style="margin-bottom:6px;">
+            <span class="sec-title-group">
+              <span class="sec-title">ファイル形式</span>
+              <button type="button" class="setting-help-btn" data-help-key="exportFormat" aria-label="ファイル形式の説明">?</button>
+            </span>
+            <span id="saveFormatLabel" class="sec-value mono">WAV</span>
+          </div>
+          <div id="saveFormatGrid" class="save-fmt-grid">
+            <button type="button" data-save-fmt="wav" class="save-fmt-btn active">
+              <span class="save-fmt-main mono">WAV</span>
+              <span class="save-fmt-sub">無圧縮・最高音質</span>
+            </button>
+            <button type="button" data-save-fmt="m4a" class="save-fmt-btn">
+              <span class="save-fmt-main mono">M4A</span>
+              <span class="save-fmt-sub">高音質・共有向け</span>
+            </button>
+            <button type="button" data-save-fmt="ogg" class="save-fmt-btn">
+              <span class="save-fmt-main mono">OGG</span>
+              <span class="save-fmt-sub">Opus・超軽量</span>
+            </button>
+            <button type="button" data-save-fmt="orig" id="btnSaveFmtOrig" class="save-fmt-btn hidden">
+              <span class="save-fmt-main">元のまま</span>
+              <span id="saveFmtOrigSub" class="save-fmt-sub mono">無劣化コピー</span>
+            </button>
+          </div>
+          <div id="saveFormatHint" class="engine-desc" style="margin-top:7px;"></div>
+        </div>
+
+        <!-- Quality Selector -->
+        <div class="modal-section">
+          <div class="sec-head" style="margin-bottom:6px;">
+            <span class="sec-title">音質</span>
+            <span id="saveQualityLabel" class="sec-value mono">24bit ハイレゾ</span>
+          </div>
+          <div id="saveQualityGrid" class="save-qual-grid"></div>
+        </div>
+
+        <!-- Size & Spec Preview -->
+        <div class="save-preview-box">
+          <div id="savePreviewSpec" class="save-preview-spec mono">WAV • 24bit PCM • 48kHz ステレオ</div>
+          <div id="savePreviewSize" class="save-preview-size mono">予想サイズ: 計算中...</div>
+        </div>
+
+        <!-- Progress bar while encoding -->
+        <div id="saveProgressBox" class="save-progress-box hidden">
+          <div class="save-progress-head">
+            <span id="saveProgressLabel">エンコード中...</span>
+            <span id="saveProgressPct" class="mono">0%</span>
+          </div>
+          <div class="save-progress-track">
+            <div id="saveProgressBar" class="save-progress-bar"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer-row" style="margin-top:12px;">
+        <button id="btnCancelSaveExport" type="button" class="danger-btn-safe" style="height:41px;border-radius:11px;">キャンセル</button>
+        <button id="btnSaveExportRun" type="button" class="whats-new-ok-btn" style="height:41px;">この設定で保存</button>
       </div>
     </div>
   </div>
@@ -4493,6 +4799,8 @@
         micGain: 1.0, // Default 0dB pure uncompressed capture
         recBitDepth: 24, // 24 (high-res PCM default) | 16 (TPDF dithered)
         recAutoNormalize: false, // Default OFF for raw untouched PCM
+        exportFormat: 'wav', // 'wav' | 'm4a' | 'ogg' | 'orig'
+        exportQualityByFormat: { wav: '24bit', m4a: '192', ogg: '128', orig: 'copy' },
         micDeviceId: '',
 
         // Acoustic Reverb Presets
@@ -4931,7 +5239,9 @@
             tunerA4: state.tunerA4,
             kbdInst: state.kbdInst,
             kbdOctave: state.kbdOctave,
-            kbdTranspose: state.kbdTranspose
+            kbdTranspose: state.kbdTranspose,
+            exportFormat: state.exportFormat,
+            exportQualityByFormat: state.exportQualityByFormat
           }));
         } catch (_) {}
       }
@@ -5027,6 +5337,19 @@
           }
           if (typeof p.kbdTranspose === 'number' && p.kbdTranspose >= -6 && p.kbdTranspose <= 6) {
             state.kbdTranspose = Math.round(p.kbdTranspose);
+          }
+          if (['wav', 'm4a', 'ogg'].includes(p.exportFormat)) {
+            state.exportFormat = p.exportFormat;
+          }
+          if (p.exportQualityByFormat && typeof p.exportQualityByFormat === 'object') {
+            state.exportQualityByFormat = {
+              wav: ['24bit', '16bit', '16bit_mono'].includes(p.exportQualityByFormat.wav) ? p.exportQualityByFormat.wav : (state.recBitDepth === 16 ? '16bit' : '24bit'),
+              m4a: ['256', '192', '128', '96'].includes(p.exportQualityByFormat.m4a) ? p.exportQualityByFormat.m4a : '192',
+              ogg: ['192', '128', '96', '64'].includes(p.exportQualityByFormat.ogg) ? p.exportQualityByFormat.ogg : '128',
+              orig: 'copy'
+            };
+          } else {
+            state.exportQualityByFormat.wav = state.recBitDepth === 16 ? '16bit' : '24bit';
           }
         } catch (_) {}
       }
@@ -6799,10 +7122,11 @@
         hideWaveProgress(650);
       }
 
-      function encodeWavFromAudioBuffer(buffer, bitDepth = 16) {
+      function encodeWavFromAudioBuffer(buffer, bitDepth = 16, forceMono = false) {
         const bits = (bitDepth === 24) ? 24 : 16;
         const bytesPerSample = bits >> 3;
-        const numCh = Math.min(2, buffer.numberOfChannels);
+        const srcCh = Math.min(2, buffer.numberOfChannels);
+        const numCh = forceMono ? 1 : srcCh;
         const sr = buffer.sampleRate;
         const len = buffer.length;
         const blockAlign = numCh * bytesPerSample;
@@ -6826,14 +7150,15 @@
         wStr(36, 'data');
         v.setUint32(40, dataSize, true);
 
-        const chs = [];
-        for (let c = 0; c < numCh; c++) chs.push(buffer.getChannelData(c));
+        const ch0 = buffer.getChannelData(0);
+        const ch1 = srcCh > 1 ? buffer.getChannelData(1) : null;
         let off = 44;
 
         if (bits === 24) {
           for (let i = 0; i < len; i++) {
-            for (let c = 0; c < numCh; c++) {
-              const s = Math.max(-1, Math.min(1, chs[c][i]));
+            if (forceMono) {
+              const raw = ch1 ? (ch0[i] + ch1[i]) * 0.5 : ch0[i];
+              const s = Math.max(-1, Math.min(1, raw));
               let val = Math.round(s * 8388607);
               if (val < -8388608) val = -8388608;
               else if (val > 8388607) val = 8388607;
@@ -6841,45 +7166,914 @@
               u8[off + 1] = (val >> 8) & 0xff;
               u8[off + 2] = (val >> 16) & 0xff;
               off += 3;
+            } else {
+              for (let c = 0; c < numCh; c++) {
+                const s = Math.max(-1, Math.min(1, (c === 0 ? ch0[i] : ch1[i])));
+                let val = Math.round(s * 8388607);
+                if (val < -8388608) val = -8388608;
+                else if (val > 8388607) val = 8388607;
+                u8[off] = val & 0xff;
+                u8[off + 1] = (val >> 8) & 0xff;
+                u8[off + 2] = (val >> 16) & 0xff;
+                off += 3;
+              }
             }
           }
         } else {
           // 16-bit PCM with TPDF triangular dithering for clean low-level musical decays
           for (let i = 0; i < len; i++) {
-            for (let c = 0; c < numCh; c++) {
+            if (forceMono) {
+              const raw = ch1 ? (ch0[i] + ch1[i]) * 0.5 : ch0[i];
               const dither = (Math.random() - Math.random()) / 32768;
-              const s = Math.max(-1, Math.min(1, chs[c][i] + dither));
+              const s = Math.max(-1, Math.min(1, raw + dither));
               const iv = Math.round(s * 32767);
               v.setInt16(off, Math.max(-32768, Math.min(32767, iv)), true);
               off += 2;
+            } else {
+              for (let c = 0; c < numCh; c++) {
+                const dither = (Math.random() - Math.random()) / 32768;
+                const s = Math.max(-1, Math.min(1, (c === 0 ? ch0[i] : ch1[i]) + dither));
+                const iv = Math.round(s * 32767);
+                v.setInt16(off, Math.max(-32768, Math.min(32767, iv)), true);
+                off += 2;
+              }
             }
           }
         }
         return new Blob([ab], { type: 'audio/wav' });
       }
 
-      function exportCurrentWav() {
-        if (!state.audioBuffer && !state.rawBlob) return;
-        showToast('WAVファイルを書き出し中...');
-        setTimeout(() => {
-          let blob = state.rawBlob;
-          let name = trackTitleEl.textContent.trim() || makeRecordingFilename();
-          if (state.audioBuffer) {
-            blob = encodeWavFromAudioBuffer(state.audioBuffer, state.recBitDepth);
-            if (!name.toLowerCase().endsWith('.wav')) {
-              name = name.replace(/\.[^/.]+$/, '') + '.wav';
-            }
+      // ==================== MULTI-FORMAT OFFLINE AUDIO ENCODER (WAV / M4A-AAC / OGG-OPUS) ====================
+      const OGG_CRC_TABLE = (() => {
+        const tbl = new Uint32Array(256);
+        for (let i = 0; i < 256; i++) {
+          let r = i << 24;
+          for (let b = 0; b < 8; b++) {
+            r = (r & 0x80000000) ? ((r << 1) ^ 0x04c11db7) : (r << 1);
           }
+          tbl[i] = r >>> 0;
+        }
+        return tbl;
+      })();
+
+      function computeOggCrc32(bytes) {
+        let crc = 0;
+        for (let i = 0; i < bytes.length; i++) {
+          crc = ((crc << 8) ^ OGG_CRC_TABLE[((crc >>> 24) ^ bytes[i]) & 0xff]) >>> 0;
+        }
+        return crc >>> 0;
+      }
+
+      function makeOggPage(packets, granulePos, serial, seqNo, headerType) {
+        const segs = [];
+        let payloadLen = 0;
+        for (let i = 0; i < packets.length; i++) {
+          const pkt = packets[i];
+          payloadLen += pkt.length;
+          let rem = pkt.length;
+          while (rem >= 255) {
+            segs.push(255);
+            rem -= 255;
+          }
+          segs.push(rem);
+        }
+
+        const page = new Uint8Array(27 + segs.length + payloadLen);
+        const dv = new DataView(page.buffer);
+        page[0] = 0x4f; page[1] = 0x67; page[2] = 0x67; page[3] = 0x53; // 'OggS'
+        page[4] = 0; // version
+        page[5] = headerType & 0xff;
+
+        // 64-bit little-endian granule position
+        const g = Math.max(0, Math.floor(granulePos));
+        const gLo = g >>> 0;
+        const gHi = Math.floor(g / 4294967296) >>> 0;
+        dv.setUint32(6, gLo, true);
+        dv.setUint32(10, gHi, true);
+
+        dv.setUint32(14, serial >>> 0, true);
+        dv.setUint32(18, seqNo >>> 0, true);
+        dv.setUint32(22, 0, true); // CRC placeholder
+        page[26] = segs.length;
+
+        for (let i = 0; i < segs.length; i++) page[27 + i] = segs[i];
+        let off = 27 + segs.length;
+        for (let i = 0; i < packets.length; i++) {
+          page.set(packets[i], off);
+          off += packets[i].length;
+        }
+
+        const crc = computeOggCrc32(page);
+        dv.setUint32(22, crc, true);
+        return page;
+      }
+
+      function muxOpusToOgg(chunks, channels, totalOriginalSamples48k, description) {
+        let preSkip = 312;
+        if (description && description.length >= 19) {
+          const tag = String.fromCharCode(
+            description[0], description[1], description[2], description[3],
+            description[4], description[5], description[6], description[7]
+          );
+          if (tag === 'OpusHead') {
+            const ddv = new DataView(description.buffer, description.byteOffset, description.byteLength);
+            preSkip = ddv.getUint16(10, true);
+          }
+        }
+
+        // Page 0: OpusHead (19 bytes)
+        const head = new Uint8Array(19);
+        const hdv = new DataView(head.buffer);
+        const headSig = 'OpusHead';
+        for (let i = 0; i < 8; i++) head[i] = headSig.charCodeAt(i);
+        head[8] = 1; // version
+        head[9] = Math.min(2, Math.max(1, channels));
+        hdv.setUint16(10, preSkip, true);
+        hdv.setUint32(12, 48000, true);
+        hdv.setInt16(16, 0, true);
+        head[18] = 0; // mapping family
+
+        // Page 1: OpusTags
+        const vendor = 'Audipo2';
+        const tags = new Uint8Array(8 + 4 + vendor.length + 4);
+        const tdv = new DataView(tags.buffer);
+        const tagSig = 'OpusTags';
+        for (let i = 0; i < 8; i++) tags[i] = tagSig.charCodeAt(i);
+        tdv.setUint32(8, vendor.length, true);
+        for (let i = 0; i < vendor.length; i++) tags[12 + i] = vendor.charCodeAt(i);
+        tdv.setUint32(12 + vendor.length, 0, true);
+
+        const serial = (Math.floor(Math.random() * 0x7fffffff) + 1) >>> 0;
+        const pages = [];
+        let seqNo = 0;
+        pages.push(makeOggPage([head], 0, serial, seqNo++, 0x02));
+        pages.push(makeOggPage([tags], 0, serial, seqNo++, 0x00));
+
+        let curPkts = [];
+        let curSegCount = 0;
+        let granule = 0;
+        const maxExactGranule = preSkip + totalOriginalSamples48k;
+
+        for (let i = 0; i < chunks.length; i++) {
+          const pkt = chunks[i].data;
+          const pktSamples = Math.max(120, Math.round(((chunks[i].duration || 20000) * 48) / 1000));
+          const pktSegs = Math.floor(pkt.length / 255) + 1;
+
+          if (curPkts.length > 0 && (curSegCount + pktSegs > 255 || curPkts.length >= 40)) {
+            pages.push(makeOggPage(curPkts, granule, serial, seqNo++, 0x00));
+            curPkts = [];
+            curSegCount = 0;
+          }
+
+          curPkts.push(pkt);
+          curSegCount += pktSegs;
+          granule += pktSamples;
+        }
+
+        if (curPkts.length > 0) {
+          const finalGranule = Math.min(granule, Math.max(preSkip, maxExactGranule));
+          pages.push(makeOggPage(curPkts, finalGranule, serial, seqNo++, 0x04));
+        }
+
+        return new Blob(pages, { type: 'audio/ogg; codecs=opus' });
+      }
+
+      // ---------- Lightweight Spec-Compliant Faststart ISO BMFF M4A (AAC-LC) Muxer ----------
+      function mp4Concat(parts) {
+        let total = 0;
+        for (let i = 0; i < parts.length; i++) total += parts[i].length;
+        const out = new Uint8Array(total);
+        let off = 0;
+        for (let i = 0; i < parts.length; i++) {
+          out.set(parts[i], off);
+          off += parts[i].length;
+        }
+        return out;
+      }
+
+      function mp4Box(typeStr, parts) {
+        let bodyLen = 0;
+        for (let i = 0; i < parts.length; i++) bodyLen += parts[i].length;
+        const out = new Uint8Array(8 + bodyLen);
+        const dv = new DataView(out.buffer);
+        dv.setUint32(0, out.length, false);
+        for (let i = 0; i < 4; i++) out[4 + i] = typeStr.charCodeAt(i);
+        let off = 8;
+        for (let i = 0; i < parts.length; i++) {
+          out.set(parts[i], off);
+          off += parts[i].length;
+        }
+        return out;
+      }
+
+      function mp4FullBox(typeStr, version, flags, parts) {
+        const hdr = new Uint8Array(4);
+        hdr[0] = version & 0xff;
+        hdr[1] = (flags >> 16) & 0xff;
+        hdr[2] = (flags >> 8) & 0xff;
+        hdr[3] = flags & 0xff;
+        return mp4Box(typeStr, [hdr, ...parts]);
+      }
+
+      function makeAacAudioSpecificConfig(sampleRate, channels) {
+        const srTable = [96000, 88200, 64000, 48000, 44100, 32000, 24000, 22050, 16000, 12000, 11025, 8000, 7350];
+        let srIdx = srTable.indexOf(sampleRate);
+        if (srIdx < 0) srIdx = 3; // 48000Hz fallback
+        const ch = Math.min(2, Math.max(1, channels));
+        const b0 = (2 << 3) | (srIdx >> 1);
+        const b1 = ((srIdx & 1) << 7) | (ch << 3);
+        return new Uint8Array([b0, b1]);
+      }
+
+      function stripAdtsHeaderIfPresent(raw) {
+        if (raw.length > 7 && raw[0] === 0xff && (raw[1] & 0xf6) === 0xf0) {
+          const adtsLen = ((raw[3] & 0x03) << 11) | (raw[4] << 3) | ((raw[5] & 0xe0) >>> 5);
+          const hdrLen = (raw[1] & 0x01) === 0 ? 9 : 7;
+          if (adtsLen === raw.length && raw.length > hdrLen) {
+            return raw.subarray(hdrLen);
+          }
+        }
+        return raw;
+      }
+
+      function muxAacToM4a(chunks, sampleRate, channels, bitrate, description) {
+        const frames = [];
+        let mdatBodySize = 0;
+        for (let i = 0; i < chunks.length; i++) {
+          const f = stripAdtsHeaderIfPresent(chunks[i].data);
+          if (f.length > 0) {
+            frames.push(f);
+            mdatBodySize += f.length;
+          }
+        }
+        const numFrames = frames.length;
+        const totalSamples = numFrames * 1024;
+        const asc = (description && description.length >= 2)
+          ? description
+          : makeAacAudioSpecificConfig(sampleRate, channels);
+
+        // ftyp box
+        const ftypBody = new Uint8Array(20);
+        const ftypBrands = 'M4A ';
+        const ftypCompat = 'M4A mp42isom';
+        for (let i = 0; i < 4; i++) ftypBody[i] = ftypBrands.charCodeAt(i);
+        for (let i = 0; i < 12; i++) ftypBody[8 + i] = ftypCompat.charCodeAt(i);
+        const ftyp = mp4Box('ftyp', [ftypBody]);
+
+        // Chunking (~40 AAC frames per chunk for fast seeking)
+        const framesPerChunk = 40;
+        const fullChunks = Math.floor(numFrames / framesPerChunk);
+        const remFrames = numFrames % framesPerChunk;
+        const numChunks = fullChunks + (remFrames > 0 ? 1 : 0);
+
+        const chunkRelOffsets = new Uint32Array(numChunks);
+        let rel = 0;
+        for (let c = 0; c < numChunks; c++) {
+          chunkRelOffsets[c] = rel;
+          const fStart = c * framesPerChunk;
+          const fEnd = Math.min(numFrames, fStart + framesPerChunk);
+          for (let f = fStart; f < fEnd; f++) rel += frames[f].length;
+        }
+
+        const buildMoov = (mdatDataOffset) => {
+          // mvhd (version 0, 96 bytes body)
+          const mvhdBody = new Uint8Array(96);
+          const mvhdDv = new DataView(mvhdBody.buffer);
+          mvhdDv.setUint32(8, sampleRate, false);
+          mvhdDv.setUint32(12, totalSamples, false);
+          mvhdDv.setUint32(16, 0x00010000, false); // rate 1.0
+          mvhdDv.setUint16(20, 0x0100, false); // volume 1.0
+          mvhdDv.setUint32(32, 0x00010000, false);
+          mvhdDv.setUint32(48, 0x00010000, false);
+          mvhdDv.setUint32(64, 0x40000000, false);
+          mvhdDv.setUint32(92, 2, false); // next_track_ID
+          const mvhd = mp4FullBox('mvhd', 0, 0, [mvhdBody]);
+
+          // tkhd (version 0, flags=3, 80 bytes body)
+          const tkhdBody = new Uint8Array(80);
+          const tkhdDv = new DataView(tkhdBody.buffer);
+          tkhdDv.setUint32(8, 1, false); // track_ID
+          tkhdDv.setUint32(16, totalSamples, false);
+          tkhdDv.setUint16(32, 0x0100, false); // audio volume 1.0
+          tkhdDv.setUint32(36, 0x00010000, false);
+          tkhdDv.setUint32(52, 0x00010000, false);
+          tkhdDv.setUint32(68, 0x40000000, false);
+          const tkhd = mp4FullBox('tkhd', 0, 3, [tkhdBody]);
+
+          // mdhd (version 0, 20 bytes body)
+          const mdhdBody = new Uint8Array(20);
+          const mdhdDv = new DataView(mdhdBody.buffer);
+          mdhdDv.setUint32(8, sampleRate, false);
+          mdhdDv.setUint32(12, totalSamples, false);
+          mdhdDv.setUint16(16, 0x55c4, false); // 'und'
+          const mdhd = mp4FullBox('mdhd', 0, 0, [mdhdBody]);
+
+          // hdlr
+          const hdlrName = 'SoundHandler';
+          const hdlrBody = new Uint8Array(20 + hdlrName.length + 1);
+          hdlrBody[4] = 0x73; hdlrBody[5] = 0x6f; hdlrBody[6] = 0x75; hdlrBody[7] = 0x6e; // 'soun'
+          for (let i = 0; i < hdlrName.length; i++) hdlrBody[20 + i] = hdlrName.charCodeAt(i);
+          const hdlr = mp4FullBox('hdlr', 0, 0, [hdlrBody]);
+
+          // smhd
+          const smhd = mp4FullBox('smhd', 0, 0, [new Uint8Array(4)]);
+
+          // dinf -> dref -> url
+          const urlBox = mp4FullBox('url ', 0, 1, []);
+          const drefCount = new Uint8Array(4);
+          new DataView(drefCount.buffer).setUint32(0, 1, false);
+          const dref = mp4FullBox('dref', 0, 0, [drefCount, urlBox]);
+          const dinf = mp4Box('dinf', [dref]);
+
+          // esds
+          const decSpec = mp4Concat([new Uint8Array([0x05, asc.length]), asc]);
+          const decCfgHdr = new Uint8Array(15);
+          const decDv = new DataView(decCfgHdr.buffer);
+          decCfgHdr[0] = 0x04;
+          decCfgHdr[1] = 13 + decSpec.length;
+          decCfgHdr[2] = 0x40; // MPEG-4 Audio
+          decCfgHdr[3] = 0x15; // audio stream
+          decDv.setUint32(7, bitrate, false);
+          decDv.setUint32(11, bitrate, false);
+          const decCfg = mp4Concat([decCfgHdr, decSpec]);
+          const slCfg = new Uint8Array([0x06, 0x01, 0x02]);
+          const esHdr = new Uint8Array([0x03, 3 + decCfg.length + slCfg.length, 0x00, 0x01, 0x00]);
+          const esds = mp4FullBox('esds', 0, 0, [mp4Concat([esHdr, decCfg, slCfg])]);
+
+          // mp4a sample entry (28 bytes + esds)
+          const mp4aHdr = new Uint8Array(28);
+          const mp4aDv = new DataView(mp4aHdr.buffer);
+          mp4aDv.setUint16(6, 1, false); // data_reference_index
+          mp4aDv.setUint16(16, Math.min(2, Math.max(1, channels)), false);
+          mp4aDv.setUint16(18, 16, false); // sampleSize
+          mp4aDv.setUint32(24, (sampleRate << 16) >>> 0, false);
+          const mp4a = mp4Box('mp4a', [mp4aHdr, esds]);
+
+          const stsdCount = new Uint8Array(4);
+          new DataView(stsdCount.buffer).setUint32(0, 1, false);
+          const stsd = mp4FullBox('stsd', 0, 0, [stsdCount, mp4a]);
+
+          // stts
+          const sttsBody = new Uint8Array(12);
+          const sttsDv = new DataView(sttsBody.buffer);
+          sttsDv.setUint32(0, 1, false);
+          sttsDv.setUint32(4, numFrames, false);
+          sttsDv.setUint32(8, 1024, false);
+          const stts = mp4FullBox('stts', 0, 0, [sttsBody]);
+
+          // stsc
+          const stscEntries = [];
+          if (fullChunks > 0) stscEntries.push([1, framesPerChunk, 1]);
+          if (remFrames > 0) stscEntries.push([fullChunks + 1, remFrames, 1]);
+          const stscBody = new Uint8Array(4 + stscEntries.length * 12);
+          const stscDv = new DataView(stscBody.buffer);
+          stscDv.setUint32(0, stscEntries.length, false);
+          for (let i = 0; i < stscEntries.length; i++) {
+            stscDv.setUint32(4 + i * 12, stscEntries[i][0], false);
+            stscDv.setUint32(8 + i * 12, stscEntries[i][1], false);
+            stscDv.setUint32(12 + i * 12, stscEntries[i][2], false);
+          }
+          const stsc = mp4FullBox('stsc', 0, 0, [stscBody]);
+
+          // stsz
+          const stszBody = new Uint8Array(8 + numFrames * 4);
+          const stszDv = new DataView(stszBody.buffer);
+          stszDv.setUint32(0, 0, false);
+          stszDv.setUint32(4, numFrames, false);
+          for (let i = 0; i < numFrames; i++) {
+            stszDv.setUint32(8 + i * 4, frames[i].length, false);
+          }
+          const stsz = mp4FullBox('stsz', 0, 0, [stszBody]);
+
+          // stco
+          const stcoBody = new Uint8Array(4 + numChunks * 4);
+          const stcoDv = new DataView(stcoBody.buffer);
+          stcoDv.setUint32(0, numChunks, false);
+          for (let c = 0; c < numChunks; c++) {
+            stcoDv.setUint32(4 + c * 4, (mdatDataOffset + chunkRelOffsets[c]) >>> 0, false);
+          }
+          const stco = mp4FullBox('stco', 0, 0, [stcoBody]);
+
+          const stbl = mp4Box('stbl', [stsd, stts, stsc, stsz, stco]);
+          const minf = mp4Box('minf', [smhd, dinf, stbl]);
+          const mdia = mp4Box('mdia', [mdhd, hdlr, minf]);
+          const trak = mp4Box('trak', [tkhd, mdia]);
+          return mp4Box('moov', [mvhd, trak]);
+        };
+
+        // 2-pass faststart offset computation: measure moov size, then patch stco with exact mdat payload offset
+        const moovPlaceholder = buildMoov(0);
+        const mdatDataOffset = ftyp.length + moovPlaceholder.length + 8;
+        const moov = buildMoov(mdatDataOffset);
+
+        const mdatHdr = new Uint8Array(8);
+        const mdatDv = new DataView(mdatHdr.buffer);
+        mdatDv.setUint32(0, 8 + mdatBodySize, false);
+        mdatHdr[4] = 0x6d; mdatHdr[5] = 0x64; mdatHdr[6] = 0x61; mdatHdr[7] = 0x74; // 'mdat'
+
+        return new Blob([ftyp, moov, mdatHdr, ...frames], { type: 'audio/mp4' });
+      }
+
+      async function resampleAudioBufferIfNeeded(srcBuffer, targetSampleRate, targetChannels) {
+        const ch = Math.min(2, Math.max(1, targetChannels));
+        if (srcBuffer.sampleRate === targetSampleRate && srcBuffer.numberOfChannels === ch) {
+          return srcBuffer;
+        }
+        const OfflineCtx = window.OfflineAudioContext || window.webkitOfflineAudioContext;
+        if (!OfflineCtx) return srcBuffer;
+        const outFrames = Math.max(1, Math.round(srcBuffer.duration * targetSampleRate));
+        const offCtx = new OfflineCtx(ch, outFrames, targetSampleRate);
+        const srcNode = offCtx.createBufferSource();
+        srcNode.buffer = srcBuffer;
+        srcNode.connect(offCtx.destination);
+        srcNode.start(0);
+        return await offCtx.startRendering();
+      }
+
+      async function encodeWithWebCodecs(srcBuffer, format, bitrateBps, onProgress, isCancelled) {
+        if (typeof AudioEncoder === 'undefined' || typeof AudioData === 'undefined') {
+          throw new Error('お使いのブラウザは高速エンコード機能(WebCodecs)に対応していません');
+        }
+
+        const isOpus = format === 'ogg';
+        const channels = Math.min(2, Math.max(1, srcBuffer.numberOfChannels));
+        const targetSr = isOpus
+          ? 48000
+          : ((srcBuffer.sampleRate === 44100 || srcBuffer.sampleRate === 48000) ? srcBuffer.sampleRate : 48000);
+
+        if (onProgress) onProgress(4, 'サンプリング調整中...');
+        const workBuf = await resampleAudioBufferIfNeeded(srcBuffer, targetSr, channels);
+        if (isCancelled && isCancelled()) throw new Error('cancelled');
+
+        const codecStr = isOpus ? 'opus' : 'mp4a.40.2';
+        const encConfig = {
+          codec: codecStr,
+          sampleRate: targetSr,
+          numberOfChannels: channels,
+          bitrate: bitrateBps
+        };
+        if (!isOpus) {
+          encConfig.aac = { format: 'aac' };
+        }
+
+        const chunks = [];
+        let description = null;
+        let encError = null;
+
+        const encoder = new AudioEncoder({
+          output: (chunk, meta) => {
+            if (!description && meta && meta.decoderConfig && meta.decoderConfig.description) {
+              const desc = meta.decoderConfig.description;
+              description = desc instanceof ArrayBuffer
+                ? new Uint8Array(desc.slice(0))
+                : new Uint8Array(desc.buffer.slice(desc.byteOffset, desc.byteOffset + desc.byteLength));
+            }
+            const buf = new Uint8Array(chunk.byteLength);
+            chunk.copyTo(buf);
+            chunks.push({ data: buf, duration: chunk.duration || 0 });
+          },
+          error: (err) => {
+            encError = err;
+          }
+        });
+
+        encoder.configure(encConfig);
+
+        const totalFrames = workBuf.length;
+        const ch0 = workBuf.getChannelData(0);
+        const ch1 = channels > 1 ? workBuf.getChannelData(1) : null;
+        const blockFrames = 4096;
+        let blockCount = 0;
+
+        for (let offset = 0; offset < totalFrames; offset += blockFrames) {
+          if (encError) throw encError;
+          if (isCancelled && isCancelled()) {
+            try { encoder.close(); } catch (_) {}
+            throw new Error('cancelled');
+          }
+
+          const n = Math.min(blockFrames, totalFrames - offset);
+          const planar = new Float32Array(n * channels);
+          planar.set(ch0.subarray(offset, offset + n), 0);
+          if (channels > 1 && ch1) {
+            planar.set(ch1.subarray(offset, offset + n), n);
+          }
+
+          const audioData = new AudioData({
+            format: 'f32-planar',
+            sampleRate: targetSr,
+            numberOfFrames: n,
+            numberOfChannels: channels,
+            timestamp: Math.round((offset / targetSr) * 1e6),
+            data: planar
+          });
+          encoder.encode(audioData);
+          audioData.close();
+
+          blockCount++;
+          if (encoder.encodeQueueSize > 16 || (blockCount % 20 === 0)) {
+            const pct = 6 + Math.min(86, Math.round((offset / Math.max(1, totalFrames)) * 86));
+            if (onProgress) onProgress(pct, isOpus ? 'OGG (Opus) エンコード中...' : 'M4A (AAC) エンコード中...');
+            await new Promise(r => setTimeout(r, 0));
+          }
+        }
+
+        if (onProgress) onProgress(94, 'ファイル組み立て中...');
+        await encoder.flush();
+        try { encoder.close(); } catch (_) {}
+        if (encError) throw encError;
+        if (chunks.length === 0) throw new Error('エンコード出力が空でした');
+
+        const outBlob = isOpus
+          ? muxOpusToOgg(chunks, channels, totalFrames, description)
+          : muxAacToM4a(chunks, targetSr, channels, bitrateBps, description);
+        if (onProgress) onProgress(100, '完了');
+        return outBlob;
+      }
+
+      // ==================== SAVE / EXPORT OPTIONS MODAL CONTROLLER ====================
+      const SAVE_FORMAT_META = {
+        wav: {
+          label: 'WAV',
+          ext: '.wav',
+          hint: '無圧縮の原音そのまま。音質最優先・DAWや高音質保存におすすめです。',
+          qualities: [
+            { id: '24bit', title: '24bit ハイレゾ', sub: '原音そのまま・最高音質' },
+            { id: '16bit', title: '16bit 標準 (CD)', sub: '高互換・約2/3容量' },
+            { id: '16bit_mono', title: '16bit モノラル', sub: '軽量・容量約1/3' }
+          ]
+        },
+        m4a: {
+          label: 'M4A (AAC)',
+          ext: '.m4a',
+          hint: 'スマホ・PC・LINE共有など幅広く再生でき、高音質かつ軽量です。',
+          qualities: [
+            { id: '256', title: '最高音質', sub: '256 kbps • 演奏保存向け' },
+            { id: '192', title: '高音質（標準）', sub: '192 kbps • バランス◎' },
+            { id: '128', title: '標準', sub: '128 kbps • 共有・軽量' },
+            { id: '96', title: '軽量', sub: '96 kbps • 容量節約' }
+          ]
+        },
+        ogg: {
+          label: 'OGG (Opus)',
+          ext: '.ogg',
+          hint: '最新Opus圧縮。とても小さい容量でも驚くほどクリアな音質を保ちます。',
+          qualities: [
+            { id: '192', title: '最高音質', sub: '192 kbps • 原音に極近' },
+            { id: '128', title: '高音質（標準）', sub: '128 kbps • CD相当以上' },
+            { id: '96', title: '標準', sub: '96 kbps • 軽量クリア' },
+            { id: '64', title: '超軽量', sub: '64 kbps • 長時間録音向け' }
+          ]
+        },
+        orig: {
+          label: '元のまま',
+          ext: '',
+          hint: '再エンコードせず、読み込んだ音声データを無劣化のまま保存します。',
+          qualities: [
+            { id: 'copy', title: '無劣化コピー', sub: '元の形式・音質のまま書き出し' }
+          ]
+        }
+      };
+
+      const saveExportModal = document.getElementById('saveExportModal');
+      const saveFileNameInput = document.getElementById('saveFileNameInput');
+      const saveFileExtBadge = document.getElementById('saveFileExtBadge');
+      const saveFormatGrid = document.getElementById('saveFormatGrid');
+      const saveFormatLabel = document.getElementById('saveFormatLabel');
+      const saveFormatHint = document.getElementById('saveFormatHint');
+      const saveQualityLabel = document.getElementById('saveQualityLabel');
+      const saveQualityGrid = document.getElementById('saveQualityGrid');
+      const savePreviewSpec = document.getElementById('savePreviewSpec');
+      const savePreviewSize = document.getElementById('savePreviewSize');
+      const saveProgressBox = document.getElementById('saveProgressBox');
+      const saveProgressLabel = document.getElementById('saveProgressLabel');
+      const saveProgressPct = document.getElementById('saveProgressPct');
+      const saveProgressBar = document.getElementById('saveProgressBar');
+      const btnSaveFmtOrig = document.getElementById('btnSaveFmtOrig');
+      const saveFmtOrigSub = document.getElementById('saveFmtOrigSub');
+      const btnSaveExportRun = document.getElementById('btnSaveExportRun');
+      const btnCancelSaveExport = document.getElementById('btnCancelSaveExport');
+      const btnCloseSaveExportX = document.getElementById('btnCloseSaveExportX');
+
+      const saveExportState = {
+        probed: false,
+        supportM4a: false,
+        supportOgg: false,
+        selectedFormat: 'wav',
+        selectedQuality: '24bit',
+        isExporting: false,
+        cancelled: false
+      };
+
+      async function probeWebCodecsExportSupport() {
+        if (saveExportState.probed) return;
+        saveExportState.probed = true;
+        if (typeof AudioEncoder === 'undefined' || typeof AudioEncoder.isConfigSupported !== 'function') {
+          saveExportState.supportM4a = false;
+          saveExportState.supportOgg = false;
+          return;
+        }
+        try {
+          const aacRes = await AudioEncoder.isConfigSupported({
+            codec: 'mp4a.40.2',
+            sampleRate: 48000,
+            numberOfChannels: 2,
+            bitrate: 192000,
+            aac: { format: 'aac' }
+          });
+          saveExportState.supportM4a = Boolean(aacRes && aacRes.supported);
+        } catch (_) {
+          saveExportState.supportM4a = false;
+        }
+        try {
+          const opusRes = await AudioEncoder.isConfigSupported({
+            codec: 'opus',
+            sampleRate: 48000,
+            numberOfChannels: 2,
+            bitrate: 128000
+          });
+          saveExportState.supportOgg = Boolean(opusRes && opusRes.supported);
+        } catch (_) {
+          saveExportState.supportOgg = false;
+        }
+      }
+
+      function getOrigFileExt() {
+        const refName = state.currentFileOrigName || trackTitleEl.textContent.trim() || '';
+        const m = refName.match(/(\.[a-zA-Z0-9]{2,5})$/);
+        if (m) return m[1].toLowerCase();
+        if (state.rawBlob && state.rawBlob.type) {
+          if (state.rawBlob.type.includes('mp4') || state.rawBlob.type.includes('m4a')) return '.m4a';
+          if (state.rawBlob.type.includes('mpeg') || state.rawBlob.type.includes('mp3')) return '.mp3';
+          if (state.rawBlob.type.includes('ogg')) return '.ogg';
+          if (state.rawBlob.type.includes('flac')) return '.flac';
+          if (state.rawBlob.type.includes('webm')) return '.webm';
+        }
+        return '.wav';
+      }
+
+      function canShowOrigCopyFormat() {
+        if (!state.rawBlob) return false;
+        if (!state.audioBuffer) return true;
+        const origExt = getOrigFileExt();
+        return !state.isUnsavedRecording && !state.ephemeralCutMemoryKey && origExt !== '.wav';
+      }
+
+      function formatBytesApprox(bytes) {
+        if (!isFinite(bytes) || bytes <= 0) return '0 KB';
+        if (bytes < 1024 * 1024) return `${Math.max(1, Math.round(bytes / 1024))} KB`;
+        return `${(bytes / (1024 * 1024)).toFixed(bytes >= 10 * 1024 * 1024 ? 1 : 2)} MB`;
+      }
+
+      function sanitizeExportBaseName(raw) {
+        let s = String(raw || '').trim();
+        s = s.replace(/[\\\/:*?"<>|]/g, '_').replace(/\s+/g, ' ').trim();
+        // Strip known audio extension if user typed it inside the base-name box
+        s = s.replace(/\.(wav|m4a|mp3|ogg|opus|flac|aac|webm)$/i, '').trim();
+        return s || makeRecordingFilename().replace(/\.wav$/i, '');
+      }
+
+      function getSelectedExportExt() {
+        const fmt = saveExportState.selectedFormat;
+        if (fmt === 'orig') return getOrigFileExt();
+        return (SAVE_FORMAT_META[fmt] && SAVE_FORMAT_META[fmt].ext) || '.wav';
+      }
+
+      function updateSaveExportModalUI() {
+        const fmt = saveExportState.selectedFormat;
+        const meta = SAVE_FORMAT_META[fmt] || SAVE_FORMAT_META.wav;
+        const hasBuf = Boolean(state.audioBuffer);
+        const showOrig = canShowOrigCopyFormat();
+
+        btnSaveFmtOrig.classList.toggle('hidden', !showOrig);
+        saveFormatGrid.classList.toggle('has-orig', showOrig);
+        if (showOrig) {
+          saveFmtOrigSub.textContent = `${getOrigFileExt().replace('.', '').toUpperCase()} 無劣化`;
+        }
+
+        // Update format buttons enabled/active states
+        saveFormatGrid.querySelectorAll('[data-save-fmt]').forEach((btn) => {
+          const f = btn.dataset.saveFmt;
+          let disabled = false;
+          let subEl = btn.querySelector('.save-fmt-sub');
+          if (f === 'wav') {
+            disabled = !hasBuf && !state.wavMeta;
+          } else if (f === 'm4a') {
+            disabled = !hasBuf || !saveExportState.supportM4a;
+            if (subEl) subEl.textContent = !saveExportState.supportM4a ? 'ブラウザ非対応' : (!hasBuf ? '解析完了後に対応' : '高音質・共有向け');
+          } else if (f === 'ogg') {
+            disabled = !hasBuf || !saveExportState.supportOgg;
+            if (subEl) subEl.textContent = !saveExportState.supportOgg ? 'ブラウザ非対応' : (!hasBuf ? '解析完了後に対応' : 'Opus・超軽量');
+          }
+          btn.disabled = disabled;
+          btn.classList.toggle('active', f === fmt);
+        });
+
+        saveFileExtBadge.textContent = getSelectedExportExt();
+        saveFormatLabel.textContent = meta.label;
+        saveFormatHint.textContent = (!hasBuf && state.isAnalyzingWave)
+          ? '波形解析中のため現在は「元のまま」保存できます（完了後にM4A/OGG等へ変換可能）。'
+          : meta.hint;
+
+        // Render quality options for selected format
+        const quals = meta.qualities;
+        if (!quals.some(q => q.id === saveExportState.selectedQuality)) {
+          saveExportState.selectedQuality = quals[0].id;
+        }
+        const activeQual = quals.find(q => q.id === saveExportState.selectedQuality) || quals[0];
+        saveQualityLabel.textContent = activeQual.title;
+
+        saveQualityGrid.className = 'save-qual-grid' + (quals.length === 3 ? ' cols-3' : (quals.length === 1 ? ' cols-1' : ''));
+        saveQualityGrid.innerHTML = '';
+        quals.forEach((q) => {
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'save-qual-btn' + (q.id === saveExportState.selectedQuality ? ' active' : '');
+          btn.disabled = saveExportState.isExporting;
+          const t = document.createElement('span');
+          t.className = 'save-qual-title';
+          t.textContent = q.title;
+          const s = document.createElement('span');
+          s.className = 'save-qual-sub';
+          s.textContent = q.sub;
+          btn.appendChild(t);
+          btn.appendChild(s);
+          btn.addEventListener('click', () => {
+            if (saveExportState.isExporting) return;
+            saveExportState.selectedQuality = q.id;
+            state.exportQualityByFormat[fmt] = q.id;
+            updateSaveExportModalUI();
+          });
+          saveQualityGrid.appendChild(btn);
+        });
+
+        // Estimate file size & spec preview
+        const dur = Math.max(0, state.duration || 0);
+        const srcSr = state.audioBuffer ? state.audioBuffer.sampleRate : (state.wavMeta ? state.wavMeta.sampleRate : 48000);
+        const srcCh = state.audioBuffer ? Math.min(2, state.audioBuffer.numberOfChannels) : (state.wavMeta ? Math.min(2, state.wavMeta.numChannels) : 2);
+        const refWav24Bytes = dur * srcSr * srcCh * 3 + 44;
+
+        let estBytes = state.rawBlob ? state.rawBlob.size : 0;
+        let specText = '';
+
+        if (fmt === 'wav') {
+          if (hasBuf) {
+            const is24 = activeQual.id === '24bit';
+            const isMono = activeQual.id === '16bit_mono';
+            const outCh = isMono ? 1 : srcCh;
+            const bps = is24 ? 3 : 2;
+            estBytes = state.audioBuffer.length * outCh * bps + 44;
+            specText = `WAV • ${is24 ? '24bit' : '16bit'} PCM • ${(srcSr / 1000).toFixed(1).replace(/\.0$/, '')}kHz ${outCh === 1 ? 'モノラル' : 'ステレオ'}`;
+          } else {
+            estBytes = state.rawBlob ? state.rawBlob.size : 0;
+            specText = `WAV • 原音そのまま • ${(srcSr / 1000).toFixed(1).replace(/\.0$/, '')}kHz`;
+          }
+        } else if (fmt === 'm4a') {
+          const kbps = parseInt(activeQual.id, 10) || 192;
+          const outSr = (srcSr === 44100 || srcSr === 48000) ? srcSr : 48000;
+          estBytes = Math.round((dur * kbps * 1000) / 8 * 1.02 + 8192);
+          specText = `M4A (AAC) • ${kbps} kbps • ${(outSr / 1000).toFixed(1).replace(/\.0$/, '')}kHz ${srcCh === 1 ? 'モノラル' : 'ステレオ'}`;
+        } else if (fmt === 'ogg') {
+          const kbps = parseInt(activeQual.id, 10) || 128;
+          estBytes = Math.round((dur * kbps * 1000) / 8 * 1.015 + 4096);
+          specText = `OGG (Opus) • ${kbps} kbps • 48kHz ${srcCh === 1 ? 'モノラル' : 'ステレオ'}`;
+        } else {
+          estBytes = state.rawBlob ? state.rawBlob.size : 0;
+          specText = `元の形式 (${getOrigFileExt().toUpperCase()}) • 無劣化コピー`;
+        }
+
+        savePreviewSpec.textContent = specText;
+        let ratioNote = '';
+        if ((fmt === 'm4a' || fmt === 'ogg' || (fmt === 'wav' && activeQual.id !== '24bit')) && refWav24Bytes > 0 && estBytes < refWav24Bytes * 0.92) {
+          const savedPct = Math.round((1 - estBytes / refWav24Bytes) * 100);
+          ratioNote = `（24bit WAV比 約${savedPct}%軽量）`;
+        }
+        savePreviewSize.textContent = `予想ファイルサイズ: 約 ${formatBytesApprox(estBytes)}${ratioNote}`;
+      }
+
+      async function openSaveExportModal() {
+        if (!state.audioBuffer && !state.rawBlob) return;
+        await probeWebCodecsExportSupport();
+
+        saveExportState.isExporting = false;
+        saveExportState.cancelled = false;
+        saveProgressBox.classList.add('hidden');
+        saveProgressBar.style.width = '0%';
+        btnSaveExportRun.disabled = false;
+        btnSaveExportRun.textContent = 'この設定で保存';
+        saveFileNameInput.disabled = false;
+
+        // Pre-fill base name without extension
+        const currentTitle = trackTitleEl.textContent.trim() || makeRecordingFilename();
+        saveFileNameInput.value = currentTitle.replace(/\.(wav|m4a|mp3|ogg|opus|flac|aac|webm)$/i, '');
+
+        // Choose default format respecting availability & user's previous preference
+        const hasBuf = Boolean(state.audioBuffer);
+        let prefFmt = state.exportFormat || 'wav';
+        if (!hasBuf) {
+          prefFmt = canShowOrigCopyFormat() ? 'orig' : 'wav';
+        } else if (prefFmt === 'm4a' && !saveExportState.supportM4a) {
+          prefFmt = 'wav';
+        } else if (prefFmt === 'ogg' && !saveExportState.supportOgg) {
+          prefFmt = 'wav';
+        } else if (prefFmt === 'orig' && !canShowOrigCopyFormat()) {
+          prefFmt = 'wav';
+        }
+
+        saveExportState.selectedFormat = prefFmt;
+        saveExportState.selectedQuality = (state.exportQualityByFormat && state.exportQualityByFormat[prefFmt])
+          || SAVE_FORMAT_META[prefFmt].qualities[0].id;
+
+        updateSaveExportModalUI();
+        saveExportModal.classList.remove('hidden');
+      }
+
+      function closeSaveExportModal() {
+        if (saveExportState.isExporting) {
+          saveExportState.cancelled = true;
+          return;
+        }
+        saveExportModal.classList.add('hidden');
+      }
+
+      async function executeSaveExport() {
+        if (saveExportState.isExporting || (!state.audioBuffer && !state.rawBlob)) return;
+
+        const fmt = saveExportState.selectedFormat;
+        const qual = saveExportState.selectedQuality;
+        const baseName = sanitizeExportBaseName(saveFileNameInput.value);
+        const ext = getSelectedExportExt();
+        const finalName = `${baseName}${ext}`;
+
+        saveExportState.isExporting = true;
+        saveExportState.cancelled = false;
+        btnSaveExportRun.disabled = true;
+        btnSaveExportRun.textContent = '書き出し中...';
+        saveFileNameInput.disabled = true;
+        saveProgressBox.classList.remove('hidden');
+        saveProgressLabel.textContent = '書き出し準備中...';
+        saveProgressPct.textContent = '0%';
+        saveProgressBar.style.width = '0%';
+
+        // Persist user's chosen format & quality for next time
+        if (fmt !== 'orig') {
+          state.exportFormat = fmt;
+        }
+        state.exportQualityByFormat[fmt] = qual;
+        if (fmt === 'wav' && (qual === '24bit' || qual === '16bit')) {
+          state.recBitDepth = qual === '24bit' ? 24 : 16;
+          updateRecSettingsUI();
+        }
+        saveAppPrefs();
+
+        const setProgress = (pct, label) => {
+          const p = Math.max(0, Math.min(100, Math.round(pct)));
+          saveProgressLabel.textContent = label || '書き出し中...';
+          saveProgressPct.textContent = `${p}%`;
+          saveProgressBar.style.width = `${p}%`;
+        };
+
+        try {
+          let blob = null;
+
+          if (fmt === 'orig' || !state.audioBuffer) {
+            setProgress(60, '元データを準備中...');
+            await new Promise(r => setTimeout(r, 20));
+            blob = state.rawBlob;
+            setProgress(100, '完了');
+          } else if (fmt === 'wav') {
+            setProgress(35, 'WAVファイルを生成中...');
+            await new Promise(r => setTimeout(r, 25));
+            const bitDepth = qual === '24bit' ? 24 : 16;
+            const forceMono = qual === '16bit_mono';
+            blob = encodeWavFromAudioBuffer(state.audioBuffer, bitDepth, forceMono);
+            setProgress(100, '完了');
+          } else if (fmt === 'm4a' || fmt === 'ogg') {
+            const kbps = parseInt(qual, 10) || (fmt === 'm4a' ? 192 : 128);
+            blob = await encodeWithWebCodecs(
+              state.audioBuffer,
+              fmt,
+              kbps * 1000,
+              setProgress,
+              () => saveExportState.cancelled
+            );
+          }
+
+          if (saveExportState.cancelled || !blob) {
+            showToast('保存をキャンセルしました');
+            return;
+          }
+
           const url = URL.createObjectURL(blob);
           const a = document.createElement('a');
           a.href = url;
-          a.download = name;
+          a.download = finalName;
           document.body.appendChild(a);
           a.click();
           document.body.removeChild(a);
-          URL.revokeObjectURL(url);
+          setTimeout(() => URL.revokeObjectURL(url), 4000);
 
-          // Now that the file has been saved, persist pin memory under the exported file's exact (size, duration)
+          // Persist pin memory under the exported file's exact (size, duration) so reopening it restores all pins!
           const wasUnsaved = state.isUnsavedRecording;
           const nextSize = blob.size || state.currentFileSize;
           const nextKey = makeFileFingerprint(nextSize, state.duration);
@@ -6888,25 +8082,72 @@
           }
           state.ephemeralCutMemoryKey = null;
           state.isUnsavedRecording = false;
-          state.currentFileOrigName = name;
+          state.currentFileOrigName = finalName;
           state.currentFileSize = nextSize;
           state.currentMemoryKey = nextKey;
           state.rawBlob = blob;
-          trackTitleEl.textContent = name;
+          trackTitleEl.textContent = finalName;
           if (state.playlist[state.currentTrackIndex]) {
-            state.playlist[state.currentTrackIndex].name = name;
-            state.playlist[state.currentTrackIndex].origName = name;
+            state.playlist[state.currentTrackIndex].name = finalName;
+            state.playlist[state.currentTrackIndex].origName = finalName;
             state.playlist[state.currentTrackIndex].blob = blob;
             state.playlist[state.currentTrackIndex].isUnsavedRecording = false;
           }
           saveCurrentFileMemory(true);
-          saveSessionAudioToIDB(blob, name, name, false, state.duration);
+          saveSessionAudioToIDB(blob, finalName, finalName, false, state.duration);
           updateHeaderSubInfo();
           updateMemoryCountBadge();
 
-          showToast(wasUnsaved ? `保存しました: ${name}（ピン情報を記憶）` : `保存しました: ${name}`);
-        }, 30);
+          saveExportState.isExporting = false;
+          saveExportModal.classList.add('hidden');
+          const sizeStr = formatBytesApprox(blob.size);
+          showToast(wasUnsaved ? `保存しました: ${finalName} (${sizeStr}・ピン記憶済)` : `保存しました: ${finalName} (${sizeStr})`);
+        } catch (err) {
+          if (err && err.message === 'cancelled') {
+            showToast('保存をキャンセルしました');
+          } else {
+            console.error('Export failed:', err);
+            showToast(`書き出しに失敗しました（WAV形式をお試しください）`);
+          }
+        } finally {
+          saveExportState.isExporting = false;
+          btnSaveExportRun.disabled = false;
+          btnSaveExportRun.textContent = 'この設定で保存';
+          saveFileNameInput.disabled = false;
+          saveProgressBox.classList.add('hidden');
+        }
       }
+
+      saveFormatGrid.querySelectorAll('[data-save-fmt]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          if (saveExportState.isExporting || btn.disabled) return;
+          const fmt = btn.dataset.saveFmt;
+          saveExportState.selectedFormat = fmt;
+          saveExportState.selectedQuality = (state.exportQualityByFormat && state.exportQualityByFormat[fmt])
+            || SAVE_FORMAT_META[fmt].qualities[0].id;
+          updateSaveExportModalUI();
+        });
+      });
+
+      document.getElementById('btnSaveResetTimestamp').addEventListener('click', () => {
+        if (saveExportState.isExporting) return;
+        saveFileNameInput.value = makeRecordingFilename().replace(/\.wav$/i, '');
+        saveFileNameInput.focus();
+      });
+
+      saveFileNameInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          saveFileNameInput.blur();
+        }
+      });
+
+      btnSaveExportRun.addEventListener('click', executeSaveExport);
+      btnCancelSaveExport.addEventListener('click', closeSaveExportModal);
+      btnCloseSaveExportX.addEventListener('click', closeSaveExportModal);
+      saveExportModal.addEventListener('click', (e) => {
+        if (e.target === saveExportModal && !saveExportState.isExporting) closeSaveExportModal();
+      });
 
       // ==================== HIGH-FIDELITY RAW PCM RECORDING (AUDIOWORKLET + DIRECT PATH) ====================
       const REC_WORKLET_CODE = `
@@ -11517,7 +12758,7 @@
       });
       document.getElementById('btnRecStop').addEventListener('click', stopRecording);
       document.getElementById('btnRecAddMarker').addEventListener('click', addMarkerDuringRecording);
-      btnSaveWav.addEventListener('click', exportCurrentWav);
+      btnSaveWav.addEventListener('click', openSaveExportModal);
 
       // Fullscreen toggle (hides address bar in normal browser tabs)
       function isInFullscreen() {
@@ -11574,11 +12815,22 @@
       document.addEventListener('webkitfullscreenchange', onFullscreenStateChanged);
 
       // ==================== GITHUB / PWA SOFTWARE UPDATE CHECK & APPLY ====================
-      const APP_VERSION = 'v27';
+      const APP_VERSION = 'v28';
 
       // Ordered newest-first; each release appends a new object at the top.
       // Users who skip multiple versions automatically see ALL unseen versions between lastSeen and current.
       const APP_RELEASE_NOTES = [
+        {
+          version: 'v28',
+          verNum: 28,
+          date: '2026/11/23',
+          title: '保存時にファイル形式・音質・ファイル名を選択可能に',
+          items: [
+            '「保存」ボタンを押したときに保存ダイアログが開き、ファイル名・ファイル形式（WAV / M4A / OGG）・音質を自由に選んで書き出せるようになりました',
+            '形式と音質を切り替えると予想ファイルサイズや軽量化率がリアルタイムに表示されます',
+            'M4AやOGGに変換して保存した場合も、保存後のサイズ・時間に紐づけて黄色ピン情報がそのまま引き継がれます'
+          ]
+        },
         {
           version: 'v27',
           verNum: 27,
@@ -11824,6 +13076,28 @@
 
       // ==================== SETTING HELP (?) CONTENT & MODAL ====================
       const SETTING_HELP_TOPICS = {
+        exportFormat: {
+          title: '保存ファイル形式の選び方',
+          sub: 'WAV / M4A (AAC) / OGG (Opus) の違い',
+          summary: '用途に合わせて「最高音質のWAV」「共有しやすいM4A」「超軽量のOGG」から選べます。どの形式で保存しても黄色ピン情報は自動で引き継がれます。',
+          sections: [
+            {
+              title: '各形式の特徴',
+              bullets: [
+                ['WAV（無圧縮）', '音を一切圧縮しない最高音質形式です。ファイルサイズは大きくなりますが、楽器の繊細な響きや後からの編集・再加工に最適です。'],
+                ['M4A / AAC（おすすめ）', 'iPhone・Android・PC・LINE共有などほぼすべての環境でそのまま再生でき、192kbps前後なら高音質かつWAVの約1/6〜1/8の軽さになります。'],
+                ['OGG / Opus（超軽量）', '最新世代の高効率圧縮です。64〜128kbpsという小さな容量でも驚くほどクリアに聴けるため、長時間の練習録音や発表会丸ごとの保存に便利です。']
+              ]
+            }
+          ],
+          tableTitle: 'おすすめ設定の目安',
+          tableHeaders: ['やりたいこと', 'おすすめ形式・音質'],
+          tableRows: [
+            ['原音のまま最高音質で残す', 'WAV • 24bit ハイレゾ'],
+            ['家族・先生へ送る／スマホ管理', 'M4A • 192kbps（または128kbps）'],
+            ['長時間の録音を軽く保存', 'OGG (Opus) • 96〜128kbps']
+          ]
+        },
         micGain: {
           title: 'マイク録音感度（入力ゲイン）',
           sub: 'マイクで録る音の大きさ（感度）の倍率',
@@ -12773,6 +14047,8 @@
           closeSettingHelpModal();
         } else if (whatsNewModal && !whatsNewModal.classList.contains('hidden')) {
           closeWhatsNewModal();
+        } else if (saveExportModal && !saveExportModal.classList.contains('hidden')) {
+          closeSaveExportModal();
         } else if (clearPinsConfirmModal && !clearPinsConfirmModal.classList.contains('hidden')) {
           clearPinsConfirmModal.classList.add('hidden');
         } else if (!cutConfirmModal.classList.contains('hidden')) {
