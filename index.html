@@ -228,6 +228,59 @@
       cursor: pointer;
     }
 
+    /* Non-intrusive Waveform Analysis Progress Bar & Pill */
+    .wave-progress-wrap {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 12;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+    }
+
+    .wave-progress-track {
+      width: 100%;
+      height: 3px;
+      background: rgba(66, 165, 245, 0.16);
+      overflow: hidden;
+    }
+
+    .wave-progress-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #38bdf8 0%, #42a5f5 60%, #60a5fa 100%);
+      transition: width 0.14s ease-out;
+    }
+
+    .wave-progress-pill {
+      position: absolute;
+      top: 6px;
+      right: 8px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 3px 9px;
+      border-radius: 999px;
+      background: rgba(17, 17, 22, 0.86);
+      border: 1px solid rgba(66, 165, 245, 0.45);
+      color: #bae6fd;
+      font-size: 10.5px;
+      font-weight: 700;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.45);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+    }
+
+    .wave-progress-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #38bdf8;
+      animation: pulseDot 1s infinite ease-in-out;
+      flex-shrink: 0;
+    }
+
     /* Startup Overlay Card */
     .startup-overlay {
       position: absolute;
@@ -1276,6 +1329,25 @@
       border-color: rgba(66, 165, 245, 0.6);
     }
 
+    .list-item.active-section {
+      background: rgba(250, 204, 21, 0.15);
+      border-color: rgba(250, 204, 21, 0.9);
+      box-shadow: inset 3.5px 0 0 var(--accent-yellow), 0 0 12px rgba(250, 204, 21, 0.2);
+    }
+
+    .active-section-badge {
+      display: inline-block;
+      margin-left: 7px;
+      padding: 1px 6px;
+      border-radius: 999px;
+      font-size: 9.5px;
+      font-weight: 800;
+      background: var(--accent-yellow);
+      color: #111113;
+      vertical-align: middle;
+      letter-spacing: 0.2px;
+    }
+
     .list-item-main {
       flex: 1;
       min-width: 0;
@@ -1420,6 +1492,17 @@
     <!-- Upper Pane: Multi-Row Overview Waveform -->
     <div class="overview-wrap">
       <canvas id="overviewCanvas"></canvas>
+
+      <!-- Non-intrusive Waveform Analysis Progress Indicator (never blocks touch/playback) -->
+      <div id="waveProgressWrap" class="wave-progress-wrap hidden" aria-live="polite">
+        <div class="wave-progress-track">
+          <div id="waveProgressFill" class="wave-progress-fill"></div>
+        </div>
+        <div class="wave-progress-pill mono">
+          <span class="wave-progress-dot"></span>
+          <span id="waveProgressText">波形解析中 0%</span>
+        </div>
+      </div>
 
       <!-- Startup Quick-Start Card (NO auto demo load on startup) -->
       <div id="startupOverlay" class="startup-overlay">
@@ -1992,6 +2075,9 @@
       const reverbLabel = document.getElementById('reverbLabel');
       const reverbIcon = document.getElementById('reverbIcon');
       const toastBanner = document.getElementById('toastBanner');
+      const waveProgressWrap = document.getElementById('waveProgressWrap');
+      const waveProgressFill = document.getElementById('waveProgressFill');
+      const waveProgressText = document.getElementById('waveProgressText');
 
       // ==================== APPLICATION STATE ====================
       let nextMarkerUid = 1;
@@ -2045,6 +2131,8 @@
         waveformPyramid: null,
         rawBlob: null,
         isFallbackLargeFile: false,
+        isAnalyzingWave: false,
+        loadToken: 0,
 
         // Visual layout & zoom
         numRows: 12,
@@ -2165,6 +2253,70 @@
           return true;
         }
         return /\.(m4a|mp3|wav|aac|flac|ogg|opus|wma|aif|aiff|caf|3gp|mp4|webm)$/i.test(file.name);
+      }
+
+      function isUsingAudioEl() {
+        return state.engine === 'native' || !state.audioBuffer || state.isFallbackLargeFile;
+      }
+
+      let waveProgressHideTimer = null;
+      function showWaveProgress(pct, label, etaSec = null) {
+        clearTimeout(waveProgressHideTimer);
+        const clamped = Math.max(0, Math.min(100, Math.round(pct)));
+        waveProgressWrap.classList.remove('hidden');
+        waveProgressWrap.style.opacity = '1';
+        waveProgressFill.style.width = `${clamped}%`;
+        let etaStr = '';
+        if (etaSec !== null && isFinite(etaSec)) {
+          if (etaSec < 1) etaStr = ' • まもなく完了';
+          else if (etaSec < 60) etaStr = ` • 残り約 ${Math.ceil(etaSec)}秒`;
+          else {
+            const m = Math.floor(etaSec / 60);
+            const s = Math.ceil(etaSec % 60);
+            etaStr = ` • 残り約 ${m}分${s}秒`;
+          }
+        }
+        waveProgressText.textContent = `${label} ${clamped}%${etaStr}`;
+      }
+
+      function hideWaveProgress(delayMs = 0) {
+        clearTimeout(waveProgressHideTimer);
+        if (delayMs <= 0) {
+          waveProgressWrap.classList.add('hidden');
+          waveProgressFill.style.width = '0%';
+          return;
+        }
+        waveProgressHideTimer = setTimeout(() => {
+          waveProgressWrap.style.opacity = '0';
+          waveProgressHideTimer = setTimeout(() => {
+            waveProgressWrap.classList.add('hidden');
+            waveProgressFill.style.width = '0%';
+            waveProgressWrap.style.opacity = '1';
+          }, 260);
+        }, delayMs);
+      }
+
+      function readBlobAsArrayBufferWithProgress(blob, onProgress, isCancelled) {
+        return new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onprogress = (ev) => {
+            if (isCancelled && isCancelled()) {
+              try { reader.abort(); } catch (_) {}
+              return;
+            }
+            if (ev.lengthComputable && ev.total > 0) {
+              onProgress(ev.loaded / ev.total);
+            }
+          };
+          reader.onload = () => {
+            if (isCancelled && isCancelled()) return reject(new Error('cancelled'));
+            onProgress(1);
+            resolve(reader.result);
+          };
+          reader.onerror = () => reject(reader.error || new Error('FileReader error'));
+          reader.onabort = () => reject(new Error('cancelled'));
+          reader.readAsArrayBuffer(blob);
+        });
       }
 
       // ==================== SECTION & SKIP HELPERS ====================
@@ -2826,7 +2978,7 @@
         const valid = ['vocoder', 'native', 'tape'];
         if (!valid.includes(nextEngine)) return;
 
-        if (state.hasAudio && (!state.audioBuffer || state.isFallbackLargeFile) && nextEngine !== 'native') {
+        if (state.hasAudio && state.isFallbackLargeFile && nextEngine !== 'native') {
           showToast('超大容量ファイルのためOS標準エンジンを使用します');
           nextEngine = 'native';
         }
@@ -2854,17 +3006,21 @@
         cTap.querySelector('.engine-name').textContent = (nextEngine === 'tape' ? '● ' : '○ ') + 'テープ再生（音程連動・DSP加工ゼロ）';
 
         if (state.hasAudio) {
-          if (nextEngine === 'vocoder' && state.audioBuffer) {
+          if (nextEngine === 'vocoder' && state.audioBuffer && !state.isFallbackLargeFile) {
             resetVocoderAtSample(Math.floor(curT * state.audioBuffer.sampleRate));
-          } else if (nextEngine === 'native') {
+          } else if (nextEngine === 'tape' && state.audioBuffer && !state.isFallbackLargeFile) {
+            if (wasPlaying) startTapeSourceAt(curT);
+          } else {
+            // Either OS standard, or PCM is still decoding in background
             audioEl.preservesPitch = true;
             audioEl.mozPreservesPitch = true;
             audioEl.webkitPreservesPitch = true;
             audioEl.playbackRate = state.playbackRate;
             audioEl.currentTime = curT;
             if (wasPlaying) audioEl.play().catch(() => {});
-          } else if (nextEngine === 'tape' && state.audioBuffer) {
-            if (wasPlaying) startTapeSourceAt(curT);
+            if (state.isAnalyzingWave && nextEngine !== 'native') {
+              showToast(`波形解析完了後に「${labels[nextEngine]}」へ自動切替します`);
+            }
           }
           state.lastSyncTime = curT;
           state.lastSyncPerf = performance.now();
@@ -2932,6 +3088,87 @@
         return { sampleRate: sr, totalSamples, duration: audioBuffer.duration, peak, levels };
       }
 
+      async function buildPcmPyramidAsync(audioBuffer, onProgress, isCancelled) {
+        const numCh = audioBuffer.numberOfChannels;
+        const totalSamples = audioBuffer.length;
+        const sr = audioBuffer.sampleRate;
+        const ch0 = audioBuffer.getChannelData(0);
+        const ch1 = numCh > 1 ? audioBuffer.getChannelData(1) : null;
+
+        const baseBin = 16;
+        const count0 = Math.max(1, Math.ceil(totalSamples / baseBin));
+        const min0 = new Float32Array(count0);
+        const max0 = new Float32Array(count0);
+        let peak = 0;
+
+        const chunkBins = 6144; // ~98k samples per time-slice keeps UI 100% responsive
+        const startPerf = performance.now();
+        let lastReportPerf = startPerf;
+
+        for (let bStart = 0; bStart < count0; bStart += chunkBins) {
+          if (isCancelled && isCancelled()) return null;
+          const bEnd = Math.min(count0, bStart + chunkBins);
+          for (let b = bStart; b < bEnd; b++) {
+            const s = b * baseBin;
+            const e = Math.min(totalSamples, s + baseBin);
+            let lo = 1.0, hi = -1.0;
+            for (let i = s; i < e; i++) {
+              const v0 = ch0[i];
+              if (v0 < lo) lo = v0;
+              if (v0 > hi) hi = v0;
+              if (ch1) {
+                const v1 = ch1[i];
+                if (v1 < lo) lo = v1;
+                if (v1 > hi) hi = v1;
+              }
+            }
+            if (lo > hi) { lo = 0; hi = 0; }
+            min0[b] = lo;
+            max0[b] = hi;
+            const a = Math.max(Math.abs(lo), Math.abs(hi));
+            if (a > peak) peak = a;
+          }
+
+          const now = performance.now();
+          if (now - lastReportPerf >= 50 || bEnd === count0) {
+            lastReportPerf = now;
+            const frac = bEnd / count0;
+            const elapsedSec = Math.max(0.02, (now - startPerf) / 1000);
+            const etaSec = frac > 0.02 ? (elapsedSec * (1 - frac) / frac) : null;
+            if (onProgress) onProgress(frac * 0.92, etaSec);
+            await new Promise(r => setTimeout(r, 0));
+          }
+        }
+
+        if (isCancelled && isCancelled()) return null;
+
+        const levels = [{ binSize: baseBin, min: min0, max: max0 }];
+        const factor = 8;
+        for (let lvl = 1; lvl <= 3; lvl++) {
+          const prev = levels[lvl - 1];
+          const pLen = prev.min.length;
+          const nLen = Math.max(1, Math.ceil(pLen / factor));
+          const nMin = new Float32Array(nLen);
+          const nMax = new Float32Array(nLen);
+          for (let b = 0; b < nLen; b++) {
+            const s = b * factor;
+            const e = Math.min(pLen, s + factor);
+            let lo = 1.0, hi = -1.0;
+            for (let j = s; j < e; j++) {
+              if (prev.min[j] < lo) lo = prev.min[j];
+              if (prev.max[j] > hi) hi = prev.max[j];
+            }
+            if (lo > hi) { lo = 0; hi = 0; }
+            nMin[b] = lo;
+            nMax[b] = hi;
+          }
+          levels.push({ binSize: prev.binSize * factor, min: nMin, max: nMax });
+        }
+
+        if (onProgress) onProgress(1.0, 0);
+        return { sampleRate: sr, totalSamples, duration: audioBuffer.duration, peak, levels };
+      }
+
       function queryPyramid(pyramid, t0, t1) {
         if (!pyramid || pyramid.totalSamples === 0) return { min: 0, max: 0 };
         const sr = pyramid.sampleRate;
@@ -2983,51 +3220,28 @@
       }
 
       async function loadAudioBlob(blob, title, initialMarkers = [], autoPlay = false, preDecodedBuffer = null, startSecEnabled = true) {
+        const myToken = ++state.loadToken;
+        const isCancelled = () => myToken !== state.loadToken;
+
         try {
           pausePlayback();
           stopInertia();
+          hideWaveProgress(0);
 
           const url = URL.createObjectURL(blob);
           state.rawBlob = blob;
           state.audioBuffer = null;
           state.waveformPyramid = null;
           state.isFallbackLargeFile = false;
+          state.isAnalyzingWave = false;
           state.undoCutSnapshot = null;
 
+          // Step 1: Resolve duration quickly & make player IMMEDIATELY usable!
           let resolvedDuration = preDecodedBuffer ? preDecodedBuffer.duration : await probeDuration(url);
-
-          if (preDecodedBuffer) {
-            state.audioBuffer = preDecodedBuffer;
-            state.waveformPyramid = buildPcmPyramid(preDecodedBuffer);
-          } else if (blob.size <= 140 * 1024 * 1024) {
-            try {
-              initAudioGraph();
-              const ab = await blob.arrayBuffer();
-              const decoded = await audioCtx.decodeAudioData(ab);
-              state.audioBuffer = decoded;
-              resolvedDuration = decoded.duration || resolvedDuration;
-              state.waveformPyramid = buildPcmPyramid(decoded);
-            } catch (decErr) {
-              console.warn('decodeAudioData fallback:', decErr);
-              state.isFallbackLargeFile = true;
-            }
-          } else {
-            state.isFallbackLargeFile = true;
+          if (isCancelled()) {
+            URL.revokeObjectURL(url);
+            return;
           }
-
-          if (state.waveformPyramid && state.waveformPyramid.peak > 0.0005) {
-            const pk = state.waveformPyramid.peak;
-            state.autoWaveGain = Math.min(12.0, Math.max(1.0, 0.88 / pk));
-            state.autoBoostGain = Math.min(4.0, Math.max(1.0, 0.71 / pk));
-          } else {
-            state.autoWaveGain = 1.0;
-            state.autoBoostGain = 1.0;
-          }
-
-          if (state.isFallbackLargeFile) {
-            setEngine('native');
-          }
-
           if (!resolvedDuration || resolvedDuration <= 0) resolvedDuration = 30;
 
           state.duration = resolvedDuration;
@@ -3038,10 +3252,8 @@
           state.markers = cloneMarkerList(initialMarkers).filter(m => m.time > 0.05 && m.time < resolvedDuration - 0.05);
           state.startSectionEnabled = startSecEnabled !== false;
           state.tempMarker = null;
-
-          if (state.audioBuffer) {
-            resetVocoderAtSample(0);
-          }
+          state.autoWaveGain = 1.0;
+          state.autoBoostGain = 1.0;
 
           if (audioEl.dataset.url) {
             URL.revokeObjectURL(audioEl.dataset.url);
@@ -3057,7 +3269,7 @@
           startupOverlay.classList.add('hidden');
           btnSaveWav.disabled = false;
           btnToggleSectionSkip.disabled = false;
-          btnCutYellowSection.disabled = !state.audioBuffer;
+          btnCutYellowSection.disabled = true;
           trackTitleEl.textContent = title;
 
           updateWaveGainUI();
@@ -3069,10 +3281,173 @@
           renderAllCanvases();
 
           if (autoPlay) startPlayback();
+
+          // Step 2: Background PCM decode & waveform pyramid build with non-intrusive progress & ETA
+          if (preDecodedBuffer) {
+            state.audioBuffer = preDecodedBuffer;
+            state.isAnalyzingWave = true;
+            showWaveProgress(65, '波形生成中', null);
+            const pyr = await buildPcmPyramidAsync(
+              preDecodedBuffer,
+              (frac, etaSec) => {
+                if (!isCancelled()) showWaveProgress(65 + frac * 35, '波形生成中', etaSec);
+              },
+              isCancelled
+            );
+            if (isCancelled() || !pyr) return;
+            finalizeDecodedAudio(preDecodedBuffer, pyr, myToken);
+            return;
+          }
+
+          if (blob.size > 140 * 1024 * 1024) {
+            state.isFallbackLargeFile = true;
+            setEngine('native');
+            hideWaveProgress(0);
+            showToast('超大容量ファイルのため簡易波形・OS標準再生で動作します');
+            return;
+          }
+
+          // Run async background analysis (do NOT block UI)
+          (async () => {
+            state.isAnalyzingWave = true;
+            const totalMB = Math.max(0.1, blob.size / (1024 * 1024));
+            const estReadSec = Math.max(0.2, totalMB * 0.04);
+            const estDecodeSec = Math.max(0.7, totalMB * 0.22 + 0.35);
+            const estPyrSec = Math.max(0.3, totalMB * 0.08 + 0.15);
+
+            showWaveProgress(2, 'ファイル読込中', estReadSec + estDecodeSec + estPyrSec);
+
+            let ab;
+            const readStart = performance.now();
+            try {
+              ab = await readBlobAsArrayBufferWithProgress(
+                blob,
+                (frac) => {
+                  if (isCancelled()) return;
+                  const elapsed = Math.max(0.02, (performance.now() - readStart) / 1000);
+                  const remRead = frac > 0.05 ? elapsed * (1 - frac) / frac : estReadSec * (1 - frac);
+                  showWaveProgress(frac * 20, 'ファイル読込中', remRead + estDecodeSec + estPyrSec);
+                },
+                isCancelled
+              );
+            } catch (readErr) {
+              if (!isCancelled()) {
+                state.isAnalyzingWave = false;
+                state.isFallbackLargeFile = true;
+                hideWaveProgress(0);
+              }
+              return;
+            }
+            if (isCancelled()) return;
+
+            // Stage 2: decodeAudioData (20% -> 65%) with smooth asymptotic ETA ticker
+            let decodeTimer = null;
+            const decStart = performance.now();
+            showWaveProgress(22, '音声デコード中', estDecodeSec + estPyrSec);
+            decodeTimer = setInterval(() => {
+              if (isCancelled()) {
+                clearInterval(decodeTimer);
+                return;
+              }
+              const elapsed = (performance.now() - decStart) / 1000;
+              const ratio = 1 - Math.exp(-elapsed / Math.max(0.5, estDecodeSec * 0.72));
+              const pct = 20 + Math.min(42, ratio * 44);
+              const remDec = Math.max(0.5, estDecodeSec - elapsed * 0.82);
+              showWaveProgress(pct, '音声デコード中', remDec + estPyrSec);
+            }, 140);
+
+            let decoded = null;
+            try {
+              initAudioGraph();
+              decoded = await audioCtx.decodeAudioData(ab);
+            } catch (decErr) {
+              clearInterval(decodeTimer);
+              if (isCancelled()) return;
+              console.warn('decodeAudioData fallback:', decErr);
+              state.isAnalyzingWave = false;
+              state.isFallbackLargeFile = true;
+              setEngine('native');
+              hideWaveProgress(0);
+              showToast('波形デコード非対応形式のためOS標準再生で動作します');
+              return;
+            }
+            clearInterval(decodeTimer);
+            if (isCancelled() || !decoded) return;
+
+            // Stage 3: Chunked PCM Pyramid generation (65% -> 100%)
+            showWaveProgress(65, '波形生成中', estPyrSec);
+            const pyr = await buildPcmPyramidAsync(
+              decoded,
+              (frac, etaSec) => {
+                if (!isCancelled()) {
+                  showWaveProgress(65 + frac * 35, '波形生成中', etaSec);
+                }
+              },
+              isCancelled
+            );
+            if (isCancelled() || !pyr) return;
+
+            finalizeDecodedAudio(decoded, pyr, myToken);
+          })();
         } catch (err) {
           console.error('loadAudioBlob error:', err);
+          state.isAnalyzingWave = false;
+          hideWaveProgress(0);
           showToast('音声ファイルの読み込みに失敗しました');
         }
+      }
+
+      function finalizeDecodedAudio(decoded, pyramid, token) {
+        if (token !== state.loadToken) return;
+
+        const wasPlaying = state.isPlaying;
+        const liveT = getLivePlayheadTime();
+
+        state.audioBuffer = decoded;
+        state.waveformPyramid = pyramid;
+        state.isAnalyzingWave = false;
+
+        if (decoded.duration && decoded.duration > 0) {
+          state.duration = decoded.duration;
+          state.numRows = computeRows(state.duration);
+        }
+
+        if (pyramid && pyramid.peak > 0.0005) {
+          const pk = pyramid.peak;
+          state.autoWaveGain = Math.min(12.0, Math.max(1.0, 0.88 / pk));
+          state.autoBoostGain = Math.min(4.0, Math.max(1.0, 0.71 / pk));
+        } else {
+          state.autoWaveGain = 1.0;
+          state.autoBoostGain = 1.0;
+        }
+
+        const clampedT = Math.max(0, Math.min(state.duration, liveT));
+        state.currentTime = clampedT;
+        state.lastSyncTime = clampedT;
+        state.lastSyncPerf = performance.now();
+
+        resetVocoderAtSample(Math.floor(clampedT * decoded.sampleRate));
+
+        // If user was already playing via audioEl and preferred vocoder/tape, hot-swap seamlessly
+        if (wasPlaying && state.engine !== 'native') {
+          if (!audioEl.paused) audioEl.pause();
+          if (state.engine === 'vocoder') {
+            resetVocoderAtSample(Math.floor(clampedT * decoded.sampleRate));
+          } else if (state.engine === 'tape') {
+            startTapeSourceAt(clampedT);
+          }
+        }
+
+        btnCutYellowSection.disabled = false;
+        updateWaveGainUI();
+        applyMasterBoost();
+        updateTimeUI();
+        updatePinButtonsUI();
+        updateSectionBarUI();
+        renderAllCanvases();
+
+        showWaveProgress(100, '波形解析完了', 0);
+        hideWaveProgress(650);
       }
 
       function encodeWavFromAudioBuffer(buffer) {
@@ -3707,7 +4082,7 @@
 
       function openCutSectionModal() {
         if (!state.hasAudio || !state.audioBuffer) {
-          showToast('音声バッファが読み込まれていません');
+          showToast(state.isAnalyzingWave ? '波形解析の完了後に区間削除が使えます' : '音声バッファが読み込まれていません');
           return;
         }
         const sec = getCurrentYellowSection(state.currentTime);
@@ -3989,7 +4364,7 @@
         if (state.isPlaying && state.engine === 'tape' && tapeSourceNode) {
           return getTapeCurrentTime();
         }
-        if (state.isPlaying && state.engine === 'native') {
+        if (state.isPlaying && isUsingAudioEl()) {
           return audioEl.currentTime;
         }
         return state.currentTime;
@@ -4903,7 +5278,7 @@
                 state.currentTime = sec.start;
               }
             }
-          } else if (state.engine === 'native') {
+          } else if (isUsingAudioEl()) {
             if (Math.abs(audioEl.currentTime - state.lastSyncTime) > 0.002) {
               state.lastSyncTime = audioEl.currentTime;
               state.lastSyncPerf = performance.now();
@@ -4940,7 +5315,7 @@
       }
 
       audioEl.addEventListener('ended', () => {
-        if (state.engine === 'native') handleTrackEnded();
+        if (isUsingAudioEl()) handleTrackEnded();
       });
 
       // ==================== SETTINGS / MARKER / PLAYLIST MODAL ====================
@@ -4961,7 +5336,7 @@
         panelPlaylist.classList.toggle('hidden', tab !== 'playlist');
       }
 
-      // Audipo-style Marker List with 0:00 row, ▼ / || icon, Name, and Pencil edit button
+      // Audipo-style Marker List with 0:00 row, ▼ / || icon, Name, Current-Section highlight, and Pencil edit button
       function renderMarkerList() {
         document.getElementById('markerTabCount').textContent = String(state.markers.length);
         const wrap = document.getElementById('markerListWrap');
@@ -4971,16 +5346,20 @@
           return;
         }
 
+        const activeSec = getCurrentYellowSection(state.currentTime);
+        const isStartActive = Boolean(activeSec && activeSec.markerId === null);
+
         // Row 0: Start of track (0:00)
         const startItem = document.createElement('div');
-        startItem.className = 'list-item';
+        startItem.className = 'list-item' + (isStartActive ? ' active-section' : '');
         const startMain = document.createElement('div');
         startMain.className = 'list-item-main';
         const startIcon = state.startSectionEnabled !== false
           ? '<span style="color:#facc15;font-weight:900;margin-right:8px;">▼</span>'
           : '<span style="color:#d4d4d8;font-weight:900;margin-right:8px;letter-spacing:1px;">||</span>';
         const startSkipNote = state.startSectionEnabled !== false ? '' : ' <span style="color:#fcd34d;font-size:10px;">(スキップ)</span>';
-        startMain.innerHTML = `<div class="list-item-title mono">${startIcon}0:00${startSkipNote}</div>`;
+        const startNowBadge = isStartActive ? '<span class="active-section-badge">現在区間</span>' : '';
+        startMain.innerHTML = `<div class="list-item-title mono">${startIcon}0:00${startSkipNote}${startNowBadge}</div>`;
         startMain.addEventListener('click', () => {
           seekTo(0, { setGreenPin: false });
           settingsModal.classList.add('hidden');
@@ -5001,8 +5380,9 @@
 
         // Yellow Markers
         state.markers.forEach((mk) => {
+          const isCurSec = Boolean(activeSec && activeSec.markerId === mk.id);
           const item = document.createElement('div');
-          item.className = 'list-item';
+          item.className = 'list-item' + (isCurSec ? ' active-section' : '');
           if (mk.enabled === false) {
             item.style.opacity = '0.52';
           }
@@ -5014,7 +5394,8 @@
             : '<span style="color:#facc15;font-weight:900;margin-right:8px;">▼</span>';
           const nameHtml = mk.name ? ` <span style="font-weight:700;color:#ffffff;">${escapeHtml(mk.name)}</span>` : '';
           const skipBadge = mk.sectionEnabled === false ? ' <span style="color:#fcd34d;font-size:10px;">(スキップ)</span>' : '';
-          main.innerHTML = `<div class="list-item-title mono">${iconHtml}${formatTime(mk.time)}${nameHtml}${skipBadge}</div>`;
+          const nowBadge = isCurSec ? '<span class="active-section-badge">現在区間</span>' : '';
+          main.innerHTML = `<div class="list-item-title mono">${iconHtml}${formatTime(mk.time)}${nameHtml}${skipBadge}${nowBadge}</div>`;
           main.addEventListener('click', () => {
             seekTo(mk.time, { setGreenPin: false });
             settingsModal.classList.add('hidden');
@@ -5034,6 +5415,15 @@
           item.appendChild(pencilBtn);
           wrap.appendChild(item);
         });
+      }
+
+      function scrollActiveMarkerIntoView() {
+        const activeEl = document.querySelector('#markerListWrap .list-item.active-section');
+        if (activeEl) {
+          requestAnimationFrame(() => {
+            activeEl.scrollIntoView({ block: 'center', behavior: 'smooth' });
+          });
+        }
       }
 
       function renderPlaylist() {
@@ -5081,6 +5471,9 @@
         renderPlaylist();
         switchModalTab(initialTab);
         settingsModal.classList.remove('hidden');
+        if (initialTab === 'markers') {
+          scrollActiveMarkerIntoView();
+        }
       }
 
       // ==================== WIRE ALL EVENT LISTENERS ====================
@@ -5253,7 +5646,7 @@
 
       // Settings Modal Controls
       tabSettings.addEventListener('click', () => switchModalTab('settings'));
-      tabMarkers.addEventListener('click', () => { renderMarkerList(); switchModalTab('markers'); });
+      tabMarkers.addEventListener('click', () => { renderMarkerList(); switchModalTab('markers'); scrollActiveMarkerIntoView(); });
       tabPlaylist.addEventListener('click', () => { renderPlaylist(); switchModalTab('playlist'); });
 
       const closeModal = () => {
