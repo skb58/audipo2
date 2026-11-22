@@ -8,7 +8,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="Audipo2">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="app-version" content="v24">
+  <meta name="app-version" content="v25">
   <link rel="manifest" href="./manifest.json">
   <title>Audipo風 練習プレイヤー＆レコーダー</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='bg' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%231b2030'/%3E%3Cstop offset='100%25' stop-color='%230d0f15'/%3E%3C/linearGradient%3E%3ClinearGradient id='wv' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0%25' stop-color='%2360c5ff'/%3E%3Cstop offset='100%25' stop-color='%232563eb'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='url(%23bg)'/%3E%3Crect x='1' y='1' width='62' height='62' rx='15' fill='none' stroke='%233b82f6' stroke-opacity='0.3' stroke-width='2'/%3E%3Cg fill='url(%23wv)'%3E%3Crect x='10' y='28' width='4.5' height='12' rx='2.25' opacity='0.6'/%3E%3Crect x='18' y='22' width='4.5' height='24' rx='2.25' opacity='0.85'/%3E%3Crect x='26' y='15' width='4.5' height='36' rx='2.25'/%3E%3Crect x='34' y='21' width='4.5' height='25' rx='2.25' opacity='0.9'/%3E%3Crect x='42' y='26' width='4.5' height='16' rx='2.25' opacity='0.75'/%3E%3Crect x='50' y='30' width='4.5' height='9' rx='2.25' opacity='0.5'/%3E%3C/g%3E%3Cpath d='M36.25 10.5c0-1.4 1.1-2.5 2.5-2.5h5.5c1.4 0 2.5 1.1 2.5 2.5v2.4c0 .8-.3 1.5-.9 2.1l-3.2 3.1c-.6.6-1.6.6-2.2 0l-3.2-3.1c-.6-.6-.9-1.3-.9-2.1v-2.4z' fill='%23facc15'/%3E%3C/svg%3E">
@@ -2838,10 +2838,16 @@
 
     .whats-new-ver-head {
       display: flex;
-      align-items: center;
-      gap: 8px;
+      flex-direction: column;
+      gap: 5px;
       margin-bottom: 7px;
-      flex-wrap: wrap;
+    }
+
+    .whats-new-ver-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
     }
 
     .whats-new-ver-badge {
@@ -2859,6 +2865,17 @@
       background: linear-gradient(135deg, #2563eb 0%, #0284c7 100%);
       border-color: rgba(147, 197, 253, 0.72);
       color: #ffffff;
+    }
+
+    .whats-new-ver-date {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-sub);
+      white-space: nowrap;
+    }
+
+    .whats-new-ver-card.is-latest .whats-new-ver-date {
+      color: #93c5fd;
     }
 
     .whats-new-ver-title {
@@ -3744,7 +3761,7 @@
             <span id="modalMemoryCount" class="sec-value mono" style="color:#fde047;">0 / 1000件</span>
           </div>
           <div class="engine-desc" style="margin-bottom:9px;">
-            ファイルごとの黄色ピン・名前・スキップ設定・再生位置を最大1000ファイルまで自動記憶します（1000件を超えると古いものから自動削除）。未保存の録音は1000件の保存枠を使わず、一時キャッシュ枠にのみ音源とピンを一時保持します（「保存」後に1000件記憶へ登録）。
+            再生時間とファイルサイズで音源を判別し、黄色ピン・名前・スキップ設定・再生位置を最大1000ファイルまで自動記憶します（ファイル名を変更しても引き継がれ、1000件を超えると古いものから自動削除）。未保存の録音は一時キャッシュ枠にのみ保持します（「保存」後に1000件記憶へ登録）。
           </div>
           <div style="display:flex;gap:8px;">
             <button id="btnClearSessionCache" type="button" class="step-btn" style="flex:1;">一時音源キャッシュ削除</button>
@@ -3756,7 +3773,7 @@
         <div class="modal-section" style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
           <div>
             <div class="sec-title">バージョン情報</div>
-            <div id="settingsVersionLabel" class="engine-desc mono">現在: v24</div>
+            <div id="settingsVersionLabel" class="engine-desc mono">現在: v25</div>
           </div>
           <button id="btnShowReleaseHistory" type="button" class="step-btn" style="color:#93c5fd;border-color:rgba(66,165,245,0.45);">更新履歴を見る</button>
         </div>
@@ -3861,6 +3878,20 @@
     </div>
   </div>
 
+  <!-- ==================== 7.5 CLEAR ALL PINS CONFIRMATION MODAL ==================== -->
+  <div id="clearPinsConfirmModal" class="modal-backdrop hidden" style="z-index:76;">
+    <div class="mark-edit-card" role="dialog" aria-modal="true" aria-labelledby="clearPinsConfirmTitle">
+      <h3 id="clearPinsConfirmTitle" class="mark-edit-title" style="color:#fca5a5;">ピンをすべて削除しますか？</h3>
+      <p id="clearPinsConfirmDesc" style="margin:0 0 16px;font-size:12.5px;line-height:1.58;color:#d4d4d8;">
+        現在登録されている黄色ピンと緑の一時ピン、区間スキップ設定をすべて削除します。この操作は元に戻せません。
+      </p>
+      <div class="mark-edit-footer">
+        <button id="btnClearPinsCancel" type="button" class="mark-dialog-btn" style="color:#a1a1aa;">キャンセル</button>
+        <button id="btnClearPinsExecute" type="button" class="mark-dialog-btn" style="color:#f87171;">すべて削除する</button>
+      </div>
+    </div>
+  </div>
+
   <!-- ==================== 8. WHAT'S NEW / UPDATE NOTICE MODAL ==================== -->
   <div id="whatsNewModal" class="modal-backdrop hidden" style="z-index:82;">
     <div class="whats-new-card" role="dialog" aria-modal="true" aria-labelledby="whatsNewTitle">
@@ -3875,7 +3906,7 @@
           </div>
           <div>
             <h3 id="whatsNewTitle" class="whats-new-title">アップデートのお知らせ</h3>
-            <p id="whatsNewSub" class="whats-new-sub mono">v24 に更新されました</p>
+            <p id="whatsNewSub" class="whats-new-sub mono">v25 に更新されました</p>
           </div>
         </div>
         <button id="btnCloseWhatsNewX" type="button" class="modal-close" aria-label="閉じる">✕</button>
@@ -4114,6 +4145,10 @@
         rawBlob: null,
         currentFileOrigName: '',
         currentFileSize: 0,
+        currentMemoryKey: null,
+        ephemeralCutMemoryKey: null,
+        durationProbed: false,
+        restoredFromMemory: false,
         isUnsavedRecording: false,
         isFallbackLargeFile: false,
         isAnalyzingWave: false,
@@ -4350,17 +4385,19 @@
       const IDB_STORE = 'session_store';
       const MAX_REMEMBERED_FILES = 1000;
 
-      function loadTempSessionState(origName, size) {
+      function loadTempSessionState(size, duration = null) {
         try {
           const raw = localStorage.getItem(LS_TEMP_SESSION_STATE_KEY);
           if (!raw) return null;
           const rec = JSON.parse(raw);
           if (!rec || typeof rec !== 'object') return null;
-          if (origName && rec.origName && rec.origName !== origName && rec.displayName !== origName) {
-            return null;
-          }
           if (size && rec.size && Math.abs(rec.size - size) > 64) {
             return null;
+          }
+          if (typeof duration === 'number' && duration > 0 && typeof rec.duration === 'number' && rec.duration > 0) {
+            if (Math.abs(rec.duration - duration) > 0.75) {
+              return null;
+            }
           }
           return rec;
         } catch (_) {
@@ -4374,8 +4411,11 @@
         } catch (_) {}
       }
 
-      function makeFileFingerprint(name, size) {
-        return `${String(name || '')}::${Number(size) || 0}`;
+      // Filename-independent identity key based on exact byte size + audio duration (0.1s resolution)
+      function makeFileFingerprint(size, duration) {
+        const s = Math.max(0, Math.round(Number(size) || 0));
+        const dDeci = Math.max(0, Math.round((Number(duration) || 0) * 10));
+        return `sz:${s}::dur:${dDeci}`;
       }
 
       function readAllFileMemories() {
@@ -4412,47 +4452,91 @@
         }
       }
 
-      function lookupFileMemory(origName, size) {
-        if (!origName) return null;
+      // Match audio purely by exact file size + duration (tolerates minor metadata vs PCM decode duration drift <= 0.6s)
+      // Also seamlessly migrates legacy v24 records that stored exact file size without duration.
+      function lookupFileMemoryEntry(size, duration = null) {
+        const targetSize = Math.max(0, Math.round(Number(size) || 0));
+        if (targetSize <= 0) return null;
         const map = readAllFileMemories();
-        const exactKey = makeFileFingerprint(origName, size);
-        if (map[exactKey]) return map[exactKey];
+        const hasDur = typeof duration === 'number' && isFinite(duration) && duration > 0;
 
-        // Fallback: latest entry with matching original file name (useful if same file re-exported or size slightly differs)
-        let best = null;
+        if (hasDur) {
+          const exactKey = makeFileFingerprint(targetSize, duration);
+          if (map[exactKey]) {
+            return { key: exactKey, rec: map[exactKey] };
+          }
+        }
+
+        let bestDurMatch = null;
+        let bestDurDiff = Infinity;
+        let bestLegacySizeMatch = null;
+
         for (const key in map) {
           const rec = map[key];
-          if (rec && (rec.origName === origName || rec.displayName === origName)) {
-            if (!best || (rec.updatedAt || 0) > (best.updatedAt || 0)) {
-              best = rec;
+          if (!rec || Number(rec.size) !== targetSize) continue;
+
+          if (hasDur && typeof rec.duration === 'number' && isFinite(rec.duration) && rec.duration > 0) {
+            const diff = Math.abs(rec.duration - duration);
+            if (diff <= 0.65) {
+              if (diff < bestDurDiff - 0.001 || (Math.abs(diff - bestDurDiff) <= 0.001 && (rec.updatedAt || 0) > (bestDurMatch?.rec?.updatedAt || 0))) {
+                bestDurDiff = diff;
+                bestDurMatch = { key, rec };
+              }
+            }
+          } else if (!hasDur || !(typeof rec.duration === 'number' && rec.duration > 0)) {
+            // Either duration not yet probed (playlist preview) OR legacy pre-v25 record without stored duration
+            if (!bestLegacySizeMatch || (rec.updatedAt || 0) > (bestLegacySizeMatch.rec.updatedAt || 0)) {
+              bestLegacySizeMatch = { key, rec };
             }
           }
         }
-        return best;
+
+        return bestDurMatch || bestLegacySizeMatch || null;
+      }
+
+      function lookupFileMemory(size, duration = null) {
+        const hit = lookupFileMemoryEntry(size, duration);
+        return hit ? hit.rec : null;
+      }
+
+      function removeFileMemoryKey(keyToRemove) {
+        if (!keyToRemove) return;
+        const map = readAllFileMemories();
+        if (Object.prototype.hasOwnProperty.call(map, keyToRemove)) {
+          delete map[keyToRemove];
+          writeAllFileMemories(map);
+        }
       }
 
       let saveMemTimer = null;
       let lastPeriodicSavePerf = 0;
 
       function saveCurrentFileMemory(immediate = false) {
-        if (!state.hasAudio || !state.currentFileOrigName) return;
+        if (!state.hasAudio) return;
         const doSave = () => {
           clearTimeout(saveMemTimer);
           saveMemTimer = null;
           lastPeriodicSavePerf = performance.now();
 
           const liveTime = getLivePlayheadTime();
-          const origName = state.currentFileOrigName;
+          const origName = state.currentFileOrigName || trackTitleEl.textContent.trim() || 'audio';
           const size = state.currentFileSize || (state.rawBlob ? state.rawBlob.size : 0);
+          const dur = Number(state.duration) || 0;
+          if (size <= 0 || dur <= 0) return;
+
+          // Do not persist a bogus fallback 30s key before actual duration is resolved
+          if (!state.durationProbed && !state.audioBuffer && !state.wavMeta) return;
+
           const displayName = trackTitleEl.textContent.trim() || origName;
           const snapshot = {
             origName,
             displayName,
             size,
+            duration: Math.round(dur * 1000) / 1000,
             markers: cloneMarkerList(state.markers),
             startSectionEnabled: state.startSectionEnabled !== false,
             tempMarker: state.tempMarker !== null ? Number(state.tempMarker) : null,
-            currentTime: Math.max(0, Math.min(state.duration || 0, Number(liveTime) || 0)),
+            currentTime: Math.max(0, Math.min(dur, Number(liveTime) || 0)),
             playbackRate: state.playbackRate,
             pitchSemitones: state.pitchSemitones,
             sectionRepeat: Boolean(state.sectionRepeat),
@@ -4469,8 +4553,21 @@
           }
 
           clearTempSessionState();
-          const key = makeFileFingerprint(origName, size);
+          const key = makeFileFingerprint(size, dur);
           const map = readAllFileMemories();
+
+          // Migrate legacy key or minor duration-refinement key cleanly in place so no duplicate entry remains
+          if (state.currentMemoryKey && state.currentMemoryKey !== key && map[state.currentMemoryKey]) {
+            const prevRec = map[state.currentMemoryKey];
+            const sameSize = Number(prevRec.size) === size;
+            const legacyNoDur = !(typeof prevRec.duration === 'number' && prevRec.duration > 0);
+            const minorDurDrift = typeof prevRec.duration === 'number' && Math.abs(prevRec.duration - dur) <= 1.0;
+            if (sameSize && (legacyNoDur || minorDurDrift)) {
+              delete map[state.currentMemoryKey];
+            }
+          }
+
+          state.currentMemoryKey = key;
           map[key] = snapshot;
           writeAllFileMemories(map);
 
@@ -4479,6 +4576,7 @@
               origName,
               displayName,
               size,
+              duration: snapshot.duration,
               markerCount: state.markers.length,
               currentTime: snapshot.currentTime,
               updatedAt: snapshot.updatedAt
@@ -4635,7 +4733,7 @@
         });
       }
 
-      async function saveSessionAudioToIDB(blob, origName, displayName, isUnsavedRecording = false) {
+      async function saveSessionAudioToIDB(blob, origName, displayName, isUnsavedRecording = false, duration = state.duration) {
         if (!blob) return false;
         try {
           // Guard against exceeding device browser storage quota
@@ -4661,6 +4759,7 @@
               origName: origName || displayName,
               displayName: displayName || origName,
               size: blob.size,
+              duration: Number(duration) || 0,
               isUnsavedRecording: Boolean(isUnsavedRecording),
               savedAt: Date.now()
             }, 'active_track');
@@ -5969,20 +6068,24 @@
             return;
           }
 
-          let resolvedDuration = preDecodedBuffer
+          let rawProbedDur = preDecodedBuffer
             ? preDecodedBuffer.duration
             : (wavMeta ? wavMeta.duration : await probeDuration(url));
           if (isCancelled()) {
             URL.revokeObjectURL(url);
-            return;
+            return { restoredFromMem: false };
           }
-          if (!resolvedDuration || resolvedDuration <= 0) resolvedDuration = 30;
+          const durationProbed = Boolean(rawProbedDur && rawProbedDur > 0);
+          const resolvedDuration = durationProbed ? rawProbedDur : 30;
 
           const origName = opts.origName || title;
           const isUnsavedRec = Boolean(opts.isUnsavedRecording);
           state.currentFileOrigName = origName;
           state.currentFileSize = blob.size || 0;
+          state.durationProbed = durationProbed;
           state.isUnsavedRecording = isUnsavedRec;
+          state.currentMemoryKey = null;
+          state.ephemeralCutMemoryKey = opts.fromSectionCut ? makeFileFingerprint(blob.size || 0, resolvedDuration) : null;
 
           let finalDisplayName = title;
           let finalMarkers = cloneMarkerList(initialMarkers);
@@ -5993,38 +6096,44 @@
 
           let mem = null;
           if (!isUnsavedRec && opts.restoreFromMemory !== false && finalMarkers.length === 0) {
-            mem = lookupFileMemory(origName, blob.size);
+            const hit = lookupFileMemoryEntry(blob.size, durationProbed ? resolvedDuration : null);
+            if (hit) {
+              mem = hit.rec;
+              state.currentMemoryKey = hit.key;
+            }
           } else if (isUnsavedRec && opts.restoreFromTempCache && finalMarkers.length === 0) {
-            mem = loadTempSessionState(origName, blob.size);
+            mem = loadTempSessionState(blob.size, durationProbed ? resolvedDuration : null);
           }
           if (mem) {
-            {
-              restoredFromMem = true;
-              if (mem.displayName) finalDisplayName = mem.displayName;
-              if (Array.isArray(mem.markers)) finalMarkers = cloneMarkerList(mem.markers);
-              finalStartSecEnabled = mem.startSectionEnabled !== false;
-              if (typeof mem.currentTime === 'number' && isFinite(mem.currentTime)) {
-                finalCurrentTime = mem.currentTime;
-              }
-              if (typeof mem.tempMarker === 'number' && isFinite(mem.tempMarker)) {
-                finalTempMarker = mem.tempMarker;
-              }
-              if (typeof mem.playbackRate === 'number' && isFinite(mem.playbackRate)) {
-                setPlaybackSpeed(mem.playbackRate);
-              }
-              if (typeof mem.pitchSemitones === 'number' && isFinite(mem.pitchSemitones)) {
-                setPitch(mem.pitchSemitones);
-              }
-              if (typeof mem.sectionRepeat === 'boolean') {
-                state.sectionRepeat = mem.sectionRepeat;
-                btnSectionRepeat.classList.toggle('active-green', state.sectionRepeat);
-                sectionRepeatLabel.textContent = state.sectionRepeat ? '区間ON' : '区間OFF';
-              }
-              if (typeof mem.zoomWindowSeconds === 'number' && isFinite(mem.zoomWindowSeconds)) {
-                setZoomSpan(mem.zoomWindowSeconds);
-              }
+            restoredFromMem = true;
+            // Preserve custom in-app title if user explicitly renamed it; otherwise use the newly opened filename
+            if (mem.displayName && mem.displayName !== mem.origName) {
+              finalDisplayName = mem.displayName;
+            }
+            if (Array.isArray(mem.markers)) finalMarkers = cloneMarkerList(mem.markers);
+            finalStartSecEnabled = mem.startSectionEnabled !== false;
+            if (typeof mem.currentTime === 'number' && isFinite(mem.currentTime)) {
+              finalCurrentTime = mem.currentTime;
+            }
+            if (typeof mem.tempMarker === 'number' && isFinite(mem.tempMarker)) {
+              finalTempMarker = mem.tempMarker;
+            }
+            if (typeof mem.playbackRate === 'number' && isFinite(mem.playbackRate)) {
+              setPlaybackSpeed(mem.playbackRate);
+            }
+            if (typeof mem.pitchSemitones === 'number' && isFinite(mem.pitchSemitones)) {
+              setPitch(mem.pitchSemitones);
+            }
+            if (typeof mem.sectionRepeat === 'boolean') {
+              state.sectionRepeat = mem.sectionRepeat;
+              btnSectionRepeat.classList.toggle('active-green', state.sectionRepeat);
+              sectionRepeatLabel.textContent = state.sectionRepeat ? '区間ON' : '区間OFF';
+            }
+            if (typeof mem.zoomWindowSeconds === 'number' && isFinite(mem.zoomWindowSeconds)) {
+              setZoomSpan(mem.zoomWindowSeconds);
             }
           }
+          state.restoredFromMemory = restoredFromMem;
 
           state.wavMeta = wavMeta;
           state.duration = resolvedDuration;
@@ -6106,7 +6215,7 @@
             );
             if (isCancelled() || !pyr) return;
             finalizeDecodedAudio(preDecodedBuffer, pyr, myToken);
-            return;
+            return { restoredFromMem };
           }
 
           // Large WAV (> 90MB): Use Zero-OOM Streaming WAV Waveform Builder! Works for 400MB ~ 2GB+ WAV files!
@@ -6137,7 +6246,7 @@
               if (isCancelled() || !pyr) return;
               finalizeStreamedWavPyramid(pyr, myToken);
             })();
-            return;
+            return { restoredFromMem };
           }
 
           if (!wavMeta && blob.size > 250 * 1024 * 1024) {
@@ -6145,7 +6254,7 @@
             setEngine('native');
             hideWaveProgress(0);
             showToast('超大容量の圧縮音声のためOS標準再生で動作します');
-            return;
+            return { restoredFromMem };
           }
 
           // Standard files (<= 90MB WAV or <= 250MB MP3/M4A/etc.): Full PCM decode with fallback to WAV streaming if OOM
@@ -6252,11 +6361,13 @@
 
             finalizeDecodedAudio(decoded, pyr, myToken);
           })();
+          return { restoredFromMem };
         } catch (err) {
           console.error('loadAudioBlob error:', err);
           state.isAnalyzingWave = false;
           hideWaveProgress(0);
           showToast('音声ファイルの読み込みに失敗しました');
+          return { restoredFromMem: false };
         }
       }
 
@@ -6276,10 +6387,26 @@
         if (token !== state.loadToken) return;
         state.waveformPyramid = pyramid;
         state.isAnalyzingWave = false;
+        const hadProbed = state.durationProbed;
         if (pyramid.duration && pyramid.duration > 0) {
           state.duration = pyramid.duration;
+          state.durationProbed = true;
           state.numRows = computeRows(state.duration);
         }
+        if (!hadProbed && !state.restoredFromMemory && !state.isUnsavedRecording && state.markers.length === 0) {
+          const lateHit = lookupFileMemoryEntry(state.currentFileSize, state.duration);
+          if (lateHit && lateHit.rec) {
+            state.currentMemoryKey = lateHit.key;
+            state.restoredFromMemory = true;
+            if (Array.isArray(lateHit.rec.markers)) {
+              state.markers = cloneMarkerList(lateHit.rec.markers).filter(m => m.time > 0.05 && m.time < state.duration - 0.05);
+            }
+            state.startSectionEnabled = lateHit.rec.startSectionEnabled !== false;
+            renderMarkerList();
+            updateHeaderSubInfo();
+          }
+        }
+        saveCurrentFileMemory(true);
         computeAutoGainsFromPeak(pyramid.peak);
         btnCutYellowSection.disabled = !state.wavMeta;
         updateWaveGainUI();
@@ -6303,10 +6430,26 @@
         state.waveformPyramid = pyramid;
         state.isAnalyzingWave = false;
 
+        const hadProbed = state.durationProbed;
         if (decoded.duration && decoded.duration > 0) {
           state.duration = decoded.duration;
+          state.durationProbed = true;
           state.numRows = computeRows(state.duration);
         }
+        if (!hadProbed && !state.restoredFromMemory && !state.isUnsavedRecording && state.markers.length === 0) {
+          const lateHit = lookupFileMemoryEntry(state.currentFileSize, state.duration);
+          if (lateHit && lateHit.rec) {
+            state.currentMemoryKey = lateHit.key;
+            state.restoredFromMemory = true;
+            if (Array.isArray(lateHit.rec.markers)) {
+              state.markers = cloneMarkerList(lateHit.rec.markers).filter(m => m.time > 0.05 && m.time < state.duration - 0.05);
+            }
+            state.startSectionEnabled = lateHit.rec.startSectionEnabled !== false;
+            renderMarkerList();
+            updateHeaderSubInfo();
+          }
+        }
+        saveCurrentFileMemory(true);
 
         computeAutoGainsFromPeak(pyramid ? pyramid.peak : 0);
 
@@ -6422,11 +6565,19 @@
           document.body.removeChild(a);
           URL.revokeObjectURL(url);
 
-          // Now that the file has been saved, enable pin memory for this file under the saved filename & size
+          // Now that the file has been saved, persist pin memory under the exported file's exact (size, duration)
           const wasUnsaved = state.isUnsavedRecording;
+          const nextSize = blob.size || state.currentFileSize;
+          const nextKey = makeFileFingerprint(nextSize, state.duration);
+          if (state.ephemeralCutMemoryKey && state.ephemeralCutMemoryKey !== nextKey) {
+            removeFileMemoryKey(state.ephemeralCutMemoryKey);
+          }
+          state.ephemeralCutMemoryKey = null;
           state.isUnsavedRecording = false;
           state.currentFileOrigName = name;
-          state.currentFileSize = blob.size || state.currentFileSize;
+          state.currentFileSize = nextSize;
+          state.currentMemoryKey = nextKey;
+          state.rawBlob = blob;
           trackTitleEl.textContent = name;
           if (state.playlist[state.currentTrackIndex]) {
             state.playlist[state.currentTrackIndex].name = name;
@@ -6435,7 +6586,7 @@
             state.playlist[state.currentTrackIndex].isUnsavedRecording = false;
           }
           saveCurrentFileMemory(true);
-          saveSessionAudioToIDB(blob, name, name, false);
+          saveSessionAudioToIDB(blob, name, name, false, state.duration);
           updateHeaderSubInfo();
           updateMemoryCountBadge();
 
@@ -7579,7 +7730,7 @@
               if (shifted > 0.05 && shifted < newDuration - 0.05) {
                 const dupIdx = updatedMarkers.findIndex(x => Math.abs(x.time - shifted) < 0.06);
                 if (dupIdx >= 0) {
-                  if (!updatedMarkers[dupIdx].name && m.name) updatedMarkers[dupIdx].name = m.name;
+                  if (m.name) updatedMarkers[dupIdx].name = m.name;
                   updatedMarkers[dupIdx].sectionEnabled = m.sectionEnabled;
                 } else {
                   updatedMarkers.push({ ...m, time: shifted });
@@ -7597,13 +7748,24 @@
             nextStartEnabled = boundaryMarker ? boundaryMarker.sectionEnabled : true;
           }
 
+          // Replace previous intermediate unsaved cut key (keep original untouched file's pins safe)
+          if (state.ephemeralCutMemoryKey) {
+            removeFileMemoryKey(state.ephemeralCutMemoryKey);
+          }
+
           if (state.playlist[state.currentTrackIndex]) {
             state.playlist[state.currentTrackIndex].blob = newBlob;
             state.playlist[state.currentTrackIndex].markers = cloneMarkerList(updatedMarkers);
             state.playlist[state.currentTrackIndex].startSectionEnabled = nextStartEnabled;
           }
 
-          await loadAudioBlob(newBlob, trackTitleEl.textContent.trim(), updatedMarkers, false, null, nextStartEnabled, { origName: state.currentFileOrigName || trackTitleEl.textContent.trim(), restoreFromMemory: false, persistSession: true, isUnsavedRecording: state.isUnsavedRecording });
+          await loadAudioBlob(newBlob, trackTitleEl.textContent.trim(), updatedMarkers, false, null, nextStartEnabled, {
+            origName: state.currentFileOrigName || trackTitleEl.textContent.trim(),
+            restoreFromMemory: false,
+            persistSession: true,
+            isUnsavedRecording: state.isUnsavedRecording,
+            fromSectionCut: true
+          });
           seekTo(Math.min(state.duration, spliceTime), { setGreenPin: false });
           showToast(`区間を削除しました (-${formatTime(cutDuration)})`);
           return;
@@ -7662,8 +7824,8 @@
             if (shifted > 0.05 && shifted < newBuf.duration - 0.05) {
               const dupIdx = updatedMarkers.findIndex(x => Math.abs(x.time - shifted) < 0.06);
               if (dupIdx >= 0) {
-                // Keep whichever has a name, or the later marker's sectionEnabled state
-                if (!updatedMarkers[dupIdx].name && m.name) {
+                // Prioritize the incoming next section's name and sectionEnabled state
+                if (m.name) {
                   updatedMarkers[dupIdx].name = m.name;
                 }
                 updatedMarkers[dupIdx].sectionEnabled = m.sectionEnabled;
@@ -7679,25 +7841,34 @@
         }
         updatedMarkers.sort((a, b) => a.time - b.time);
 
-        if (sec.start <= 0.02 && sec.markerObj) {
+        if (sec.start <= 0.02) {
           // If first section [0, m1] was cut, m1 becomes 0:00 so its sectionEnabled becomes startSectionEnabled
           const boundaryMarker = state.markers.find(m => Math.abs(m.time - sec.end) < 0.03);
           state.startSectionEnabled = boundaryMarker ? boundaryMarker.sectionEnabled : true;
         }
 
-        // Rebuild pyramid & WAV blob
-        const newBlob = encodeWavFromAudioBuffer(newBuf);
+        // Rebuild pyramid & WAV blob using the exact same bit depth as exportCurrentWav() so saved file size matches 100%
+        const newBlob = encodeWavFromAudioBuffer(newBuf, state.recBitDepth);
         const newUrl = URL.createObjectURL(newBlob);
+
+        // Replace any previous intermediate cut entry (keeping the original untouched file's memory intact)
+        if (state.ephemeralCutMemoryKey) {
+          removeFileMemoryKey(state.ephemeralCutMemoryKey);
+        }
+        const cutKey = makeFileFingerprint(newBlob.size, newBuf.duration);
+        state.currentMemoryKey = cutKey;
+        state.ephemeralCutMemoryKey = cutKey;
 
         state.audioBuffer = newBuf;
         state.rawBlob = newBlob;
         state.currentFileSize = newBlob.size;
         state.waveformPyramid = buildPcmPyramid(newBuf);
         state.duration = newBuf.duration;
+        state.durationProbed = true;
         state.markers = updatedMarkers;
         state.tempMarker = null;
         state.numRows = computeRows(state.duration);
-        saveSessionAudioToIDB(newBlob, state.currentFileOrigName, trackTitleEl.textContent.trim(), state.isUnsavedRecording);
+        saveSessionAudioToIDB(newBlob, state.currentFileOrigName, trackTitleEl.textContent.trim(), state.isUnsavedRecording, newBuf.duration);
 
         if (audioEl.dataset.url) {
           URL.revokeObjectURL(audioEl.dataset.url);
@@ -10854,10 +11025,11 @@
             state.playlist[existingIdx].blob = f;
             if (k === 0) targetIdx = existingIdx;
           } else {
-            const mem = lookupFileMemory(f.name, f.size);
+            const mem = lookupFileMemory(f.size, null);
             const newIdx = state.playlist.length;
+            const customTitle = (mem && mem.displayName && mem.displayName !== mem.origName) ? mem.displayName : f.name;
             state.playlist.push({
-              name: mem?.displayName || f.name,
+              name: customTitle,
               origName: f.name,
               blob: f,
               markers: mem ? cloneMarkerList(mem.markers) : [],
@@ -10868,9 +11040,8 @@
         }
         state.currentTrackIndex = targetIdx >= 0 ? targetIdx : 0;
         const firstFile = valid[0];
-        const hasMem = Boolean(lookupFileMemory(firstFile.name, firstFile.size));
-        await loadAudioBlob(firstFile, firstFile.name, [], false, null, true, { origName: firstFile.name, restoreFromMemory: true, persistSession: true });
-        if (!hasMem) {
+        const loadRes = await loadAudioBlob(firstFile, firstFile.name, [], false, null, true, { origName: firstFile.name, restoreFromMemory: true, persistSession: true });
+        if (!loadRes || !loadRes.restoredFromMem) {
           showToast(valid.length > 1 ? `${valid.length}個のローカルファイルを読み込みました` : `読込完了: ${firstFile.name}`);
         }
         fileInput.value = '';
@@ -11089,14 +11260,27 @@
       document.addEventListener('webkitfullscreenchange', onFullscreenStateChanged);
 
       // ==================== GITHUB / PWA SOFTWARE UPDATE CHECK & APPLY ====================
-      const APP_VERSION = 'v24';
+      const APP_VERSION = 'v25';
 
       // Ordered newest-first; each release appends a new object at the top.
       // Users who skip multiple versions automatically see ALL unseen versions between lastSeen and current.
       const APP_RELEASE_NOTES = [
         {
+          version: 'v25',
+          verNum: 25,
+          date: '2026/11/23',
+          title: '更新日の表示・全削除確認・時間とサイズでのピン記憶',
+          items: [
+            '変更履歴・アップデートのお知らせに各バージョンの変更日を表示するようにしました',
+            'ピンの「全削除」ボタンを押した際に、本当に削除してよいか確認画面を表示するようにしました',
+            'ピンの記憶判別をファイル名ではなく「再生時間とファイルサイズ」で行うように変更しました（ファイル名を変更してもピンが引き継がれます）',
+            '区間削除（切り取り）でファイルサイズや長さ・ピン位置が変わった際も、新しいサイズ・時間・ピン位置へ自動追従するようにしました'
+          ]
+        },
+        {
           version: 'v24',
           verNum: 24,
+          date: '2026/11/22',
           title: 'アップデート連絡・更新概要の初回表示',
           items: [
             '更新後の初回起動時に、変更内容の概要を自動でお知らせするようにしました（各バージョン1回のみ表示）',
@@ -11107,15 +11291,17 @@
         {
           version: 'v23',
           verNum: 23,
+          date: '2026/11/22',
           title: '曲の始まり・終わり自動ピン追加',
           items: [
             'ピンリスト画面に「曲の始まり」「曲の終わり」自動ピン追加ボタンを配置しました',
-            '曲間の入れ替えやチューニング等の演奏停止（約13〜30秒前後）を自動判別して、演奏区間ごとに黄色ピンを配置します'
+            '曲の開始終了を自動判別して演奏区間ごとにピンを配置します'
           ]
         },
         {
           version: 'v22',
           verNum: 22,
+          date: '2026/11/22',
           title: '鍵盤UIの視認性向上＆横画面ロック強化',
           items: [
             '鍵盤のオクターブ切替と「持続」ボタンを押しやすく強調し、基準ピッチ(Hz)を「キー:C」の隣へ整理しました',
@@ -11125,6 +11311,7 @@
         {
           version: 'v21',
           verNum: 21,
+          date: '2026/11/22',
           title: 'アプリ内更新後の表示崩れ修正',
           items: [
             '更新ボタンからリロードした直後に最下部の操作ボタンが画面外に隠れて押せなくなる現象を修正しました'
@@ -11133,6 +11320,7 @@
         {
           version: 'v20',
           verNum: 20,
+          date: '2026/11/22',
           title: '鍵盤の縦1オクターブ／横2オクターブ切替',
           items: [
             '縦画面では大きく弾きやすい1オクターブ、横画面では広い2オクターブへ自動で切り替わるようにしました',
@@ -11180,13 +11368,22 @@
 
           const head = document.createElement('div');
           head.className = 'whats-new-ver-head';
+          const metaRow = document.createElement('div');
+          metaRow.className = 'whats-new-ver-meta';
           const badge = document.createElement('span');
           badge.className = 'whats-new-ver-badge mono';
           badge.textContent = entry.version;
+          metaRow.appendChild(badge);
+          if (entry.date) {
+            const dateEl = document.createElement('span');
+            dateEl.className = 'whats-new-ver-date mono';
+            dateEl.textContent = `変更日: ${entry.date}`;
+            metaRow.appendChild(dateEl);
+          }
           const vTitle = document.createElement('span');
           vTitle.className = 'whats-new-ver-title';
           vTitle.textContent = entry.title;
-          head.appendChild(badge);
+          head.appendChild(metaRow);
           head.appendChild(vTitle);
 
           const ul = document.createElement('ul');
@@ -11506,7 +11703,28 @@
         addYellowPinAtCurrent();
         scrollActiveMarkerIntoView(upperMarkerListWrap);
       });
-      document.getElementById('btnClearAllMarkersUpper').addEventListener('click', () => {
+      const clearPinsConfirmModal = document.getElementById('clearPinsConfirmModal');
+      const clearPinsConfirmDesc = document.getElementById('clearPinsConfirmDesc');
+
+      function openClearAllMarkersConfirm() {
+        if (!state.hasAudio) {
+          showToast('音声ファイルが読み込まれていません');
+          return;
+        }
+        if (state.markers.length === 0 && state.tempMarker === null && state.startSectionEnabled !== false) {
+          showToast('削除するピンがありません');
+          return;
+        }
+        const yellowCount = state.markers.length;
+        const extra = state.tempMarker !== null ? '・緑の一時ピン' : '';
+        clearPinsConfirmDesc.textContent = yellowCount > 0
+          ? `現在登録されている黄色ピン ${yellowCount}個${extra}および区間スキップ設定をすべて削除します。よろしいですか？（元に戻せません）`
+          : '現在設定されている一時ピン・区間スキップ設定をすべてリセットします。よろしいですか？';
+        clearPinsConfirmModal.classList.remove('hidden');
+      }
+
+      function executeClearAllMarkers() {
+        clearPinsConfirmModal.classList.add('hidden');
         state.markers = [];
         state.startSectionEnabled = true;
         state.tempMarker = null;
@@ -11515,8 +11733,19 @@
         updatePinButtonsUI();
         updateSectionBarUI();
         renderAllCanvases();
-        showToast('すべてのマーカーを削除しました');
+        renderMarkerList();
+        showToast('すべてのピンを削除しました');
+      }
+
+      document.getElementById('btnClearPinsCancel').addEventListener('click', () => {
+        clearPinsConfirmModal.classList.add('hidden');
       });
+      document.getElementById('btnClearPinsExecute').addEventListener('click', executeClearAllMarkers);
+      clearPinsConfirmModal.addEventListener('click', (e) => {
+        if (e.target === clearPinsConfirmModal) clearPinsConfirmModal.classList.add('hidden');
+      });
+
+      document.getElementById('btnClearAllMarkersUpper').addEventListener('click', openClearAllMarkersConfirm);
 
       // Section Action Bar Listeners: tapping section bar jumps to Upper Right Page (Pin List) & scrolls to current section
       currentSectionInfo.addEventListener('click', () => {
@@ -11786,18 +12015,7 @@
         addYellowPinAtCurrent();
         renderMarkerList();
       });
-      document.getElementById('btnClearAllMarkers').addEventListener('click', () => {
-        state.markers = [];
-        state.startSectionEnabled = true;
-        state.tempMarker = null;
-        syncCurrentPlaylistMarkers();
-        updateHeaderSubInfo();
-        updatePinButtonsUI();
-        updateSectionBarUI();
-        renderAllCanvases();
-        renderMarkerList();
-        showToast('すべてのマーカーを削除しました');
-      });
+      document.getElementById('btnClearAllMarkers').addEventListener('click', openClearAllMarkersConfirm);
 
       // ==================== ANDROID / MOBILE BACK BUTTON GUARD ====================
       // Pressing Back closes open modals first, then returns to the Waveform Home screen ('wave').
@@ -11841,6 +12059,8 @@
         // 1. Close topmost open modal if any
         if (whatsNewModal && !whatsNewModal.classList.contains('hidden')) {
           closeWhatsNewModal();
+        } else if (clearPinsConfirmModal && !clearPinsConfirmModal.classList.contains('hidden')) {
+          clearPinsConfirmModal.classList.add('hidden');
         } else if (!cutConfirmModal.classList.contains('hidden')) {
           pendingCutSection = null;
           cutConfirmModal.classList.add('hidden');
@@ -11961,8 +12181,8 @@
           const dispName = cached.displayName || origName;
           const isUnsaved = Boolean(cached.isUnsavedRecording);
           const mem = isUnsaved
-            ? loadTempSessionState(origName, cached.blob.size)
-            : lookupFileMemory(origName, cached.blob.size);
+            ? loadTempSessionState(cached.blob.size, cached.duration || null)
+            : lookupFileMemory(cached.blob.size, cached.duration || null);
           state.playlist = [{
             name: mem?.displayName || dispName,
             origName,
