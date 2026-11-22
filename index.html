@@ -1673,7 +1673,7 @@
         <div class="rec-head">
           <div class="rec-label-group">
             <span class="rec-dot" style="animation: pulseDot 1s infinite ease-in-out;"></span>
-            <span>録音中 (PCM高音質・ゲイン <span id="recLiveGainLabel">4.0x</span>)</span>
+            <span>録音中 (<span id="recLiveSpecLabel">PCM</span>・<span id="recLiveGainLabel">1.0x</span>)</span>
           </div>
           <span id="recTimerText" class="rec-timer mono">00:00.0</span>
         </div>
@@ -2044,16 +2044,41 @@
           </div>
 
           <div class="sec-head" style="margin-top:12px;">
-            <span class="sec-title">マイク録音入力ゲイン（停止後自動最適化）</span>
-            <span id="modalMicGainVal" class="sec-value mono" style="color:#fca5a5;">4.0x (+12dB)</span>
+            <span class="sec-title">マイク録音入力ゲイン（1xはコンプ完全バイパス）</span>
+            <span id="modalMicGainVal" class="sec-value mono" style="color:#fca5a5;">1.0x (0dB・原音)</span>
           </div>
           <div class="opt-grid-5">
-            <button type="button" data-mic-gain="1" class="opt-pill mic-gain-opt mono">1x</button>
+            <button type="button" data-mic-gain="1" class="opt-pill mic-gain-opt active-red mono">1x</button>
+            <button type="button" data-mic-gain="1.5" class="opt-pill mic-gain-opt mono">1.5x</button>
             <button type="button" data-mic-gain="2" class="opt-pill mic-gain-opt mono">2x</button>
-            <button type="button" data-mic-gain="4" class="opt-pill mic-gain-opt active-red mono">4x</button>
+            <button type="button" data-mic-gain="4" class="opt-pill mic-gain-opt mono">4x</button>
             <button type="button" data-mic-gain="6" class="opt-pill mic-gain-opt mono">6x</button>
-            <button type="button" data-mic-gain="8" class="opt-pill mic-gain-opt mono">8x</button>
           </div>
+
+          <div class="sec-head" style="margin-top:12px;">
+            <span class="sec-title">録音PCMフォーマット（WAV出力）</span>
+            <span id="modalRecBitVal" class="sec-value mono" style="color:#93c5fd;">16bit (ディザ付)</span>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
+            <button type="button" data-rec-bits="16" class="opt-pill rec-bits-opt active-green">16bit 高互換（ディザ付）</button>
+            <button type="button" data-rec-bits="24" class="opt-pill rec-bits-opt">24bit ハイレゾPCM</button>
+          </div>
+
+          <div class="toggle-row">
+            <div>
+              <div class="sec-title">録音後の自動ノーマライズ</div>
+              <div id="recNormStatusText" class="engine-desc">OFF（無加工の原音PCMそのまま保存）</div>
+            </div>
+            <button id="btnToggleRecNorm" type="button" class="toggle-pill">OFF</button>
+          </div>
+
+          <div class="sec-head" style="margin-top:10px;">
+            <span class="sec-title">入力マイク選択（外部マイク対応）</span>
+            <button id="btnRefreshMics" type="button" class="step-btn" style="padding:2px 8px;font-size:10px;">更新</button>
+          </div>
+          <select id="selectMicDevice" class="text-input" style="font-size:12px;">
+            <option value="">端末の標準マイク（自動）</option>
+          </select>
         </div>
 
         <!-- Track Name Rename -->
@@ -2195,6 +2220,8 @@
       const recMeterBar = document.getElementById('recMeterBar');
       const recMarkerCountBadge = document.getElementById('recMarkerCountBadge');
       const recLiveGainLabel = document.getElementById('recLiveGainLabel');
+      const recLiveSpecLabel = document.getElementById('recLiveSpecLabel');
+      const selectMicDevice = document.getElementById('selectMicDevice');
 
       const btnWaveGainQuick = document.getElementById('btnWaveGainQuick');
       const btnZoomSpanReset = document.getElementById('btnZoomSpanReset');
@@ -2301,9 +2328,12 @@
         autoWaveGain: 1.0,
 
         // Playback Boost & Mic Input Gain
-        boostMode: 'auto', // 'auto' | 1 | 1.5 | 2 | 3 | 4
+        boostMode: 'auto', // 'auto' | 1 | 1.5 | 2 | 3 | 5
         autoBoostGain: 1.0,
-        micGain: 4.0, // Default +12dB
+        micGain: 1.0, // Default 0dB pure uncompressed capture
+        recBitDepth: 16, // 16 (TPDF dithered) | 24 (high-res PCM)
+        recAutoNormalize: false, // Default OFF for raw untouched PCM
+        micDeviceId: '',
 
         // Acoustic Reverb Presets
         reverbPresets: [
@@ -2347,11 +2377,14 @@
         recGainNode: null,
         recLimiterNode: null,
         recAnalyser: null,
+        recWorkletNode: null,
+        recWorkletLoaded: false,
         recProcessor: null,
         recSilentGain: null,
         recBuffersL: [],
         recBuffersR: [],
-        recSampleRate: 44100,
+        recChannelCount: 2,
+        recSampleRate: 48000,
         recStartPerf: 0,
         recPendingMarkers: [],
         recAnimId: null
@@ -2624,6 +2657,10 @@
             waveGainMode: state.waveGainMode,
             boostMode: state.boostMode,
             micGain: state.micGain,
+            micGainDefaultV2: true,
+            recBitDepth: state.recBitDepth,
+            recAutoNormalize: state.recAutoNormalize,
+            micDeviceId: state.micDeviceId,
             reverbIndex: state.reverbIndex,
             zoomVisible: state.zoomVisible,
             zoomWindowSeconds: state.zoomWindowSeconds
@@ -2667,7 +2704,15 @@
           }
           if (p.waveGainMode !== undefined) state.waveGainMode = p.waveGainMode;
           if (p.boostMode !== undefined) state.boostMode = p.boostMode;
-          if (typeof p.micGain === 'number' && isFinite(p.micGain)) state.micGain = p.micGain;
+          if (p.micGainDefaultV2 && typeof p.micGain === 'number' && isFinite(p.micGain)) {
+            state.micGain = p.micGain;
+          } else {
+            // Migrate legacy v1 default (4.0x) to clean 1.0x (0dB) once
+            state.micGain = 1.0;
+          }
+          if (p.recBitDepth === 16 || p.recBitDepth === 24) state.recBitDepth = p.recBitDepth;
+          if (typeof p.recAutoNormalize === 'boolean') state.recAutoNormalize = p.recAutoNormalize;
+          if (typeof p.micDeviceId === 'string') state.micDeviceId = p.micDeviceId;
           if (typeof p.reverbIndex === 'number' && p.reverbIndex >= 0 && p.reverbIndex < state.reverbPresets.length) {
             state.reverbIndex = p.reverbIndex;
             const rp = state.reverbPresets[state.reverbIndex];
@@ -3492,10 +3537,13 @@
       }
 
       function setMicGain(val) {
-        const clamped = Math.max(1, Math.min(8, parseFloat(val) || 4));
+        const parsed = parseFloat(val);
+        const clamped = Math.max(1, Math.min(6, isFinite(parsed) ? parsed : 1));
         state.micGain = clamped;
         const db = Math.round(20 * Math.log10(clamped));
-        document.getElementById('modalMicGainVal').textContent = `${clamped.toFixed(1)}x (+${db}dB)`;
+        document.getElementById('modalMicGainVal').textContent = clamped <= 1.01
+          ? '1.0x (0dB・原音)'
+          : `${clamped.toFixed(1)}x (+${db}dB)`;
         recLiveGainLabel.textContent = `${clamped.toFixed(1)}x`;
         if (audioCtx && state.recGainNode) {
           state.recGainNode.gain.setTargetAtTime(clamped, audioCtx.currentTime, 0.02);
@@ -3503,6 +3551,50 @@
         document.querySelectorAll('.mic-gain-opt').forEach(btn => {
           btn.classList.toggle('active-red', Math.abs(parseFloat(btn.dataset.micGain) - clamped) < 0.05);
         });
+      }
+
+      function updateRecSettingsUI() {
+        const bitEl = document.getElementById('modalRecBitVal');
+        if (bitEl) {
+          bitEl.textContent = state.recBitDepth === 24 ? '24bit ハイレゾPCM' : '16bit (ディザ付)';
+        }
+        document.querySelectorAll('.rec-bits-opt').forEach(btn => {
+          btn.classList.toggle('active-green', parseInt(btn.dataset.recBits, 10) === state.recBitDepth);
+        });
+
+        const normBtn = document.getElementById('btnToggleRecNorm');
+        const normTxt = document.getElementById('recNormStatusText');
+        if (normBtn) {
+          normBtn.textContent = state.recAutoNormalize ? 'ON' : 'OFF';
+          normBtn.classList.toggle('on', state.recAutoNormalize);
+        }
+        if (normTxt) {
+          normTxt.textContent = state.recAutoNormalize
+            ? 'ON（停止後に音量を-1dBFSへ自動最適化）'
+            : 'OFF（無加工の原音PCMそのまま保存）';
+        }
+      }
+
+      async function refreshMicDeviceList() {
+        if (!navigator.mediaDevices || !navigator.mediaDevices.enumerateDevices || !selectMicDevice) return;
+        try {
+          const devices = await navigator.mediaDevices.enumerateDevices();
+          const inputs = devices.filter(d => d.kind === 'audioinput');
+          const prevVal = state.micDeviceId || '';
+          selectMicDevice.innerHTML = '<option value="">端末の標準マイク（自動）</option>';
+          inputs.forEach((dev, idx) => {
+            if (!dev.deviceId || dev.deviceId === 'default' || dev.deviceId === 'communications') return;
+            const opt = document.createElement('option');
+            opt.value = dev.deviceId;
+            opt.textContent = dev.label || `マイク入力 #${idx + 1}`;
+            selectMicDevice.appendChild(opt);
+          });
+          if ([...selectMicDevice.options].some(o => o.value === prevVal)) {
+            selectMicDevice.value = prevVal;
+          } else {
+            selectMicDevice.value = '';
+          }
+        } catch (_) {}
       }
 
       function setEngine(nextEngine) {
@@ -4358,14 +4450,17 @@
         hideWaveProgress(650);
       }
 
-      function encodeWavFromAudioBuffer(buffer) {
+      function encodeWavFromAudioBuffer(buffer, bitDepth = 16) {
+        const bits = (bitDepth === 24) ? 24 : 16;
+        const bytesPerSample = bits >> 3;
         const numCh = Math.min(2, buffer.numberOfChannels);
         const sr = buffer.sampleRate;
         const len = buffer.length;
-        const blockAlign = numCh * 2;
+        const blockAlign = numCh * bytesPerSample;
         const dataSize = len * blockAlign;
         const ab = new ArrayBuffer(44 + dataSize);
         const v = new DataView(ab);
+        const u8 = new Uint8Array(ab);
 
         const wStr = (off, s) => { for (let i = 0; i < s.length; i++) v.setUint8(off + i, s.charCodeAt(i)); };
         wStr(0, 'RIFF');
@@ -4378,18 +4473,37 @@
         v.setUint32(24, sr, true);
         v.setUint32(28, sr * blockAlign, true);
         v.setUint16(32, blockAlign, true);
-        v.setUint16(34, 16, true);
+        v.setUint16(34, bits, true);
         wStr(36, 'data');
         v.setUint32(40, dataSize, true);
 
         const chs = [];
         for (let c = 0; c < numCh; c++) chs.push(buffer.getChannelData(c));
         let off = 44;
-        for (let i = 0; i < len; i++) {
-          for (let c = 0; c < numCh; c++) {
-            const s = Math.max(-1, Math.min(1, chs[c][i]));
-            v.setInt16(off, s < 0 ? s * 0x8000 : s * 0x7fff, true);
-            off += 2;
+
+        if (bits === 24) {
+          for (let i = 0; i < len; i++) {
+            for (let c = 0; c < numCh; c++) {
+              const s = Math.max(-1, Math.min(1, chs[c][i]));
+              let val = Math.round(s * 8388607);
+              if (val < -8388608) val = -8388608;
+              else if (val > 8388607) val = 8388607;
+              u8[off] = val & 0xff;
+              u8[off + 1] = (val >> 8) & 0xff;
+              u8[off + 2] = (val >> 16) & 0xff;
+              off += 3;
+            }
+          }
+        } else {
+          // 16-bit PCM with TPDF triangular dithering for clean low-level musical decays
+          for (let i = 0; i < len; i++) {
+            for (let c = 0; c < numCh; c++) {
+              const dither = (Math.random() - Math.random()) / 32768;
+              const s = Math.max(-1, Math.min(1, chs[c][i] + dither));
+              const iv = Math.round(s * 32767);
+              v.setInt16(off, Math.max(-32768, Math.min(32767, iv)), true);
+              off += 2;
+            }
           }
         }
         return new Blob([ab], { type: 'audio/wav' });
@@ -4402,7 +4516,7 @@
           let blob = state.rawBlob;
           let name = trackTitleEl.textContent.trim() || makeRecordingFilename();
           if (state.audioBuffer) {
-            blob = encodeWavFromAudioBuffer(state.audioBuffer);
+            blob = encodeWavFromAudioBuffer(state.audioBuffer, state.recBitDepth);
             if (!name.toLowerCase().endsWith('.wav')) {
               name = name.replace(/\.[^/.]+$/, '') + '.wav';
             }
@@ -4437,75 +4551,220 @@
         }, 30);
       }
 
-      // ==================== HIGH-GAIN PCM RECORDING + AUTO-NORMALIZE ====================
+      // ==================== HIGH-FIDELITY RAW PCM RECORDING (AUDIOWORKLET + DIRECT PATH) ====================
+      const REC_WORKLET_CODE = `
+        class RawPcmRecorderProcessor extends AudioWorkletProcessor {
+          constructor() {
+            super();
+            this._bufSize = 4096;
+            this._pos = 0;
+            this._bufL = new Float32Array(this._bufSize);
+            this._bufR = new Float32Array(this._bufSize);
+            this._hasStereo = false;
+            this._stopped = false;
+            this.port.onmessage = (e) => {
+              if (e.data === 'flush') {
+                this._stopped = true;
+                if (this._pos > 0) {
+                  const outL = this._bufL.slice(0, this._pos);
+                  const outR = this._hasStereo ? this._bufR.slice(0, this._pos) : null;
+                  this.port.postMessage({ l: outL, r: outR, stereo: this._hasStereo }, outR ? [outL.buffer, outR.buffer] : [outL.buffer]);
+                  this._pos = 0;
+                }
+                this.port.postMessage({ done: true });
+              }
+            };
+          }
+          process(inputs) {
+            if (this._stopped) return false;
+            const input = inputs[0];
+            if (!input || input.length === 0) return true;
+            const inL = input[0];
+            const inR = input.length > 1 ? input[1] : null;
+            if (inR) this._hasStereo = true;
+            const n = inL.length;
+            let offset = 0;
+            while (offset < n) {
+              const space = this._bufSize - this._pos;
+              const take = Math.min(space, n - offset);
+              this._bufL.set(inL.subarray(offset, offset + take), this._pos);
+              if (inR) {
+                this._bufR.set(inR.subarray(offset, offset + take), this._pos);
+              }
+              this._pos += take;
+              offset += take;
+              if (this._pos >= this._bufSize) {
+                const outL = this._bufL;
+                const outR = this._hasStereo ? this._bufR : null;
+                this.port.postMessage({ l: outL, r: outR, stereo: this._hasStereo }, outR ? [outL.buffer, outR.buffer] : [outL.buffer]);
+                this._bufL = new Float32Array(this._bufSize);
+                this._bufR = new Float32Array(this._bufSize);
+                this._pos = 0;
+              }
+            }
+            return true;
+          }
+        }
+        registerProcessor('raw-pcm-recorder-processor', RawPcmRecorderProcessor);
+      `;
+
+      async function ensureRecWorkletLoaded() {
+        if (!audioCtx || !audioCtx.audioWorklet) return false;
+        if (state.recWorkletLoaded) return true;
+        try {
+          const blob = new Blob([REC_WORKLET_CODE], { type: 'application/javascript' });
+          const url = URL.createObjectURL(blob);
+          await audioCtx.audioWorklet.addModule(url);
+          URL.revokeObjectURL(url);
+          state.recWorkletLoaded = true;
+          return true;
+        } catch (err) {
+          console.warn('AudioWorklet load fallback to ScriptProcessor:', err);
+          return false;
+        }
+      }
+
       async function startRecording() {
         if (state.isRecording) return;
         try {
           if (state.isPlaying) pausePlayback();
           initAudioGraph();
 
+          // Request raw unprocessed high-res stereo audio (disables voice isolation, AEC, AGC, NS)
+          const rawAudioConstraints = {
+            echoCancellation: false,
+            noiseSuppression: false,
+            autoGainControl: false,
+            voiceIsolation: false,
+            channelCount: { ideal: 2 },
+            sampleRate: { ideal: 48000 },
+            sampleSize: { ideal: 24 }
+          };
+          if (state.micDeviceId) {
+            rawAudioConstraints.deviceId = { ideal: state.micDeviceId };
+          }
+
           let stream;
           try {
-            stream = await navigator.mediaDevices.getUserMedia({
-              audio: {
+            stream = await navigator.mediaDevices.getUserMedia({ audio: rawAudioConstraints });
+          } catch (_) {
+            try {
+              const basicRaw = {
                 echoCancellation: false,
                 noiseSuppression: false,
-                autoGainControl: false
-              }
-            });
-          } catch (_) {
-            stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                autoGainControl: false,
+                channelCount: { ideal: 2 }
+              };
+              if (state.micDeviceId) basicRaw.deviceId = { ideal: state.micDeviceId };
+              stream = await navigator.mediaDevices.getUserMedia({ audio: basicRaw });
+            } catch (__) {
+              stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            }
           }
+
+          // Refresh device labels now that mic permission is granted
+          refreshMicDeviceList();
+
+          const track = stream.getAudioTracks()[0];
+          const trackSettings = (track && track.getSettings) ? track.getSettings() : {};
+          const actualCh = Math.min(2, Math.max(1, trackSettings.channelCount || 1));
 
           state.isRecording = true;
           state.recStream = stream;
           state.recBuffersL = [];
           state.recBuffersR = [];
+          state.recChannelCount = actualCh;
           state.recPendingMarkers = [];
           state.recSampleRate = audioCtx.sampleRate;
           state.recStartPerf = performance.now();
 
           const src = audioCtx.createMediaStreamSource(stream);
+          const useDirectUncompressed = state.micGain <= 1.01;
+
           const gainNode = audioCtx.createGain();
           gainNode.gain.value = state.micGain;
 
-          // Hard-knee brickwall limiter to prevent clipping at high mic gain
-          const limiter = audioCtx.createDynamicsCompressor();
-          limiter.threshold.value = -2.0;
-          limiter.knee.value = 2.0;
-          limiter.ratio.value = 20.0;
-          limiter.attack.value = 0.001;
-          limiter.release.value = 0.07;
+          // Only engage soft clip-guard limiter if gain boost > 1.0x (1.0x = 100% pure untouched signal!)
+          let limiter = null;
+          let captureSource = src;
+
+          if (!useDirectUncompressed) {
+            limiter = audioCtx.createDynamicsCompressor();
+            limiter.threshold.value = -1.0;
+            limiter.knee.value = 3.0;
+            limiter.ratio.value = 16.0;
+            limiter.attack.value = 0.002;
+            limiter.release.value = 0.08;
+            src.connect(gainNode);
+            gainNode.connect(limiter);
+            captureSource = limiter;
+          } else {
+            src.connect(gainNode);
+            captureSource = gainNode;
+          }
 
           const analyser = audioCtx.createAnalyser();
           analyser.fftSize = 512;
-
-          // Direct Float32 PCM capture via ScriptProcessorNode (zero codec artifacts)
-          const processor = audioCtx.createScriptProcessor(4096, 2, 1);
-          processor.onaudioprocess = (ev) => {
-            if (!state.isRecording) return;
-            const inL = ev.inputBuffer.getChannelData(0);
-            const inR = ev.inputBuffer.numberOfChannels > 1 ? ev.inputBuffer.getChannelData(1) : inL;
-            state.recBuffersL.push(new Float32Array(inL));
-            state.recBuffersR.push(new Float32Array(inR));
-          };
+          captureSource.connect(analyser);
 
           const silentGain = audioCtx.createGain();
           silentGain.gain.value = 0;
 
-          src.connect(gainNode);
-          gainNode.connect(limiter);
-          limiter.connect(analyser);
-          limiter.connect(processor);
-          processor.connect(silentGain);
-          silentGain.connect(audioCtx.destination);
+          // Prefer dedicated real-time thread AudioWorkletNode (zero UI-thread clicks/dropouts!)
+          const workletOk = await ensureRecWorkletLoaded();
+          let workletNode = null;
+          let processor = null;
+
+          if (workletOk) {
+            workletNode = new AudioWorkletNode(audioCtx, 'raw-pcm-recorder-processor', {
+              numberOfInputs: 1,
+              numberOfOutputs: 1,
+              channelCount: actualCh,
+              channelCountMode: 'explicit',
+              channelInterpretation: 'speakers'
+            });
+            workletNode.port.onmessage = (ev) => {
+              const d = ev.data;
+              if (!d || d.done) return;
+              if (d.l) state.recBuffersL.push(d.l);
+              if (d.stereo && d.r) {
+                state.recChannelCount = 2;
+                state.recBuffersR.push(d.r);
+              }
+            };
+            captureSource.connect(workletNode);
+            workletNode.connect(silentGain);
+            silentGain.connect(audioCtx.destination);
+          } else {
+            processor = audioCtx.createScriptProcessor(4096, actualCh, 1);
+            processor.onaudioprocess = (ev) => {
+              if (!state.isRecording) return;
+              const inL = ev.inputBuffer.getChannelData(0);
+              state.recBuffersL.push(new Float32Array(inL));
+              if (ev.inputBuffer.numberOfChannels > 1) {
+                state.recChannelCount = 2;
+                state.recBuffersR.push(new Float32Array(ev.inputBuffer.getChannelData(1)));
+              }
+            };
+            captureSource.connect(processor);
+            processor.connect(silentGain);
+            silentGain.connect(audioCtx.destination);
+          }
 
           state.recSourceNode = src;
           state.recGainNode = gainNode;
           state.recLimiterNode = limiter;
           state.recAnalyser = analyser;
+          state.recWorkletNode = workletNode;
           state.recProcessor = processor;
           state.recSilentGain = silentGain;
+
+          const khz = (state.recSampleRate / 1000).toFixed(1).replace(/\.0$/, '');
+          const chLabel = actualCh >= 2 ? 'ステレオ' : 'モノラル';
+          const bitLabel = `${state.recBitDepth}bit`;
+          if (recLiveSpecLabel) {
+            recLiveSpecLabel.textContent = `${khz}kHz・${bitLabel}・${chLabel}`;
+          }
 
           startupOverlay.classList.add('hidden');
           recOverlay.classList.remove('hidden');
@@ -4515,7 +4774,8 @@
           recLiveGainLabel.textContent = `${state.micGain.toFixed(1)}x`;
 
           renderLiveRecordingLoop();
-          showToast(`PCM録音開始（マイクゲイン ${state.micGain.toFixed(1)}x）`);
+          const modeNote = useDirectUncompressed ? '原音ダイレクト' : `ゲイン ${state.micGain.toFixed(1)}x`;
+          showToast(`PCM録音開始（${khz}kHz ${bitLabel} ${chLabel}・${modeNote}）`);
         } catch (err) {
           console.error('Recording start failed:', err);
           showToast('マイクの使用が許可されていません');
@@ -4589,12 +4849,30 @@
         state.isRecording = false;
         if (state.recAnimId) cancelAnimationFrame(state.recAnimId);
 
+        // Flush remaining samples from AudioWorklet before disconnecting
+        if (state.recWorkletNode) {
+          await new Promise((resolve) => {
+            const timeout = setTimeout(resolve, 180);
+            const prevHandler = state.recWorkletNode.port.onmessage;
+            state.recWorkletNode.port.onmessage = (ev) => {
+              if (prevHandler) prevHandler(ev);
+              if (ev.data && ev.data.done) {
+                clearTimeout(timeout);
+                resolve();
+              }
+            };
+            try { state.recWorkletNode.port.postMessage('flush'); } catch (_) { clearTimeout(timeout); resolve(); }
+          });
+        }
+
         const chunksL = state.recBuffersL;
         const chunksR = state.recBuffersR;
+        const isStereo = chunksR.length === chunksL.length && chunksR.length > 0;
         const sr = state.recSampleRate;
         const capturedMarkers = cloneMarkerList(state.recPendingMarkers);
 
         try {
+          if (state.recWorkletNode) { state.recWorkletNode.port.onmessage = null; state.recWorkletNode.disconnect(); }
           if (state.recProcessor) { state.recProcessor.onaudioprocess = null; state.recProcessor.disconnect(); }
           if (state.recSourceNode) state.recSourceNode.disconnect();
           if (state.recGainNode) state.recGainNode.disconnect();
@@ -4607,6 +4885,7 @@
         state.recGainNode = null;
         state.recLimiterNode = null;
         state.recAnalyser = null;
+        state.recWorkletNode = null;
         state.recProcessor = null;
         state.recSilentGain = null;
         state.recStream = null;
@@ -4627,38 +4906,57 @@
           return;
         }
 
-        const recBuffer = audioCtx.createBuffer(2, totalSamples, sr);
+        const outChCount = isStereo ? 2 : 1;
+        const recBuffer = audioCtx.createBuffer(outChCount, totalSamples, sr);
         const dstL = recBuffer.getChannelData(0);
-        const dstR = recBuffer.getChannelData(1);
-        let offset = 0;
-        let maxAbs = 0;
+        const dstR = isStereo ? recBuffer.getChannelData(1) : null;
 
+        let offset = 0;
+        let sumL = 0, sumR = 0;
         for (let i = 0; i < chunksL.length; i++) {
           const cL = chunksL[i];
-          const cR = chunksR[i];
           dstL.set(cL, offset);
-          dstR.set(cR, offset);
-          for (let j = 0; j < cL.length; j++) {
-            const a = Math.max(Math.abs(cL[j]), Math.abs(cR[j]));
-            if (a > maxAbs) maxAbs = a;
+          for (let j = 0; j < cL.length; j++) sumL += cL[j];
+          if (dstR) {
+            const cR = chunksR[i];
+            dstR.set(cR, offset);
+            for (let j = 0; j < cR.length; j++) sumR += cR[j];
           }
           offset += cL.length;
         }
 
+        // Clean DC-offset removal (transparent; prevents waveform drift and start/end clicks)
+        const dcL = sumL / totalSamples;
+        const dcR = dstR ? (sumR / totalSamples) : 0;
+        let maxAbs = 0;
+        for (let i = 0; i < totalSamples; i++) {
+          const vL = dstL[i] - dcL;
+          dstL[i] = vL;
+          const aL = Math.abs(vL);
+          if (aL > maxAbs) maxAbs = aL;
+          if (dstR) {
+            const vR = dstR[i] - dcR;
+            dstR[i] = vR;
+            const aR = Math.abs(vR);
+            if (aR > maxAbs) maxAbs = aR;
+          }
+        }
+
+        // Optional linear peak normalization ONLY when user enables it in Settings (default OFF = pure raw PCM)
         let normGain = 1.0;
-        if (maxAbs > 0.001 && maxAbs < 0.89) {
-          normGain = Math.min(8.0, 0.89 / maxAbs);
+        if (state.recAutoNormalize && maxAbs > 0.001 && maxAbs < 0.89) {
+          normGain = Math.min(6.0, 0.89 / maxAbs);
           if (normGain > 1.04) {
             for (let i = 0; i < totalSamples; i++) {
-              dstL[i] = Math.max(-0.98, Math.min(0.98, dstL[i] * normGain));
-              dstR[i] = Math.max(-0.98, Math.min(0.98, dstR[i] * normGain));
+              dstL[i] = Math.max(-0.99, Math.min(0.99, dstL[i] * normGain));
+              if (dstR) dstR[i] = Math.max(-0.99, Math.min(0.99, dstR[i] * normGain));
             }
           } else {
             normGain = 1.0;
           }
         }
 
-        const wavBlob = encodeWavFromAudioBuffer(recBuffer);
+        const wavBlob = encodeWavFromAudioBuffer(recBuffer, state.recBitDepth);
         const title = makeRecordingFilename();
         state.playlist.push({ name: title, origName: title, blob: wavBlob, markers: capturedMarkers, startSectionEnabled: true, isUnsavedRecording: true });
         state.currentTrackIndex = state.playlist.length - 1;
@@ -4669,8 +4967,8 @@
           persistSession: true,
           isUnsavedRecording: true
         });
-        const normNote = normGain > 1.04 ? `・自動最適化(${normGain.toFixed(1)}x)` : '';
-        showToast(`録音完了（黄色ピン ${capturedMarkers.length}個${normNote} • 未保存）`);
+        const normNote = normGain > 1.04 ? `・ノーマライズ(${normGain.toFixed(1)}x)` : '';
+        showToast(`録音完了（${state.recBitDepth}bit・黄色ピン ${capturedMarkers.length}個${normNote} • 未保存）`);
       }
 
       // ==================== PIN (MARKER) & BIDIRECTIONAL GREEN <-> YELLOW LOGIC ====================
@@ -6750,6 +7048,8 @@
         updateWaveGainUI();
         applyMasterBoost();
         setMicGain(state.micGain);
+        updateRecSettingsUI();
+        refreshMicDeviceList();
         updateLowpassFilter();
         updateMemoryCountBadge();
         renderMarkerList();
@@ -7040,6 +7340,33 @@
         });
       });
 
+      document.querySelectorAll('.rec-bits-opt').forEach(btn => {
+        btn.addEventListener('click', () => {
+          state.recBitDepth = parseInt(btn.dataset.recBits, 10) === 24 ? 24 : 16;
+          updateRecSettingsUI();
+          saveAppPrefs();
+          showToast(`録音フォーマット: ${state.recBitDepth}bit PCM`);
+        });
+      });
+
+      document.getElementById('btnToggleRecNorm').addEventListener('click', () => {
+        state.recAutoNormalize = !state.recAutoNormalize;
+        updateRecSettingsUI();
+        saveAppPrefs();
+      });
+
+      selectMicDevice.addEventListener('change', () => {
+        state.micDeviceId = selectMicDevice.value || '';
+        saveAppPrefs();
+        const label = selectMicDevice.options[selectMicDevice.selectedIndex]?.textContent || '標準マイク';
+        showToast(`入力マイク: ${label}`);
+      });
+
+      document.getElementById('btnRefreshMics').addEventListener('click', async () => {
+        await refreshMicDeviceList();
+        showToast('マイク一覧を更新しました');
+      });
+
       document.getElementById('btnClearSessionCache').addEventListener('click', async () => {
         await clearSessionAudioFromIDB();
         showToast('一時音源キャッシュを削除しました（ピン記憶は保持されます）');
@@ -7109,6 +7436,8 @@
         updateWaveGainUI();
         applyMasterBoost();
         setMicGain(state.micGain);
+        updateRecSettingsUI();
+        refreshMicDeviceList();
         setUpperPage('wave', { scrollActive: false });
         updateSectionBarUI();
         updateStartupLastFileHint();
