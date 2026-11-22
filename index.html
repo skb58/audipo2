@@ -485,24 +485,41 @@
       box-shadow: 0 0 6px rgba(249, 115, 22, 0.65);
     }
 
-    /* ===== METRONOME PENDULUM NEEDLE STAGE ===== */
-    .metro-pendulum-card {
+    /* ===== METRONOME HERO CARD (2-COLUMN: LEFT PENDULUM / RIGHT BPM & STEP CONTROLS) ===== */
+    .metro-hero-card {
       position: relative;
-      background: #151519;
+      background: #16161b;
       border: 1px solid var(--border-subtle);
       border-radius: 14px;
-      padding: 6px 10px 8px;
+      padding: 8px 10px 7px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      overflow: hidden;
+    }
+
+    .metro-hero-grid {
+      display: grid;
+      grid-template-columns: 126px minmax(0, 1fr);
+      gap: 10px;
+      align-items: center;
+    }
+
+    .metro-pendulum-col {
       display: flex;
       flex-direction: column;
       align-items: center;
-      overflow: hidden;
+      justify-content: center;
+      background: #111115;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 11px;
+      padding: 4px 4px 5px;
     }
 
     .metro-pendulum-stage {
       position: relative;
-      width: 100%;
-      max-width: 240px;
-      height: 98px;
+      width: 116px;
+      height: 88px;
       display: flex;
       align-items: flex-end;
       justify-content: center;
@@ -518,8 +535,8 @@
 
     .metro-pendulum-arm {
       position: relative;
-      width: 6px;
-      height: 86px;
+      width: 5.5px;
+      height: 76px;
       border-radius: 999px;
       background: linear-gradient(180deg, #f59e0b 0%, #fbbf24 55%, #d97706 100%);
       box-shadow: 0 0 10px rgba(245, 158, 11, 0.35);
@@ -537,13 +554,13 @@
       position: absolute;
       left: 50%;
       top: 32%;
-      width: 20px;
-      height: 20px;
+      width: 18px;
+      height: 18px;
       border-radius: 50%;
       transform: translate(-50%, -50%);
       background: radial-gradient(circle at 35% 32%, #ffffff 0%, #e4e4e7 70%, #a1a1aa 100%);
       border: 2px solid rgba(255, 255, 255, 0.9);
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.55);
+      box-shadow: 0 2px 7px rgba(0, 0, 0, 0.55);
       transition: top 0.16s ease-out;
     }
 
@@ -552,44 +569,51 @@
       bottom: 2px;
       left: 50%;
       transform: translateX(-50%);
-      width: 12px;
-      height: 12px;
+      width: 11px;
+      height: 11px;
       border-radius: 50%;
       background: #2b2b34;
       border: 2px solid #f59e0b;
       z-index: 3;
     }
 
-    .metro-tempo-meta {
-      width: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 8px;
-      margin-top: 2px;
-    }
-
     .metro-tempo-marking {
-      font-size: 13px;
+      margin-top: 2px;
+      font-size: 11.5px;
       font-weight: 600;
       font-style: italic;
       color: #d4d4d8;
-      letter-spacing: 0.3px;
+      letter-spacing: 0.25px;
+      line-height: 1.1;
+    }
+
+    .metro-bpm-col {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      min-width: 0;
+    }
+
+    .metro-bpm-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
     }
 
     .metro-led-strip {
-      display: flex;
+      display: inline-flex;
       align-items: center;
-      gap: 7px;
-      padding: 3px 9px;
+      gap: 6px;
+      padding: 3px 8px;
       border-radius: 999px;
       background: #101014;
       border: 1px solid var(--border-subtle);
     }
 
     .metro-led {
-      width: 9px;
-      height: 9px;
+      width: 8.5px;
+      height: 8.5px;
       border-radius: 50%;
       background: #272730;
       border: 1px solid #3f3f4a;
@@ -610,70 +634,35 @@
       transform: scale(1.18);
     }
 
-    .metro-bpm-card {
-      background: #17171c;
-      border: 1px solid var(--border-subtle);
-      border-radius: 13px;
-      padding: 7px 9px 6px;
-    }
-
-    .metro-bpm-controls {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 5px;
-      margin-bottom: 4px;
-    }
-
-    .metro-step-btn {
-      height: 36px;
-      min-width: 38px;
-      padding: 0 7px;
-      border-radius: 9px;
-      background: #222229;
-      border: 1px solid var(--border-strong);
-      color: #e4e4e7;
-      font-size: 12px;
-      font-weight: 700;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      transition: transform 0.08s ease, background-color 0.1s ease;
-    }
-
-    .metro-step-btn:active {
-      transform: scale(0.93);
-      background: #2e2e38;
-    }
-
     .metro-bpm-input-wrap {
-      flex: 1;
+      width: 100%;
       display: flex;
       align-items: baseline;
       justify-content: center;
-      gap: 4px;
-      background: #111115;
+      gap: 5px;
+      background: #101014;
       border: 1px solid var(--border-strong);
       border-radius: 10px;
-      padding: 2px 8px;
-      height: 38px;
+      padding: 2px 10px;
+      height: 44px;
     }
 
     .metro-bpm-input-wrap:focus-within {
       border-color: var(--accent-blue);
-      box-shadow: 0 0 0 2px rgba(66, 165, 245, 0.2);
+      box-shadow: 0 0 0 2px rgba(66, 165, 245, 0.22);
     }
 
     .metro-bpm-input {
-      width: 68px;
+      width: 78px;
       background: transparent;
       border: none;
       outline: none;
       color: #ffffff;
-      font-size: 24px;
+      font-size: 28px;
       font-weight: 800;
       text-align: center;
       padding: 0;
+      line-height: 1;
       -moz-appearance: textfield;
     }
 
@@ -684,9 +673,43 @@
     }
 
     .metro-bpm-unit {
-      font-size: 10.5px;
+      font-size: 11px;
       font-weight: 700;
       color: var(--text-sub);
+    }
+
+    .metro-step-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 5px;
+    }
+
+    .metro-step-btn {
+      height: 36px;
+      padding: 0 4px;
+      border-radius: 9px;
+      background: #23232b;
+      border: 1px solid var(--border-strong);
+      color: #f4f4f6;
+      font-size: 12.5px;
+      font-weight: 800;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.08s ease, background-color 0.1s ease;
+    }
+
+    .metro-step-btn:active {
+      transform: scale(0.93);
+      background: #32323e;
+    }
+
+    .metro-hero-slider-wrap {
+      padding: 0 2px;
+    }
+
+    .metro-hero-slider-wrap input[type="range"] {
+      margin: 2px 0;
     }
 
     /* Larger, high-comfort Start/Stop & Tap-In buttons */
@@ -2221,39 +2244,51 @@
                 <div id="tunerMeterBars" class="tuner-meter-bars" aria-label="チューナーセントメーター"></div>
               </div>
 
-              <!-- Middle: Animated Swinging Pendulum Needle + Tempo Marking + Beat LEDs -->
-              <div class="metro-pendulum-card">
-                <div class="metro-pendulum-stage">
-                  <svg class="metro-pendulum-arc" viewBox="0 0 240 98" fill="none">
-                    <path d="M56 34 A 96 96 0 0 1 184 34" stroke="rgba(255,255,255,0.11)" stroke-width="1.5" stroke-dasharray="3 5"/>
-                    <line x1="120" y1="7" x2="120" y2="15" stroke="rgba(250,204,21,0.55)" stroke-width="2" stroke-linecap="round"/>
-                    <line x1="69" y1="22" x2="73" y2="29" stroke="rgba(255,255,255,0.22)" stroke-width="1.5" stroke-linecap="round"/>
-                    <line x1="171" y1="22" x2="167" y2="29" stroke="rgba(255,255,255,0.22)" stroke-width="1.5" stroke-linecap="round"/>
-                  </svg>
-                  <div id="metroPendulumArm" class="metro-pendulum-arm">
-                    <div id="metroPendulumWeight" class="metro-pendulum-weight"></div>
+              <!-- Middle: 2-Column Hero Card (Left: Pendulum Needle / Right: BPM & -5 -1 +1 +5 Controls) -->
+              <div class="metro-hero-card">
+                <div class="metro-hero-grid">
+                  <!-- Left: Swinging Pendulum Needle + Tempo Marking -->
+                  <div class="metro-pendulum-col">
+                    <div class="metro-pendulum-stage">
+                      <svg class="metro-pendulum-arc" viewBox="0 0 140 88" fill="none">
+                        <path d="M22 30 A 74 74 0 0 1 118 30" stroke="rgba(255,255,255,0.12)" stroke-width="1.5" stroke-dasharray="3 4"/>
+                        <line x1="70" y1="6" x2="70" y2="14" stroke="rgba(250,204,21,0.6)" stroke-width="2" stroke-linecap="round"/>
+                        <line x1="32" y1="19" x2="36" y2="26" stroke="rgba(255,255,255,0.22)" stroke-width="1.5" stroke-linecap="round"/>
+                        <line x1="108" y1="19" x2="104" y2="26" stroke="rgba(255,255,255,0.22)" stroke-width="1.5" stroke-linecap="round"/>
+                      </svg>
+                      <div id="metroPendulumArm" class="metro-pendulum-arm">
+                        <div id="metroPendulumWeight" class="metro-pendulum-weight"></div>
+                      </div>
+                      <div class="metro-pendulum-pivot"></div>
+                    </div>
+                    <span id="metroTempoMarking" class="metro-tempo-marking">Allegretto</span>
                   </div>
-                  <div class="metro-pendulum-pivot"></div>
-                </div>
-                <div class="metro-tempo-meta">
-                  <span id="metroTempoMarking" class="metro-tempo-marking">Allegretto</span>
-                  <div id="metroLedStrip" class="metro-led-strip" aria-label="拍インジケーター"></div>
-                </div>
-              </div>
 
-              <!-- BPM Numeric Input + Step Buttons + Slider -->
-              <div class="metro-bpm-card">
-                <div class="metro-bpm-controls">
-                  <button id="btnMetroM5" type="button" class="metro-step-btn mono">-5</button>
-                  <button id="btnMetroM1" type="button" class="metro-step-btn mono">-1</button>
-                  <div class="metro-bpm-input-wrap">
-                    <input id="metroBpmInput" type="number" inputmode="numeric" min="20" max="300" step="1" value="120" class="metro-bpm-input mono" aria-label="テンポBPM入力">
-                    <span class="metro-bpm-unit mono">BPM</span>
+                  <!-- Right: Beat LEDs + BPM Numeric Input + Step Buttons (-5, -1, +1, +5) -->
+                  <div class="metro-bpm-col">
+                    <div class="metro-bpm-head">
+                      <span style="font-size:10.5px;font-weight:700;color:#a1a1aa;">テンポ</span>
+                      <div id="metroLedStrip" class="metro-led-strip" aria-label="拍インジケーター"></div>
+                    </div>
+
+                    <div class="metro-bpm-input-wrap">
+                      <input id="metroBpmInput" type="number" inputmode="numeric" min="20" max="300" step="1" value="120" class="metro-bpm-input mono" aria-label="テンポBPM入力">
+                      <span class="metro-bpm-unit mono">BPM</span>
+                    </div>
+
+                    <div class="metro-step-grid">
+                      <button id="btnMetroM5" type="button" class="metro-step-btn mono">-5</button>
+                      <button id="btnMetroM1" type="button" class="metro-step-btn mono">-1</button>
+                      <button id="btnMetroP1" type="button" class="metro-step-btn mono">+1</button>
+                      <button id="btnMetroP5" type="button" class="metro-step-btn mono">+5</button>
+                    </div>
                   </div>
-                  <button id="btnMetroP1" type="button" class="metro-step-btn mono">+1</button>
-                  <button id="btnMetroP5" type="button" class="metro-step-btn mono">+5</button>
                 </div>
-                <input id="metroBpmSlider" type="range" min="20" max="300" step="1" value="120" aria-label="テンポスライダー">
+
+                <!-- Full-width BPM Slider underneath -->
+                <div class="metro-hero-slider-wrap">
+                  <input id="metroBpmSlider" type="range" min="20" max="300" step="1" value="120" aria-label="テンポスライダー">
+                </div>
               </div>
 
               <!-- Larger Start/Stop + Tap-In Buttons -->
@@ -6595,7 +6630,7 @@
 
       function seekTo(timeSec, opts = {}) {
         if (!state.hasAudio) return;
-        const { keepInertia = false, setGreenPin = false } = opts;
+        const { keepInertia = false, setGreenPin = false, deferAudioSeek = false } = opts;
         if (!keepInertia) stopInertia();
 
         const clamped = Math.max(0, Math.min(state.duration, timeSec));
@@ -6607,22 +6642,26 @@
           state.tempMarker = clamped;
         }
 
-        const path = getActivePlaybackPath();
-        if (path === 'vocoderDsp') {
-          resetVocoderAtSample(Math.floor(clamped * state.audioBuffer.sampleRate));
-        } else if (path === 'bufferDirect') {
-          if (state.isPlaying) {
-            startTapeSourceAt(clamped);
+        if (!deferAudioSeek) {
+          const path = getActivePlaybackPath();
+          if (path === 'vocoderDsp') {
+            resetVocoderAtSample(Math.floor(clamped * state.audioBuffer.sampleRate));
+          } else if (path === 'bufferDirect') {
+            if (state.isPlaying) {
+              startTapeSourceAt(clamped);
+            }
+          } else {
+            audioEl.currentTime = clamped;
           }
-        } else {
-          audioEl.currentTime = clamped;
         }
 
         updateTimeUI();
         updatePinButtonsUI();
         updateSectionBarUI();
         renderAllCanvases();
-        saveCurrentFileMemory(false);
+        if (!deferAudioSeek) {
+          saveCurrentFileMemory(false);
+        }
       }
 
       function startPlayback() {
@@ -7425,21 +7464,72 @@
         endPagerGesture(e.clientX, e.clientY, false);
       });
 
-      function stopInertia() {
+      // Sliding-window gesture velocity tracker for natural, butter-smooth inertial glide on Zoom Waveform
+      let zoomTrackSamples = []; // [{ x, t }]
+
+      function recordZoomSample(x, now) {
+        zoomTrackSamples.push({ x, t: now });
+        // Keep samples within last 120ms for accurate flick release velocity
+        const cutoff = now - 120;
+        while (zoomTrackSamples.length > 2 && zoomTrackSamples[0].t < cutoff) {
+          zoomTrackSamples.shift();
+        }
+      }
+
+      function computeZoomReleaseVelocitySecPerMs(W) {
+        if (zoomTrackSamples.length < 2) return 0;
+        const now = performance.now();
+        const last = zoomTrackSamples[zoomTrackSamples.length - 1];
+        // If finger paused motionless for > 110ms before lifting, do not coast
+        if (now - last.t > 110) return 0;
+
+        // Find earliest sample within ~95ms before the last move
+        let first = zoomTrackSamples[0];
+        for (let i = zoomTrackSamples.length - 2; i >= 0; i--) {
+          first = zoomTrackSamples[i];
+          if (last.t - first.t >= 35) break;
+        }
+        const dt = last.t - first.t;
+        if (dt < 4) return 0;
+
+        const vxPxPerMs = (last.x - first.x) / dt;
+        // Require a genuine flick (> 0.08 px/ms) regardless of zoom span
+        if (Math.abs(vxPxPerMs) < 0.08) return 0;
+
+        // Convert screen px/ms to audio seconds/ms (dragging right -> earlier in time -> negative delta)
+        const secPerMs = -(vxPxPerMs / Math.max(1, W)) * state.zoomWindowSeconds;
+        // Clamp extreme single-frame spikes
+        const maxSecPerMs = (6.0 / Math.max(1, W)) * state.zoomWindowSeconds;
+        return Math.max(-maxSecPerMs, Math.min(maxSecPerMs, secPerMs));
+      }
+
+      function stopInertia(commitAudio = false) {
+        const wasActive = state.isInertiaActive;
         state.isInertiaActive = false;
         state.zoomVelSecPerMs = 0;
         if (state.inertiaRafId) {
           cancelAnimationFrame(state.inertiaRafId);
           state.inertiaRafId = null;
         }
+        if (commitAudio && wasActive && state.hasAudio) {
+          seekTo(state.currentTime, { keepInertia: true, setGreenPin: false, deferAudioSeek: false });
+        }
       }
 
       function startInertia(velSecPerMs) {
-        stopInertia();
-        if (!state.hasAudio || Math.abs(velSecPerMs) < 0.00014) return;
+        stopInertia(false);
+        if (!state.hasAudio || !isFinite(velSecPerMs) || Math.abs(velSecPerMs) < 1e-6) return;
+
+        const rect = zoomCanvas.getBoundingClientRect();
+        const W = Math.max(1, rect.width);
+        // Minimum stopping velocity equivalent to ~0.015 px/ms on screen (consistent across all zoom levels!)
+        const minStopSecPerMs = (0.015 / W) * state.zoomWindowSeconds;
+        if (Math.abs(velSecPerMs) <= minStopSecPerMs) return;
+
         state.isInertiaActive = true;
         state.zoomVelSecPerMs = velSecPerMs;
         let lastTs = performance.now();
+        let lastAudioSyncPerf = lastTs;
 
         const tick = (now) => {
           if (!state.isInertiaActive || !state.hasAudio) return;
@@ -7448,14 +7538,22 @@
 
           const nextT = state.currentTime + state.zoomVelSecPerMs * dt;
           if (nextT <= 0 || nextT >= state.duration) {
-            seekTo(Math.max(0, Math.min(state.duration, nextT)), { keepInertia: false, setGreenPin: true });
+            state.isInertiaActive = false;
+            state.zoomVelSecPerMs = 0;
+            state.inertiaRafId = null;
+            seekTo(Math.max(0, Math.min(state.duration, nextT)), { keepInertia: true, setGreenPin: false, deferAudioSeek: false });
             return;
           }
-          seekTo(nextT, { keepInertia: true, setGreenPin: true });
 
-          state.zoomVelSecPerMs *= Math.pow(0.91, dt / 16.67);
-          if (Math.abs(state.zoomVelSecPerMs) < 0.000045) {
-            stopInertia();
+          // While playing, throttle audio seek to ~110ms intervals so playback never crackles during glide
+          const shouldSyncAudio = !state.isPlaying || (now - lastAudioSyncPerf >= 110);
+          if (shouldSyncAudio) lastAudioSyncPerf = now;
+          seekTo(nextT, { keepInertia: true, setGreenPin: false, deferAudioSeek: !shouldSyncAudio });
+
+          // Smooth iOS/Android-like exponential deceleration (0.955 per 16.67ms frame)
+          state.zoomVelSecPerMs *= Math.pow(0.955, dt / 16.67);
+          if (Math.abs(state.zoomVelSecPerMs) < minStopSecPerMs) {
+            stopInertia(true);
             return;
           }
           state.inertiaRafId = requestAnimationFrame(tick);
@@ -7473,24 +7571,27 @@
       zoomCanvas.addEventListener('touchstart', (e) => {
         if (!state.hasAudio) return;
         e.preventDefault();
-        stopInertia();
+        stopInertia(false);
 
         if (e.touches.length === 1) {
           const t = e.touches[0];
+          const now = performance.now();
           state.isPinchingZoom = false;
           state.isDraggingZoom = true;
           state.zoomDragStartX = t.clientX;
           state.zoomDragStartY = t.clientY;
           state.zoomDragStartTime = state.currentTime;
-          state.zoomTapStartPerf = performance.now();
+          state.zoomTapStartPerf = now;
           state.zoomMoved = false;
           state.zoomLastX = t.clientX;
-          state.zoomLastPerf = performance.now();
+          state.zoomLastPerf = now;
           state.zoomVelSecPerMs = 0;
+          zoomTrackSamples = [{ x: t.clientX, t: now }];
         } else if (e.touches.length >= 2) {
           state.isDraggingZoom = false;
           state.isPinchingZoom = true;
           state.zoomMoved = true;
+          zoomTrackSamples = [];
           const t0 = e.touches[0], t1 = e.touches[1];
           const rect = zoomCanvas.getBoundingClientRect();
 
@@ -7518,29 +7619,28 @@
           const midX = (t0.clientX + t1.clientX) * 0.5 - rect.left;
           const ratio = Math.max(0, Math.min(1, midX / W));
           const anchoredCenter = state.pinchAnchorTime - (ratio - 0.5) * newWin;
-          seekTo(anchoredCenter, { keepInertia: false, setGreenPin: false });
+          seekTo(anchoredCenter, { keepInertia: true, setGreenPin: false });
         } else if (state.isDraggingZoom && e.touches.length === 1) {
           const t = e.touches[0];
+          const now = performance.now();
           if (Math.hypot(t.clientX - state.zoomDragStartX, t.clientY - state.zoomDragStartY) > 6) {
             state.zoomMoved = true;
           }
-          const now = performance.now();
-          const dt = Math.max(1, now - state.zoomLastPerf);
-          const dxStep = t.clientX - state.zoomLastX;
-          const instVel = -(dxStep / W) * state.zoomWindowSeconds / dt;
-          state.zoomVelSecPerMs = state.zoomVelSecPerMs * 0.55 + instVel * 0.45;
+          recordZoomSample(t.clientX, now);
           state.zoomLastX = t.clientX;
           state.zoomLastPerf = now;
 
           const totalDx = t.clientX - state.zoomDragStartX;
           const deltaSec = -(totalDx / W) * state.zoomWindowSeconds;
-          seekTo(state.zoomDragStartTime + deltaSec, { keepInertia: false, setGreenPin: true });
+          // keepInertia: true avoids resetting velocity; setGreenPin: false preserves green pin position!
+          seekTo(state.zoomDragStartTime + deltaSec, { keepInertia: true, setGreenPin: false });
         }
       }, { passive: false });
 
       zoomCanvas.addEventListener('touchend', (e) => {
         if (e.touches.length === 1 && state.isPinchingZoom) {
           const t = e.touches[0];
+          const now = performance.now();
           state.isPinchingZoom = false;
           state.isDraggingZoom = true;
           state.zoomDragStartX = t.clientX;
@@ -7548,84 +7648,92 @@
           state.zoomDragStartTime = state.currentTime;
           state.zoomMoved = true;
           state.zoomLastX = t.clientX;
-          state.zoomLastPerf = performance.now();
-          state.zoomVelSecPerMs = 0;
+          state.zoomLastPerf = now;
+          zoomTrackSamples = [{ x: t.clientX, t: now }];
         } else if (e.touches.length === 0) {
           const wasDrag = state.isDraggingZoom;
           const wasTap = wasDrag && !state.zoomMoved && (performance.now() - state.zoomTapStartPerf) < 280;
-          const recent = (performance.now() - state.zoomLastPerf) < 85;
           state.isDraggingZoom = false;
           state.isPinchingZoom = false;
 
+          const rect = zoomCanvas.getBoundingClientRect();
+          const W = Math.max(1, rect.width);
+
           if (wasTap) {
-            const rect = zoomCanvas.getBoundingClientRect();
-            const W = Math.max(1, rect.width);
             const offsetFrac = ((state.zoomDragStartX - rect.left) - W * 0.5) / W;
-            seekTo(state.zoomDragStartTime + offsetFrac * state.zoomWindowSeconds, { setGreenPin: true });
-          } else if (wasDrag && recent) {
-            startInertia(state.zoomVelSecPerMs);
+            seekTo(state.zoomDragStartTime + offsetFrac * state.zoomWindowSeconds, { setGreenPin: false });
+          } else if (wasDrag) {
+            const releaseVel = computeZoomReleaseVelocitySecPerMs(W);
+            if (Math.abs(releaseVel) > 0) {
+              startInertia(releaseVel);
+            }
           }
+          zoomTrackSamples = [];
         }
       });
 
       zoomCanvas.addEventListener('touchcancel', () => {
         state.isDraggingZoom = false;
         state.isPinchingZoom = false;
+        zoomTrackSamples = [];
       });
 
       zoomCanvas.addEventListener('mousedown', (e) => {
         if (!state.hasAudio || e.button !== 0) return;
-        stopInertia();
+        stopInertia(false);
+        const now = performance.now();
         state.isDraggingZoom = true;
         state.zoomDragStartX = e.clientX;
         state.zoomDragStartY = e.clientY;
         state.zoomDragStartTime = state.currentTime;
-        state.zoomTapStartPerf = performance.now();
+        state.zoomTapStartPerf = now;
         state.zoomMoved = false;
         state.zoomLastX = e.clientX;
-        state.zoomLastPerf = performance.now();
+        state.zoomLastPerf = now;
         state.zoomVelSecPerMs = 0;
+        zoomTrackSamples = [{ x: e.clientX, t: now }];
       });
 
       window.addEventListener('mousemove', (e) => {
         if (!state.isDraggingZoom || !state.hasAudio) return;
+        const now = performance.now();
         if (Math.hypot(e.clientX - state.zoomDragStartX, e.clientY - state.zoomDragStartY) > 5) {
           state.zoomMoved = true;
         }
         const rect = zoomCanvas.getBoundingClientRect();
         const W = Math.max(1, rect.width);
-        const now = performance.now();
-        const dt = Math.max(1, now - state.zoomLastPerf);
-        const dxStep = e.clientX - state.zoomLastX;
-        const instVel = -(dxStep / W) * state.zoomWindowSeconds / dt;
-        state.zoomVelSecPerMs = state.zoomVelSecPerMs * 0.55 + instVel * 0.45;
+        recordZoomSample(e.clientX, now);
         state.zoomLastX = e.clientX;
         state.zoomLastPerf = now;
 
         const deltaSec = -((e.clientX - state.zoomDragStartX) / W) * state.zoomWindowSeconds;
-        seekTo(state.zoomDragStartTime + deltaSec, { keepInertia: false, setGreenPin: true });
+        seekTo(state.zoomDragStartTime + deltaSec, { keepInertia: true, setGreenPin: false });
       });
 
       window.addEventListener('mouseup', () => {
         if (!state.isDraggingZoom) return;
         const wasClick = !state.zoomMoved && (performance.now() - state.zoomTapStartPerf) < 280;
-        const recent = (performance.now() - state.zoomLastPerf) < 85;
         state.isDraggingZoom = false;
 
+        const rect = zoomCanvas.getBoundingClientRect();
+        const W = Math.max(1, rect.width);
+
         if (wasClick) {
-          const rect = zoomCanvas.getBoundingClientRect();
-          const W = Math.max(1, rect.width);
           const offsetFrac = ((state.zoomDragStartX - rect.left) - W * 0.5) / W;
-          seekTo(state.zoomDragStartTime + offsetFrac * state.zoomWindowSeconds, { setGreenPin: true });
-        } else if (recent) {
-          startInertia(state.zoomVelSecPerMs);
+          seekTo(state.zoomDragStartTime + offsetFrac * state.zoomWindowSeconds, { setGreenPin: false });
+        } else {
+          const releaseVel = computeZoomReleaseVelocitySecPerMs(W);
+          if (Math.abs(releaseVel) > 0) {
+            startInertia(releaseVel);
+          }
         }
+        zoomTrackSamples = [];
       });
 
       zoomCanvas.addEventListener('wheel', (e) => {
         if (!state.hasAudio) return;
         e.preventDefault();
-        stopInertia();
+        stopInertia(false);
         const rect = zoomCanvas.getBoundingClientRect();
         const W = Math.max(1, rect.width);
         const ratio = Math.max(0, Math.min(1, (e.clientX - rect.left) / W));
@@ -7633,7 +7741,7 @@
         const factor = e.deltaY > 0 ? 1.18 : 1 / 1.18;
         const newWin = Math.max(0.03, Math.min(60.0, state.zoomWindowSeconds * factor));
         setZoomSpan(newWin);
-        seekTo(anchorT - (ratio - 0.5) * newWin, { keepInertia: false, setGreenPin: false });
+        seekTo(anchorT - (ratio - 0.5) * newWin, { keepInertia: true, setGreenPin: false });
       }, { passive: false });
 
       // ==================== 60/120FPS ANIMATION & PLAYBACK SYNC LOOP ====================
