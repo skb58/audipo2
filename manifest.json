@@ -1,0 +1,41 @@
+{
+  "name": "Audipo風 練習プレイヤー＆レコーダー",
+  "short_name": "Audipo2",
+  "description": "高音質スロー再生・区間リピート・録音・メトロノーム＆チューナー搭載の練習プレイヤー",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "display_override": [
+    "standalone",
+    "fullscreen"
+  ],
+  "orientation": "portrait",
+  "background_color": "#111113",
+  "theme_color": "#111113",
+  "icons": [
+    {
+      "src": "./icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "./icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
