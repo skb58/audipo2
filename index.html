@@ -8,7 +8,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="Audipo2">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="app-version" content="v28">
+  <meta name="app-version" content="v29">
   <link rel="manifest" href="./manifest.json">
   <title>Audipo風 練習プレイヤー＆レコーダー</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='bg' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%231b2030'/%3E%3Cstop offset='100%25' stop-color='%230d0f15'/%3E%3C/linearGradient%3E%3ClinearGradient id='wv' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0%25' stop-color='%2360c5ff'/%3E%3Cstop offset='100%25' stop-color='%232563eb'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='url(%23bg)'/%3E%3Crect x='1' y='1' width='62' height='62' rx='15' fill='none' stroke='%233b82f6' stroke-opacity='0.3' stroke-width='2'/%3E%3Cg fill='url(%23wv)'%3E%3Crect x='10' y='28' width='4.5' height='12' rx='2.25' opacity='0.6'/%3E%3Crect x='18' y='22' width='4.5' height='24' rx='2.25' opacity='0.85'/%3E%3Crect x='26' y='15' width='4.5' height='36' rx='2.25'/%3E%3Crect x='34' y='21' width='4.5' height='25' rx='2.25' opacity='0.9'/%3E%3Crect x='42' y='26' width='4.5' height='16' rx='2.25' opacity='0.75'/%3E%3Crect x='50' y='30' width='4.5' height='9' rx='2.25' opacity='0.5'/%3E%3C/g%3E%3Cpath d='M36.25 10.5c0-1.4 1.1-2.5 2.5-2.5h5.5c1.4 0 2.5 1.1 2.5 2.5v2.4c0 .8-.3 1.5-.9 2.1l-3.2 3.1c-.6.6-1.6.6-2.2 0l-3.2-3.1c-.6-.6-.9-1.3-.9-2.1v-2.4z' fill='%23facc15'/%3E%3C/svg%3E">
@@ -3316,6 +3316,54 @@
       color: #86efac;
     }
 
+    .save-qual-rank {
+      display: inline-block;
+      margin-bottom: 2px;
+      padding: 1px 6px;
+      border-radius: 999px;
+      font-size: 9.5px;
+      font-weight: 800;
+      letter-spacing: 0.2px;
+      background: rgba(250, 204, 21, 0.14);
+      border: 1px solid rgba(250, 204, 21, 0.42);
+      color: #fde68a;
+      line-height: 1.3;
+    }
+
+    .save-qual-btn.active .save-qual-rank {
+      background: rgba(34, 197, 94, 0.26);
+      border-color: rgba(134, 239, 172, 0.72);
+      color: #dcfce7;
+    }
+
+    .save-rank-guide {
+      font-size: 10.5px;
+      line-height: 1.45;
+      color: #93c5fd;
+      background: rgba(66, 165, 245, 0.09);
+      border: 1px solid rgba(96, 165, 250, 0.24);
+      border-radius: 8px;
+      padding: 5px 8px;
+      margin-bottom: 7px;
+    }
+
+    .help-table.cols-3 td:first-child {
+      width: 14%;
+      white-space: nowrap;
+      color: #fde68a;
+    }
+
+    .help-table.cols-3 td:nth-child(2) {
+      width: 38%;
+      font-weight: 700;
+      color: #e0f2fe;
+    }
+
+    .help-table.cols-3 td:last-child {
+      width: 48%;
+      color: #d4d4d8;
+    }
+
     .save-preview-box {
       background: #121318;
       border: 1px solid var(--border-subtle);
@@ -4189,14 +4237,15 @@
 
           <div class="sec-head" style="margin-top:12px;">
             <span class="sec-title-group">
-              <span class="sec-title">録音PCMフォーマット（WAV出力）</span>
-              <button type="button" class="setting-help-btn" data-help-key="recFormat" aria-label="録音PCMフォーマットの説明">?</button>
+              <span class="sec-title">録音時の音質（WAV）</span>
+              <button type="button" class="setting-help-btn" data-help-key="recFormat" aria-label="録音時の音質の説明">?</button>
             </span>
             <span id="modalRecBitVal" class="sec-value mono" style="color:#93c5fd;">24bit ハイレゾPCM</span>
           </div>
+          <div class="sec-mini-hint">基本は高音質な 24bit でOK（保存時に M4A や OGG へ軽く変換して書き出すこともできます）。</div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
-            <button type="button" data-rec-bits="16" class="opt-pill rec-bits-opt">16bit 高互換（ディザ付）</button>
-            <button type="button" data-rec-bits="24" class="opt-pill rec-bits-opt active-green">24bit ハイレゾPCM</button>
+            <button type="button" data-rec-bits="16" class="opt-pill rec-bits-opt">16bit 標準 (CD品質)</button>
+            <button type="button" data-rec-bits="24" class="opt-pill rec-bits-opt active-green">24bit ハイレゾ (最高)</button>
           </div>
 
           <div class="toggle-row">
@@ -4252,7 +4301,7 @@
         <div class="modal-section" style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
           <div>
             <div class="sec-title">バージョン情報</div>
-            <div id="settingsVersionLabel" class="engine-desc mono">現在: v28</div>
+            <div id="settingsVersionLabel" class="engine-desc mono">現在: v29</div>
           </div>
           <button id="btnShowReleaseHistory" type="button" class="step-btn" style="color:#93c5fd;border-color:rgba(66,165,245,0.45);">更新履歴を見る</button>
         </div>
@@ -4385,7 +4434,7 @@
           </div>
           <div>
             <h3 id="whatsNewTitle" class="whats-new-title">アップデートのお知らせ</h3>
-            <p id="whatsNewSub" class="whats-new-sub mono">v28 に更新されました</p>
+            <p id="whatsNewSub" class="whats-new-sub mono">v29 に更新されました</p>
           </div>
         </div>
         <button id="btnCloseWhatsNewX" type="button" class="modal-close" aria-label="閉じる">✕</button>
@@ -4488,15 +4537,15 @@
           <div id="saveFormatGrid" class="save-fmt-grid">
             <button type="button" data-save-fmt="wav" class="save-fmt-btn active">
               <span class="save-fmt-main mono">WAV</span>
-              <span class="save-fmt-sub">無圧縮・最高音質</span>
+              <span class="save-fmt-sub">★5 無圧縮・最高</span>
             </button>
             <button type="button" data-save-fmt="m4a" class="save-fmt-btn">
               <span class="save-fmt-main mono">M4A</span>
-              <span class="save-fmt-sub">高音質・共有向け</span>
+              <span class="save-fmt-sub">★4 共有向き・定番</span>
             </button>
             <button type="button" data-save-fmt="ogg" class="save-fmt-btn">
               <span class="save-fmt-main mono">OGG</span>
-              <span class="save-fmt-sub">Opus・超軽量</span>
+              <span class="save-fmt-sub">★4 超軽量・高効率</span>
             </button>
             <button type="button" data-save-fmt="orig" id="btnSaveFmtOrig" class="save-fmt-btn hidden">
               <span class="save-fmt-main">元のまま</span>
@@ -4509,8 +4558,14 @@
         <!-- Quality Selector -->
         <div class="modal-section">
           <div class="sec-head" style="margin-bottom:6px;">
-            <span class="sec-title">音質</span>
-            <span id="saveQualityLabel" class="sec-value mono">24bit ハイレゾ</span>
+            <span class="sec-title-group">
+              <span class="sec-title">音質（全形式の順位つき）</span>
+              <button type="button" class="setting-help-btn" data-help-key="exportFormat" aria-label="音質順位と形式のくわしい説明">?</button>
+            </span>
+            <span id="saveQualityLabel" class="sec-value mono">1位 ★5.0</span>
+          </div>
+          <div class="save-rank-guide">
+            高音質順: <strong>WAV 24bit</strong> ＞ <strong>WAV 16bit</strong> ＞ <strong>M4A 256 ≒ OGG 192</strong> ＞ <strong>M4A 192 ≒ OGG 128</strong>（詳しくは ? をタップ）
           </div>
           <div id="saveQualityGrid" class="save-qual-grid"></div>
         </div>
@@ -7696,41 +7751,41 @@
         wav: {
           label: 'WAV',
           ext: '.wav',
-          hint: '無圧縮の原音そのまま。音質最優先・DAWや高音質保存におすすめです。',
+          hint: '無圧縮・最高音質（1〜2位）。強弱や響きを劣化ゼロで残したいときに最適。',
           qualities: [
-            { id: '24bit', title: '24bit ハイレゾ', sub: '原音そのまま・最高音質' },
-            { id: '16bit', title: '16bit 標準 (CD)', sub: '高互換・約2/3容量' },
-            { id: '16bit_mono', title: '16bit モノラル', sub: '軽量・容量約1/3' }
+            { id: '24bit', rank: '1位 ★5', title: '24bit ハイレゾ', sub: '原音そのまま・最高音質' },
+            { id: '16bit', rank: '2位 ★4.8', title: '16bit 標準 (CD)', sub: 'CD品質・約2/3容量' },
+            { id: '16bit_mono', rank: 'モノラル', title: '16bit モノラル', sub: '無圧縮1ch・約1/3容量' }
           ]
         },
         m4a: {
           label: 'M4A (AAC)',
           ext: '.m4a',
-          hint: 'スマホ・PC・LINE共有など幅広く再生でき、高音質かつ軽量です。',
+          hint: '共有しやすく高音質（3〜6位）。迷ったら「192 kbps」が定番バランスです。',
           qualities: [
-            { id: '256', title: '最高音質', sub: '256 kbps • 演奏保存向け' },
-            { id: '192', title: '高音質（標準）', sub: '192 kbps • バランス◎' },
-            { id: '128', title: '標準', sub: '128 kbps • 共有・軽量' },
-            { id: '96', title: '軽量', sub: '96 kbps • 容量節約' }
+            { id: '256', rank: '3位相当 ★4.5', title: '256 kbps', sub: '原音に極近 (≒OGG 192)' },
+            { id: '192', rank: '4位相当 ★4', title: '192 kbps おすすめ', sub: 'バランス◎ (≒OGG 128)' },
+            { id: '128', rank: '5位相当 ★3', title: '128 kbps 標準', sub: '共有・軽量 (≒OGG 96)' },
+            { id: '96', rank: '6位相当 ★2', title: '96 kbps 軽量', sub: '容量節約 (≒OGG 64)' }
           ]
         },
         ogg: {
           label: 'OGG (Opus)',
           ext: '.ogg',
-          hint: '最新Opus圧縮。とても小さい容量でも驚くほどクリアな音質を保ちます。',
+          hint: '最新Opus圧縮（3〜6位）。同じ音質でもM4Aより小さく、目安は「OGG × 約1.5倍 ≒ M4A」です。',
           qualities: [
-            { id: '192', title: '最高音質', sub: '192 kbps • 原音に極近' },
-            { id: '128', title: '高音質（標準）', sub: '128 kbps • CD相当以上' },
-            { id: '96', title: '標準', sub: '96 kbps • 軽量クリア' },
-            { id: '64', title: '超軽量', sub: '64 kbps • 長時間録音向け' }
+            { id: '192', rank: '3位相当 ★4.5', title: '192 kbps 最高', sub: 'M4A 256相当のクリア音質' },
+            { id: '128', rank: '4位相当 ★4', title: '128 kbps おすすめ', sub: 'M4A 192相当・長時間◎' },
+            { id: '96', rank: '5位相当 ★3', title: '96 kbps 標準', sub: 'M4A 128相当・軽量' },
+            { id: '64', rank: '6位相当 ★2', title: '64 kbps 超軽量', sub: 'M4A 96相当・メモ向け' }
           ]
         },
         orig: {
           label: '元のまま',
           ext: '',
-          hint: '再エンコードせず、読み込んだ音声データを無劣化のまま保存します。',
+          hint: '再圧縮せず元ファイルを無劣化のまま保存します（すでに圧縮済みの音源に最適）。',
           qualities: [
-            { id: 'copy', title: '無劣化コピー', sub: '元の形式・音質のまま書き出し' }
+            { id: 'copy', rank: '無劣化', title: '元のままコピー', sub: '元データと同じ形式・音質' }
           ]
         }
       };
@@ -7860,10 +7915,10 @@
             disabled = !hasBuf && !state.wavMeta;
           } else if (f === 'm4a') {
             disabled = !hasBuf || !saveExportState.supportM4a;
-            if (subEl) subEl.textContent = !saveExportState.supportM4a ? 'ブラウザ非対応' : (!hasBuf ? '解析完了後に対応' : '高音質・共有向け');
+            if (subEl) subEl.textContent = !saveExportState.supportM4a ? 'ブラウザ非対応' : (!hasBuf ? '解析完了後に対応' : '★4 共有向き・定番');
           } else if (f === 'ogg') {
             disabled = !hasBuf || !saveExportState.supportOgg;
-            if (subEl) subEl.textContent = !saveExportState.supportOgg ? 'ブラウザ非対応' : (!hasBuf ? '解析完了後に対応' : 'Opus・超軽量');
+            if (subEl) subEl.textContent = !saveExportState.supportOgg ? 'ブラウザ非対応' : (!hasBuf ? '解析完了後に対応' : '★4 超軽量・高効率');
           }
           btn.disabled = disabled;
           btn.classList.toggle('active', f === fmt);
@@ -7881,7 +7936,7 @@
           saveExportState.selectedQuality = quals[0].id;
         }
         const activeQual = quals.find(q => q.id === saveExportState.selectedQuality) || quals[0];
-        saveQualityLabel.textContent = activeQual.title;
+        saveQualityLabel.textContent = activeQual.rank ? `${activeQual.rank} (${activeQual.title})` : activeQual.title;
 
         saveQualityGrid.className = 'save-qual-grid' + (quals.length === 3 ? ' cols-3' : (quals.length === 1 ? ' cols-1' : ''));
         saveQualityGrid.innerHTML = '';
@@ -7890,6 +7945,12 @@
           btn.type = 'button';
           btn.className = 'save-qual-btn' + (q.id === saveExportState.selectedQuality ? ' active' : '');
           btn.disabled = saveExportState.isExporting;
+          if (q.rank) {
+            const r = document.createElement('span');
+            r.className = 'save-qual-rank mono';
+            r.textContent = q.rank;
+            btn.appendChild(r);
+          }
           const t = document.createElement('span');
           t.className = 'save-qual-title';
           t.textContent = q.title;
@@ -12815,11 +12876,22 @@
       document.addEventListener('webkitfullscreenchange', onFullscreenStateChanged);
 
       // ==================== GITHUB / PWA SOFTWARE UPDATE CHECK & APPLY ====================
-      const APP_VERSION = 'v28';
+      const APP_VERSION = 'v29';
 
       // Ordered newest-first; each release appends a new object at the top.
       // Users who skip multiple versions automatically see ALL unseen versions between lastSeen and current.
       const APP_RELEASE_NOTES = [
+        {
+          version: 'v29',
+          verNum: 29,
+          date: '2026/11/23',
+          title: '保存形式・音質にわかりやすい順位表示と詳細ヘルプを追加',
+          items: [
+            '保存画面の各音質ボタンに全形式共通の音質順位（1位 ★5 〜 6位相当 ★2）と一目でわかる高音質順ガイドを追加しました',
+            '保存画面の「?」ヘルプに、WAV / M4A / OGG を横断した音質ランキング表・数値の違い（OGG × 約1.5倍 ≒ M4A）・モノラルや無劣化コピーの位置づけを詳しくまとめました',
+            '設定画面の「録音時の音質（WAV）」表記もシンプルでわかりやすく見直しました'
+          ]
+        },
         {
           version: 'v28',
           verNum: 28,
@@ -13077,25 +13149,44 @@
       // ==================== SETTING HELP (?) CONTENT & MODAL ====================
       const SETTING_HELP_TOPICS = {
         exportFormat: {
-          title: '保存ファイル形式の選び方',
-          sub: 'WAV / M4A (AAC) / OGG (Opus) の違い',
-          summary: '用途に合わせて「最高音質のWAV」「共有しやすいM4A」「超軽量のOGG」から選べます。どの形式で保存しても黄色ピン情報は自動で引き継がれます。',
-          sections: [
+          title: '保存形式と音質ランキング',
+          sub: 'WAV / M4A / OGG の音質が良い順番と選び方',
+          summary: '迷ったら「音質最優先なら WAV 24bit」「スマホ管理・共有なら M4A 192kbps」「長時間・超軽量なら OGG 128kbps」が定番です。どの形式で保存しても黄色ピンは自動で引き継がれます。',
+          tablesBefore: [
             {
-              title: '各形式の特徴',
-              bullets: [
-                ['WAV（無圧縮）', '音を一切圧縮しない最高音質形式です。ファイルサイズは大きくなりますが、楽器の繊細な響きや後からの編集・再加工に最適です。'],
-                ['M4A / AAC（おすすめ）', 'iPhone・Android・PC・LINE共有などほぼすべての環境でそのまま再生でき、192kbps前後なら高音質かつWAVの約1/6〜1/8の軽さになります。'],
-                ['OGG / Opus（超軽量）', '最新世代の高効率圧縮です。64〜128kbpsという小さな容量でも驚くほどクリアに聴けるため、長時間の練習録音や発表会丸ごとの保存に便利です。']
+              title: '音質が良い順（ステレオ音源）',
+              headers: ['順位', '形式・音質設定', '音質レベルと特徴'],
+              rows: [
+                ['1位', 'WAV 24bit', '無圧縮・原音そのまま。弱奏(pp)〜強奏(ff)の幅が最も広く編集にも劣化なし'],
+                ['2位', 'WAV 16bit', '無圧縮・CD品質。人の耳では1位とほぼ区別不能で、容量は24bitの約2/3'],
+                ['3位', 'M4A 256 ≒ OGG 192', '圧縮ありだが、ほとんどの環境でWAVと聴き分けられない高音質'],
+                ['4位', 'M4A 192 ≒ OGG 128', '楽器演奏の記録や共有に十分な高音質。音質と容量のバランス最良'],
+                ['5位', 'M4A 128 ≒ OGG 96', '標準音質。日常の練習確認には十分だが、響きや高音がわずかに丸くなる'],
+                ['6位', 'M4A 96 ≒ OGG 64', '容量節約向け。会話や長時間の練習メモに便利だが圧縮感が出やすい']
               ]
             }
           ],
-          tableTitle: 'おすすめ設定の目安',
+          sections: [
+            {
+              title: '数字(kbps)が違っても同じ順位になる理由',
+              bullets: [
+                ['OGG (Opus) は高効率', 'M4A (AAC) より新しい圧縮方式のため、少ないデータ量で同じ音質を出せます。目安は「OGGの数値 × 約1.3〜1.5倍 ＝ M4Aの数値」です（例: OGG 128 ≒ M4A 192）。']
+              ]
+            },
+            {
+              title: '特殊な2つの選択肢の位置づけ',
+              bullets: [
+                ['WAV 16bit モノラル', '圧縮ノイズはゼロで音の芯はクリアですが、左右の広がりが消えて1chになります。響きを残したいステレオ録音は M4A 192 や OGG 128 の方が自然に聴こえます。'],
+                ['元のまま（無劣化コピー）', '読み込んだ MP3 や M4A 等を未編集のまま名前変更して保存する場合、再圧縮しないため劣化ゼロです（圧縮済み音源をWAVにしても容量が増えるだけで音質は上がりません）。']
+              ]
+            }
+          ],
+          tableTitle: '迷ったときの定番設定',
           tableHeaders: ['やりたいこと', 'おすすめ形式・音質'],
           tableRows: [
-            ['原音のまま最高音質で残す', 'WAV • 24bit ハイレゾ'],
-            ['家族・先生へ送る／スマホ管理', 'M4A • 192kbps（または128kbps）'],
-            ['長時間の録音を軽く保存', 'OGG (Opus) • 96〜128kbps']
+            ['音質最優先で残す', 'WAV • 24bit ハイレゾ（1位）'],
+            ['誰かに送る・スマホ管理', 'M4A • 192 kbps（4位・互換性◎）'],
+            ['長時間録音を軽く残す', 'OGG • 128 kbps（4位・超軽量）']
           ]
         },
         micGain: {
@@ -13290,12 +13381,55 @@
         settingHelpSub.textContent = topic.sub || '設定のくわしい説明';
         settingHelpBody.innerHTML = '';
 
+        const appendHelpTableCard = (title, headers, rows) => {
+          if (!rows || rows.length === 0) return;
+          const card = document.createElement('div');
+          card.className = 'help-sec-card';
+          if (title) {
+            const h = document.createElement('div');
+            h.className = 'help-sec-title';
+            h.textContent = title;
+            card.appendChild(h);
+          }
+          const table = document.createElement('table');
+          const colCount = (headers && headers.length) || (rows[0] ? rows[0].length : 2);
+          table.className = 'help-table' + (colCount === 3 ? ' cols-3' : '');
+          if (headers && headers.length > 0) {
+            const thead = document.createElement('thead');
+            const tr = document.createElement('tr');
+            headers.forEach((thTxt) => {
+              const th = document.createElement('th');
+              th.textContent = thTxt;
+              tr.appendChild(th);
+            });
+            thead.appendChild(tr);
+            table.appendChild(thead);
+          }
+          const tbody = document.createElement('tbody');
+          rows.forEach((row) => {
+            const tr = document.createElement('tr');
+            row.forEach((cell) => {
+              const td = document.createElement('td');
+              td.textContent = cell;
+              tr.appendChild(td);
+            });
+            tbody.appendChild(tr);
+          });
+          table.appendChild(tbody);
+          card.appendChild(table);
+          settingHelpBody.appendChild(card);
+        };
+
         if (topic.summary) {
           const sumBox = document.createElement('div');
           sumBox.className = 'help-summary-box';
           sumBox.textContent = topic.summary;
           settingHelpBody.appendChild(sumBox);
         }
+
+        (topic.tablesBefore || []).forEach((tb) => {
+          appendHelpTableCard(tb.title, tb.headers, tb.rows);
+        });
 
         (topic.sections || []).forEach((sec) => {
           const card = document.createElement('div');
@@ -13325,40 +13459,7 @@
         });
 
         if (topic.tableRows && topic.tableRows.length > 0) {
-          const card = document.createElement('div');
-          card.className = 'help-sec-card';
-          if (topic.tableTitle) {
-            const h = document.createElement('div');
-            h.className = 'help-sec-title';
-            h.textContent = topic.tableTitle;
-            card.appendChild(h);
-          }
-          const table = document.createElement('table');
-          table.className = 'help-table';
-          if (topic.tableHeaders && topic.tableHeaders.length === 2) {
-            const thead = document.createElement('thead');
-            const tr = document.createElement('tr');
-            topic.tableHeaders.forEach((thTxt) => {
-              const th = document.createElement('th');
-              th.textContent = thTxt;
-              tr.appendChild(th);
-            });
-            thead.appendChild(tr);
-            table.appendChild(thead);
-          }
-          const tbody = document.createElement('tbody');
-          topic.tableRows.forEach((row) => {
-            const tr = document.createElement('tr');
-            row.forEach((cell) => {
-              const td = document.createElement('td');
-              td.textContent = cell;
-              tr.appendChild(td);
-            });
-            tbody.appendChild(tr);
-          });
-          table.appendChild(tbody);
-          card.appendChild(table);
-          settingHelpBody.appendChild(card);
+          appendHelpTableCard(topic.tableTitle, topic.tableHeaders, topic.tableRows);
         }
 
         settingHelpModal.classList.remove('hidden');
