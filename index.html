@@ -450,17 +450,7 @@
       cursor: ew-resize;
     }
 
-    .zoom-badge-left {
-      position: absolute;
-      top: 5px;
-      left: 7px;
-      pointer-events: none;
-      font-size: 10px;
-      color: #b4b4be;
-      background: rgba(12, 12, 14, 0.72);
-      padding: 2px 6px;
-      border-radius: 6px;
-    }
+
 
     .zoom-badges-right {
       position: absolute;
@@ -715,6 +705,257 @@
       background: rgba(250, 204, 21, 0.24);
       border-color: var(--accent-yellow);
       box-shadow: 0 0 12px rgba(250, 204, 21, 0.45), inset 0 0 6px rgba(250, 204, 21, 0.22);
+    }
+
+    .pad-btn.active-green-glow {
+      background: rgba(34, 197, 94, 0.24);
+      border-color: var(--accent-green);
+      box-shadow: 0 0 12px rgba(34, 197, 94, 0.45), inset 0 0 6px rgba(34, 197, 94, 0.22);
+    }
+
+    /* ==================== SECTION ACTION BAR (SKIP & CUT) ==================== */
+    .section-action-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+      padding: 4px 8px;
+      background: #141418;
+      border-bottom: 1px solid var(--border-subtle);
+      flex-shrink: 0;
+    }
+
+    .sec-info-chip {
+      flex: 1;
+      min-width: 0;
+      font-size: 11px;
+      color: var(--text-sub);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      cursor: pointer;
+    }
+
+    .sec-info-chip strong {
+      color: #fde047;
+      font-weight: 700;
+    }
+
+    .sec-act-group {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      flex-shrink: 0;
+    }
+
+    .sec-act-btn {
+      height: 25px;
+      padding: 0 8px;
+      border-radius: 7px;
+      font-size: 11px;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: var(--bg-btn);
+      border: 1px solid var(--border-strong);
+      color: var(--text-main);
+      transition: transform 0.08s ease, background-color 0.12s ease, border-color 0.12s ease;
+    }
+
+    .sec-act-btn:active {
+      transform: scale(0.94);
+    }
+
+    .sec-act-btn:disabled {
+      opacity: 0.38;
+      pointer-events: none;
+    }
+
+    .sec-act-btn.skip-active {
+      background: var(--accent-amber-bg);
+      border-color: var(--accent-amber);
+      color: #fcd34d;
+    }
+
+    .sec-act-btn.cut-btn {
+      background: rgba(239, 68, 68, 0.14);
+      border-color: rgba(239, 68, 68, 0.45);
+      color: #fca5a5;
+    }
+
+    /* ==================== AUDIPO MARK EDIT MODAL STYLES ==================== */
+    .mark-edit-card {
+      width: 100%;
+      max-width: 380px;
+      background: #232328;
+      border: 1px solid var(--border-strong);
+      border-radius: 14px;
+      padding: 18px 18px 14px;
+      box-shadow: 0 24px 56px rgba(0, 0, 0, 0.85);
+      color: var(--text-main);
+    }
+
+    .mark-edit-title {
+      margin: 0 0 14px;
+      font-size: 17px;
+      font-weight: 700;
+      color: #ffffff;
+    }
+
+    .mark-name-input {
+      width: 100%;
+      height: 40px;
+      padding: 4px 6px;
+      background: transparent;
+      border: none;
+      border-bottom: 2px solid var(--accent-blue);
+      color: #ffffff;
+      font-size: 16px;
+      outline: none;
+      margin-bottom: 14px;
+    }
+
+    .mark-name-input::placeholder {
+      color: var(--text-dim);
+      font-size: 13px;
+    }
+
+    .mark-time-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 14px;
+      padding: 8px;
+      background: #19191d;
+      border-radius: 10px;
+      border: 1px solid var(--border-subtle);
+    }
+
+    .mark-time-readout {
+      font-size: 22px;
+      font-weight: 700;
+      color: #ffffff;
+      letter-spacing: 0.5px;
+    }
+
+    .mark-time-steps {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .mark-time-step-btn {
+      padding: 4px 9px;
+      border-radius: 6px;
+      background: #2a2a32;
+      border: 1px solid var(--border-strong);
+      color: #e4e4e7;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .mark-time-step-btn:active {
+      transform: scale(0.95);
+    }
+
+    .mark-action-block {
+      width: 100%;
+      height: 40px;
+      padding: 0 14px;
+      border-radius: 8px;
+      background: #323238;
+      border: 1px solid #3f3f48;
+      color: #f4f4f6;
+      font-size: 13px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 10px;
+    }
+
+    .mark-action-block:active {
+      background: #3e3e46;
+    }
+
+    .mark-switch-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 2px;
+      font-size: 13.5px;
+      color: #f4f4f6;
+    }
+
+    .audipo-switch {
+      position: relative;
+      width: 44px;
+      height: 24px;
+      border-radius: 999px;
+      background: #4b4b55;
+      transition: background-color 0.16s ease;
+      flex-shrink: 0;
+    }
+
+    .audipo-switch::after {
+      content: '';
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #d4d4d8;
+      transition: transform 0.16s ease, background-color 0.16s ease;
+    }
+
+    .audipo-switch.on {
+      background: rgba(66, 165, 245, 0.45);
+    }
+
+    .audipo-switch.on::after {
+      transform: translateX(20px);
+      background: var(--accent-blue);
+    }
+
+    .mark-edit-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 18px;
+      margin-top: 14px;
+      padding-top: 8px;
+    }
+
+    .mark-dialog-btn {
+      padding: 8px 12px;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--accent-blue);
+      border-radius: 8px;
+    }
+
+    .mark-dialog-btn:active {
+      background: rgba(66, 165, 245, 0.14);
+    }
+
+    .marker-row-pencil {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: #272730;
+      border: 1px solid var(--border-strong);
+      color: #e4e4e7;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .marker-row-pencil:active {
+      transform: scale(0.93);
     }
 
     .pad-btn.active-star {
@@ -1206,9 +1447,7 @@
               <span>マイクで録音する</span>
             </button>
 
-            <button id="btnLoadDemo" type="button" class="start-btn start-btn-demo">
-              <span>デモ練習音源を試す</span>
-            </button>
+
           </div>
         </div>
       </div>
@@ -1242,7 +1481,6 @@
     <!-- Lower Pane: Closeable Zoomed Detail Waveform -->
     <section id="zoomPane" class="zoom-pane">
       <canvas id="zoomCanvas"></canvas>
-      <div class="zoom-badge-left">拡大波形 (ドラッグ移動 / 2本指ズーム)</div>
       <div class="zoom-badges-right">
         <button id="btnWaveGainQuick" type="button" class="zoom-pill zoom-pill-gain mono" title="波形縦倍率を切替 (自動/1x/2x/4x/8x)">波形:自動</button>
         <button id="btnZoomSpanReset" type="button" class="zoom-pill zoom-pill-span mono" title="タップで8.0sにリセット">8.0s</button>
@@ -1300,17 +1538,32 @@
     </div>
   </section>
 
+  <!-- ==================== 3.5 SECTION SKIP & CUT ACTION BAR ==================== -->
+  <section class="section-action-bar">
+    <div id="currentSectionInfo" class="sec-info-chip" title="タップしてマーカー一覧・名前編集を開く">
+      区間: 0:00 〜 0:00
+    </div>
+    <div class="sec-act-group">
+      <button id="btnToggleSectionSkip" type="button" disabled class="sec-act-btn" title="手前の黄色〜次の黄色までを再生時に自動スキップ">
+        <span>⏭ 区間スキップ</span>
+      </button>
+      <button id="btnCutYellowSection" type="button" disabled class="sec-act-btn cut-btn" title="手前の黄色〜次の黄色までの音声データを削除して詰める">
+        <span>✂ 区間削除</span>
+      </button>
+    </div>
+  </section>
+
   <!-- ==================== 4. BOTTOM 3x7 AUDIPO CONTROL GRID ==================== -->
   <footer class="control-footer">
     <!-- ROW 1: Pin Controls (Exact Spec), Speed/Pitch, Local Folder -->
     <div class="ctrl-row">
-      <!-- Col 1: Green-to-Yellow Convert (Green ▼ arrow down to Yellow ▼) -->
-      <button id="btnPromoteTemp" type="button" class="pad-btn dimmed" title="現在位置の緑一時ピンを黄色確定ピンに変換">
-        <svg width="26" height="26" viewBox="0 0 28 28" fill="none">
-          <polygon points="3,4 13,4 8,12" fill="#22c55e"/>
+      <!-- Col 1: Bidirectional Green <-> Yellow Convert -->
+      <button id="btnPromoteTemp" type="button" class="pad-btn dimmed" title="緑一時ピン⇔黄色確定ピンを相互変換">
+        <svg id="svgConvertPin" width="26" height="26" viewBox="0 0 28 28" fill="none">
+          <polygon id="convPinFrom" points="3,4 13,4 8,12" fill="#22c55e"/>
           <path d="M15 7h4v5" stroke="#e4e4e7" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/>
           <polyline points="16.8,9.8 19,12.2 21.2,9.8" stroke="#e4e4e7" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/>
-          <polygon points="14,16 24,16 19,24" fill="#facc15"/>
+          <polygon id="convPinTo" points="14,16 24,16 19,24" fill="#facc15"/>
         </svg>
       </button>
 
@@ -1617,6 +1870,69 @@
     </div>
   </div>
 
+  <!-- ==================== 6. AUDIPO-STYLE MARK EDIT MODAL ==================== -->
+  <div id="markEditModal" class="modal-backdrop hidden" style="z-index:75;">
+    <div class="mark-edit-card">
+      <h3 class="mark-edit-title">マークの編集</h3>
+
+      <input type="text" id="editMarkNameInput" class="mark-name-input" placeholder="マーク名を入力（例: 26 優ちゃん、Aメロ）">
+
+      <div id="editMarkTimeBox" class="mark-time-box">
+        <div id="editMarkTimeText" class="mark-time-readout mono">00 : 00 . 000</div>
+        <div class="mark-time-steps">
+          <button type="button" data-ms="-500" class="mark-time-step-btn mono">-0.5s</button>
+          <button type="button" data-ms="-50" class="mark-time-step-btn mono">-50ms</button>
+          <button type="button" data-ms="50" class="mark-time-step-btn mono">+50ms</button>
+          <button type="button" data-ms="500" class="mark-time-step-btn mono">+0.5s</button>
+        </div>
+      </div>
+
+      <button id="btnEditMarkPreview" type="button" class="mark-action-block">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+          <polygon points="6,4 20,12 6,20"/>
+        </svg>
+        <span>試しにここから再生</span>
+      </button>
+
+      <button id="btnEditMarkDelete" type="button" class="mark-action-block">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+        </svg>
+        <span>このマークを削除</span>
+      </button>
+
+      <div id="editMarkEnabledRow" class="mark-switch-row">
+        <span>このマークは有効</span>
+        <button id="toggleEditMarkEnabled" type="button" class="audipo-switch on" aria-label="このマークは有効"></button>
+      </div>
+
+      <div class="mark-switch-row">
+        <span>ここから始まる区間は有効</span>
+        <button id="toggleEditSectionEnabled" type="button" class="audipo-switch on" aria-label="ここから始まる区間は有効"></button>
+      </div>
+
+      <div class="mark-edit-footer">
+        <button id="btnEditMarkCancel" type="button" class="mark-dialog-btn">キャンセル</button>
+        <button id="btnEditMarkOk" type="button" class="mark-dialog-btn">OK</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== 7. SECTION CUT CONFIRMATION MODAL ==================== -->
+  <div id="cutConfirmModal" class="modal-backdrop hidden" style="z-index:75;">
+    <div class="mark-edit-card">
+      <h3 class="mark-edit-title" style="color:#fca5a5;">手前の黄色〜次の黄色を削除</h3>
+      <p id="cutConfirmRangeText" class="mono" style="margin:0 0 10px;font-size:14px;font-weight:700;color:#fde047;"></p>
+      <p style="margin:0 0 16px;font-size:12px;line-height:1.55;color:#d4d4d8;">
+        この区間の音声データをカットして前後の音声をつなぎます。以降の黄色ピン時刻は自動的に前へ詰まります（削除後は「保存」でWAV書き出し可能）。
+      </p>
+      <div class="mark-edit-footer">
+        <button id="btnCutCancel" type="button" class="mark-dialog-btn" style="color:#a1a1aa;">キャンセル</button>
+        <button id="btnCutExecute" type="button" class="mark-dialog-btn" style="color:#f87171;">この区間を削除する</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Toast Banner -->
   <div id="toastBanner" class="toast-banner"></div>
 
@@ -1657,7 +1973,13 @@
       const btnBoostQuick = document.getElementById('btnBoostQuick');
       const btnEngineQuick = document.getElementById('btnEngineQuick');
 
+      const currentSectionInfo = document.getElementById('currentSectionInfo');
+      const btnToggleSectionSkip = document.getElementById('btnToggleSectionSkip');
+      const btnCutYellowSection = document.getElementById('btnCutYellowSection');
+
       const btnPromoteTemp = document.getElementById('btnPromoteTemp');
+      const convPinFrom = document.getElementById('convPinFrom');
+      const convPinTo = document.getElementById('convPinTo');
       const btnJumpTemp = document.getElementById('btnJumpTemp');
       const speedBadgeText = document.getElementById('speedBadgeText');
       const pitchBadgeText = document.getElementById('pitchBadgeText');
@@ -1671,6 +1993,30 @@
       const toastBanner = document.getElementById('toastBanner');
 
       // ==================== APPLICATION STATE ====================
+      let nextMarkerUid = 1;
+      function makeMarkerObj(time, name = '', enabled = true, sectionEnabled = true) {
+        return {
+          id: `mk_${nextMarkerUid++}_${Math.random().toString(36).slice(2, 6)}`,
+          time: Number(time) || 0,
+          name: String(name || ''),
+          enabled: enabled !== false,
+          sectionEnabled: sectionEnabled !== false
+        };
+      }
+
+      function cloneMarkerList(list) {
+        return (list || []).map(m => {
+          if (typeof m === 'number') return makeMarkerObj(m, '', true, true);
+          return {
+            id: m.id || `mk_${nextMarkerUid++}`,
+            time: Number(m.time) || 0,
+            name: String(m.name || ''),
+            enabled: m.enabled !== false,
+            sectionEnabled: m.sectionEnabled !== false
+          };
+        }).sort((a, b) => a.time - b.time);
+      }
+
       const state = {
         hasAudio: false,
         isPlaying: false,
@@ -1685,9 +2031,13 @@
         orderMode: 'stop', // 'loop1' | 'loopAll' | 'stop' | 'shuffle'
         sectionRepeat: false,
 
-        // Markers: Yellow Confirmed Pins (permanent) & Green Temporary Pin (max 1)
+        // Markers: Yellow Confirmed Pins (objects) & startSectionEnabled (0:00 -> 1st yellow) & Green Temporary Pin (max 1)
         markers: [],
+        startSectionEnabled: true,
         tempMarker: null,
+
+        // Undo snapshot for audio section cut
+        undoCutSnapshot: null,
 
         // Real PCM Buffer & Multi-Resolution Min/Max Pyramid
         audioBuffer: null,
@@ -1717,7 +2067,7 @@
         reverbIndex: 0,
 
         // Playlist
-        playlist: [], // { name, blob, markers, durationHint }
+        playlist: [], // { name, blob, markers, startSectionEnabled }
         currentTrackIndex: 0,
 
         // High-precision playhead interpolation for zero-jitter 60/120fps scrolling
@@ -1767,7 +2117,7 @@
         clearTimeout(toastTimer);
         toastTimer = setTimeout(() => {
           toastBanner.classList.remove('show');
-        }, 2100);
+        }, 2200);
       }
 
       function formatTime(sec, withTenths = false) {
@@ -1780,6 +2130,15 @@
         const ss = String(secs).padStart(2, '0');
         const base = hrs > 0 ? `${hrs}:${mm}:${ss}` : `${mm}:${ss}`;
         return withTenths ? `${base}.${tenths}` : base;
+      }
+
+      function formatTimeMs(sec) {
+        if (!isFinite(sec) || sec < 0) sec = 0;
+        const totalMs = Math.round(sec * 1000);
+        const mins = Math.floor(totalMs / 60000);
+        const secs = Math.floor((totalMs % 60000) / 1000);
+        const ms = totalMs % 1000;
+        return `${String(mins).padStart(2, '0')} : ${String(secs).padStart(2, '0')} . ${String(ms).padStart(3, '0')}`;
       }
 
       function formatRowTime(sec) {
@@ -1805,6 +2164,80 @@
           return true;
         }
         return /\.(m4a|mp3|wav|aac|flac|ogg|opus|wma|aif|aiff|caf|3gp|mp4|webm)$/i.test(file.name);
+      }
+
+      // ==================== SECTION & SKIP HELPERS ====================
+      function getEnabledMarkers() {
+        return state.markers.filter(m => m.enabled !== false);
+      }
+
+      // Returns ordered array of sections covering [0, duration]:
+      // { start, end, markerId (null for 0:00 start), markerObj (null for 0:00), name, sectionEnabled }
+      function getAllSections() {
+        if (!state.hasAudio || state.duration <= 0) return [];
+        const enabled = getEnabledMarkers();
+        const sections = [];
+        let prevTime = 0;
+        let prevMarker = null;
+        let prevEnabled = state.startSectionEnabled !== false;
+
+        for (let i = 0; i < enabled.length; i++) {
+          const m = enabled[i];
+          if (m.time > prevTime + 0.001) {
+            sections.push({
+              start: prevTime,
+              end: m.time,
+              markerId: prevMarker ? prevMarker.id : null,
+              markerObj: prevMarker,
+              name: prevMarker ? prevMarker.name : '',
+              sectionEnabled: prevEnabled
+            });
+          }
+          prevTime = m.time;
+          prevMarker = m;
+          prevEnabled = m.sectionEnabled !== false;
+        }
+
+        if (state.duration > prevTime + 0.001) {
+          sections.push({
+            start: prevTime,
+            end: state.duration,
+            markerId: prevMarker ? prevMarker.id : null,
+            markerObj: prevMarker,
+            name: prevMarker ? prevMarker.name : '',
+            sectionEnabled: prevEnabled
+          });
+        }
+        return sections;
+      }
+
+      function getCurrentYellowSection(atTime = state.currentTime) {
+        const secs = getAllSections();
+        if (secs.length === 0) return null;
+        for (let i = 0; i < secs.length; i++) {
+          if (atTime >= secs[i].start - 0.03 && atTime < secs[i].end - 0.01) {
+            return secs[i];
+          }
+        }
+        return secs[secs.length - 1];
+      }
+
+      // Finds where playback should jump if `t` lands inside a skipped section (`sectionEnabled === false`)
+      function resolveSkipTarget(t) {
+        const secs = getAllSections();
+        for (let i = 0; i < secs.length; i++) {
+          const s = secs[i];
+          if (!s.sectionEnabled && t >= s.start - 0.02 && t < s.end - 0.03) {
+            // Advance past any consecutive skipped sections as well
+            let target = s.end;
+            for (let j = i + 1; j < secs.length; j++) {
+              if (!secs[j].sectionEnabled) target = secs[j].end;
+              else break;
+            }
+            return target;
+          }
+        }
+        return null;
       }
 
       // ==================== WEB AUDIO GRAPH & 3 PLAYBACK ENGINES ====================
@@ -2130,11 +2563,33 @@
           }
         }
 
+        // Precompute skipped sample intervals
+        const allSecs = getAllSections();
+        const skipRanges = [];
+        for (let i = 0; i < allSecs.length; i++) {
+          if (!allSecs[i].sectionEnabled) {
+            skipRanges.push([
+              Math.floor(allSecs[i].start * bufSr),
+              Math.min(totalSamples, Math.floor(allSecs[i].end * bufSr))
+            ]);
+          }
+        }
+
         const len = outL.length;
         for (let i = 0; i < len; i++) {
           if (useSectionLoop && pv.analysisPos >= loopEndS) {
             resetVocoderAtSample(loopStartS);
           }
+
+          // Check skipped sections
+          for (let s = 0; s < skipRanges.length; s++) {
+            const [sk0, sk1] = skipRanges[s];
+            if (pv.analysisPos >= sk0 && pv.analysisPos < sk1 - 32) {
+              resetVocoderAtSample(sk1);
+              break;
+            }
+          }
+
           if (pv.analysisPos >= totalSamples) {
             outL[i] = 0;
             outR[i] = 0;
@@ -2370,7 +2825,6 @@
         const valid = ['vocoder', 'native', 'tape'];
         if (!valid.includes(nextEngine)) return;
 
-        // If no decoded PCM buffer (extreme large fallback), force native
         if (state.hasAudio && (!state.audioBuffer || state.isFallbackLargeFile) && nextEngine !== 'native') {
           showToast('超大容量ファイルのためOS標準エンジンを使用します');
           nextEngine = 'native';
@@ -2380,7 +2834,6 @@
         const curT = getLivePlayheadTime();
         state.currentTime = curT;
 
-        // Cleanly stop previous engine
         stopTapeSource();
         if (!audioEl.paused) audioEl.pause();
 
@@ -2388,7 +2841,6 @@
         const labels = { vocoder: 'ボコーダ', native: 'OS標準', tape: 'テープ' };
         btnEngineQuick.textContent = labels[nextEngine];
 
-        // Update Settings modal engine cards
         const cVoc = document.getElementById('btnEngVocoder');
         const cNat = document.getElementById('btnEngNative');
         const cTap = document.getElementById('btnEngTape');
@@ -2400,7 +2852,6 @@
         cNat.querySelector('.engine-name').textContent = (nextEngine === 'native' ? '● ' : '○ ') + 'OS標準（端末内蔵ストレッチ）';
         cTap.querySelector('.engine-name').textContent = (nextEngine === 'tape' ? '● ' : '○ ') + 'テープ再生（音程連動・DSP加工ゼロ）';
 
-        // Re-sync new engine seamlessly
         if (state.hasAudio) {
           if (nextEngine === 'vocoder' && state.audioBuffer) {
             resetVocoderAtSample(Math.floor(curT * state.audioBuffer.sampleRate));
@@ -2530,7 +2981,7 @@
         return 14;
       }
 
-      async function loadAudioBlob(blob, title, initialMarkers = [], autoPlay = false, preDecodedBuffer = null) {
+      async function loadAudioBlob(blob, title, initialMarkers = [], autoPlay = false, preDecodedBuffer = null, startSecEnabled = true) {
         try {
           pausePlayback();
           stopInertia();
@@ -2540,6 +2991,7 @@
           state.audioBuffer = null;
           state.waveformPyramid = null;
           state.isFallbackLargeFile = false;
+          state.undoCutSnapshot = null;
 
           let resolvedDuration = preDecodedBuffer ? preDecodedBuffer.duration : await probeDuration(url);
 
@@ -2582,7 +3034,8 @@
           state.lastSyncTime = 0;
           state.lastSyncPerf = performance.now();
           state.numRows = computeRows(resolvedDuration);
-          state.markers = initialMarkers.filter(t => t > 0.1 && t < resolvedDuration - 0.1).sort((a, b) => a - b);
+          state.markers = cloneMarkerList(initialMarkers).filter(m => m.time > 0.05 && m.time < resolvedDuration - 0.05);
+          state.startSectionEnabled = startSecEnabled !== false;
           state.tempMarker = null;
 
           if (state.audioBuffer) {
@@ -2602,6 +3055,8 @@
           state.hasAudio = true;
           startupOverlay.classList.add('hidden');
           btnSaveWav.disabled = false;
+          btnToggleSectionSkip.disabled = false;
+          btnCutYellowSection.disabled = !state.audioBuffer;
           trackTitleEl.textContent = title;
 
           updateWaveGainUI();
@@ -2609,6 +3064,7 @@
           updateHeaderSubInfo();
           updateTimeUI();
           updatePinButtonsUI();
+          updateSectionBarUI();
           renderAllCanvases();
 
           if (autoPlay) startPlayback();
@@ -2679,93 +3135,6 @@
         }, 30);
       }
 
-      // ==================== REALISTIC MUSICAL DEMO GENERATOR ====================
-      async function loadDemoTrack() {
-        showToast('デモ練習音源を生成中...');
-        initAudioGraph();
-        const sr = 22050;
-        const duration = 32;
-        const total = sr * duration;
-        const buf = audioCtx.createBuffer(2, total, sr);
-        const outL = buf.getChannelData(0);
-        const outR = buf.getChannelData(1);
-
-        // Warm piano accompaniment + expressive flute-like melody with clear phrasing & dynamics
-        const chordProg = [
-          [261.63, 329.63, 392.00], // C
-          [220.00, 261.63, 329.63], // Am
-          [174.61, 220.00, 261.63], // F
-          [196.00, 246.94, 293.66]  // G
-        ];
-        const flutePhrase = [
-          { t: 0.2, d: 1.4, f: 523.25 }, { t: 1.7, d: 0.7, f: 587.33 }, { t: 2.5, d: 1.3, f: 659.25 },
-          { t: 4.1, d: 1.5, f: 783.99 }, { t: 5.7, d: 0.8, f: 659.25 }, { t: 6.6, d: 1.1, f: 587.33 },
-          { t: 8.2, d: 1.4, f: 523.25 }, { t: 9.8, d: 0.8, f: 440.00 }, { t: 10.7, d: 1.2, f: 523.25 },
-          { t: 12.1, d: 1.8, f: 659.25 }, { t: 14.1, d: 1.5, f: 587.33 },
-          { t: 16.2, d: 1.2, f: 698.46 }, { t: 17.5, d: 0.6, f: 783.99 }, { t: 18.2, d: 1.5, f: 880.00 },
-          { t: 20.1, d: 1.4, f: 783.99 }, { t: 21.6, d: 0.9, f: 659.25 }, { t: 22.6, d: 1.2, f: 587.33 },
-          { t: 24.2, d: 1.3, f: 659.25 }, { t: 25.6, d: 1.1, f: 587.33 }, { t: 26.8, d: 1.4, f: 523.25 },
-          { t: 28.4, d: 2.8, f: 523.25 }
-        ];
-
-        for (let i = 0; i < total; i++) {
-          const t = i / sr;
-          // Distinct phrasing dynamics across 4 sections (8s each)
-          let dyn = 0.75;
-          if (t >= 8 && t < 16) dyn = 0.48;       // Soft piano-like mp passage
-          else if (t >= 16 && t < 24) dyn = 0.95; // Forte climax
-          else if (t >= 24) dyn = 0.78;
-
-          // Piano arpeggio chords (2s per bar)
-          const barIdx = Math.floor(t / 2) % chordProg.length;
-          const barPhase = t % 2;
-          const chord = chordProg[barIdx];
-          let piano = 0;
-          for (let n = 0; n < chord.length; n++) {
-            const noteT = barPhase - n * 0.16;
-            if (noteT > 0) {
-              const env = Math.exp(-noteT * 2.4) * Math.min(1, noteT / 0.012);
-              const f = chord[n];
-              piano += (Math.sin(2 * Math.PI * f * t) * 0.75 + Math.sin(4 * Math.PI * f * t) * 0.25) * env * 0.14;
-            }
-          }
-
-          // Flute-like expressive melody with subtle vibrato & breath attack
-          let flute = 0;
-          for (let k = 0; k < flutePhrase.length; k++) {
-            const note = flutePhrase[k];
-            if (t >= note.t && t < note.t + note.d) {
-              const nt = t - note.t;
-              const attack = Math.min(1, nt / 0.09);
-              const release = Math.min(1, (note.d - nt) / 0.14);
-              const vib = 1 + 0.005 * Math.sin(2 * Math.PI * 5.2 * nt);
-              const f = note.f * vib;
-              const wave = Math.sin(2 * Math.PI * f * t) * 0.76
-                         + Math.sin(4 * Math.PI * f * t) * 0.19
-                         + Math.sin(6 * Math.PI * f * t) * 0.05;
-              flute += wave * attack * release * 0.34;
-              break;
-            }
-          }
-
-          const valL = Math.max(-0.94, Math.min(0.94, (piano * 0.95 + flute * 1.05) * dyn));
-          const valR = Math.max(-0.94, Math.min(0.94, (piano * 1.05 + flute * 0.95) * dyn));
-          outL[i] = valL;
-          outR[i] = valR;
-        }
-
-        const wavBlob = encodeWavFromAudioBuffer(buf);
-        const demoTrack = {
-          name: 'デモ練習曲_フルート＆ピアノ.wav',
-          blob: wavBlob,
-          markers: [8.0, 16.0, 24.0]
-        };
-        state.playlist = [demoTrack];
-        state.currentTrackIndex = 0;
-        await loadAudioBlob(wavBlob, demoTrack.name, demoTrack.markers, false, buf);
-        showToast('デモ練習音源を読み込みました（黄色ピン3箇所付）');
-      }
-
       // ==================== HIGH-GAIN PCM RECORDING + AUTO-NORMALIZE ====================
       async function startRecording() {
         if (state.isRecording) return;
@@ -2819,7 +3188,6 @@
             state.recBuffersR.push(new Float32Array(inR));
           };
 
-          // Silent sink prevents speaker feedback while keeping ScriptProcessor active
           const silentGain = audioCtx.createGain();
           silentGain.gain.value = 0;
 
@@ -2870,7 +3238,6 @@
           const rms = Math.sqrt(sumSq / bufLen);
           recMeterBar.style.width = `${Math.min(100, Math.round(rms * 320))}%`;
 
-          // Draw live oscilloscope preview
           const dpr = window.devicePixelRatio || 1;
           const rect = recLiveWaveCanvas.getBoundingClientRect();
           if (rect.width > 0 && rect.height > 0) {
@@ -2909,7 +3276,7 @@
         if (!state.isRecording) return;
         const t = (performance.now() - state.recStartPerf) / 1000;
         if (t > 0.15) {
-          state.recPendingMarkers.push(t);
+          state.recPendingMarkers.push(makeMarkerObj(t, '', true, true));
           recMarkerCountBadge.textContent = String(state.recPendingMarkers.length);
           showToast(`録音中に黄色ピン追加 (${formatTime(t)})`);
         }
@@ -2923,9 +3290,8 @@
         const chunksL = state.recBuffersL;
         const chunksR = state.recBuffersR;
         const sr = state.recSampleRate;
-        const capturedMarkers = [...state.recPendingMarkers];
+        const capturedMarkers = cloneMarkerList(state.recPendingMarkers);
 
-        // Cleanup recording audio nodes
         try {
           if (state.recProcessor) { state.recProcessor.onaudioprocess = null; state.recProcessor.disconnect(); }
           if (state.recSourceNode) state.recSourceNode.disconnect();
@@ -2959,7 +3325,6 @@
           return;
         }
 
-        // Merge captured Float32 PCM chunks into AudioBuffer
         const recBuffer = audioCtx.createBuffer(2, totalSamples, sr);
         const dstL = recBuffer.getChannelData(0);
         const dstR = recBuffer.getChannelData(1);
@@ -2978,7 +3343,6 @@
           offset += cL.length;
         }
 
-        // Auto-Normalize up to -1 dBFS (0.89 peak, capped at 8x gain)
         let normGain = 1.0;
         if (maxAbs > 0.001 && maxAbs < 0.89) {
           normGain = Math.min(8.0, 0.89 / maxAbs);
@@ -2994,36 +3358,73 @@
 
         const wavBlob = encodeWavFromAudioBuffer(recBuffer);
         const title = makeRecordingFilename();
-        state.playlist.push({ name: title, blob: wavBlob, markers: capturedMarkers });
+        state.playlist.push({ name: title, blob: wavBlob, markers: capturedMarkers, startSectionEnabled: true });
         state.currentTrackIndex = state.playlist.length - 1;
 
-        await loadAudioBlob(wavBlob, title, capturedMarkers, false, recBuffer);
+        await loadAudioBlob(wavBlob, title, capturedMarkers, false, recBuffer, true);
         const normNote = normGain > 1.04 ? `・自動最適化(${normGain.toFixed(1)}x)` : '';
         showToast(`録音完了（黄色ピン ${capturedMarkers.length}個${normNote}）`);
       }
 
-      // ==================== PIN (MARKER) & SECTION REPEAT LOGIC ====================
+      // ==================== PIN (MARKER) & BIDIRECTIONAL GREEN <-> YELLOW LOGIC ====================
       function isAtGreenTempPin() {
         if (!state.hasAudio || state.tempMarker === null) return false;
         return Math.abs(state.currentTime - state.tempMarker) <= 0.5;
       }
 
+      function findYellowMarkerNear(timeSec, tolerance = 0.5) {
+        if (!state.hasAudio || state.markers.length === 0) return null;
+        let best = null;
+        let bestDiff = Infinity;
+        for (let i = 0; i < state.markers.length; i++) {
+          const d = Math.abs(state.markers[i].time - timeSec);
+          if (d <= tolerance && d < bestDiff) {
+            bestDiff = d;
+            best = state.markers[i];
+          }
+        }
+        return best;
+      }
+
+      function setConvertButtonIcon(direction) {
+        // direction: 'greenToYellow' | 'yellowToGreen'
+        if (direction === 'yellowToGreen') {
+          convPinFrom.setAttribute('fill', '#facc15');
+          convPinTo.setAttribute('fill', '#22c55e');
+          btnPromoteTemp.title = '現在位置の黄色ピンを緑一時ピンに戻す';
+        } else {
+          convPinFrom.setAttribute('fill', '#22c55e');
+          convPinTo.setAttribute('fill', '#facc15');
+          btnPromoteTemp.title = '現在位置の緑一時ピンを黄色確定ピンに変換';
+        }
+      }
+
       function updatePinButtonsUI() {
+        // Left-2 button: Jump to Green Temporary Pin
         if (state.tempMarker === null) {
           btnJumpTemp.classList.add('dimmed');
           btnJumpTemp.classList.remove('active-green');
-          btnPromoteTemp.classList.add('dimmed');
-          btnPromoteTemp.classList.remove('active-yellow-glow');
         } else {
           btnJumpTemp.classList.remove('dimmed');
           btnJumpTemp.classList.add('active-green');
-          if (isAtGreenTempPin()) {
-            btnPromoteTemp.classList.remove('dimmed');
-            btnPromoteTemp.classList.add('active-yellow-glow');
-          } else {
-            btnPromoteTemp.classList.add('dimmed');
-            btnPromoteTemp.classList.remove('active-yellow-glow');
-          }
+        }
+
+        // Top-left Col 1 button: Bidirectional Green <-> Yellow conversion
+        const atGreen = isAtGreenTempPin();
+        const nearYellow = findYellowMarkerNear(state.currentTime, 0.5);
+
+        if (atGreen && (!nearYellow || Math.abs(state.currentTime - state.tempMarker) <= Math.abs(state.currentTime - nearYellow.time))) {
+          setConvertButtonIcon('greenToYellow');
+          btnPromoteTemp.classList.remove('dimmed', 'active-green-glow');
+          btnPromoteTemp.classList.add('active-yellow-glow');
+        } else if (nearYellow) {
+          setConvertButtonIcon('yellowToGreen');
+          btnPromoteTemp.classList.remove('dimmed', 'active-yellow-glow');
+          btnPromoteTemp.classList.add('active-green-glow');
+        } else {
+          setConvertButtonIcon('greenToYellow');
+          btnPromoteTemp.classList.add('dimmed');
+          btnPromoteTemp.classList.remove('active-yellow-glow', 'active-green-glow');
         }
       }
 
@@ -3033,40 +3434,58 @@
           showToast('緑の一時ピンがありません（波形タッチで緑▼が付きます）');
           return;
         }
-        // Jump to green pin WITHOUT erasing it
         seekTo(state.tempMarker, { setGreenPin: false });
         showToast(`緑の一時ピンへ移動: ${formatTime(state.tempMarker)}`);
       }
 
-      function promoteGreenToYellow() {
+      function handleConvertPinButton() {
         if (!state.hasAudio) return;
-        if (state.tempMarker === null) {
-          showToast('緑の一時ピンがありません');
-          return;
-        }
-        if (!isAtGreenTempPin()) {
-          showToast('現在位置が緑▼ではありません（緑▼←で移動してから変換してください）');
-          return;
-        }
-        const t = state.tempMarker;
-        state.tempMarker = null;
+        const atGreen = isAtGreenTempPin();
+        const nearYellow = findYellowMarkerNear(state.currentTime, 0.5);
 
-        if (t > 0.1 && t < state.duration - 0.1) {
-          const exists = state.markers.some(m => Math.abs(m - t) < 0.2);
-          if (!exists) {
-            state.markers.push(t);
-            state.markers.sort((a, b) => a - b);
+        // Case 1: Convert Green Temporary Pin -> Yellow Confirmed Pin
+        if (atGreen && (!nearYellow || Math.abs(state.currentTime - state.tempMarker) <= Math.abs(state.currentTime - nearYellow.time))) {
+          const t = state.tempMarker;
+          state.tempMarker = null;
+
+          if (t > 0.05 && t < state.duration - 0.05) {
+            const exists = state.markers.some(m => Math.abs(m.time - t) < 0.2);
+            if (!exists) {
+              state.markers.push(makeMarkerObj(t, '', true, true));
+              state.markers.sort((a, b) => a.time - b.time);
+            }
+            syncCurrentPlaylistMarkers();
+            updateHeaderSubInfo();
+            updatePinButtonsUI();
+            updateSectionBarUI();
+            renderAllCanvases();
+            showToast(`緑▼を黄色ピンに確定: ${formatTime(t)}`);
+          } else {
+            updatePinButtonsUI();
+            renderAllCanvases();
+            showToast('曲の端には確定ピンを追加できません');
           }
-          syncCurrentPlaylistMarkers();
-          updateHeaderSubInfo();
-          updatePinButtonsUI();
-          renderAllCanvases();
-          showToast(`緑▼を黄色ピンに確定: ${formatTime(t)}`);
-        } else {
-          updatePinButtonsUI();
-          renderAllCanvases();
-          showToast('曲の端には確定ピンを追加できません');
+          return;
         }
+
+        // Case 2: Convert Yellow Confirmed Pin -> Green Temporary Pin
+        if (nearYellow) {
+          const idx = state.markers.findIndex(m => m.id === nearYellow.id);
+          if (idx >= 0) {
+            const removed = state.markers.splice(idx, 1)[0];
+            state.tempMarker = removed.time;
+            syncCurrentPlaylistMarkers();
+            updateHeaderSubInfo();
+            updatePinButtonsUI();
+            updateSectionBarUI();
+            renderAllCanvases();
+            const label = removed.name ? `「${removed.name}」` : formatTime(removed.time);
+            showToast(`黄色ピン ${label} を緑一時ピンに変更`);
+          }
+          return;
+        }
+
+        showToast('現在位置が緑▼または黄▼のときに変換できます');
       }
 
       function addYellowPinAtCurrent() {
@@ -3076,46 +3495,56 @@
         }
         if (!state.hasAudio) return;
         const t = state.currentTime;
-        if (t <= 0.1 || t >= state.duration - 0.1) {
+        if (t <= 0.05 || t >= state.duration - 0.05) {
           showToast('曲の開始・終了付近には追加できません');
           return;
         }
-        if (state.markers.some(m => Math.abs(m - t) < 0.2)) {
+        if (state.markers.some(m => Math.abs(m.time - t) < 0.2)) {
           showToast('すぐ近くに黄色ピンが存在します');
           return;
         }
-        state.markers.push(t);
-        state.markers.sort((a, b) => a - b);
+        state.markers.push(makeMarkerObj(t, '', true, true));
+        state.markers.sort((a, b) => a.time - b.time);
         syncCurrentPlaylistMarkers();
         updateHeaderSubInfo();
+        updatePinButtonsUI();
+        updateSectionBarUI();
         renderAllCanvases();
         showToast(`黄色ピン追加: ${formatTime(t)}`);
       }
 
       function jumpPrevYellowPin() {
         if (!state.hasAudio) return;
+        const enabled = getEnabledMarkers();
         const ref = state.currentTime - 0.35;
         let target = 0;
-        for (let i = state.markers.length - 1; i >= 0; i--) {
-          if (state.markers[i] < ref) {
-            target = state.markers[i];
+        let targetName = '';
+        for (let i = enabled.length - 1; i >= 0; i--) {
+          if (enabled[i].time < ref) {
+            target = enabled[i].time;
+            targetName = enabled[i].name;
             break;
           }
         }
         seekTo(target, { setGreenPin: false });
+        if (targetName) showToast(`移動: ${formatTime(target)} ${targetName}`);
       }
 
       function jumpNextYellowPin() {
         if (!state.hasAudio) return;
+        const enabled = getEnabledMarkers();
         const ref = state.currentTime + 0.15;
         let target = state.duration;
-        for (let i = 0; i < state.markers.length; i++) {
-          if (state.markers[i] > ref) {
-            target = state.markers[i];
+        let targetName = '';
+        for (let i = 0; i < enabled.length; i++) {
+          if (enabled[i].time > ref) {
+            target = enabled[i].time;
+            targetName = enabled[i].name;
             break;
           }
         }
         seekTo(target, { setGreenPin: false });
+        if (targetName) showToast(`移動: ${formatTime(target)} ${targetName}`);
       }
 
       function deleteNearestYellowOrOpenList() {
@@ -3127,7 +3556,7 @@
         let bestIdx = -1;
         let bestDiff = Infinity;
         for (let i = 0; i < state.markers.length; i++) {
-          const d = Math.abs(state.markers[i] - state.currentTime);
+          const d = Math.abs(state.markers[i].time - state.currentTime);
           if (d < bestDiff) {
             bestDiff = d;
             bestIdx = i;
@@ -3137,8 +3566,11 @@
           const removed = state.markers.splice(bestIdx, 1)[0];
           syncCurrentPlaylistMarkers();
           updateHeaderSubInfo();
+          updatePinButtonsUI();
+          updateSectionBarUI();
           renderAllCanvases();
-          showToast(`黄色ピン削除: ${formatTime(removed)}`);
+          const lbl = removed.name ? `${formatTime(removed.time)} (${removed.name})` : formatTime(removed.time);
+          showToast(`黄色ピン削除: ${lbl}`);
         } else {
           openSettingsModal('markers');
         }
@@ -3146,7 +3578,8 @@
 
       function getActiveLoopSection() {
         if (!state.hasAudio || state.duration <= 0) return { start: 0, end: 0 };
-        const bounds = [0, ...state.markers, state.duration];
+        const enabledTimes = getEnabledMarkers().map(m => m.time);
+        const bounds = [0, ...enabledTimes, state.duration];
         const t = state.currentTime;
         let segStart = 0;
         let segEnd = state.duration;
@@ -3161,7 +3594,6 @@
             segEnd = bounds[i + 1];
           }
         }
-        // If green temp pin lies inside this yellow section and playhead is at/after it, loop from green pin to next yellow pin
         if (state.tempMarker !== null && state.tempMarker > segStart + 0.05 && state.tempMarker < segEnd - 0.2 && t >= state.tempMarker - 0.05) {
           segStart = state.tempMarker;
         }
@@ -3170,7 +3602,8 @@
 
       function syncCurrentPlaylistMarkers() {
         if (state.playlist[state.currentTrackIndex]) {
-          state.playlist[state.currentTrackIndex].markers = [...state.markers];
+          state.playlist[state.currentTrackIndex].markers = cloneMarkerList(state.markers);
+          state.playlist[state.currentTrackIndex].startSectionEnabled = state.startSectionEnabled;
         }
       }
 
@@ -3185,6 +3618,358 @@
         const mb = state.rawBlob ? `${(state.rawBlob.size / (1024 * 1024)).toFixed(1)}MB` : '';
         trackSubtitleEl.textContent = `${mb} • ${curIdx}/${totalTracks} • 黄色ピン ${state.markers.length}個`;
       }
+
+      // ==================== SECTION SKIP & YELLOW-TO-YELLOW AUDIO CUT ====================
+      function updateSectionBarUI() {
+        if (!state.hasAudio) {
+          currentSectionInfo.innerHTML = '区間: 0:00 〜 0:00';
+          btnToggleSectionSkip.classList.remove('skip-active');
+          btnToggleSectionSkip.innerHTML = '<span>⏭ 区間スキップ</span>';
+          btnToggleSectionSkip.disabled = true;
+          btnCutYellowSection.disabled = true;
+          return;
+        }
+        btnToggleSectionSkip.disabled = false;
+        btnCutYellowSection.disabled = !state.audioBuffer;
+
+        const sec = getCurrentYellowSection(state.currentTime);
+        if (!sec) return;
+
+        const rangeStr = `${formatTime(sec.start)} 〜 ${formatTime(sec.end)}`;
+        const namePart = sec.name ? ` <strong>[${escapeHtml(sec.name)}]</strong>` : '';
+        const skipTag = !sec.sectionEnabled ? ' <span style="color:#fcd34d;font-weight:700;">(スキップ設定中)</span>' : '';
+        currentSectionInfo.innerHTML = `区間: ${rangeStr}${namePart}${skipTag}`;
+
+        if (!sec.sectionEnabled) {
+          btnToggleSectionSkip.classList.add('skip-active');
+          btnToggleSectionSkip.innerHTML = '<span>⏭ スキップ中</span>';
+        } else {
+          btnToggleSectionSkip.classList.remove('skip-active');
+          btnToggleSectionSkip.innerHTML = '<span>⏭ 区間スキップ</span>';
+        }
+      }
+
+      function escapeHtml(str) {
+        return String(str)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;');
+      }
+
+      function toggleCurrentSectionSkip() {
+        if (!state.hasAudio) return;
+        const sec = getCurrentYellowSection(state.currentTime);
+        if (!sec) return;
+
+        const nextEnabled = !sec.sectionEnabled;
+        if (sec.markerObj) {
+          sec.markerObj.sectionEnabled = nextEnabled;
+        } else {
+          state.startSectionEnabled = nextEnabled;
+        }
+
+        syncCurrentPlaylistMarkers();
+        updateSectionBarUI();
+        renderAllCanvases();
+
+        const rangeStr = `${formatTime(sec.start)} 〜 ${formatTime(sec.end)}`;
+        if (!nextEnabled) {
+          showToast(`区間スキップON: ${rangeStr} を自動スキップします`);
+          if (state.isPlaying) {
+            const target = resolveSkipTarget(state.currentTime);
+            if (target !== null) {
+              if (target >= state.duration - 0.05) handleTrackEnded();
+              else seekTo(target, { setGreenPin: false });
+            }
+          }
+        } else {
+          showToast(`区間スキップOFF: ${rangeStr} を通常再生します`);
+        }
+      }
+
+      // Cut (excise) audio from previous yellow marker to next yellow marker
+      const cutConfirmModal = document.getElementById('cutConfirmModal');
+      const cutConfirmRangeText = document.getElementById('cutConfirmRangeText');
+      let pendingCutSection = null;
+
+      function openCutSectionModal() {
+        if (!state.hasAudio || !state.audioBuffer) {
+          showToast('音声バッファが読み込まれていません');
+          return;
+        }
+        const sec = getCurrentYellowSection(state.currentTime);
+        if (!sec || sec.end - sec.start < 0.05) {
+          showToast('削除できる区間がありません');
+          return;
+        }
+        if (state.duration - (sec.end - sec.start) < 0.2) {
+          showToast('曲全体をすべて削除することはできません');
+          return;
+        }
+        pendingCutSection = sec;
+        const durCut = sec.end - sec.start;
+        const nameLabel = sec.name ? ` (${sec.name})` : '';
+        cutConfirmRangeText.textContent = `${formatTime(sec.start, true)} 〜 ${formatTime(sec.end, true)}  [長さ ${formatTime(durCut, true)}]${nameLabel}`;
+        cutConfirmModal.classList.remove('hidden');
+      }
+
+      function executeCutYellowSection() {
+        cutConfirmModal.classList.add('hidden');
+        if (!pendingCutSection || !state.audioBuffer) return;
+
+        const sec = pendingCutSection;
+        pendingCutSection = null;
+
+        const wasPlaying = state.isPlaying;
+        if (wasPlaying) pausePlayback();
+        stopInertia();
+
+        const buf = state.audioBuffer;
+        const sr = buf.sampleRate;
+        const numCh = buf.numberOfChannels;
+        const totalSamples = buf.length;
+
+        const s0 = Math.max(0, Math.min(totalSamples, Math.floor(sec.start * sr)));
+        const s1 = Math.max(s0, Math.min(totalSamples, Math.floor(sec.end * sr)));
+        const cutSamples = s1 - s0;
+        const newLen = totalSamples - cutSamples;
+
+        if (cutSamples <= 0 || newLen < Math.floor(sr * 0.1)) {
+          showToast('削除区間が短すぎるか、残りが短すぎます');
+          return;
+        }
+
+        // Save 1-step Undo snapshot
+        state.undoCutSnapshot = {
+          audioBuffer: buf,
+          markers: cloneMarkerList(state.markers),
+          startSectionEnabled: state.startSectionEnabled,
+          duration: state.duration
+        };
+
+        // Construct new AudioBuffer stitching [0, s0) and [s1, totalSamples)
+        const newBuf = audioCtx.createBuffer(numCh, newLen, sr);
+        for (let ch = 0; ch < numCh; ch++) {
+          const oldData = buf.getChannelData(ch);
+          const newData = newBuf.getChannelData(ch);
+          if (s0 > 0) {
+            newData.set(oldData.subarray(0, s0), 0);
+          }
+          if (s1 < totalSamples) {
+            newData.set(oldData.subarray(s1, totalSamples), s0);
+          }
+        }
+
+        const cutDuration = cutSamples / sr;
+        const spliceTime = s0 / sr;
+
+        // Update markers:
+        // - Remove markers strictly inside (sec.start + 0.02, sec.end - 0.02)
+        // - Shift markers at/after sec.end - 0.02 earlier by cutDuration
+        // - Deduplicate if both boundary markers land at spliceTime (preserving named marker)
+        const updatedMarkers = [];
+        for (const m of state.markers) {
+          if (m.time > sec.start + 0.02 && m.time < sec.end - 0.02) {
+            continue;
+          }
+          if (m.time >= sec.end - 0.02) {
+            const shifted = Math.max(0, m.time - cutDuration);
+            if (shifted > 0.05 && shifted < newBuf.duration - 0.05) {
+              const dupIdx = updatedMarkers.findIndex(x => Math.abs(x.time - shifted) < 0.06);
+              if (dupIdx >= 0) {
+                // Keep whichever has a name, or the later marker's sectionEnabled state
+                if (!updatedMarkers[dupIdx].name && m.name) {
+                  updatedMarkers[dupIdx].name = m.name;
+                }
+                updatedMarkers[dupIdx].sectionEnabled = m.sectionEnabled;
+              } else {
+                updatedMarkers.push({ ...m, time: shifted });
+              }
+            }
+          } else {
+            if (m.time > 0.05 && m.time < newBuf.duration - 0.05) {
+              updatedMarkers.push({ ...m });
+            }
+          }
+        }
+        updatedMarkers.sort((a, b) => a.time - b.time);
+
+        if (sec.start <= 0.02 && sec.markerObj) {
+          // If first section [0, m1] was cut, m1 becomes 0:00 so its sectionEnabled becomes startSectionEnabled
+          const boundaryMarker = state.markers.find(m => Math.abs(m.time - sec.end) < 0.03);
+          state.startSectionEnabled = boundaryMarker ? boundaryMarker.sectionEnabled : true;
+        }
+
+        // Rebuild pyramid & WAV blob
+        const newBlob = encodeWavFromAudioBuffer(newBuf);
+        const newUrl = URL.createObjectURL(newBlob);
+
+        state.audioBuffer = newBuf;
+        state.rawBlob = newBlob;
+        state.waveformPyramid = buildPcmPyramid(newBuf);
+        state.duration = newBuf.duration;
+        state.markers = updatedMarkers;
+        state.tempMarker = null;
+        state.numRows = computeRows(state.duration);
+
+        if (audioEl.dataset.url) {
+          URL.revokeObjectURL(audioEl.dataset.url);
+        }
+        audioEl.dataset.url = newUrl;
+        audioEl.src = newUrl;
+
+        if (state.playlist[state.currentTrackIndex]) {
+          state.playlist[state.currentTrackIndex].blob = newBlob;
+          state.playlist[state.currentTrackIndex].markers = cloneMarkerList(updatedMarkers);
+          state.playlist[state.currentTrackIndex].startSectionEnabled = state.startSectionEnabled;
+        }
+
+        seekTo(Math.min(state.duration, spliceTime), { setGreenPin: false });
+        updateHeaderSubInfo();
+        updatePinButtonsUI();
+        updateSectionBarUI();
+        renderAllCanvases();
+
+        showToast(`区間を削除しました (-${formatTime(cutDuration)})`);
+      }
+
+      // ==================== AUDIPO-STYLE MARK EDIT MODAL ====================
+      const markEditModal = document.getElementById('markEditModal');
+      const editMarkNameInput = document.getElementById('editMarkNameInput');
+      const editMarkTimeBox = document.getElementById('editMarkTimeBox');
+      const editMarkTimeText = document.getElementById('editMarkTimeText');
+      const btnEditMarkPreview = document.getElementById('btnEditMarkPreview');
+      const btnEditMarkDelete = document.getElementById('btnEditMarkDelete');
+      const editMarkEnabledRow = document.getElementById('editMarkEnabledRow');
+      const toggleEditMarkEnabled = document.getElementById('toggleEditMarkEnabled');
+      const toggleEditSectionEnabled = document.getElementById('toggleEditSectionEnabled');
+
+      let editingMarkTarget = null; // { isStart: boolean, markerId: string|null, draftTime: number, draftEnabled: boolean, draftSectionEnabled: boolean }
+
+      function openMarkEditModal(markerId = null) {
+        if (!state.hasAudio) return;
+
+        if (markerId === null) {
+          // Editing 0:00 start section
+          editingMarkTarget = {
+            isStart: true,
+            markerId: null,
+            draftTime: 0,
+            draftEnabled: true,
+            draftSectionEnabled: state.startSectionEnabled !== false
+          };
+          editMarkNameInput.value = '0:00 (曲頭)';
+          editMarkNameInput.disabled = true;
+          editMarkTimeBox.classList.add('hidden');
+          btnEditMarkDelete.classList.add('hidden');
+          editMarkEnabledRow.classList.add('hidden');
+        } else {
+          const m = state.markers.find(item => item.id === markerId);
+          if (!m) return;
+          editingMarkTarget = {
+            isStart: false,
+            markerId: m.id,
+            draftTime: m.time,
+            draftEnabled: m.enabled !== false,
+            draftSectionEnabled: m.sectionEnabled !== false
+          };
+          editMarkNameInput.value = m.name || '';
+          editMarkNameInput.disabled = false;
+          editMarkTimeBox.classList.remove('hidden');
+          editMarkTimeText.textContent = formatTimeMs(m.time);
+          btnEditMarkDelete.classList.remove('hidden');
+          editMarkEnabledRow.classList.remove('hidden');
+        }
+
+        toggleEditMarkEnabled.classList.toggle('on', editingMarkTarget.draftEnabled);
+        toggleEditSectionEnabled.classList.toggle('on', editingMarkTarget.draftSectionEnabled);
+        markEditModal.classList.remove('hidden');
+
+        if (!editingMarkTarget.isStart) {
+          setTimeout(() => editMarkNameInput.focus(), 60);
+        }
+      }
+
+      function closeMarkEditModal() {
+        editingMarkTarget = null;
+        markEditModal.classList.add('hidden');
+      }
+
+      document.querySelectorAll('.mark-time-step-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          if (!editingMarkTarget || editingMarkTarget.isStart) return;
+          const deltaSec = (parseInt(btn.dataset.ms, 10) || 0) / 1000;
+          editingMarkTarget.draftTime = Math.max(0.05, Math.min(state.duration - 0.05, editingMarkTarget.draftTime + deltaSec));
+          editMarkTimeText.textContent = formatTimeMs(editingMarkTarget.draftTime);
+        });
+      });
+
+      toggleEditMarkEnabled.addEventListener('click', () => {
+        if (!editingMarkTarget) return;
+        editingMarkTarget.draftEnabled = !editingMarkTarget.draftEnabled;
+        toggleEditMarkEnabled.classList.toggle('on', editingMarkTarget.draftEnabled);
+      });
+
+      toggleEditSectionEnabled.addEventListener('click', () => {
+        if (!editingMarkTarget) return;
+        editingMarkTarget.draftSectionEnabled = !editingMarkTarget.draftSectionEnabled;
+        toggleEditSectionEnabled.classList.toggle('on', editingMarkTarget.draftSectionEnabled);
+      });
+
+      btnEditMarkPreview.addEventListener('click', () => {
+        if (!editingMarkTarget) return;
+        const previewT = editingMarkTarget.draftTime;
+        seekTo(previewT, { setGreenPin: false });
+        if (!state.isPlaying) startPlayback();
+        showToast(`試し再生: ${formatTime(previewT)}`);
+      });
+
+      btnEditMarkDelete.addEventListener('click', () => {
+        if (!editingMarkTarget || editingMarkTarget.isStart) return;
+        const idx = state.markers.findIndex(m => m.id === editingMarkTarget.markerId);
+        if (idx >= 0) {
+          const removed = state.markers.splice(idx, 1)[0];
+          syncCurrentPlaylistMarkers();
+          updateHeaderSubInfo();
+          updatePinButtonsUI();
+          updateSectionBarUI();
+          renderAllCanvases();
+          renderMarkerList();
+          showToast(`マークを削除しました: ${formatTime(removed.time)}`);
+        }
+        closeMarkEditModal();
+      });
+
+      document.getElementById('btnEditMarkCancel').addEventListener('click', closeMarkEditModal);
+
+      document.getElementById('btnEditMarkOk').addEventListener('click', () => {
+        if (!editingMarkTarget) return;
+        if (editingMarkTarget.isStart) {
+          state.startSectionEnabled = editingMarkTarget.draftSectionEnabled;
+        } else {
+          const m = state.markers.find(item => item.id === editingMarkTarget.markerId);
+          if (m) {
+            m.name = editMarkNameInput.value.trim();
+            m.time = editingMarkTarget.draftTime;
+            m.enabled = editingMarkTarget.draftEnabled;
+            m.sectionEnabled = editingMarkTarget.draftSectionEnabled;
+            state.markers.sort((a, b) => a.time - b.time);
+          }
+        }
+        syncCurrentPlaylistMarkers();
+        updateHeaderSubInfo();
+        updatePinButtonsUI();
+        updateSectionBarUI();
+        renderAllCanvases();
+        renderMarkerList();
+        closeMarkEditModal();
+        showToast('マーク設定を保存しました');
+      });
+
+      markEditModal.addEventListener('click', (e) => {
+        if (e.target === markEditModal) closeMarkEditModal();
+      });
 
       // ==================== TRANSPORT, PLAYHEAD INTERPOLATION & PLAYLIST ====================
       function getLivePlayheadTime() {
@@ -3206,7 +3991,6 @@
         if (state.engine === 'tape' && tapeSourceNode) {
           return getTapeCurrentTime();
         }
-        // Smoothly interpolate between audio callbacks at 60/120fps to prevent visual jitter
         const dtSec = Math.max(0, (performance.now() - state.lastSyncPerf) / 1000);
         const adv = Math.min(0.06, dtSec) * state.playbackRate;
         let t = state.lastSyncTime + adv;
@@ -3245,6 +4029,7 @@
 
         updateTimeUI();
         updatePinButtonsUI();
+        updateSectionBarUI();
         renderAllCanvases();
       }
 
@@ -3255,6 +4040,16 @@
 
         if (state.currentTime >= state.duration - 0.05) {
           seekTo(0, { setGreenPin: false });
+        }
+
+        // If starting inside a skipped section, jump past it immediately
+        const skipDest = resolveSkipTarget(state.currentTime);
+        if (skipDest !== null) {
+          if (skipDest >= state.duration - 0.05) {
+            handleTrackEnded();
+            return;
+          }
+          seekTo(skipDest, { setGreenPin: false });
         }
 
         state.isPlaying = true;
@@ -3305,7 +4100,6 @@
       function setPlaybackSpeed(rate) {
         const clamped = Math.max(0.25, Math.min(2.0, Math.round(rate * 100) / 100));
 
-        // Keep tape mode offset seamlessly synced when changing speed mid-play
         if (state.isPlaying && state.engine === 'tape' && tapeSourceNode && audioCtx) {
           tapeAnchorOffset = getTapeCurrentTime();
           tapeAnchorCtxTime = audioCtx.currentTime;
@@ -3361,7 +4155,7 @@
         const safeIdx = ((idx % state.playlist.length) + state.playlist.length) % state.playlist.length;
         state.currentTrackIndex = safeIdx;
         const item = state.playlist[safeIdx];
-        await loadAudioBlob(item.blob, item.name, item.markers || [], autoPlay);
+        await loadAudioBlob(item.blob, item.name, item.markers || [], autoPlay, null, item.startSectionEnabled !== false);
         showToast(`トラック ${safeIdx + 1}/${state.playlist.length}: ${item.name}`);
       }
 
@@ -3390,10 +4184,11 @@
             startPlayback();
           }
         } else {
-          // Stop at end
           pausePlayback();
           state.currentTime = state.duration;
           updateTimeUI();
+          updatePinButtonsUI();
+          updateSectionBarUI();
           renderAllCanvases();
         }
       }
@@ -3432,10 +4227,7 @@
         const displayTime = getSmoothPlayheadTime();
         const waveGain = getEffectiveWaveGain();
         const loopSec = state.sectionRepeat ? getActiveLoopSection() : null;
-
-        ctx.font = '500 10px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace';
-        ctx.textAlign = 'right';
-        ctx.textBaseline = 'middle';
+        const allSecs = state.hasAudio ? getAllSections() : [];
 
         for (let r = 0; r < rows; r++) {
           const rStart = r * rowDur;
@@ -3445,12 +4237,32 @@
           const halfH = barH * 0.46;
 
           // Left timestamp
+          ctx.font = '500 10px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace';
+          ctx.textAlign = 'right';
+          ctx.textBaseline = 'middle';
           ctx.fillStyle = '#9ca3af';
           ctx.fillText(formatRowTime(rStart), labelW - 1, midY);
 
           // Row track background
           ctx.fillStyle = '#1c1c21';
           ctx.fillRect(waveX, barTop, waveW, barH);
+
+          // Skipped section shading (sectionEnabled === false)
+          if (state.hasAudio) {
+            for (let s = 0; s < allSecs.length; s++) {
+              const sec = allSecs[s];
+              if (!sec.sectionEnabled) {
+                const ovS = Math.max(rStart, sec.start);
+                const ovE = Math.min(rEnd, sec.end);
+                if (ovE > ovS) {
+                  const sx = waveX + ((ovS - rStart) / rowDur) * waveW;
+                  const sw = ((ovE - ovS) / rowDur) * waveW;
+                  ctx.fillStyle = 'rgba(245, 158, 11, 0.14)';
+                  ctx.fillRect(sx, barTop, sw, barH);
+                }
+              }
+            }
+          }
 
           // Active Section Repeat highlight
           if (state.hasAudio && loopSec) {
@@ -3477,11 +4289,21 @@
               const yTop = midY - Math.max(0, sMax) * halfH;
               const yBot = midY - Math.min(0, sMin) * halfH;
 
-              ctx.fillStyle = t0 <= displayTime ? '#42a5f5' : '#6b7280';
+              // Dim waveform inside skipped sections
+              let inSkip = false;
+              for (let s = 0; s < allSecs.length; s++) {
+                if (!allSecs[s].sectionEnabled && t0 >= allSecs[s].start && t0 < allSecs[s].end) {
+                  inSkip = true;
+                  break;
+                }
+              }
+
+              ctx.fillStyle = inSkip
+                ? 'rgba(113, 113, 122, 0.36)'
+                : (t0 <= displayTime ? '#42a5f5' : '#6b7280');
               ctx.fillRect(waveX + px, yTop, Math.max(1.0, step - 0.35), Math.max(1.0, yBot - yTop));
             }
           } else if (state.hasAudio) {
-            // Simple progress bar when extreme large file skips PCM decode
             ctx.fillStyle = '#3f3f46';
             ctx.fillRect(waveX, midY - 1, waveW, 2);
             if (displayTime > rStart) {
@@ -3491,18 +4313,34 @@
             }
           }
 
-          // Yellow Confirmed Pins (▼)
+          // Yellow Confirmed Pins (▼) + Marker Names (like Audipo screenshot)
           if (state.hasAudio && state.markers.length > 0) {
-            ctx.fillStyle = '#facc15';
-            for (const mT of state.markers) {
+            for (const mk of state.markers) {
+              const mT = mk.time;
               if (mT >= rStart && mT <= rEnd) {
                 const mx = waveX + ((mT - rStart) / rowDur) * waveW;
+                const isEnabled = mk.enabled !== false;
+
+                ctx.fillStyle = isEnabled ? '#facc15' : 'rgba(250, 204, 21, 0.38)';
                 ctx.beginPath();
                 ctx.moveTo(mx - 4.8, barTop - 2);
                 ctx.lineTo(mx + 4.8, barTop - 2);
                 ctx.lineTo(mx, barTop + 5);
                 ctx.closePath();
                 ctx.fill();
+
+                if (mk.name) {
+                  ctx.font = '700 10px -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Noto Sans JP", sans-serif';
+                  ctx.textAlign = 'left';
+                  ctx.textBaseline = 'top';
+                  const maxLabelW = Math.max(24, (waveX + waveW) - (mx + 6));
+                  const textY = barTop + 1;
+                  ctx.fillStyle = 'rgba(17, 17, 19, 0.72)';
+                  const measuredW = Math.min(maxLabelW, ctx.measureText(mk.name).width + 4);
+                  ctx.fillRect(mx + 5, textY - 1, measuredW, 12);
+                  ctx.fillStyle = isEnabled ? '#fef08a' : '#a1a1aa';
+                  ctx.fillText(mk.name, mx + 7, textY, maxLabelW);
+                }
               }
             }
           }
@@ -3563,7 +4401,6 @@
         const samplesPerPx = visSamples / W;
         const waveGain = getEffectiveWaveGain();
 
-        // Deep Zoom: Raw sample-by-sample PCM curve
         if (buf && samplesPerPx <= 2.5) {
           const ch0 = buf.getChannelData(0);
           const s0 = Math.max(0, Math.floor(visStart * sr) - 1);
@@ -3607,7 +4444,6 @@
           return;
         }
 
-        // Standard Zoom: World-locked sub-pixel Min/Max polygon (zero pixel-grid shimmer)
         let lvl = pyr.levels[pyr.levels.length - 1];
         for (let i = 0; i < pyr.levels.length; i++) {
           if (visSamples / pyr.levels[i].binSize >= W * 0.75 || i === 0) {
@@ -3681,6 +4517,27 @@
         const winEnd = displayTime + halfWin;
         const pxPerSec = W / state.zoomWindowSeconds;
 
+        // Skipped sections highlight on zoom pane
+        if (state.hasAudio) {
+          const allSecs = getAllSections();
+          for (let i = 0; i < allSecs.length; i++) {
+            const s = allSecs[i];
+            if (!s.sectionEnabled) {
+              const sX = Math.max(0, (s.start - winStart) * pxPerSec);
+              const eX = Math.min(W, (s.end - winStart) * pxPerSec);
+              if (eX > sX) {
+                ctx.fillStyle = 'rgba(245, 158, 11, 0.13)';
+                ctx.fillRect(sX, 0, eX - sX, H);
+                ctx.fillStyle = 'rgba(252, 211, 77, 0.75)';
+                ctx.font = '700 10px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace';
+                ctx.textAlign = 'left';
+                ctx.textBaseline = 'bottom';
+                ctx.fillText('SKIP', sX + 4, H - 4);
+              }
+            }
+          }
+        }
+
         // Active Section Repeat highlight on zoom pane
         if (state.hasAudio && state.sectionRepeat) {
           const sec = getActiveLoopSection();
@@ -3698,25 +4555,39 @@
           drawZoomWaveformClip(ctx, W, H, midY, halfH, winStart, winEnd, pxPerSec, centerX, W, 'rgba(107, 114, 128, 0.78)', '#9ca3af');
         }
 
-        // Draw Yellow Confirmed Pins in zoom window
+        // Draw Yellow Confirmed Pins + Names in zoom window
         if (state.hasAudio) {
-          for (const mT of state.markers) {
+          for (const mk of state.markers) {
+            const mT = mk.time;
             if (mT >= winStart && mT <= winEnd) {
               const mx = (mT - winStart) * pxPerSec;
-              ctx.strokeStyle = 'rgba(250, 204, 21, 0.8)';
+              const isEnabled = mk.enabled !== false;
+
+              ctx.strokeStyle = isEnabled ? 'rgba(250, 204, 21, 0.82)' : 'rgba(250, 204, 21, 0.35)';
               ctx.lineWidth = 1.5;
               ctx.beginPath();
               ctx.moveTo(mx, 0);
               ctx.lineTo(mx, H);
               ctx.stroke();
 
-              ctx.fillStyle = '#facc15';
+              ctx.fillStyle = isEnabled ? '#facc15' : 'rgba(250, 204, 21, 0.45)';
               ctx.beginPath();
               ctx.moveTo(mx - 6, 0);
               ctx.lineTo(mx + 6, 0);
               ctx.lineTo(mx, 9.5);
               ctx.closePath();
               ctx.fill();
+
+              if (mk.name) {
+                ctx.font = '700 11px -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Noto Sans JP", sans-serif';
+                ctx.textAlign = 'left';
+                ctx.textBaseline = 'top';
+                const tw = ctx.measureText(mk.name).width;
+                ctx.fillStyle = 'rgba(12, 12, 14, 0.8)';
+                ctx.fillRect(mx + 5, 3, tw + 8, 16);
+                ctx.fillStyle = isEnabled ? '#fef08a' : '#a1a1aa';
+                ctx.fillText(mk.name, mx + 9, 5);
+              }
             }
           }
 
@@ -3789,7 +4660,6 @@
       overviewCanvas.addEventListener('pointerup', stopOverviewDrag);
       overviewCanvas.addEventListener('pointercancel', stopOverviewDrag);
 
-      // Momentum / Inertia Scroll for Zoom Canvas
       function stopInertia() {
         state.isInertiaActive = false;
         state.zoomVelSecPerMs = 0;
@@ -3833,7 +4703,6 @@
         updateZoomSpanLabel();
       }
 
-      // Touch handlers on Zoom Canvas (1-finger scrub/tap + 2-finger midpoint-anchored pinch zoom)
       zoomCanvas.addEventListener('touchstart', (e) => {
         if (!state.hasAudio) return;
         e.preventDefault();
@@ -3937,7 +4806,6 @@
         state.isPinchingZoom = false;
       });
 
-      // Desktop Mouse Drag, Click-to-Jump & Wheel Cursor-Anchored Zoom
       zoomCanvas.addEventListener('mousedown', (e) => {
         if (!state.hasAudio || e.button !== 0) return;
         stopInertia();
@@ -4006,6 +4874,16 @@
         if (state.hasAudio && state.isPlaying && !state.isDraggingOverview && !state.isDraggingZoom && !state.isPinchingZoom) {
           if (state.engine === 'tape' && tapeSourceNode) {
             state.currentTime = getTapeCurrentTime();
+            const skipDest = resolveSkipTarget(state.currentTime);
+            if (skipDest !== null) {
+              if (skipDest >= state.duration - 0.05) {
+                handleTrackEnded();
+                requestAnimationFrame(animationLoop);
+                return;
+              }
+              startTapeSourceAt(skipDest);
+              state.currentTime = skipDest;
+            }
             if (state.sectionRepeat) {
               const sec = getActiveLoopSection();
               if (sec.end - sec.start > 0.15 && state.currentTime >= sec.end - 0.025) {
@@ -4019,6 +4897,18 @@
               state.lastSyncPerf = performance.now();
             }
             state.currentTime = audioEl.currentTime;
+            const skipDest = resolveSkipTarget(state.currentTime);
+            if (skipDest !== null) {
+              if (skipDest >= state.duration - 0.05) {
+                handleTrackEnded();
+                requestAnimationFrame(animationLoop);
+                return;
+              }
+              audioEl.currentTime = skipDest;
+              state.currentTime = skipDest;
+              state.lastSyncTime = skipDest;
+              state.lastSyncPerf = performance.now();
+            }
             if (state.sectionRepeat) {
               const sec = getActiveLoopSection();
               if (sec.end - sec.start > 0.15 && state.currentTime >= sec.end - 0.03) {
@@ -4031,6 +4921,7 @@
           }
           updateTimeUI();
           updatePinButtonsUI();
+          updateSectionBarUI();
           renderAllCanvases();
         }
         requestAnimationFrame(animationLoop);
@@ -4058,49 +4949,77 @@
         panelPlaylist.classList.toggle('hidden', tab !== 'playlist');
       }
 
+      // Audipo-style Marker List with 0:00 row, ▼ / || icon, Name, and Pencil edit button
       function renderMarkerList() {
         document.getElementById('markerTabCount').textContent = String(state.markers.length);
         const wrap = document.getElementById('markerListWrap');
         wrap.innerHTML = '';
-        if (!state.hasAudio || state.markers.length === 0) {
-          wrap.innerHTML = '<div style="text-align:center;color:#71717a;font-size:12px;padding:24px 0;">黄色ピンはまだありません</div>';
+        if (!state.hasAudio) {
+          wrap.innerHTML = '<div style="text-align:center;color:#71717a;font-size:12px;padding:24px 0;">音声ファイルが読み込まれていません</div>';
           return;
         }
-        state.markers.forEach((mT, idx) => {
+
+        // Row 0: Start of track (0:00)
+        const startItem = document.createElement('div');
+        startItem.className = 'list-item';
+        const startMain = document.createElement('div');
+        startMain.className = 'list-item-main';
+        const startIcon = state.startSectionEnabled !== false
+          ? '<span style="color:#facc15;font-weight:900;margin-right:8px;">▼</span>'
+          : '<span style="color:#d4d4d8;font-weight:900;margin-right:8px;letter-spacing:1px;">||</span>';
+        const startSkipNote = state.startSectionEnabled !== false ? '' : ' <span style="color:#fcd34d;font-size:10px;">(スキップ)</span>';
+        startMain.innerHTML = `<div class="list-item-title mono">${startIcon}0:00${startSkipNote}</div>`;
+        startMain.addEventListener('click', () => {
+          seekTo(0, { setGreenPin: false });
+          settingsModal.classList.add('hidden');
+        });
+
+        const startPencil = document.createElement('button');
+        startPencil.type = 'button';
+        startPencil.className = 'marker-row-pencil';
+        startPencil.title = '0:00の区間設定を編集';
+        startPencil.innerHTML = `<svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1.003 1.003 0 0 0 0-1.42l-2.34-2.34a1.003 1.003 0 0 0-1.42 0l-1.83 1.83 3.75 3.75 1.84-1.82z"/></svg>`;
+        startPencil.addEventListener('click', (e) => {
+          e.stopPropagation();
+          openMarkEditModal(null);
+        });
+        startItem.appendChild(startMain);
+        startItem.appendChild(startPencil);
+        wrap.appendChild(startItem);
+
+        // Yellow Markers
+        state.markers.forEach((mk) => {
           const item = document.createElement('div');
           item.className = 'list-item';
+          if (mk.enabled === false) {
+            item.style.opacity = '0.52';
+          }
+
           const main = document.createElement('div');
           main.className = 'list-item-main';
-          main.innerHTML = `<div class="list-item-title">黄色ピン #${idx + 1}</div><div class="list-item-sub mono">${formatTime(mT, true)}</div>`;
+          const iconHtml = mk.sectionEnabled === false
+            ? '<span style="color:#d4d4d8;font-weight:900;margin-right:8px;letter-spacing:1px;">||</span>'
+            : '<span style="color:#facc15;font-weight:900;margin-right:8px;">▼</span>';
+          const nameHtml = mk.name ? ` <span style="font-weight:700;color:#ffffff;">${escapeHtml(mk.name)}</span>` : '';
+          const skipBadge = mk.sectionEnabled === false ? ' <span style="color:#fcd34d;font-size:10px;">(スキップ)</span>' : '';
+          main.innerHTML = `<div class="list-item-title mono">${iconHtml}${formatTime(mk.time)}${nameHtml}${skipBadge}</div>`;
           main.addEventListener('click', () => {
-            seekTo(mT, { setGreenPin: false });
+            seekTo(mk.time, { setGreenPin: false });
             settingsModal.classList.add('hidden');
           });
 
-          const jumpBtn = document.createElement('button');
-          jumpBtn.type = 'button';
-          jumpBtn.className = 'mini-act-btn';
-          jumpBtn.textContent = '移動';
-          jumpBtn.addEventListener('click', () => {
-            seekTo(mT, { setGreenPin: false });
-            settingsModal.classList.add('hidden');
-          });
-
-          const delBtn = document.createElement('button');
-          delBtn.type = 'button';
-          delBtn.className = 'mini-act-btn mini-act-del';
-          delBtn.textContent = '削除';
-          delBtn.addEventListener('click', () => {
-            state.markers.splice(idx, 1);
-            syncCurrentPlaylistMarkers();
-            updateHeaderSubInfo();
-            renderAllCanvases();
-            renderMarkerList();
+          const pencilBtn = document.createElement('button');
+          pencilBtn.type = 'button';
+          pencilBtn.className = 'marker-row-pencil';
+          pencilBtn.title = 'マークの名前・設定を編集';
+          pencilBtn.innerHTML = `<svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1.003 1.003 0 0 0 0-1.42l-2.34-2.34a1.003 1.003 0 0 0-1.42 0l-1.83 1.83 3.75 3.75 1.84-1.82z"/></svg>`;
+          pencilBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            openMarkEditModal(mk.id);
           });
 
           item.appendChild(main);
-          item.appendChild(jumpBtn);
-          item.appendChild(delBtn);
+          item.appendChild(pencilBtn);
           wrap.appendChild(item);
         });
       }
@@ -4120,7 +5039,7 @@
           item.className = 'list-item' + (isCur ? ' current' : '');
           const main = document.createElement('div');
           main.className = 'list-item-main';
-          main.innerHTML = `<div class="list-item-title">${idx + 1}. ${tr.name}</div><div class="list-item-sub mono">${mb} • 黄色ピン ${(tr.markers || []).length}個</div>`;
+          main.innerHTML = `<div class="list-item-title">${idx + 1}. ${escapeHtml(tr.name)}</div><div class="list-item-sub mono">${mb} • 黄色ピン ${(tr.markers || []).length}個</div>`;
           const btn = document.createElement('button');
           btn.type = 'button';
           btn.className = 'mini-act-btn';
@@ -4153,7 +5072,6 @@
       }
 
       // ==================== WIRE ALL EVENT LISTENERS ====================
-      // Local File Picker (single & multi-file support)
       fileInput.addEventListener('change', async (e) => {
         const files = e.target.files ? Array.from(e.target.files) : [];
         if (files.length === 0) return;
@@ -4163,15 +5081,12 @@
           fileInput.value = '';
           return;
         }
-        if (state.playlist.length === 1 && state.playlist[0].name.startsWith('デモ練習曲_')) {
-          state.playlist = [];
-        }
         const startIdx = state.playlist.length;
         for (const f of valid) {
-          state.playlist.push({ name: f.name, blob: f, markers: [] });
+          state.playlist.push({ name: f.name, blob: f, markers: [], startSectionEnabled: true });
         }
         state.currentTrackIndex = startIdx;
-        await loadAudioBlob(valid[0], valid[0].name, [], false);
+        await loadAudioBlob(valid[0], valid[0].name, [], false, null, true);
         showToast(valid.length > 1 ? `${valid.length}個のローカルファイルを読み込みました` : `読込完了: ${valid[0].name}`);
         fileInput.value = '';
         settingsModal.classList.add('hidden');
@@ -4182,9 +5097,28 @@
       document.getElementById('btnStartRecord').addEventListener('click', startRecording);
       document.getElementById('btnRecStop').addEventListener('click', stopRecording);
       document.getElementById('btnRecAddMarker').addEventListener('click', addMarkerDuringRecording);
-      document.getElementById('btnLoadDemo').addEventListener('click', loadDemoTrack);
       btnSaveWav.addEventListener('click', exportCurrentWav);
       document.getElementById('headerInfo').addEventListener('click', () => openSettingsModal('settings'));
+
+      // Section Action Bar Listeners
+      currentSectionInfo.addEventListener('click', () => {
+        if (!state.hasAudio) return;
+        openSettingsModal('markers');
+      });
+      btnToggleSectionSkip.addEventListener('click', toggleCurrentSectionSkip);
+      btnCutYellowSection.addEventListener('click', openCutSectionModal);
+
+      document.getElementById('btnCutCancel').addEventListener('click', () => {
+        pendingCutSection = null;
+        cutConfirmModal.classList.add('hidden');
+      });
+      document.getElementById('btnCutExecute').addEventListener('click', executeCutYellowSection);
+      cutConfirmModal.addEventListener('click', (e) => {
+        if (e.target === cutConfirmModal) {
+          pendingCutSection = null;
+          cutConfirmModal.classList.add('hidden');
+        }
+      });
 
       // Zoom Pane Overlay Buttons
       document.getElementById('btnCloseZoom').addEventListener('click', () => {
@@ -4243,7 +5177,7 @@
       document.getElementById('btnOrderShuffle').addEventListener('click', () => setOrderMode('shuffle'));
 
       // Row 1: Pin & Marker Controls
-      btnPromoteTemp.addEventListener('click', promoteGreenToYellow);
+      btnPromoteTemp.addEventListener('click', handleConvertPinButton);
       btnJumpTemp.addEventListener('click', jumpToGreenPin);
       document.getElementById('btnPrevYellow').addEventListener('click', jumpPrevYellowPin);
       document.getElementById('btnAddYellow').addEventListener('click', addYellowPinAtCurrent);
@@ -4353,10 +5287,12 @@
       });
       document.getElementById('btnClearAllMarkers').addEventListener('click', () => {
         state.markers = [];
+        state.startSectionEnabled = true;
         state.tempMarker = null;
         syncCurrentPlaylistMarkers();
         updateHeaderSubInfo();
         updatePinButtonsUI();
+        updateSectionBarUI();
         renderAllCanvases();
         renderMarkerList();
         showToast('すべてのマーカーを削除しました');
@@ -4368,6 +5304,7 @@
         updateWaveGainUI();
         applyMasterBoost();
         setMicGain(state.micGain);
+        updateSectionBarUI();
         renderAllCanvases();
         requestAnimationFrame(animationLoop);
       };
