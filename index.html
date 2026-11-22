@@ -1500,6 +1500,12 @@
       box-shadow: 0 0 12px rgba(34, 197, 94, 0.45), inset 0 0 6px rgba(34, 197, 94, 0.22);
     }
 
+    .pad-btn.active-red-glow {
+      background: rgba(239, 68, 68, 0.22);
+      border-color: rgba(248, 113, 113, 0.85);
+      box-shadow: 0 0 11px rgba(239, 68, 68, 0.35), inset 0 0 6px rgba(239, 68, 68, 0.18);
+    }
+
     /* ==================== SECTION ACTION BAR (SKIP & CUT) ==================== */
     .section-action-bar {
       display: flex;
@@ -2608,11 +2614,12 @@
         </svg>
       </button>
 
-      <!-- Col 4: Add Yellow Confirmed Pin -->
-      <button id="btnAddYellow" type="button" class="pad-btn" title="現在位置に黄色マーカーを追加">
+      <!-- Col 4: Toggle Add / Delete Yellow Confirmed Pin -->
+      <button id="btnAddYellow" type="button" class="pad-btn" title="現在位置に黄色マーカーを追加 / 既存ピンを削除">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
           <path d="M4.2 6.5h6.2a1.6 1.6 0 0 1 1.6 1.6v3.2c0 .55-.24 1.07-.66 1.43l-3.15 2.7a1.4 1.4 0 0 1-1.78 0l-3.15-2.7A1.88 1.88 0 0 1 2.6 11.3V8.1a1.6 1.6 0 0 1 1.6-1.6Z" fill="#facc15"/>
-          <path d="M18 8.3v6.4M14.8 11.5h6.4" stroke="#f4f4f6" stroke-width="2" stroke-linecap="round"/>
+          <path id="addYellowPlusSign" d="M18 8.3v6.4M14.8 11.5h6.4" stroke="#f4f4f6" stroke-width="2" stroke-linecap="round"/>
+          <path id="addYellowMinusSign" class="hidden" d="M14.8 11.5h6.4" stroke="#f87171" stroke-width="2.2" stroke-linecap="round"/>
         </svg>
       </button>
 
@@ -3056,6 +3063,9 @@
       const convPinFrom = document.getElementById('convPinFrom');
       const convPinTo = document.getElementById('convPinTo');
       const btnJumpTemp = document.getElementById('btnJumpTemp');
+      const btnAddYellow = document.getElementById('btnAddYellow');
+      const addYellowPlusSign = document.getElementById('addYellowPlusSign');
+      const addYellowMinusSign = document.getElementById('addYellowMinusSign');
       const speedBadgeText = document.getElementById('speedBadgeText');
       const pitchBadgeText = document.getElementById('pitchBadgeText');
       const btnSectionRepeat = document.getElementById('btnSectionRepeat');
@@ -5923,6 +5933,10 @@
         }
       }
 
+      function getYellowPinHitTolerance() {
+        return Math.max(0.2, Math.min(0.5, state.zoomWindowSeconds * 0.1));
+      }
+
       function updatePinButtonsUI() {
         // Left-2 button: Jump to Green Temporary Pin
         if (state.tempMarker === null) {
@@ -5933,10 +5947,11 @@
           btnJumpTemp.classList.add('active-green');
         }
 
-        // Top-left Col 1 button: Bidirectional Green <-> Yellow conversion
+        const tol = getYellowPinHitTolerance();
         const atGreen = isAtGreenTempPin();
-        const nearYellow = findYellowMarkerNear(state.currentTime, 0.5);
+        const nearYellow = findYellowMarkerNear(state.currentTime, tol);
 
+        // Top-left Col 1 button: Bidirectional Green <-> Yellow conversion
         if (atGreen && (!nearYellow || Math.abs(state.currentTime - state.tempMarker) <= Math.abs(state.currentTime - nearYellow.time))) {
           setConvertButtonIcon('greenToYellow');
           btnPromoteTemp.classList.remove('dimmed', 'active-green-glow');
@@ -5950,6 +5965,13 @@
           btnPromoteTemp.classList.add('dimmed');
           btnPromoteTemp.classList.remove('active-yellow-glow', 'active-green-glow');
         }
+
+        // Col 4 button (▼+ / ▼-): Show delete state when playhead is on an existing yellow pin
+        const isOnYellow = !state.isRecording && Boolean(nearYellow);
+        addYellowPlusSign.classList.toggle('hidden', isOnYellow);
+        addYellowMinusSign.classList.toggle('hidden', !isOnYellow);
+        btnAddYellow.classList.toggle('active-red-glow', isOnYellow);
+        btnAddYellow.title = isOnYellow ? '現在位置の黄色マーカーを削除' : '現在位置に黄色マーカーを追加';
       }
 
       function jumpToGreenPin() {
@@ -5965,7 +5987,7 @@
       function handleConvertPinButton() {
         if (!state.hasAudio) return;
         const atGreen = isAtGreenTempPin();
-        const nearYellow = findYellowMarkerNear(state.currentTime, 0.5);
+        const nearYellow = findYellowMarkerNear(state.currentTime, getYellowPinHitTolerance());
 
         // Case 1: Convert Green Temporary Pin -> Yellow Confirmed Pin
         if (atGreen && (!nearYellow || Math.abs(state.currentTime - state.tempMarker) <= Math.abs(state.currentTime - nearYellow.time))) {
@@ -6045,6 +6067,30 @@
         updateSectionBarUI();
         renderAllCanvases();
         showToast(`黄色ピン追加: ${formatTime(t)}`);
+      }
+
+      function toggleYellowPinAtCurrent() {
+        if (state.isRecording) {
+          addMarkerDuringRecording();
+          return;
+        }
+        if (!state.hasAudio) return;
+        const nearYellow = findYellowMarkerNear(state.currentTime, getYellowPinHitTolerance());
+        if (nearYellow) {
+          const idx = state.markers.findIndex(m => m.id === nearYellow.id);
+          if (idx >= 0) {
+            const removed = state.markers.splice(idx, 1)[0];
+            syncCurrentPlaylistMarkers();
+            updateHeaderSubInfo();
+            updatePinButtonsUI();
+            updateSectionBarUI();
+            renderAllCanvases();
+            const lbl = removed.name ? `${formatTime(removed.time)} (${removed.name})` : formatTime(removed.time);
+            showToast(`黄色ピン削除: ${lbl}`);
+            return;
+          }
+        }
+        addYellowPinAtCurrent();
       }
 
       function jumpPrevYellowPin() {
@@ -7599,6 +7645,7 @@
       function setZoomSpan(sec) {
         state.zoomWindowSeconds = Math.max(0.03, Math.min(60.0, sec));
         updateZoomSpanLabel();
+        if (state.hasAudio) updatePinButtonsUI();
         saveCurrentFileMemory(false);
         saveAppPrefs();
       }
@@ -9122,7 +9169,7 @@
       btnPromoteTemp.addEventListener('click', handleConvertPinButton);
       btnJumpTemp.addEventListener('click', jumpToGreenPin);
       document.getElementById('btnPrevYellow').addEventListener('click', jumpPrevYellowPin);
-      document.getElementById('btnAddYellow').addEventListener('click', addYellowPinAtCurrent);
+      btnAddYellow.addEventListener('click', toggleYellowPinAtCurrent);
       document.getElementById('btnNextYellow').addEventListener('click', jumpNextYellowPin);
       document.getElementById('btnSpeedPitch').addEventListener('click', () => openSettingsModal('settings'));
 
