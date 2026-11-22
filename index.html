@@ -8,7 +8,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="Audipo2">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="app-version" content="v22">
+  <meta name="app-version" content="v24">
   <link rel="manifest" href="./manifest.json">
   <title>Audipo風 練習プレイヤー＆レコーダー</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='bg' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%231b2030'/%3E%3Cstop offset='100%25' stop-color='%230d0f15'/%3E%3C/linearGradient%3E%3ClinearGradient id='wv' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0%25' stop-color='%2360c5ff'/%3E%3Cstop offset='100%25' stop-color='%232563eb'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='url(%23bg)'/%3E%3Crect x='1' y='1' width='62' height='62' rx='15' fill='none' stroke='%233b82f6' stroke-opacity='0.3' stroke-width='2'/%3E%3Cg fill='url(%23wv)'%3E%3Crect x='10' y='28' width='4.5' height='12' rx='2.25' opacity='0.6'/%3E%3Crect x='18' y='22' width='4.5' height='24' rx='2.25' opacity='0.85'/%3E%3Crect x='26' y='15' width='4.5' height='36' rx='2.25'/%3E%3Crect x='34' y='21' width='4.5' height='25' rx='2.25' opacity='0.9'/%3E%3Crect x='42' y='26' width='4.5' height='16' rx='2.25' opacity='0.75'/%3E%3Crect x='50' y='30' width='4.5' height='9' rx='2.25' opacity='0.5'/%3E%3C/g%3E%3Cpath d='M36.25 10.5c0-1.4 1.1-2.5 2.5-2.5h5.5c1.4 0 2.5 1.1 2.5 2.5v2.4c0 .8-.3 1.5-.9 2.1l-3.2 3.1c-.6.6-1.6.6-2.2 0l-3.2-3.1c-.6-.6-.9-1.3-.9-2.1v-2.4z' fill='%23facc15'/%3E%3C/svg%3E">
@@ -1343,11 +1343,62 @@
 
     .upper-pin-footer {
       display: flex;
-      gap: 8px;
-      padding: 5px 8px 14px;
+      align-items: center;
+      gap: 5px;
+      padding: 5px 6px 14px;
       background: #141418;
       border-top: 1px solid var(--border-subtle);
       flex-shrink: 0;
+    }
+
+    .pin-foot-btn {
+      height: 33px;
+      padding: 0 7px;
+      border-radius: 8px;
+      background: #23232c;
+      border: 1px solid var(--border-strong);
+      color: #f4f4f6;
+      font-size: 10.5px;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      white-space: nowrap;
+      flex: 1 1 0;
+      min-width: 0;
+      transition: transform 0.08s ease, background-color 0.12s ease;
+    }
+
+    .pin-foot-btn:active {
+      transform: scale(0.95);
+      background: #30303c;
+    }
+
+    .pin-foot-btn-start {
+      background: rgba(56, 189, 248, 0.13);
+      border-color: rgba(56, 189, 248, 0.52);
+      color: #bae6fd;
+    }
+
+    .pin-foot-btn-end {
+      background: rgba(52, 211, 153, 0.13);
+      border-color: rgba(52, 211, 153, 0.52);
+      color: #a7f3d0;
+    }
+
+    .pin-foot-btn-cur {
+      background: rgba(250, 204, 21, 0.14);
+      border-color: rgba(250, 204, 21, 0.58);
+      color: #fde047;
+    }
+
+    .pin-foot-btn-clear {
+      flex: 0 0 auto;
+      padding: 0 9px;
+      background: rgba(239, 68, 68, 0.14);
+      border-color: rgba(239, 68, 68, 0.5);
+      color: #fca5a5;
     }
 
     /* Minimal Home-Screen-Style 3-Dot Page Indicator (non-blocking, zero vertical bloat) */
@@ -2703,6 +2754,157 @@
       color: #08131d;
     }
 
+    /* ==================== WHAT'S NEW / UPDATE NOTICE MODAL ==================== */
+    .whats-new-card {
+      width: 100%;
+      max-width: 420px;
+      max-height: 86dvh;
+      background: #1c1c22;
+      border: 1px solid rgba(96, 165, 250, 0.48);
+      border-radius: 18px;
+      padding: 16px 16px 14px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.82), 0 0 28px rgba(66, 165, 245, 0.14);
+    }
+
+    .whats-new-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 12px;
+      flex-shrink: 0;
+    }
+
+    .whats-new-title-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .whats-new-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 11px;
+      background: linear-gradient(135deg, rgba(56, 189, 248, 0.28) 0%, rgba(37, 99, 235, 0.34) 100%);
+      border: 1px solid rgba(96, 165, 250, 0.55);
+      color: #93c5fd;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .whats-new-title {
+      margin: 0;
+      font-size: 15px;
+      font-weight: 800;
+      color: #ffffff;
+      line-height: 1.25;
+    }
+
+    .whats-new-sub {
+      margin: 2px 0 0;
+      font-size: 11.5px;
+      color: #93c5fd;
+      font-weight: 600;
+    }
+
+    .whats-new-list {
+      flex: 1;
+      min-height: 0;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      padding-right: 2px;
+    }
+
+    .whats-new-ver-card {
+      background: #141419;
+      border: 1px solid var(--border-subtle);
+      border-radius: 13px;
+      padding: 11px 12px;
+    }
+
+    .whats-new-ver-card.is-latest {
+      border-color: rgba(66, 165, 245, 0.52);
+      background: linear-gradient(180deg, rgba(66, 165, 245, 0.08) 0%, #141419 42%);
+    }
+
+    .whats-new-ver-head {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 7px;
+      flex-wrap: wrap;
+    }
+
+    .whats-new-ver-badge {
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 800;
+      background: #272732;
+      color: #d4d4d8;
+      border: 1px solid var(--border-strong);
+      flex-shrink: 0;
+    }
+
+    .whats-new-ver-card.is-latest .whats-new-ver-badge {
+      background: linear-gradient(135deg, #2563eb 0%, #0284c7 100%);
+      border-color: rgba(147, 197, 253, 0.72);
+      color: #ffffff;
+    }
+
+    .whats-new-ver-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: #ffffff;
+      line-height: 1.3;
+    }
+
+    .whats-new-bullets {
+      margin: 0;
+      padding-left: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      font-size: 12px;
+      line-height: 1.5;
+      color: #d4d4d8;
+    }
+
+    .whats-new-bullets li::marker {
+      color: #60a5fa;
+    }
+
+    .whats-new-footer {
+      margin-top: 13px;
+      flex-shrink: 0;
+    }
+
+    .whats-new-ok-btn {
+      width: 100%;
+      height: 42px;
+      border-radius: 11px;
+      background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+      border: 1px solid rgba(147, 197, 253, 0.65);
+      color: #ffffff;
+      font-size: 13.5px;
+      font-weight: 800;
+      box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);
+      transition: transform 0.08s ease;
+    }
+
+    .whats-new-ok-btn:active {
+      transform: scale(0.97);
+    }
+
     /* Toast Notification (never uses alert/confirm) */
     .toast-banner {
       position: fixed;
@@ -3071,8 +3273,10 @@
           <div id="upperPagePins" class="upper-page upper-page-pins">
             <div id="upperMarkerListWrap" class="upper-pin-list"></div>
             <div class="upper-pin-footer">
-              <button id="btnAddMarkerFromUpper" type="button" class="step-btn" style="flex:1;color:#fde047;border-color:rgba(250,204,21,0.5);">＋ 現在位置に黄色ピン追加</button>
-              <button id="btnClearAllMarkersUpper" type="button" class="step-btn" style="color:#fca5a5;border-color:rgba(239,68,68,0.5);">全削除</button>
+              <button id="btnAutoPinStartsUpper" type="button" class="pin-foot-btn pin-foot-btn-start" title="演奏の区切り（入れ替え・チューニング等の停止）から各曲の始まりに黄色ピンを自動追加">曲の始まり</button>
+              <button id="btnAutoPinEndsUpper" type="button" class="pin-foot-btn pin-foot-btn-end" title="演奏の区切り（入れ替え・チューニング等の停止）から各曲の終わりに黄色ピンを自動追加">曲の終わり</button>
+              <button id="btnAddMarkerFromUpper" type="button" class="pin-foot-btn pin-foot-btn-cur" title="現在位置に黄色ピンを追加">＋現在位置</button>
+              <button id="btnClearAllMarkersUpper" type="button" class="pin-foot-btn pin-foot-btn-clear" title="すべての黄色ピンを削除">全削除</button>
             </div>
           </div>
         </div>
@@ -3547,14 +3751,25 @@
             <button id="btnClearPinMemory" type="button" class="step-btn" style="color:#fca5a5;border-color:rgba(239,68,68,0.45);">全ピン記憶を初期化</button>
           </div>
         </div>
+
+        <!-- App Version & Release History -->
+        <div class="modal-section" style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+          <div>
+            <div class="sec-title">バージョン情報</div>
+            <div id="settingsVersionLabel" class="engine-desc mono">現在: v24</div>
+          </div>
+          <button id="btnShowReleaseHistory" type="button" class="step-btn" style="color:#93c5fd;border-color:rgba(66,165,245,0.45);">更新履歴を見る</button>
+        </div>
       </div>
 
       <!-- TAB 2: YELLOW MARKER LIST -->
       <div id="panelMarkers" class="modal-body hidden">
         <div id="markerListWrap"></div>
-        <div style="display:flex;gap:8px;margin-top:4px;">
-          <button id="btnAddMarkerFromModal" type="button" class="step-btn" style="flex:1;color:#fde047;border-color:rgba(250,204,21,0.5);">＋ 現在位置に黄色ピン追加</button>
-          <button id="btnClearAllMarkers" type="button" class="step-btn" style="color:#fca5a5;border-color:rgba(239,68,68,0.5);">全削除</button>
+        <div style="display:flex;gap:5px;margin-top:4px;">
+          <button id="btnAutoPinStartsModal" type="button" class="pin-foot-btn pin-foot-btn-start" title="演奏の区切りから各曲の始まりに黄色ピンを自動追加">曲の始まり</button>
+          <button id="btnAutoPinEndsModal" type="button" class="pin-foot-btn pin-foot-btn-end" title="演奏の区切りから各曲の終わりに黄色ピンを自動追加">曲の終わり</button>
+          <button id="btnAddMarkerFromModal" type="button" class="pin-foot-btn pin-foot-btn-cur" title="現在位置に黄色ピンを追加">＋現在位置</button>
+          <button id="btnClearAllMarkers" type="button" class="pin-foot-btn pin-foot-btn-clear" title="すべての黄色ピンを削除">全削除</button>
         </div>
       </div>
 
@@ -3642,6 +3857,34 @@
       <div class="mark-edit-footer">
         <button id="btnCutCancel" type="button" class="mark-dialog-btn" style="color:#a1a1aa;">キャンセル</button>
         <button id="btnCutExecute" type="button" class="mark-dialog-btn" style="color:#f87171;">この区間を削除する</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== 8. WHAT'S NEW / UPDATE NOTICE MODAL ==================== -->
+  <div id="whatsNewModal" class="modal-backdrop hidden" style="z-index:82;">
+    <div class="whats-new-card" role="dialog" aria-modal="true" aria-labelledby="whatsNewTitle">
+      <div class="whats-new-head">
+        <div class="whats-new-title-wrap">
+          <div class="whats-new-icon" aria-hidden="true">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 3l1.9 4.6L18.5 9.5l-4.6 1.9L12 16l-1.9-4.6L5.5 9.5l4.6-1.9L12 3Z"/>
+              <path d="M5 17l.9 2.1L8 20l-2.1.9L5 23l-.9-2.1L2 20l2.1-.9L5 17Z"/>
+              <path d="M19 14l.7 1.6 1.6.7-1.6.7-.7 1.6-.7-1.6-1.6-.7 1.6-.7.7-1.6Z"/>
+            </svg>
+          </div>
+          <div>
+            <h3 id="whatsNewTitle" class="whats-new-title">アップデートのお知らせ</h3>
+            <p id="whatsNewSub" class="whats-new-sub mono">v24 に更新されました</p>
+          </div>
+        </div>
+        <button id="btnCloseWhatsNewX" type="button" class="modal-close" aria-label="閉じる">✕</button>
+      </div>
+
+      <div id="whatsNewList" class="whats-new-list"></div>
+
+      <div class="whats-new-footer">
+        <button id="btnCloseWhatsNewOk" type="button" class="whats-new-ok-btn">確認してはじめる</button>
       </div>
     </div>
   </div>
@@ -4102,6 +4345,7 @@
       const LS_APP_PREFS_KEY = 'audipo2_app_prefs_v1';
       const LS_LAST_SESSION_KEY = 'audipo2_last_session_v1';
       const LS_TEMP_SESSION_STATE_KEY = 'audipo2_temp_session_state_v1';
+      const LS_LAST_SEEN_VERSION_KEY = 'audipo2_last_seen_version_v1';
       const IDB_NAME = 'audipo2_session_db_v1';
       const IDB_STORE = 'session_store';
       const MAX_REMEMBERED_FILES = 1000;
@@ -6811,6 +7055,254 @@
           }
         }
         addYellowPinAtCurrent();
+      }
+
+      // ==================== AUTO PIECE START / END DETECTION (RECITAL / CHANGEOVER PAUSE DETECTOR) ====================
+      function computeEnvelopeFrames(dtSec = 0.25) {
+        if (!state.hasAudio || state.duration <= 0) return null;
+        const dur = state.duration;
+        const numFrames = Math.max(1, Math.floor(dur / dtSec));
+        const energies = new Float32Array(numFrames);
+
+        if (state.audioBuffer) {
+          const buf = state.audioBuffer;
+          const sr = buf.sampleRate;
+          const ch0 = buf.getChannelData(0);
+          const ch1 = buf.numberOfChannels > 1 ? buf.getChannelData(1) : null;
+          const totalS = buf.length;
+          const stride = Math.max(1, Math.floor(sr / 4000)); // Fast ~4kHz strided RMS scan
+
+          for (let f = 0; f < numFrames; f++) {
+            const s0 = Math.floor(f * dtSec * sr);
+            const s1 = Math.min(totalS, Math.floor((f + 1) * dtSec * sr));
+            let sumSq = 0;
+            let cnt = 0;
+            for (let i = s0; i < s1; i += stride) {
+              const v0 = ch0[i];
+              sumSq += v0 * v0;
+              cnt++;
+              if (ch1) {
+                const v1 = ch1[i];
+                sumSq += v1 * v1;
+                cnt++;
+              }
+            }
+            energies[f] = cnt > 0 ? Math.sqrt(sumSq / cnt) : 0;
+          }
+          return { energies, dt: dtSec, duration: dur };
+        }
+
+        if (state.waveformPyramid && state.waveformPyramid.levels && state.waveformPyramid.levels.length > 0) {
+          const pyr = state.waveformPyramid;
+          const sr = pyr.sampleRate;
+          const targetBin = Math.max(16, sr * 0.025);
+          let lvl = pyr.levels[0];
+          for (let i = 0; i < pyr.levels.length; i++) {
+            if (pyr.levels[i].binSize <= targetBin * 2) {
+              lvl = pyr.levels[i];
+            }
+          }
+          const binDur = lvl.binSize / sr;
+          const bLen = lvl.min.length;
+
+          for (let f = 0; f < numFrames; f++) {
+            const b0 = Math.max(0, Math.min(bLen - 1, Math.floor((f * dtSec) / binDur)));
+            const b1 = Math.max(b0, Math.min(bLen - 1, Math.ceil(((f + 1) * dtSec) / binDur)));
+            let sumSq = 0;
+            let cnt = 0;
+            for (let b = b0; b <= b1; b++) {
+              const amp = Math.max(Math.abs(lvl.min[b]), Math.abs(lvl.max[b]));
+              sumSq += amp * amp;
+              cnt++;
+            }
+            energies[f] = cnt > 0 ? Math.sqrt(sumSq / cnt) : 0;
+          }
+          return { energies, dt: dtSec, duration: dur };
+        }
+
+        return null;
+      }
+
+      function detectPieceSegments() {
+        const frameData = computeEnvelopeFrames(0.25);
+        if (!frameData) return null;
+        const { energies, dt, duration } = frameData;
+        const n = energies.length;
+        if (n < 4) return [];
+
+        const db = new Float32Array(n);
+        for (let i = 0; i < n; i++) {
+          db[i] = 20.0 * Math.log10(Math.max(1e-6, energies[i]));
+        }
+
+        const sortedDb = Array.from(db).sort((a, b) => a - b);
+        const pct = (p) => sortedDb[Math.min(n - 1, Math.max(0, Math.floor(p * (n - 1))))];
+
+        const activeDb = pct(0.90);
+        const rawFloorDb = pct(0.03);
+        const floorDb = Math.max(activeDb - 52.0, Math.min(rawFloorDb, activeDb - 14.0));
+        const dynRange = Math.max(0, activeDb - floorDb);
+        if (dynRange < 4.0) {
+          return [{ start: 0, end: duration }];
+        }
+
+        const threshDb = Math.min(activeDb - 10.0, floorDb + Math.max(5.5, Math.min(14.0, dynRange * 0.26)));
+
+        // 3-frame median filter removes single-frame pops/clicks without smearing silence boundaries
+        const medDb = new Float32Array(n);
+        for (let i = 0; i < n; i++) {
+          const a = i > 0 ? db[i - 1] : db[i];
+          const b = db[i];
+          const c = i + 1 < n ? db[i + 1] : db[i];
+          if (a <= b) {
+            medDb[i] = (b <= c) ? b : Math.max(a, c);
+          } else {
+            medDb[i] = (a <= c) ? a : Math.max(b, c);
+          }
+        }
+
+        // Tuned for live recital/concert recordings where performance pauses ~15-35s between pieces
+        // (changeover, applause, brief tuning notes) while preserving internal rests up to ~12s
+        const isLongRec = duration >= 60.0;
+        const microGapSec = isLongRec ? 1.0 : 0.75;
+        const shortBurstSec = isLongRec ? 9.5 : 1.5;
+        const shortBurstQuietPad = isLongRec ? 1.25 : 0.75;
+        const minInterPieceGapSec = isLongRec ? 13.0 : Math.max(3.0, duration * 0.12);
+        const minPieceSec = isLongRec ? 10.0 : 2.5;
+
+        const active = new Uint8Array(n);
+        for (let i = 0; i < n; i++) {
+          active[i] = medDb[i] >= threshDb ? 1 : 0;
+        }
+
+        const closeGaps = (arr, maxGapFrames) => {
+          let i = 0;
+          while (i < arr.length) {
+            if (arr[i] === 0) {
+              let j = i;
+              while (j < arr.length && arr[j] === 0) j++;
+              if (i > 0 && j < arr.length && (j - i) <= maxGapFrames) {
+                for (let k = i; k < j; k++) arr[k] = 1;
+              }
+              i = j;
+            } else {
+              i++;
+            }
+          }
+        };
+
+        const extractIslands = (arr) => {
+          const out = [];
+          let i = 0;
+          while (i < arr.length) {
+            if (arr[i] === 1) {
+              let j = i;
+              while (j < arr.length && arr[j] === 1) j++;
+              out.push([i, j]);
+              i = j;
+            } else {
+              i++;
+            }
+          }
+          return out;
+        };
+
+        // 1. Bridge micro-gaps inside continuous musical phrases
+        closeGaps(active, Math.round(microGapSec / dt));
+
+        // 2. Suppress isolated short bursts (tuning notes, footsteps, mic bumps, brief claps)
+        const islands = extractIslands(active);
+        const minPadFrames = Math.round(shortBurstQuietPad / dt);
+        const maxBurstFrames = Math.round(shortBurstSec / dt);
+        for (let idx = 0; idx < islands.length; idx++) {
+          const [s, e] = islands[idx];
+          if ((e - s) <= maxBurstFrames) {
+            const gapBefore = idx === 0 ? s : (s - islands[idx - 1][1]);
+            const gapAfter = idx === islands.length - 1 ? (n - e) : (islands[idx + 1][0] - e);
+            if (gapBefore >= minPadFrames && gapAfter >= minPadFrames) {
+              for (let k = s; k < e; k++) active[k] = 0;
+            }
+          }
+        }
+
+        // 3. Bridge musical rests/fermatas shorter than the inter-piece changeover threshold
+        closeGaps(active, Math.round(minInterPieceGapSec / dt));
+
+        // 4. Extract final piece boundaries with slight lead-in / decay-tail padding
+        const finalIslands = extractIslands(active);
+        const pieces = [];
+        for (let idx = 0; idx < finalIslands.length; idx++) {
+          const [s, e] = finalIslands[idx];
+          const rawStart = s * dt;
+          const rawEnd = Math.min(duration, e * dt);
+          if (rawEnd - rawStart >= minPieceSec) {
+            let rs = s;
+            while (rs > 0 && rs > s - 3 && db[rs - 1] >= threshDb - 2.0) rs--;
+            let re = e;
+            while (re < n && re < e + 3 && db[re] >= threshDb - 2.0) re++;
+            pieces.push({
+              start: Math.max(0, rs * dt - 0.35),
+              end: Math.min(duration, re * dt + 0.55)
+            });
+          }
+        }
+        return pieces;
+      }
+
+      function autoAddPieceBoundaryPins(mode) {
+        // mode: 'start' | 'end'
+        if (!state.hasAudio) {
+          showToast('音声ファイルを読み込んでから実行してください');
+          return;
+        }
+        if (!state.audioBuffer && !state.waveformPyramid) {
+          showToast(state.isAnalyzingWave ? '波形解析の完了後に実行してください' : '波形データがないため自動検出できません');
+          return;
+        }
+
+        const pieces = detectPieceSegments();
+        if (!pieces || pieces.length === 0) {
+          showToast('演奏区間を検出できませんでした');
+          return;
+        }
+
+        let addedCount = 0;
+        let skippedExisting = 0;
+        const dupTol = 2.0;
+
+        pieces.forEach((p, idx) => {
+          const num = idx + 1;
+          const t = mode === 'start' ? p.start : p.end;
+          // Skip pins practically sitting on 0:00 (already Row 0) or the very end of the file
+          if (mode === 'start' && t < 0.8) return;
+          if (mode === 'end' && t > state.duration - 1.0) return;
+          if (t <= 0.05 || t >= state.duration - 0.05) return;
+
+          if (state.markers.some(m => Math.abs(m.time - t) < dupTol)) {
+            skippedExisting++;
+            return;
+          }
+          const label = mode === 'start' ? `曲${num} 始まり` : `曲${num} 終わり`;
+          state.markers.push(makeMarkerObj(t, label, true, true));
+          addedCount++;
+        });
+
+        if (addedCount > 0) {
+          state.markers.sort((a, b) => a.time - b.time);
+          syncCurrentPlaylistMarkers();
+          updateHeaderSubInfo();
+          updatePinButtonsUI();
+          updateSectionBarUI();
+          renderAllCanvases();
+          const kind = mode === 'start' ? '曲の始まり' : '曲の終わり';
+          showToast(`${kind}ピンを${addedCount}個追加しました（検出 ${pieces.length}曲）`);
+        } else if (skippedExisting > 0) {
+          showToast(`検出位置（${pieces.length}曲）にはすでにピンがあります`);
+        } else {
+          showToast(mode === 'start'
+            ? '曲頭(0:00)以外の曲の始まりは見つかりませんでした'
+            : '曲末以外の曲の終わりは見つかりませんでした');
+        }
       }
 
       function jumpPrevYellowPin() {
@@ -10597,7 +11089,208 @@
       document.addEventListener('webkitfullscreenchange', onFullscreenStateChanged);
 
       // ==================== GITHUB / PWA SOFTWARE UPDATE CHECK & APPLY ====================
-      const APP_VERSION = 'v22';
+      const APP_VERSION = 'v24';
+
+      // Ordered newest-first; each release appends a new object at the top.
+      // Users who skip multiple versions automatically see ALL unseen versions between lastSeen and current.
+      const APP_RELEASE_NOTES = [
+        {
+          version: 'v24',
+          verNum: 24,
+          title: 'アップデート連絡・更新概要の初回表示',
+          items: [
+            '更新後の初回起動時に、変更内容の概要を自動でお知らせするようにしました（各バージョン1回のみ表示）',
+            '複数バージョンを飛ばして更新した場合も、間のバージョンの変更内容をすべてまとめて表示します',
+            '設定画面の「更新履歴を見る」から過去の変更内容もいつでも見返せます'
+          ]
+        },
+        {
+          version: 'v23',
+          verNum: 23,
+          title: '曲の始まり・終わり自動ピン追加',
+          items: [
+            'ピンリスト画面に「曲の始まり」「曲の終わり」自動ピン追加ボタンを配置しました',
+            '曲間の入れ替えやチューニング等の演奏停止（約13〜30秒前後）を自動判別して、演奏区間ごとに黄色ピンを配置します'
+          ]
+        },
+        {
+          version: 'v22',
+          verNum: 22,
+          title: '鍵盤UIの視認性向上＆横画面ロック強化',
+          items: [
+            '鍵盤のオクターブ切替と「持続」ボタンを押しやすく強調し、基準ピッチ(Hz)を「キー:C」の隣へ整理しました',
+            '横画面モード時にスマホの自動回転が有効でも縦へ戻らないよう横固定を強化しました'
+          ]
+        },
+        {
+          version: 'v21',
+          verNum: 21,
+          title: 'アプリ内更新後の表示崩れ修正',
+          items: [
+            '更新ボタンからリロードした直後に最下部の操作ボタンが画面外に隠れて押せなくなる現象を修正しました'
+          ]
+        },
+        {
+          version: 'v20',
+          verNum: 20,
+          title: '鍵盤の縦1オクターブ／横2オクターブ切替',
+          items: [
+            '縦画面では大きく弾きやすい1オクターブ、横画面では広い2オクターブへ自動で切り替わるようにしました',
+            '縦画面に大型の「横画面にする」ボタン、横モードに常時固定の「縦に戻す」ボタンを配置しました'
+          ]
+        }
+      ];
+
+      const whatsNewModal = document.getElementById('whatsNewModal');
+      const whatsNewTitle = document.getElementById('whatsNewTitle');
+      const whatsNewSub = document.getElementById('whatsNewSub');
+      const whatsNewList = document.getElementById('whatsNewList');
+      const btnCloseWhatsNewOk = document.getElementById('btnCloseWhatsNewOk');
+
+      function parseAppVersionNum(verStr) {
+        const s = String(verStr || '').trim();
+        const digits = s.replace(/[^0-9]/g, '');
+        const n = parseInt(digits, 10);
+        return isFinite(n) ? n : 0;
+      }
+
+      function markCurrentVersionSeen() {
+        try {
+          localStorage.setItem(LS_LAST_SEEN_VERSION_KEY, APP_VERSION);
+        } catch (_) {}
+      }
+
+      function openWhatsNewModal(entries, opts = {}) {
+        const {
+          title = 'アップデートのお知らせ',
+          subtitle = `${APP_VERSION} に更新されました`,
+          buttonLabel = '確認してはじめる'
+        } = opts;
+        if (!whatsNewModal || !entries || entries.length === 0) return;
+
+        whatsNewTitle.textContent = title;
+        whatsNewSub.textContent = subtitle;
+        btnCloseWhatsNewOk.textContent = buttonLabel;
+        whatsNewList.innerHTML = '';
+
+        const currentNum = parseAppVersionNum(APP_VERSION);
+        entries.forEach((entry, idx) => {
+          const card = document.createElement('div');
+          card.className = 'whats-new-ver-card' + (entry.verNum === currentNum || idx === 0 ? ' is-latest' : '');
+
+          const head = document.createElement('div');
+          head.className = 'whats-new-ver-head';
+          const badge = document.createElement('span');
+          badge.className = 'whats-new-ver-badge mono';
+          badge.textContent = entry.version;
+          const vTitle = document.createElement('span');
+          vTitle.className = 'whats-new-ver-title';
+          vTitle.textContent = entry.title;
+          head.appendChild(badge);
+          head.appendChild(vTitle);
+
+          const ul = document.createElement('ul');
+          ul.className = 'whats-new-bullets';
+          (entry.items || []).forEach((line) => {
+            const li = document.createElement('li');
+            li.textContent = line;
+            ul.appendChild(li);
+          });
+
+          card.appendChild(head);
+          card.appendChild(ul);
+          whatsNewList.appendChild(card);
+        });
+
+        whatsNewModal.classList.remove('hidden');
+        whatsNewList.scrollTop = 0;
+      }
+
+      function closeWhatsNewModal() {
+        markCurrentVersionSeen();
+        if (whatsNewModal) whatsNewModal.classList.add('hidden');
+      }
+
+      function maybeShowStartupWhatsNew() {
+        const currentNum = parseAppVersionNum(APP_VERSION);
+        let savedVer = '';
+        try {
+          savedVer = localStorage.getItem(LS_LAST_SEEN_VERSION_KEY) || '';
+        } catch (_) {}
+
+        let justUpdated = false;
+        try {
+          if (sessionStorage.getItem('audipo2_just_updated') === '1') {
+            sessionStorage.removeItem('audipo2_just_updated');
+            justUpdated = true;
+          }
+        } catch (_) {}
+
+        const savedNum = parseAppVersionNum(savedVer);
+
+        // Already saw this version (or newer): never show again
+        if (savedNum >= currentNum) {
+          if (justUpdated) {
+            setTimeout(() => showToast(`最新バージョンへ更新しました (${APP_VERSION})`), 350);
+          }
+          return false;
+        }
+
+        let entriesToShow = [];
+        let subtitle = `${APP_VERSION} に更新されました`;
+
+        if (savedNum > 0) {
+          // Returning user: show ALL versions skipped between savedNum and currentNum (newest first)
+          entriesToShow = APP_RELEASE_NOTES
+            .filter((e) => e.verNum > savedNum && e.verNum <= currentNum)
+            .sort((a, b) => b.verNum - a.verNum);
+          if (entriesToShow.length === 0) {
+            entriesToShow = APP_RELEASE_NOTES.filter((e) => e.verNum === currentNum);
+          }
+          subtitle = entriesToShow.length > 1
+            ? `${savedVer} → ${APP_VERSION}（${entriesToShow.length}バージョン分の変更）`
+            : `${savedVer} → ${APP_VERSION} に更新されました`;
+        } else {
+          // First launch with version tracking enabled: show current release summary once
+          entriesToShow = APP_RELEASE_NOTES.filter((e) => e.verNum === currentNum);
+          if (entriesToShow.length === 0 && APP_RELEASE_NOTES.length > 0) {
+            entriesToShow = [APP_RELEASE_NOTES[0]];
+          }
+          subtitle = `${APP_VERSION} に更新されました`;
+        }
+
+        // Mark seen immediately so each version is strictly shown only on its very first launch
+        markCurrentVersionSeen();
+
+        if (entriesToShow.length > 0) {
+          openWhatsNewModal(entriesToShow, {
+            title: 'アップデートのお知らせ',
+            subtitle,
+            buttonLabel: '確認してはじめる'
+          });
+          return true;
+        }
+        return false;
+      }
+
+      document.getElementById('btnCloseWhatsNewX').addEventListener('click', closeWhatsNewModal);
+      btnCloseWhatsNewOk.addEventListener('click', closeWhatsNewModal);
+      whatsNewModal.addEventListener('click', (e) => {
+        if (e.target === whatsNewModal) closeWhatsNewModal();
+      });
+      document.getElementById('btnShowReleaseHistory').addEventListener('click', () => {
+        const allEntries = [...APP_RELEASE_NOTES].sort((a, b) => b.verNum - a.verNum);
+        openWhatsNewModal(allEntries, {
+          title: 'アップデート履歴',
+          subtitle: `現在のバージョン: ${APP_VERSION}`,
+          buttonLabel: '閉じる'
+        });
+      });
+      const settingsVersionLabelEl = document.getElementById('settingsVersionLabel');
+      if (settingsVersionLabelEl) {
+        settingsVersionLabelEl.textContent = `現在: ${APP_VERSION}`;
+      }
+
       const appUpdateState = {
         checking: false,
         available: false,
@@ -10801,6 +11494,14 @@
       document.getElementById('headerInfo').addEventListener('click', () => openSettingsModal('settings'));
 
       // Upper Pin List Footer Actions
+      document.getElementById('btnAutoPinStartsUpper').addEventListener('click', () => {
+        autoAddPieceBoundaryPins('start');
+        scrollActiveMarkerIntoView(upperMarkerListWrap);
+      });
+      document.getElementById('btnAutoPinEndsUpper').addEventListener('click', () => {
+        autoAddPieceBoundaryPins('end');
+        scrollActiveMarkerIntoView(upperMarkerListWrap);
+      });
       document.getElementById('btnAddMarkerFromUpper').addEventListener('click', () => {
         addYellowPinAtCurrent();
         scrollActiveMarkerIntoView(upperMarkerListWrap);
@@ -11073,6 +11774,14 @@
         showToast('記憶していたすべてのファイルピン情報を初期化しました');
       });
 
+      document.getElementById('btnAutoPinStartsModal').addEventListener('click', () => {
+        autoAddPieceBoundaryPins('start');
+        renderMarkerList();
+      });
+      document.getElementById('btnAutoPinEndsModal').addEventListener('click', () => {
+        autoAddPieceBoundaryPins('end');
+        renderMarkerList();
+      });
       document.getElementById('btnAddMarkerFromModal').addEventListener('click', () => {
         addYellowPinAtCurrent();
         renderMarkerList();
@@ -11130,7 +11839,9 @@
 
       window.addEventListener('popstate', () => {
         // 1. Close topmost open modal if any
-        if (!cutConfirmModal.classList.contains('hidden')) {
+        if (whatsNewModal && !whatsNewModal.classList.contains('hidden')) {
+          closeWhatsNewModal();
+        } else if (!cutConfirmModal.classList.contains('hidden')) {
           pendingCutSection = null;
           cutConfirmModal.classList.add('hidden');
         } else if (!markEditModal.classList.contains('hidden')) {
@@ -11220,12 +11931,7 @@
           }, ms);
         });
 
-        try {
-          if (sessionStorage.getItem('audipo2_just_updated') === '1') {
-            sessionStorage.removeItem('audipo2_just_updated');
-            setTimeout(() => showToast(`最新バージョンへ更新しました (${APP_VERSION})`), 350);
-          }
-        } catch (_) {}
+        setTimeout(() => maybeShowStartupWhatsNew(), 160);
 
         loadAppPrefs();
         updateWaveGainUI();
