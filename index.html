@@ -8,7 +8,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="Audipo2">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="app-version" content="v32">
+  <meta name="app-version" content="v33">
   <link rel="manifest" href="./manifest.json">
   <title>Audipo風 練習プレイヤー＆レコーダー</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='bg' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%231b2030'/%3E%3Cstop offset='100%25' stop-color='%230d0f15'/%3E%3C/linearGradient%3E%3ClinearGradient id='wv' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0%25' stop-color='%2360c5ff'/%3E%3Cstop offset='100%25' stop-color='%232563eb'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='url(%23bg)'/%3E%3Crect x='1' y='1' width='62' height='62' rx='15' fill='none' stroke='%233b82f6' stroke-opacity='0.3' stroke-width='2'/%3E%3Cg fill='url(%23wv)'%3E%3Crect x='10' y='28' width='4.5' height='12' rx='2.25' opacity='0.6'/%3E%3Crect x='18' y='22' width='4.5' height='24' rx='2.25' opacity='0.85'/%3E%3Crect x='26' y='15' width='4.5' height='36' rx='2.25'/%3E%3Crect x='34' y='21' width='4.5' height='25' rx='2.25' opacity='0.9'/%3E%3Crect x='42' y='26' width='4.5' height='16' rx='2.25' opacity='0.75'/%3E%3Crect x='50' y='30' width='4.5' height='9' rx='2.25' opacity='0.5'/%3E%3C/g%3E%3Cpath d='M36.25 10.5c0-1.4 1.1-2.5 2.5-2.5h5.5c1.4 0 2.5 1.1 2.5 2.5v2.4c0 .8-.3 1.5-.9 2.1l-3.2 3.1c-.6.6-1.6.6-2.2 0l-3.2-3.1c-.6-.6-.9-1.3-.9-2.1v-2.4z' fill='%23facc15'/%3E%3C/svg%3E">
@@ -4280,6 +4280,17 @@
             <button type="button" data-wave-gain="8" class="opt-pill wave-gain-opt mono">8x</button>
           </div>
 
+          <div class="toggle-row">
+            <div>
+              <div class="sec-title-group">
+                <span class="sec-title">波形のうねり除去・上下対称表示</span>
+                <button type="button" class="setting-help-btn" data-help-key="waveSymmetry" aria-label="波形のうねり除去・上下対称表示の説明">?</button>
+              </div>
+              <div id="waveSymmetryStatusText" class="engine-desc">ON（超低周波の偏りを抑えて上下対称に表示・標準）</div>
+            </div>
+            <button id="btnToggleWaveSymmetry" type="button" class="toggle-pill on">ON</button>
+          </div>
+
           <div class="sec-head" style="margin-top:12px;">
             <span class="sec-title-group">
               <span class="sec-title">再生音量ブースト（リミッター保護付）</span>
@@ -4378,7 +4389,7 @@
         <div class="modal-section" style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
           <div>
             <div class="sec-title">バージョン情報</div>
-            <div id="settingsVersionLabel" class="engine-desc mono">現在: v32</div>
+            <div id="settingsVersionLabel" class="engine-desc mono">現在: v33</div>
           </div>
           <button id="btnShowReleaseHistory" type="button" class="step-btn" style="color:#93c5fd;border-color:rgba(66,165,245,0.45);">更新履歴を見る</button>
         </div>
@@ -4535,7 +4546,7 @@
           </div>
           <div>
             <h3 id="whatsNewTitle" class="whats-new-title">アップデートのお知らせ</h3>
-            <p id="whatsNewSub" class="whats-new-sub mono">v32 に更新されました</p>
+            <p id="whatsNewSub" class="whats-new-sub mono">v33 に更新されました</p>
           </div>
         </div>
         <button id="btnCloseWhatsNewX" type="button" class="modal-close" aria-label="閉じる">✕</button>
@@ -4955,6 +4966,7 @@
         zoomVisible: true,
         zoomWindowSeconds: 8.0,
         waveGainMode: 'auto', // 'auto' | 1 | 2 | 4 | 8
+        waveSymmetry: true, // true: subsonic drift removal + symmetric amplitude display (default ON)
         autoWaveGain: 1.0,
 
         // Playback Boost & Mic Input Gain
@@ -5387,6 +5399,7 @@
             lpfEnabled: state.lpfEnabled,
             orderMode: state.orderMode,
             waveGainMode: state.waveGainMode,
+            waveSymmetry: state.waveSymmetry,
             boostMode: state.boostMode,
             micGain: state.micGain,
             micGainDefaultV2: true,
@@ -5449,6 +5462,7 @@
             document.getElementById('btnOrderShuffle').classList.toggle('active', p.orderMode === 'shuffle');
           }
           if (p.waveGainMode !== undefined) state.waveGainMode = p.waveGainMode;
+          if (typeof p.waveSymmetry === 'boolean') state.waveSymmetry = p.waveSymmetry;
           if (p.boostMode !== undefined) state.boostMode = p.boostMode;
           if (p.micGainDefaultV2 && typeof p.micGain === 'number' && isFinite(p.micGain)) {
             state.micGain = p.micGain;
@@ -6317,6 +6331,17 @@
         document.querySelectorAll('.wave-gain-opt').forEach(btn => {
           btn.classList.toggle('active-green', btn.dataset.waveGain === String(state.waveGainMode));
         });
+        const symBtn = document.getElementById('btnToggleWaveSymmetry');
+        const symTxt = document.getElementById('waveSymmetryStatusText');
+        if (symBtn) {
+          symBtn.textContent = state.waveSymmetry ? 'ON' : 'OFF';
+          symBtn.classList.toggle('on', state.waveSymmetry);
+        }
+        if (symTxt) {
+          symTxt.textContent = state.waveSymmetry
+            ? 'ON（超低周波の偏りを抑えて上下対称に表示・標準）'
+            : 'OFF（生のプラス／マイナス波形をそのまま表示）';
+        }
       }
 
       function applyMasterBoost() {
@@ -8956,9 +8981,15 @@
         const validBins = Math.min(totalBins, Math.max(1, Math.floor(scannedSamples / chosenLvl.binSize)));
 
         const step = Math.max(1, Math.floor(validBins / 4096));
+        const useSymWave = Boolean(state.waveSymmetry);
         const samples = [];
         for (let b = 0; b < validBins; b += step) {
-          const amp = Math.max(Math.abs(chosenLvl.min[b]), Math.abs(chosenLvl.max[b]));
+          const lo = chosenLvl.min[b];
+          const hi = chosenLvl.max[b];
+          // When waveSymmetry is ON, use AC half-span (hi - lo) / 2 over the ~150ms bin so subsonic DC drift never shrinks auto-gain
+          const amp = useSymWave
+            ? Math.max(0, (hi - lo) * 0.5)
+            : Math.max(Math.abs(lo), Math.abs(hi));
           if (amp > 0.0004) samples.push(amp);
         }
 
@@ -10538,9 +10569,13 @@
           const timeData = new Uint8Array(bufLen);
           state.recAnalyser.getByteTimeDomainData(timeData);
 
+          let frameMean = 0;
+          for (let i = 0; i < bufLen; i++) frameMean += (timeData[i] - 128) / 128;
+          frameMean /= Math.max(1, bufLen);
+
           let sumSq = 0;
           for (let i = 0; i < bufLen; i++) {
-            const v = (timeData[i] - 128) / 128;
+            const v = (timeData[i] - 128) / 128 - frameMean;
             sumSq += v * v;
           }
           const rms = Math.sqrt(sumSq / bufLen);
@@ -10569,7 +10604,8 @@
             ctx.beginPath();
             for (let i = 0; i < bufLen; i++) {
               const x = (i / (bufLen - 1)) * rect.width;
-              const y = ((timeData[i] - 128) / 128) * (rect.height * 0.44) + rect.height / 2;
+              const v = Math.max(-1, Math.min(1, (timeData[i] - 128) / 128 - frameMean));
+              const y = v * (rect.height * 0.44) + rect.height / 2;
               if (i === 0) ctx.moveTo(x, y);
               else ctx.lineTo(x, y);
             }
@@ -10671,17 +10707,54 @@
           offset += cL.length;
         }
 
-        // Clean DC-offset removal (transparent; prevents waveform drift and start/end clicks)
-        const dcL = sumL / totalSamples;
-        const dcR = dstR ? (sumR / totalSamples) : 0;
+        // Zero-phase 20Hz subsonic DC blocker (removes inaudible mic startup jumps, wind/AC rumble & DC drift
+        // with zero phase distortion and <0.07dB impact above 260Hz) + tiny 10ms anti-pop fade-in
+        const applyZeroPhaseSubsonicCut = (arr, sampleRate, fc = 20.0) => {
+          const n = arr.length;
+          if (n < 4) return;
+          const alpha = 1.0 / (1.0 + (2.0 * Math.PI * fc) / sampleRate);
+          // Pass 1: forward 1st-order HPF (initialized at arr[0] so startup DC step creates zero spike)
+          let xPrev = arr[0];
+          let yPrev = 0.0;
+          for (let i = 0; i < n; i++) {
+            const xi = arr[i];
+            const yi = alpha * (yPrev + xi - xPrev);
+            arr[i] = yi;
+            xPrev = xi;
+            yPrev = yi;
+          }
+          // Pass 2: reverse 1st-order HPF -> 12dB/oct zero-phase 20Hz subsonic cut
+          xPrev = arr[n - 1];
+          yPrev = 0.0;
+          for (let i = n - 1; i >= 0; i--) {
+            const xi = arr[i];
+            const yi = alpha * (yPrev + xi - xPrev);
+            arr[i] = yi;
+            xPrev = xi;
+            yPrev = yi;
+          }
+          // 10ms cosine fade-in & 4ms fade-out to suppress hardware mic switch pop
+          const fadeInLen = Math.min(n, Math.round(sampleRate * 0.010));
+          for (let i = 0; i < fadeInLen; i++) {
+            arr[i] *= 0.5 * (1.0 - Math.cos((Math.PI * i) / fadeInLen));
+          }
+          const fadeOutLen = Math.min(n, Math.round(sampleRate * 0.004));
+          for (let i = 0; i < fadeOutLen; i++) {
+            arr[n - 1 - i] *= 0.5 * (1.0 - Math.cos((Math.PI * i) / fadeOutLen));
+          }
+        };
+
+        applyZeroPhaseSubsonicCut(dstL, sr, 20.0);
+        if (dstR) applyZeroPhaseSubsonicCut(dstR, sr, 20.0);
+
         let maxAbs = 0;
         for (let i = 0; i < totalSamples; i++) {
-          const vL = dstL[i] - dcL;
+          const vL = Math.max(-0.999, Math.min(0.999, dstL[i]));
           dstL[i] = vL;
           const aL = Math.abs(vL);
           if (aL > maxAbs) maxAbs = aL;
           if (dstR) {
-            const vR = dstR[i] - dcR;
+            const vR = Math.max(-0.999, Math.min(0.999, dstR[i]));
             dstR[i] = vR;
             const aR = Math.abs(vR);
             if (aR > maxAbs) maxAbs = aR;
@@ -12088,32 +12161,89 @@
             }
           }
 
-          // Real PCM Min/Max waveform
+          // Real PCM Min/Max waveform (with optional subsonic drift removal & symmetric rendering)
           if (state.hasAudio && pyr) {
             const step = 1.5;
-            for (let px = 0; px < waveW; px += step) {
-              const t0 = rStart + (px / waveW) * rowDur;
-              const t1 = rStart + (Math.min(waveW, px + step) / waveW) * rowDur;
-              const { min, max } = queryPyramid(pyr, t0, t1);
+            const colCount = Math.ceil(waveW / step);
+            const colDur = (step / waveW) * rowDur;
+            const useSym = Boolean(state.waveSymmetry);
 
-              const sMax = Math.max(-1, Math.min(1, max * waveGain));
-              const sMin = Math.max(-1, Math.min(1, min * waveGain));
-              const yTop = midY - Math.max(0, sMax) * halfH;
-              const yBot = midY - Math.min(0, sMin) * halfH;
-
-              // Dim waveform inside skipped sections
-              let inSkip = false;
-              for (let s = 0; s < allSecs.length; s++) {
-                if (!allSecs[s].sectionEnabled && t0 >= allSecs[s].start && t0 < allSecs[s].end) {
-                  inSkip = true;
-                  break;
-                }
+            if (useSym) {
+              const cMin = new Float32Array(colCount);
+              const cMax = new Float32Array(colCount);
+              const cMid = new Float32Array(colCount);
+              for (let c = 0; c < colCount; c++) {
+                const px = c * step;
+                const t0 = rStart + (px / waveW) * rowDur;
+                const t1 = rStart + (Math.min(waveW, px + step) / waveW) * rowDur;
+                const q = queryPyramid(pyr, t0, t1);
+                cMin[c] = q.min;
+                cMax[c] = q.max;
+                cMid[c] = 0.5 * (q.min + q.max);
               }
 
-              ctx.fillStyle = inSkip
-                ? 'rgba(113, 113, 122, 0.36)'
-                : (t0 <= displayTime ? '#42a5f5' : '#6b7280');
-              ctx.fillRect(waveX + px, yTop, Math.max(1.0, step - 0.35), Math.max(1.0, yBot - yTop));
+              let cPrefix = null;
+              let winR = 0;
+              if (colDur < 0.025) {
+                winR = Math.max(1, Math.min(colCount, Math.round(0.025 / Math.max(0.0001, colDur))));
+                cPrefix = new Float64Array(colCount + 1);
+                for (let c = 0; c < colCount; c++) cPrefix[c + 1] = cPrefix[c] + cMid[c];
+              }
+
+              for (let c = 0; c < colCount; c++) {
+                const px = c * step;
+                const t0 = rStart + (px / waveW) * rowDur;
+                const lo = cMin[c];
+                const hi = cMax[c];
+                let amp = Math.max(0, 0.5 * (hi - lo));
+                if (cPrefix) {
+                  const a = Math.max(0, c - winR);
+                  const b = Math.min(colCount, c + winR + 1);
+                  const center = (cPrefix[b] - cPrefix[a]) / Math.max(1, b - a);
+                  const dev = Math.max(Math.abs(hi - center), Math.abs(lo - center));
+                  if (dev > amp) amp = dev;
+                }
+                const sAmp = Math.min(1, amp * waveGain);
+                const yTop = midY - sAmp * halfH;
+                const yBot = midY + sAmp * halfH;
+
+                let inSkip = false;
+                for (let s = 0; s < allSecs.length; s++) {
+                  if (!allSecs[s].sectionEnabled && t0 >= allSecs[s].start && t0 < allSecs[s].end) {
+                    inSkip = true;
+                    break;
+                  }
+                }
+                ctx.fillStyle = inSkip
+                  ? 'rgba(113, 113, 122, 0.36)'
+                  : (t0 <= displayTime ? '#42a5f5' : '#6b7280');
+                ctx.fillRect(waveX + px, yTop, Math.max(1.0, step - 0.35), Math.max(1.0, yBot - yTop));
+              }
+            } else {
+              for (let px = 0; px < waveW; px += step) {
+                const t0 = rStart + (px / waveW) * rowDur;
+                const t1 = rStart + (Math.min(waveW, px + step) / waveW) * rowDur;
+                const { min, max } = queryPyramid(pyr, t0, t1);
+
+                const sMax = Math.max(-1, Math.min(1, max * waveGain));
+                const sMin = Math.max(-1, Math.min(1, min * waveGain));
+                const yTop = midY - Math.max(0, sMax) * halfH;
+                const yBot = midY - Math.min(0, sMin) * halfH;
+
+                // Dim waveform inside skipped sections
+                let inSkip = false;
+                for (let s = 0; s < allSecs.length; s++) {
+                  if (!allSecs[s].sectionEnabled && t0 >= allSecs[s].start && t0 < allSecs[s].end) {
+                    inSkip = true;
+                    break;
+                  }
+                }
+
+                ctx.fillStyle = inSkip
+                  ? 'rgba(113, 113, 122, 0.36)'
+                  : (t0 <= displayTime ? '#42a5f5' : '#6b7280');
+                ctx.fillRect(waveX + px, yTop, Math.max(1.0, step - 0.35), Math.max(1.0, yBot - yTop));
+              }
             }
           } else if (state.hasAudio) {
             ctx.fillStyle = '#3f3f46';
@@ -12212,17 +12342,29 @@
         const visSamples = (winEnd - winStart) * sr;
         const samplesPerPx = visSamples / W;
         const waveGain = getEffectiveWaveGain();
+        const useSym = Boolean(state.waveSymmetry);
 
         if (buf && samplesPerPx <= 2.5) {
           const ch0 = buf.getChannelData(0);
           const s0 = Math.max(0, Math.floor(visStart * sr) - 1);
           const s1 = Math.min(ch0.length - 1, Math.ceil(visEnd * sr) + 1);
           if (s1 >= s0) {
+            // In extreme sample-level zoom, subtract local DC drift (~25ms window) when correction is ON
+            let dcOffset = 0;
+            if (useSym) {
+              const pad = Math.round(sr * 0.025);
+              const m0 = Math.max(0, s0 - pad);
+              const m1 = Math.min(ch0.length - 1, s1 + pad);
+              let sum = 0;
+              for (let s = m0; s <= m1; s++) sum += ch0[s];
+              dcOffset = sum / Math.max(1, m1 - m0 + 1);
+            }
+
             ctx.beginPath();
             ctx.moveTo(((s0 / sr) - winStart) * pxPerSec, midY);
             for (let s = s0; s <= s1; s++) {
               const x = ((s / sr) - winStart) * pxPerSec;
-              const y = midY - Math.max(-1, Math.min(1, ch0[s] * waveGain)) * halfH;
+              const y = midY - Math.max(-1, Math.min(1, (ch0[s] - dcOffset) * waveGain)) * halfH;
               ctx.lineTo(x, y);
             }
             ctx.lineTo(((s1 / sr) - winStart) * pxPerSec, midY);
@@ -12233,7 +12375,7 @@
             ctx.beginPath();
             for (let s = s0; s <= s1; s++) {
               const x = ((s / sr) - winStart) * pxPerSec;
-              const y = midY - Math.max(-1, Math.min(1, ch0[s] * waveGain)) * halfH;
+              const y = midY - Math.max(-1, Math.min(1, (ch0[s] - dcOffset) * waveGain)) * halfH;
               if (s === s0) ctx.moveTo(x, y);
               else ctx.lineTo(x, y);
             }
@@ -12245,7 +12387,7 @@
               ctx.fillStyle = '#ffffff';
               for (let s = s0; s <= s1; s++) {
                 const x = ((s / sr) - winStart) * pxPerSec;
-                const y = midY - Math.max(-1, Math.min(1, ch0[s] * waveGain)) * halfH;
+                const y = midY - Math.max(-1, Math.min(1, (ch0[s] - dcOffset) * waveGain)) * halfH;
                 ctx.beginPath();
                 ctx.arc(x, y, 2.0, 0, Math.PI * 2);
                 ctx.fill();
@@ -12268,24 +12410,78 @@
         const b1 = Math.min(lvl.min.length - 1, Math.ceil(visEnd / binDur) + 1);
 
         if (b1 >= b0) {
-          ctx.beginPath();
-          for (let b = b0; b <= b1; b++) {
-            const x = ((b + 0.5) * binDur - winStart) * pxPerSec;
-            const yTop = midY - Math.max(-1, Math.min(1, lvl.max[b] * waveGain)) * halfH;
-            if (b === b0) ctx.moveTo(x, yTop);
-            else ctx.lineTo(x, yTop);
+          if (useSym) {
+            const winR = binDur < 0.025 ? Math.max(1, Math.round(0.025 / Math.max(0.0001, binDur))) : 0;
+            const p0 = Math.max(0, b0 - winR);
+            const p1 = Math.min(lvl.min.length - 1, b1 + winR);
+            let prefix = null;
+            if (winR > 0) {
+              const pLen = p1 - p0 + 1;
+              prefix = new Float64Array(pLen + 1);
+              for (let i = 0; i < pLen; i++) {
+                const idx = p0 + i;
+                prefix[i + 1] = prefix[i] + 0.5 * (lvl.min[idx] + lvl.max[idx]);
+              }
+            }
+
+            const count = b1 - b0 + 1;
+            const symAmps = new Float32Array(count);
+            for (let i = 0; i < count; i++) {
+              const b = b0 + i;
+              const lo = lvl.min[b];
+              const hi = lvl.max[b];
+              let amp = Math.max(0, 0.5 * (hi - lo));
+              if (prefix) {
+                const rel = b - p0;
+                const a = Math.max(0, rel - winR);
+                const e = Math.min(prefix.length - 1, rel + winR + 1);
+                const center = (prefix[e] - prefix[a]) / Math.max(1, e - a);
+                const dev = Math.max(Math.abs(hi - center), Math.abs(lo - center));
+                if (dev > amp) amp = dev;
+              }
+              symAmps[i] = Math.min(1, amp * waveGain);
+            }
+
+            ctx.beginPath();
+            for (let i = 0; i < count; i++) {
+              const b = b0 + i;
+              const x = ((b + 0.5) * binDur - winStart) * pxPerSec;
+              const yTop = midY - symAmps[i] * halfH;
+              if (i === 0) ctx.moveTo(x, yTop);
+              else ctx.lineTo(x, yTop);
+            }
+            for (let i = count - 1; i >= 0; i--) {
+              const b = b0 + i;
+              const x = ((b + 0.5) * binDur - winStart) * pxPerSec;
+              const yBot = midY + symAmps[i] * halfH;
+              ctx.lineTo(x, yBot);
+            }
+            ctx.closePath();
+            ctx.fillStyle = fillColor;
+            ctx.fill();
+            ctx.strokeStyle = strokeColor;
+            ctx.lineWidth = 0.85;
+            ctx.stroke();
+          } else {
+            ctx.beginPath();
+            for (let b = b0; b <= b1; b++) {
+              const x = ((b + 0.5) * binDur - winStart) * pxPerSec;
+              const yTop = midY - Math.max(-1, Math.min(1, lvl.max[b] * waveGain)) * halfH;
+              if (b === b0) ctx.moveTo(x, yTop);
+              else ctx.lineTo(x, yTop);
+            }
+            for (let b = b1; b >= b0; b--) {
+              const x = ((b + 0.5) * binDur - winStart) * pxPerSec;
+              const yBot = midY - Math.max(-1, Math.min(1, lvl.min[b] * waveGain)) * halfH;
+              ctx.lineTo(x, yBot);
+            }
+            ctx.closePath();
+            ctx.fillStyle = fillColor;
+            ctx.fill();
+            ctx.strokeStyle = strokeColor;
+            ctx.lineWidth = 0.85;
+            ctx.stroke();
           }
-          for (let b = b1; b >= b0; b--) {
-            const x = ((b + 0.5) * binDur - winStart) * pxPerSec;
-            const yBot = midY - Math.max(-1, Math.min(1, lvl.min[b] * waveGain)) * halfH;
-            ctx.lineTo(x, yBot);
-          }
-          ctx.closePath();
-          ctx.fillStyle = fillColor;
-          ctx.fill();
-          ctx.strokeStyle = strokeColor;
-          ctx.lineWidth = 0.85;
-          ctx.stroke();
         }
         ctx.restore();
       }
@@ -14999,11 +15195,22 @@
       document.addEventListener('webkitfullscreenchange', onFullscreenStateChanged);
 
       // ==================== GITHUB / PWA SOFTWARE UPDATE CHECK & APPLY ====================
-      const APP_VERSION = 'v32';
+      const APP_VERSION = 'v33';
 
       // Ordered newest-first; each release appends a new object at the top.
       // Users who skip multiple versions automatically see ALL unseen versions between lastSeen and current.
       const APP_RELEASE_NOTES = [
+        {
+          version: 'v33',
+          verNum: 33,
+          date: '2026/11/23',
+          title: '波形のうねり除去・上下対称表示と録音時の20Hz超低周波カットを追加',
+          items: [
+            '設定画面に「波形のうねり除去・上下対称表示」スイッチ（デフォルトON）を追加し、上半分・下半分に偏って見えていた波形を常に中央から上下対称で見やすく表示できるようにしました',
+            'アプリで新規録音した音声に対し、人間の耳に聞こえない20Hz以下の超低周波うねり（DCドリフト・風圧・起動ポップ）を音色を変えないゼロ位相フィルターで自動カットするようにしました',
+            '録音中のリアルタイム波形・レベルメーターも中央線基準で安定表示するよう改善しました'
+          ]
+        },
         {
           version: 'v32',
           verNum: 32,
@@ -15425,6 +15632,26 @@
                 ['ON（標準）', '速度を落としたときだけ自動で働き、聴き疲れしにくい自然な音にします。'],
                 ['OFF', '高い周波数を一切カットせずそのまま出します。金属音や息遣いの高域まで細部を確認したいときに試してください。'],
                 ['等速(1.00x)のとき', 'ONにしていても、1.00x・原曲キーの通常再生時は自動で完全にバイパスされ、原音のまま鳴ります。']
+              ]
+            }
+          ]
+        },
+        waveSymmetry: {
+          title: '波形のうねり除去・上下対称表示',
+          sub: '上半分・下半分に偏る波形を見やすく補正',
+          summary: 'マイク録音時の空調風圧や振動・直流オフセットによる「耳に聞こえない超低周波のうねり」を表示上で取り除き、中央線から上下対称にスッキリ描画します。',
+          sections: [
+            {
+              title: 'ON / OFF の違い',
+              bullets: [
+                ['ON（標準・おすすめ）', '既存の録音ファイルや他アプリで録った音源でも、波形が上半分だけ・下半分だけに偏らず見やすく中央に揃います。'],
+                ['OFF（生波形そのまま）', '録音データに含まれるプラス／マイナスの偏りや超低周波のうねりも含めてそのまま確認したいときに使います。']
+              ]
+            },
+            {
+              title: '録音時の自動対策',
+              bullets: [
+                ['20Hz以下カット（録音時）', 'このアプリで新しく録音した音声には、停止時に人間の耳に聞こえない20Hz以下の超低周波うねり・起動ノイズをゼロ位相で自動除去しています（楽器の音色には影響しません）。']
               ]
             }
           ]
@@ -16092,6 +16319,17 @@
           saveAppPrefs();
           renderAllCanvases();
         });
+      });
+
+      document.getElementById('btnToggleWaveSymmetry').addEventListener('click', () => {
+        state.waveSymmetry = !state.waveSymmetry;
+        if (state.waveformPyramid) {
+          computeAutoGainsFromPyramid(state.waveformPyramid, { updateBoost: false });
+        }
+        updateWaveGainUI();
+        saveAppPrefs();
+        renderAllCanvases();
+        showToast(state.waveSymmetry ? '波形表示: うねり除去・上下対称ON' : '波形表示: 生のプラス/マイナス表示');
       });
 
       document.querySelectorAll('.boost-opt').forEach(btn => {
