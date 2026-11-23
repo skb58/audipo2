@@ -8,7 +8,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="Audipo2">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="app-version" content="v33">
+  <meta name="app-version" content="v34">
   <link rel="manifest" href="./manifest.json">
   <title>Audipo風 練習プレイヤー＆レコーダー</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='bg' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%231b2030'/%3E%3Cstop offset='100%25' stop-color='%230d0f15'/%3E%3C/linearGradient%3E%3ClinearGradient id='wv' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0%25' stop-color='%2360c5ff'/%3E%3Cstop offset='100%25' stop-color='%232563eb'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='url(%23bg)'/%3E%3Crect x='1' y='1' width='62' height='62' rx='15' fill='none' stroke='%233b82f6' stroke-opacity='0.3' stroke-width='2'/%3E%3Cg fill='url(%23wv)'%3E%3Crect x='10' y='28' width='4.5' height='12' rx='2.25' opacity='0.6'/%3E%3Crect x='18' y='22' width='4.5' height='24' rx='2.25' opacity='0.85'/%3E%3Crect x='26' y='15' width='4.5' height='36' rx='2.25'/%3E%3Crect x='34' y='21' width='4.5' height='25' rx='2.25' opacity='0.9'/%3E%3Crect x='42' y='26' width='4.5' height='16' rx='2.25' opacity='0.75'/%3E%3Crect x='50' y='30' width='4.5' height='9' rx='2.25' opacity='0.5'/%3E%3C/g%3E%3Cpath d='M36.25 10.5c0-1.4 1.1-2.5 2.5-2.5h5.5c1.4 0 2.5 1.1 2.5 2.5v2.4c0 .8-.3 1.5-.9 2.1l-3.2 3.1c-.6.6-1.6.6-2.2 0l-3.2-3.1c-.6-.6-.9-1.3-.9-2.1v-2.4z' fill='%23facc15'/%3E%3C/svg%3E">
@@ -1683,12 +1683,132 @@
 
     #recLiveWaveCanvas {
       width: 100%;
-      height: 40px;
+      height: 38px;
       display: block;
       background: #120c0d;
       border-radius: 8px;
       border: 1px solid #342124;
-      margin-bottom: 10px;
+      margin-bottom: 8px;
+    }
+
+    .rec-gain-hint {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 7px 9px;
+      margin-bottom: 9px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.045);
+      border: 1px solid rgba(250, 204, 21, 0.34);
+      transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .rec-gain-hint.low-level {
+      background: rgba(245, 158, 11, 0.16);
+      border-color: rgba(250, 204, 21, 0.85);
+      box-shadow: 0 0 12px rgba(245, 158, 11, 0.22);
+    }
+
+    .rec-gain-hint-body {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .rec-gain-hint-text {
+      font-size: 10.5px;
+      line-height: 1.42;
+      color: #fde68a;
+    }
+
+    .rec-gain-hint.low-level .rec-gain-hint-text {
+      color: #fef08a;
+      font-weight: 700;
+    }
+
+    .rec-stereo-note {
+      font-size: 10px;
+      line-height: 1.35;
+      color: #93c5fd;
+    }
+
+    .rec-gain-jump-btn {
+      flex-shrink: 0;
+      height: 32px;
+      padding: 0 9px;
+      border-radius: 8px;
+      background: rgba(250, 204, 21, 0.18);
+      border: 1px solid rgba(250, 204, 21, 0.68);
+      color: #fef08a;
+      font-size: 11px;
+      font-weight: 800;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      white-space: nowrap;
+      transition: transform 0.08s ease, background-color 0.14s ease;
+    }
+
+    .rec-gain-jump-btn:active {
+      transform: scale(0.95);
+      background: rgba(250, 204, 21, 0.32);
+    }
+
+    .setting-focus-block {
+      margin-top: 10px;
+      padding: 8px;
+      margin-left: -8px;
+      margin-right: -8px;
+      border-radius: 11px;
+      border: 1.5px solid transparent;
+      transition: border-color 0.22s ease, background-color 0.22s ease, box-shadow 0.22s ease;
+    }
+
+    .setting-focus-block.is-focused {
+      background: rgba(250, 204, 21, 0.11);
+      border-color: #facc15;
+      box-shadow: 0 0 0 3px rgba(250, 204, 21, 0.22), 0 0 20px rgba(250, 204, 21, 0.28);
+      animation: settingFocusPulse 1.15s ease-in-out 3;
+    }
+
+    @keyframes settingFocusPulse {
+      0%, 100% {
+        border-color: #facc15;
+        box-shadow: 0 0 0 3px rgba(250, 204, 21, 0.22), 0 0 20px rgba(250, 204, 21, 0.28);
+      }
+      50% {
+        border-color: #fde047;
+        box-shadow: 0 0 0 5px rgba(250, 204, 21, 0.42), 0 0 26px rgba(245, 158, 11, 0.48);
+      }
+    }
+
+    .focus-target-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 1px 7px;
+      border-radius: 999px;
+      background: #facc15;
+      color: #111113;
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.2px;
+      flex-shrink: 0;
+    }
+
+    .rec-mid-gain-warn {
+      margin: 0 0 7px;
+      padding: 6px 8px;
+      border-radius: 8px;
+      background: rgba(245, 158, 11, 0.14);
+      border: 1px solid rgba(245, 158, 11, 0.5);
+      color: #fde68a;
+      font-size: 10.5px;
+      line-height: 1.45;
+      font-weight: 600;
     }
 
     .rec-controls {
@@ -3903,6 +4023,20 @@
           <div id="recMeterBar" class="rec-meter-bar"></div>
         </div>
         <canvas id="recLiveWaveCanvas"></canvas>
+        <div id="recGainHintBox" class="rec-gain-hint">
+          <div class="rec-gain-hint-body">
+            <div id="recGainHintText" class="rec-gain-hint-text">音量が小さい場合は設定で「入力ゲイン」を上げてください。録音途中も変更できますが、音量変化や操作音が入るためおすすめしません。</div>
+            <div id="recStereoStatusNote" class="rec-stereo-note hidden"></div>
+          </div>
+          <button id="btnRecOpenMicGain" type="button" class="rec-gain-jump-btn" title="設定画面のマイク録音感度（入力ゲイン）へ移動">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="4" y1="6" x2="20" y2="6"/><circle cx="9" cy="6" r="2" fill="currentColor"/>
+              <line x1="4" y1="12" x2="20" y2="12"/><circle cx="15" cy="12" r="2" fill="currentColor"/>
+              <line x1="4" y1="18" x2="20" y2="18"/><circle cx="10" cy="18" r="2" fill="currentColor"/>
+            </svg>
+            <span>感度設定へ</span>
+          </button>
+        </div>
         <div class="rec-controls">
           <button id="btnRecAddMarker" type="button" class="rec-add-marker-btn">
             <span>▼+ 録音中マーカー追加</span>
@@ -4307,20 +4441,24 @@
             <button type="button" data-boost="5" class="opt-pill boost-opt mono">500%</button>
           </div>
 
-          <div class="sec-head" style="margin-top:12px;">
-            <span class="sec-title-group">
-              <span class="sec-title">マイク録音感度（入力ゲイン）</span>
-              <button type="button" class="setting-help-btn" data-help-key="micGain" aria-label="マイク録音感度の説明">?</button>
-            </span>
-            <span id="modalMicGainVal" class="sec-value mono" style="color:#fca5a5;">1.0x (0dB・原音)</span>
-          </div>
-          <div class="sec-mini-hint">基本は 1x（自然なそのままの音）でOK。録った音が小さすぎるときだけ数字を上げます。</div>
-          <div class="opt-grid-5">
-            <button type="button" data-mic-gain="1" class="opt-pill mic-gain-opt active-red mono">1x</button>
-            <button type="button" data-mic-gain="1.5" class="opt-pill mic-gain-opt mono">1.5x</button>
-            <button type="button" data-mic-gain="2" class="opt-pill mic-gain-opt mono">2x</button>
-            <button type="button" data-mic-gain="4" class="opt-pill mic-gain-opt mono">4x</button>
-            <button type="button" data-mic-gain="6" class="opt-pill mic-gain-opt mono">6x</button>
+          <div id="settingBlockMicGain" class="setting-focus-block">
+            <div class="sec-head">
+              <span class="sec-title-group">
+                <span class="sec-title">マイク録音感度（入力ゲイン）</span>
+                <button type="button" class="setting-help-btn" data-help-key="micGain" aria-label="マイク録音感度の説明">?</button>
+                <span id="micGainFocusBadge" class="focus-target-badge hidden">ここを変更</span>
+              </span>
+              <span id="modalMicGainVal" class="sec-value mono" style="color:#fca5a5;">1.0x (0dB・原音)</span>
+            </div>
+            <div class="sec-mini-hint">基本は 1x（自然なそのままの音）でOK。録った音が小さすぎるときだけ数字を上げます。</div>
+            <div id="recMidGainWarn" class="rec-mid-gain-warn hidden">⚠ 録音中です：ここを変えると今すぐ反映されますが、音量段差や操作音が入るため録音前の変更をおすすめします。</div>
+            <div class="opt-grid-5">
+              <button type="button" data-mic-gain="1" class="opt-pill mic-gain-opt active-red mono">1x</button>
+              <button type="button" data-mic-gain="1.5" class="opt-pill mic-gain-opt mono">1.5x</button>
+              <button type="button" data-mic-gain="2" class="opt-pill mic-gain-opt mono">2x</button>
+              <button type="button" data-mic-gain="4" class="opt-pill mic-gain-opt mono">4x</button>
+              <button type="button" data-mic-gain="6" class="opt-pill mic-gain-opt mono">6x</button>
+            </div>
           </div>
 
           <div class="sec-head" style="margin-top:12px;">
@@ -4389,7 +4527,7 @@
         <div class="modal-section" style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
           <div>
             <div class="sec-title">バージョン情報</div>
-            <div id="settingsVersionLabel" class="engine-desc mono">現在: v33</div>
+            <div id="settingsVersionLabel" class="engine-desc mono">現在: v34</div>
           </div>
           <button id="btnShowReleaseHistory" type="button" class="step-btn" style="color:#93c5fd;border-color:rgba(66,165,245,0.45);">更新履歴を見る</button>
         </div>
@@ -4546,7 +4684,7 @@
           </div>
           <div>
             <h3 id="whatsNewTitle" class="whats-new-title">アップデートのお知らせ</h3>
-            <p id="whatsNewSub" class="whats-new-sub mono">v33 に更新されました</p>
+            <p id="whatsNewSub" class="whats-new-sub mono">v34 に更新されました</p>
           </div>
         </div>
         <button id="btnCloseWhatsNewX" type="button" class="modal-close" aria-label="閉じる">✕</button>
@@ -4807,6 +4945,13 @@
       const recMarkerCountBadge = document.getElementById('recMarkerCountBadge');
       const recLiveGainLabel = document.getElementById('recLiveGainLabel');
       const recLiveSpecLabel = document.getElementById('recLiveSpecLabel');
+      const recGainHintBox = document.getElementById('recGainHintBox');
+      const recGainHintText = document.getElementById('recGainHintText');
+      const recStereoStatusNote = document.getElementById('recStereoStatusNote');
+      const btnRecOpenMicGain = document.getElementById('btnRecOpenMicGain');
+      const settingBlockMicGain = document.getElementById('settingBlockMicGain');
+      const micGainFocusBadge = document.getElementById('micGainFocusBadge');
+      const recMidGainWarn = document.getElementById('recMidGainWarn');
       const selectMicDevice = document.getElementById('selectMicDevice');
 
       const btnWaveGainQuick = document.getElementById('btnWaveGainQuick');
@@ -5033,7 +5178,10 @@
         recSampleRate: 48000,
         recStartPerf: 0,
         recPendingMarkers: [],
-        recAnimId: null
+        recAnimId: null,
+        recLastDecentLevelPerf: 0,
+        recLowLevelAlertActive: false,
+        recHasTrueStereoDiff: false
       };
 
       // ==================== UTILITIES ====================
@@ -6374,6 +6522,13 @@
         recLiveGainLabel.textContent = `${clamped.toFixed(1)}x`;
         if (audioCtx && state.recGainNode) {
           state.recGainNode.gain.setTargetAtTime(clamped, audioCtx.currentTime, 0.02);
+        }
+        if (state.isRecording && state.recWorkletNode) {
+          try {
+            state.recWorkletNode.port.postMessage({
+              softLimit: clamped > 1.01 && !state.recLimiterNode
+            });
+          } catch (_) {}
         }
         document.querySelectorAll('.mic-gain-opt').forEach(btn => {
           btn.classList.toggle('active-red', Math.abs(parseFloat(btn.dataset.micGain) - clamped) < 0.05);
@@ -10337,6 +10492,9 @@
             this._bufL = new Float32Array(this._bufSize);
             this._bufR = new Float32Array(this._bufSize);
             this._hasStereo = false;
+            this._reportedCh = 0;
+            this._reportedStereoDiff = false;
+            this._softLimit = false;
             this._stopped = false;
             this.port.onmessage = (e) => {
               if (e.data === 'flush') {
@@ -10348,8 +10506,19 @@
                   this._pos = 0;
                 }
                 this.port.postMessage({ done: true });
+              } else if (e.data && typeof e.data === 'object' && typeof e.data.softLimit === 'boolean') {
+                this._softLimit = e.data.softLimit;
               }
             };
+          }
+          _limitSample(x) {
+            const ax = x < 0 ? -x : x;
+            if (ax <= 0.88) return x;
+            const s = x < 0 ? -1 : 1;
+            const excess = (ax - 0.88) / 0.115;
+            // Smooth tanh-like soft saturation above 0.88 so mid-recording gain bumps never hard-clip
+            const k = excess / (1 + excess);
+            return s * (0.88 + 0.115 * k);
           }
           process(inputs) {
             if (this._stopped) return false;
@@ -10357,15 +10526,49 @@
             if (!input || input.length === 0) return true;
             const inL = input[0];
             const inR = input.length > 1 ? input[1] : null;
-            if (inR) this._hasStereo = true;
+            if (inR && !this._hasStereo) {
+              this._hasStereo = true;
+              if (this._pos > 0) {
+                this._bufR.set(this._bufL.subarray(0, this._pos), 0);
+              }
+            }
+            const curCh = inR ? 2 : 1;
+            if (curCh !== this._reportedCh) {
+              this._reportedCh = curCh;
+              this.port.postMessage({ meta: true, channels: curCh, stereoDiff: this._reportedStereoDiff });
+            }
             const n = inL.length;
+            if (inR && !this._reportedStereoDiff) {
+              for (let i = 0; i < n; i += 4) {
+                const d = inL[i] - inR[i];
+                if (d > 1e-5 || d < -1e-5) {
+                  this._reportedStereoDiff = true;
+                  this.port.postMessage({ meta: true, channels: 2, stereoDiff: true });
+                  break;
+                }
+              }
+            }
             let offset = 0;
             while (offset < n) {
               const space = this._bufSize - this._pos;
               const take = Math.min(space, n - offset);
-              this._bufL.set(inL.subarray(offset, offset + take), this._pos);
-              if (inR) {
-                this._bufR.set(inR.subarray(offset, offset + take), this._pos);
+              if (this._softLimit) {
+                for (let i = 0; i < take; i++) {
+                  const vL = this._limitSample(inL[offset + i]);
+                  this._bufL[this._pos + i] = vL;
+                  if (this._hasStereo) {
+                    this._bufR[this._pos + i] = inR ? this._limitSample(inR[offset + i]) : vL;
+                  }
+                }
+              } else {
+                this._bufL.set(inL.subarray(offset, offset + take), this._pos);
+                if (this._hasStereo) {
+                  if (inR) {
+                    this._bufR.set(inR.subarray(offset, offset + take), this._pos);
+                  } else {
+                    this._bufR.set(inL.subarray(offset, offset + take), this._pos);
+                  }
+                }
               }
               this._pos += take;
               offset += take;
@@ -10400,6 +10603,35 @@
         }
       }
 
+      function updateRecLiveSpecBadge(chCount, stereoDeniedByOs = false) {
+        const khz = (state.recSampleRate / 1000).toFixed(1).replace(/\.0$/, '');
+        const chLabel = chCount >= 2 ? 'ステレオ' : 'モノラル';
+        const bitLabel = `${state.recBitDepth}bit`;
+        if (recLiveSpecLabel) {
+          recLiveSpecLabel.textContent = `${khz}kHz・${bitLabel}・${chLabel}`;
+        }
+        if (recStereoStatusNote) {
+          if (chCount >= 2) {
+            recStereoStatusNote.classList.add('hidden');
+            recStereoStatusNote.textContent = '';
+          } else if (stereoDeniedByOs) {
+            recStereoStatusNote.textContent = '※端末/Chromeの内蔵マイク仕様により1chモノラル入力中です（USB外部ステレオマイク接続時はステレオ録音可）';
+            recStereoStatusNote.classList.remove('hidden');
+          }
+        }
+      }
+
+      function updateRecGainHintUI(isLowLevel) {
+        if (!recGainHintBox || !recGainHintText) return;
+        state.recLowLevelAlertActive = Boolean(isLowLevel);
+        recGainHintBox.classList.toggle('low-level', state.recLowLevelAlertActive);
+        if (state.recLowLevelAlertActive) {
+          recGainHintText.textContent = '⚠ 音量が小さめです：設定で「入力ゲイン」を上げてください（録音途中も変更できますが、音量変化や操作音が入るためおすすめしません）';
+        } else {
+          recGainHintText.textContent = '音量が小さい場合は設定で「入力ゲイン」を上げてください。録音途中も変更できますが、音量変化や操作音が入るためおすすめしません。';
+        }
+      }
+
       async function startRecording() {
         if (state.isRecording) return;
         try {
@@ -10407,59 +10639,144 @@
           if (state.isPlaying) pausePlayback();
           initAudioGraph();
 
-          // Request raw unprocessed high-res stereo audio (disables voice isolation, AEC, AGC, NS)
-          const rawAudioConstraints = {
-            echoCancellation: false,
-            noiseSuppression: false,
-            autoGainControl: false,
-            voiceIsolation: false,
-            channelCount: { ideal: 2 },
-            sampleRate: { ideal: 48000 },
-            sampleSize: { ideal: 24 }
-          };
-          if (state.micDeviceId) {
-            rawAudioConstraints.deviceId = { ideal: state.micDeviceId };
-          }
+          const supported = (navigator.mediaDevices && navigator.mediaDevices.getSupportedConstraints)
+            ? navigator.mediaDevices.getSupportedConstraints()
+            : {};
 
-          let stream;
-          try {
-            stream = await navigator.mediaDevices.getUserMedia({ audio: rawAudioConstraints });
-          } catch (_) {
-            try {
-              const basicRaw = {
-                echoCancellation: false,
-                noiseSuppression: false,
-                autoGainControl: false,
-                channelCount: { ideal: 2 }
-              };
-              if (state.micDeviceId) basicRaw.deviceId = { ideal: state.micDeviceId };
-              stream = await navigator.mediaDevices.getUserMedia({ audio: basicRaw });
-            } catch (__) {
-              stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+          // Build strict stereo-first raw unprocessed constraints (only include browser-supported keys so Chrome never rejects!)
+          const makeRawAudioConstraints = (channelConstraint, deviceIdOpt = state.micDeviceId, includeOptional = true) => {
+            const c = {
+              echoCancellation: false,
+              noiseSuppression: false,
+              autoGainControl: false,
+              googEchoCancellation: false,
+              googAutoGainControl: false,
+              googNoiseSuppression: false,
+              googHighpassFilter: false
+            };
+            if (channelConstraint) c.channelCount = channelConstraint;
+            if (includeOptional) {
+              if (supported.voiceIsolation) c.voiceIsolation = false;
+              if (supported.sampleRate) c.sampleRate = { ideal: 48000 };
+              if (supported.latency) c.latency = { ideal: 0.01 };
             }
+            if (deviceIdOpt) {
+              c.deviceId = { ideal: deviceIdOpt };
+            }
+            return c;
+          };
+
+          let stream = null;
+          let stereoExplicitSucceeded = false;
+
+          // Tier 1: Strict 2ch stereo + raw unprocessed (forces Android Chrome to open stereo capture when supported)
+          const attempts = [
+            { cfg: makeRawAudioConstraints({ exact: 2 }, state.micDeviceId, true), strictStereo: true },
+            { cfg: makeRawAudioConstraints({ exact: 2 }, state.micDeviceId, false), strictStereo: true },
+            { cfg: makeRawAudioConstraints({ min: 2, ideal: 2 }, state.micDeviceId, false), strictStereo: true },
+            { cfg: makeRawAudioConstraints({ ideal: 2 }, state.micDeviceId, true), strictStereo: false },
+            { cfg: makeRawAudioConstraints(null, state.micDeviceId, false), strictStereo: false },
+            { cfg: true, strictStereo: false }
+          ];
+
+          for (let i = 0; i < attempts.length; i++) {
+            try {
+              stream = await navigator.mediaDevices.getUserMedia({ audio: attempts[i].cfg });
+              stereoExplicitSucceeded = attempts[i].strictStereo;
+              break;
+            } catch (_) {}
+          }
+          if (!stream) {
+            throw new Error('getUserMedia failed');
           }
 
           // Refresh device labels now that mic permission is granted
-          refreshMicDeviceList();
+          await refreshMicDeviceList();
 
-          const track = stream.getAudioTracks()[0];
-          const trackSettings = (track && track.getSettings) ? track.getSettings() : {};
-          const actualCh = Math.min(2, Math.max(1, trackSettings.channelCount || 1));
+          let track = stream.getAudioTracks()[0];
+          let trackSettings = (track && track.getSettings) ? track.getSettings() : {};
+
+          // If channelCount is still 1 (or undefined), try upgrading the active track via applyConstraints
+          if (track && track.applyConstraints && trackSettings.channelCount !== 2) {
+            try {
+              await track.applyConstraints({
+                channelCount: { exact: 2 },
+                echoCancellation: false,
+                noiseSuppression: false,
+                autoGainControl: false
+              });
+              trackSettings = track.getSettings ? track.getSettings() : trackSettings;
+              if (trackSettings.channelCount >= 2) stereoExplicitSucceeded = true;
+            } catch (_) {}
+          }
+
+          // If auto-mic mode is active and default mic was forced to 1ch, probe other non-BT audio inputs for a stereo-capable mic
+          if (!state.micDeviceId && (!trackSettings.channelCount || trackSettings.channelCount < 2) && navigator.mediaDevices.enumerateDevices) {
+            try {
+              const allDevs = await navigator.mediaDevices.enumerateDevices();
+              const altInputs = allDevs.filter(d =>
+                d.kind === 'audioinput' &&
+                d.deviceId &&
+                d.deviceId !== 'default' &&
+                d.deviceId !== 'communications' &&
+                d.deviceId !== trackSettings.deviceId &&
+                !/bluetooth|hands-?free|headset|earpiece|telephony/i.test(d.label || '')
+              );
+              for (const dev of altInputs) {
+                try {
+                  const probeStream = await navigator.mediaDevices.getUserMedia({
+                    audio: {
+                      deviceId: { exact: dev.deviceId },
+                      channelCount: { exact: 2 },
+                      echoCancellation: false,
+                      noiseSuppression: false,
+                      autoGainControl: false
+                    }
+                  });
+                  const pTrack = probeStream.getAudioTracks()[0];
+                  const pSet = (pTrack && pTrack.getSettings) ? pTrack.getSettings() : {};
+                  if (pSet.channelCount >= 2) {
+                    stream.getTracks().forEach(t => t.stop());
+                    stream = probeStream;
+                    track = pTrack;
+                    trackSettings = pSet;
+                    stereoExplicitSucceeded = true;
+                    break;
+                  } else {
+                    probeStream.getTracks().forEach(t => t.stop());
+                  }
+                } catch (_) {}
+              }
+            } catch (_) {}
+          }
+
+          const src = audioCtx.createMediaStreamSource(stream);
+          src.channelCountMode = 'max';
+          src.channelInterpretation = 'discrete';
+
+          const reportedCh = Number(trackSettings.channelCount) || Number(src.channelCount) || 1;
+          const actualCh = Math.min(2, Math.max(1, reportedCh));
+          const stereoDeniedByOs = actualCh < 2 && !stereoExplicitSucceeded;
 
           state.isRecording = true;
           state.recStream = stream;
           state.recBuffersL = [];
           state.recBuffersR = [];
           state.recChannelCount = actualCh;
+          state.recHasTrueStereoDiff = false;
           state.recPendingMarkers = [];
           state.recSampleRate = audioCtx.sampleRate;
           state.recStartPerf = performance.now();
+          state.recLastDecentLevelPerf = state.recStartPerf;
+          state.recLowLevelAlertActive = false;
 
-          const src = audioCtx.createMediaStreamSource(stream);
           const useDirectUncompressed = state.micGain <= 1.01;
 
           const gainNode = audioCtx.createGain();
           gainNode.gain.value = state.micGain;
+          gainNode.channelCount = 2;
+          gainNode.channelCountMode = 'max';
+          gainNode.channelInterpretation = 'discrete';
 
           // Only engage soft clip-guard limiter if gain boost > 1.0x (1.0x = 100% pure untouched signal!)
           let limiter = null;
@@ -10467,6 +10784,8 @@
 
           if (!useDirectUncompressed) {
             limiter = audioCtx.createDynamicsCompressor();
+            limiter.channelCount = 2;
+            limiter.channelCountMode = 'clamped-max';
             limiter.threshold.value = -1.0;
             limiter.knee.value = 3.0;
             limiter.ratio.value = 16.0;
@@ -10487,7 +10806,7 @@
           const silentGain = audioCtx.createGain();
           silentGain.gain.value = 0;
 
-          // Prefer dedicated real-time thread AudioWorkletNode (zero UI-thread clicks/dropouts!)
+          // Prefer dedicated real-time thread AudioWorkletNode with channelCountMode:'max' so 2ch stereo is NEVER downmixed!
           const workletOk = await ensureRecWorkletLoaded();
           let workletNode = null;
           let processor = null;
@@ -10496,13 +10815,20 @@
             workletNode = new AudioWorkletNode(audioCtx, 'raw-pcm-recorder-processor', {
               numberOfInputs: 1,
               numberOfOutputs: 1,
-              channelCount: actualCh,
-              channelCountMode: 'explicit',
-              channelInterpretation: 'speakers'
+              channelCount: 2,
+              channelCountMode: 'max',
+              channelInterpretation: 'discrete'
             });
             workletNode.port.onmessage = (ev) => {
               const d = ev.data;
               if (!d || d.done) return;
+              if (d.meta) {
+                const liveCh = d.channels >= 2 ? 2 : 1;
+                state.recChannelCount = liveCh;
+                if (d.stereoDiff) state.recHasTrueStereoDiff = true;
+                updateRecLiveSpecBadge(liveCh, liveCh < 2);
+                return;
+              }
               if (d.l) state.recBuffersL.push(d.l);
               if (d.stereo && d.r) {
                 state.recChannelCount = 2;
@@ -10513,7 +10839,9 @@
             workletNode.connect(silentGain);
             silentGain.connect(audioCtx.destination);
           } else {
-            processor = audioCtx.createScriptProcessor(4096, actualCh, 1);
+            // ScriptProcessorNode fallback: request 2ch when stream reports >=2ch, otherwise actualCh
+            const spCh = actualCh >= 2 ? 2 : 1;
+            processor = audioCtx.createScriptProcessor(4096, spCh, 1);
             processor.onaudioprocess = (ev) => {
               if (!state.isRecording) return;
               const inL = ev.inputBuffer.getChannelData(0);
@@ -10536,12 +10864,9 @@
           state.recProcessor = processor;
           state.recSilentGain = silentGain;
 
-          const khz = (state.recSampleRate / 1000).toFixed(1).replace(/\.0$/, '');
-          const chLabel = actualCh >= 2 ? 'ステレオ' : 'モノラル';
-          const bitLabel = `${state.recBitDepth}bit`;
-          if (recLiveSpecLabel) {
-            recLiveSpecLabel.textContent = `${khz}kHz・${bitLabel}・${chLabel}`;
-          }
+          updateRecLiveSpecBadge(actualCh, stereoDeniedByOs);
+          updateRecGainHintUI(false);
+          if (recMidGainWarn) recMidGainWarn.classList.remove('hidden');
 
           startupOverlay.classList.add('hidden');
           recOverlay.classList.remove('hidden');
@@ -10551,6 +10876,9 @@
           recLiveGainLabel.textContent = `${state.micGain.toFixed(1)}x`;
 
           renderLiveRecordingLoop();
+          const khz = (state.recSampleRate / 1000).toFixed(1).replace(/\.0$/, '');
+          const chLabel = actualCh >= 2 ? 'ステレオ' : 'モノラル';
+          const bitLabel = `${state.recBitDepth}bit`;
           const modeNote = useDirectUncompressed ? '原音ダイレクト' : `ゲイン ${state.micGain.toFixed(1)}x`;
           showToast(`PCM録音開始（${khz}kHz ${bitLabel} ${chLabel}・${modeNote}）`);
         } catch (err) {
@@ -10579,7 +10907,24 @@
             sumSq += v * v;
           }
           const rms = Math.sqrt(sumSq / bufLen);
-          recMeterBar.style.width = `${Math.min(100, Math.round(rms * 320))}%`;
+          const meterPct = Math.min(100, Math.round(rms * 320));
+          recMeterBar.style.width = `${meterPct}%`;
+
+          const nowPerf = performance.now();
+          if (rms >= 0.032) {
+            state.recLastDecentLevelPerf = nowPerf;
+            if (state.recLowLevelAlertActive) {
+              updateRecGainHintUI(false);
+            }
+          } else if (
+            state.micGain < 5.9 &&
+            (nowPerf - state.recStartPerf) >= 2600 &&
+            (nowPerf - state.recLastDecentLevelPerf) >= 2600
+          ) {
+            if (!state.recLowLevelAlertActive) {
+              updateRecGainHintUI(true);
+            }
+          }
 
           const dpr = window.devicePixelRatio || 1;
           const rect = recLiveWaveCanvas.getBoundingClientRect();
@@ -10649,7 +10994,17 @@
 
         const chunksL = state.recBuffersL;
         const chunksR = state.recBuffersR;
-        const isStereo = chunksR.length === chunksL.length && chunksR.length > 0;
+        const isStereo = chunksR.length > 0 && chunksL.length > 0;
+        if (isStereo && chunksR.length < chunksL.length) {
+          // Align any early mono warm-up blocks cleanly so L/R lengths always match 100%
+          const padCount = chunksL.length - chunksR.length;
+          for (let p = padCount - 1; p >= 0; p--) {
+            chunksR.unshift(new Float32Array(chunksL[p]));
+          }
+        }
+        if (recMidGainWarn) recMidGainWarn.classList.add('hidden');
+        if (recStereoStatusNote) recStereoStatusNote.classList.add('hidden');
+        updateRecGainHintUI(false);
         const sr = state.recSampleRate;
         const capturedMarkers = cloneMarkerList(state.recPendingMarkers);
 
@@ -14883,7 +15238,31 @@
         });
       }
 
-      function openSettingsModal(initialTab = 'settings') {
+      function clearSettingsFocusHighlights() {
+        if (settingBlockMicGain) settingBlockMicGain.classList.remove('is-focused');
+        if (micGainFocusBadge) micGainFocusBadge.classList.add('hidden');
+      }
+
+      function focusSettingBlock(targetKey) {
+        clearSettingsFocusHighlights();
+        if (targetKey === 'micGain' && settingBlockMicGain) {
+          // Force reflow so keyframe animation replays cleanly on repeated jumps
+          void settingBlockMicGain.offsetWidth;
+          settingBlockMicGain.classList.add('is-focused');
+          if (micGainFocusBadge) micGainFocusBadge.classList.remove('hidden');
+          requestAnimationFrame(() => {
+            setTimeout(() => {
+              try {
+                settingBlockMicGain.scrollIntoView({ behavior: 'smooth', block: 'center' });
+              } catch (_) {
+                settingBlockMicGain.scrollIntoView();
+              }
+            }, 40);
+          });
+        }
+      }
+
+      function openSettingsModal(initialTab = 'settings', opts = {}) {
         document.getElementById('inputTrackName').value = trackTitleEl.textContent.trim();
         document.getElementById('speedSlider').value = state.playbackRate;
         document.getElementById('modalSpeedVal').textContent = `${state.playbackRate.toFixed(2)}x`;
@@ -14892,12 +15271,14 @@
         applyMasterBoost();
         setMicGain(state.micGain);
         updateRecSettingsUI();
+        if (recMidGainWarn) recMidGainWarn.classList.toggle('hidden', !state.isRecording);
         refreshMicDeviceList();
         updateLowpassFilter();
         updateMemoryCountBadge();
         renderMarkerList();
         renderPlaylist();
         switchModalTab(initialTab);
+        clearSettingsFocusHighlights();
         settingsModal.classList.remove('hidden');
         updateAppUpdateButtonUI();
         if (!appUpdateState.available) {
@@ -14905,6 +15286,8 @@
         }
         if (initialTab === 'markers') {
           scrollActiveMarkerIntoView();
+        } else if (initialTab === 'settings' && opts && opts.focusSection) {
+          focusSettingBlock(opts.focusSection);
         }
       }
 
@@ -15104,6 +15487,7 @@
       });
       document.getElementById('btnRecStop').addEventListener('click', stopRecording);
       document.getElementById('btnRecAddMarker').addEventListener('click', addMarkerDuringRecording);
+      btnRecOpenMicGain.addEventListener('click', () => openSettingsModal('settings', { focusSection: 'micGain' }));
       btnSaveWav.addEventListener('click', () => openSaveExportModal('save'));
       btnShareAudio.addEventListener('click', () => openSaveExportModal('share'));
 
@@ -15195,11 +15579,22 @@
       document.addEventListener('webkitfullscreenchange', onFullscreenStateChanged);
 
       // ==================== GITHUB / PWA SOFTWARE UPDATE CHECK & APPLY ====================
-      const APP_VERSION = 'v33';
+      const APP_VERSION = 'v34';
 
       // Ordered newest-first; each release appends a new object at the top.
       // Users who skip multiple versions automatically see ALL unseen versions between lastSeen and current.
       const APP_RELEASE_NOTES = [
+        {
+          version: 'v34',
+          verNum: 34,
+          date: '2026/11/23',
+          title: '録音画面のゲイン案内・設定ジャンプハイライトとステレオ録音処理を強化',
+          items: [
+            '録音画面に「音量が小さい場合は入力ゲインを上げてください（録音途中も変更可・ただし操作音や段差が入るため非推奨）」の案内と、音量が小さいときの自動強調表示を追加しました',
+            '録音画面から「感度設定へ」ボタンで設定画面へ直接ジャンプでき、変更すべき「マイク録音感度（入力ゲイン）」枠へ自動スクロールして黄色ハイライト枠＋「ここを変更」バッジで強調表示します',
+            'ステレオ録音を改善：厳密な2ch要求（exact: 2）＋対応制約チェック＋非ダウンミックス AudioWorklet（channelCountMode: max）へ修正し、録音中にゲインを上げた際の音割れ防止ソフトリミッターも追加しました'
+          ]
+        },
         {
           version: 'v33',
           verNum: 33,
@@ -16281,6 +16676,7 @@
           }
           saveCurrentFileMemory(true);
         }
+        clearSettingsFocusHighlights();
         settingsModal.classList.add('hidden');
       };
       document.getElementById('btnCloseSettings').addEventListener('click', closeModal);
@@ -16345,6 +16741,9 @@
         btn.addEventListener('click', () => {
           setMicGain(btn.dataset.micGain);
           saveAppPrefs();
+          if (state.isRecording) {
+            showToast(`録音中の入力ゲインを ${state.micGain.toFixed(1)}x に変更しました`);
+          }
         });
       });
 
