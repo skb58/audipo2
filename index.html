@@ -8,7 +8,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="Audipo2">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="app-version" content="v34">
+  <meta name="app-version" content="v35">
   <link rel="manifest" href="./manifest.json">
   <title>Audipo風 練習プレイヤー＆レコーダー</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='bg' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%231b2030'/%3E%3Cstop offset='100%25' stop-color='%230d0f15'/%3E%3C/linearGradient%3E%3ClinearGradient id='wv' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0%25' stop-color='%2360c5ff'/%3E%3Cstop offset='100%25' stop-color='%232563eb'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='url(%23bg)'/%3E%3Crect x='1' y='1' width='62' height='62' rx='15' fill='none' stroke='%233b82f6' stroke-opacity='0.3' stroke-width='2'/%3E%3Cg fill='url(%23wv)'%3E%3Crect x='10' y='28' width='4.5' height='12' rx='2.25' opacity='0.6'/%3E%3Crect x='18' y='22' width='4.5' height='24' rx='2.25' opacity='0.85'/%3E%3Crect x='26' y='15' width='4.5' height='36' rx='2.25'/%3E%3Crect x='34' y='21' width='4.5' height='25' rx='2.25' opacity='0.9'/%3E%3Crect x='42' y='26' width='4.5' height='16' rx='2.25' opacity='0.75'/%3E%3Crect x='50' y='30' width='4.5' height='9' rx='2.25' opacity='0.5'/%3E%3C/g%3E%3Cpath d='M36.25 10.5c0-1.4 1.1-2.5 2.5-2.5h5.5c1.4 0 2.5 1.1 2.5 2.5v2.4c0 .8-.3 1.5-.9 2.1l-3.2 3.1c-.6.6-1.6.6-2.2 0l-3.2-3.1c-.6-.6-.9-1.3-.9-2.1v-2.4z' fill='%23facc15'/%3E%3C/svg%3E">
@@ -2029,6 +2029,12 @@
       color: #93c5fd;
     }
 
+    .pill-engine.low-mem {
+      background: rgba(161, 161, 170, 0.14);
+      border-color: rgba(161, 161, 170, 0.45);
+      color: #d4d4d8;
+    }
+
     .status-right {
       display: flex;
       align-items: center;
@@ -2582,6 +2588,12 @@
       gap: 6px;
     }
 
+    .opt-grid-4 {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 5px;
+    }
+
     .opt-pill {
       height: 32px;
       border-radius: 8px;
@@ -2593,6 +2605,12 @@
       display: flex;
       align-items: center;
       justify-content: center;
+    }
+
+    .opt-pill.active-blue {
+      background: var(--accent-blue-bg);
+      border-color: var(--accent-blue);
+      color: #93c5fd;
     }
 
     .opt-pill.active-green {
@@ -4074,7 +4092,7 @@
         <span id="currentTimeText">0:00</span><span class="slash">/</span><span id="totalTimeText" class="total">0:00</span>
       </div>
       <button id="btnBoostQuick" type="button" class="status-pill pill-boost mono" title="再生音量ブースト切替">音量:自動</button>
-      <button id="btnEngineQuick" type="button" class="status-pill pill-engine" title="スロー再生エンジン切替 (ボコーダ/OS標準/テープ)">ボコーダ</button>
+      <button id="btnEngineQuick" type="button" class="status-pill pill-engine" title="スロー再生の質感（ボコーダー加減）を切替">スロー:標準</button>
     </div>
 
     <div class="status-right">
@@ -4361,39 +4379,44 @@
           </div>
         </div>
 
-        <!-- Slow-down Audio Engine Selector -->
+        <!-- Slow-down Vocoder Tone & High-Freq Smoothing -->
         <div class="modal-section">
           <div class="sec-head">
             <span class="sec-title-group">
-              <span class="sec-title">スロー再生エンジン（再生中も切替可）</span>
-              <button type="button" class="setting-help-btn" data-help-key="engine" aria-label="スロー再生エンジンの説明">?</button>
+              <span class="sec-title">スロー再生の質感（ボコーダー加減）</span>
+              <button type="button" class="setting-help-btn" data-help-key="vocoderTone" aria-label="ボコーダー加減の説明">?</button>
             </span>
+            <span id="modalVocoderToneVal" class="sec-value">標準</span>
           </div>
+          <div class="sec-mini-hint">1.00x・原曲キー時はボコーダーを完全バイパス（原音そのまま）。大容量ファイル時のみ一時的に省メモリ再生し、通常曲や録音へ戻ると自動でボコーダーに復帰します。</div>
 
-          <button id="btnEngVocoder" type="button" class="engine-card active">
-            <div class="engine-name">● ボコーダ（同一位相ロック・ロボット声対策 / 標準）</div>
-            <div class="engine-desc">1.00x・原曲キー時はDSPを通さず原音そのままダイレクト再生。速度・ピッチ変更時のみ位相ロック・フェーズボコーダで高音質スロー再生します。</div>
+          <button type="button" data-vocoder-tone="crisp" class="engine-card vocoder-tone-card">
+            <div class="engine-name">○ くっきり（アタック重視）</div>
+            <div class="engine-desc">音の立ち上がりで位相を揃え、タンギングやリズムの輪郭をくっきり保ちます。</div>
           </button>
 
-          <button id="btnEngNative" type="button" class="engine-card">
-            <div class="engine-name">○ OS標準（端末内蔵ストレッチ）</div>
-            <div class="engine-desc">ブラウザ/OS標準の音程維持再生を使用します。省電力再生や超大容量ファイル向けです。</div>
+          <button type="button" data-vocoder-tone="balanced" class="engine-card vocoder-tone-card active">
+            <div class="engine-name">● 標準（バランス・おすすめ）</div>
+            <div class="engine-desc">音の輪郭と響きの自然さを両立する標準設定。普段のスロー練習全般に向いています。</div>
           </button>
 
-          <button id="btnEngTape" type="button" class="engine-card">
-            <div class="engine-name">○ テープ再生（音程連動・DSP加工ゼロ）</div>
-            <div class="engine-desc">純粋な可変速リサンプリング再生です。速度に合わせて音程も変わりますが、タイムストレッチ由来のデジタルノイズが原理上0%になります。</div>
+          <button type="button" data-vocoder-tone="smooth" class="engine-card vocoder-tone-card">
+            <div class="engine-name">○ なめらか（響き重視）</div>
+            <div class="engine-desc">広い帯域を滑らかに位相ロックし、伸ばす音やホールの残響のうねり・金属音を抑えます。</div>
           </button>
 
-          <div class="toggle-row">
-            <div>
-              <div class="sec-title-group">
-                <span class="sec-title">高域スムージングフィルター</span>
-                <button type="button" class="setting-help-btn" data-help-key="lpf" aria-label="高域スムージングフィルターの説明">?</button>
-              </div>
-              <div id="lpfStatusText" class="engine-desc mono">速度連動ローパス (現在: 18.0kHz)</div>
-            </div>
-            <button id="btnToggleLpf" type="button" class="toggle-pill on">ON</button>
+          <div class="sec-head" style="margin-top:12px;">
+            <span class="sec-title-group">
+              <span class="sec-title">高域スムージング（ロボット声・金属音対策）</span>
+              <button type="button" class="setting-help-btn" data-help-key="lpf" aria-label="高域スムージングの説明">?</button>
+            </span>
+            <span id="lpfStatusText" class="sec-value mono" style="color:#86efac;">標準</span>
+          </div>
+          <div class="opt-grid-4">
+            <button type="button" data-lpf-level="off" class="opt-pill lpf-level-opt">OFF</button>
+            <button type="button" data-lpf-level="light" class="opt-pill lpf-level-opt">弱</button>
+            <button type="button" data-lpf-level="normal" class="opt-pill lpf-level-opt active-blue">標準</button>
+            <button type="button" data-lpf-level="strong" class="opt-pill lpf-level-opt">強</button>
           </div>
         </div>
 
@@ -4527,7 +4550,7 @@
         <div class="modal-section" style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
           <div>
             <div class="sec-title">バージョン情報</div>
-            <div id="settingsVersionLabel" class="engine-desc mono">現在: v34</div>
+            <div id="settingsVersionLabel" class="engine-desc mono">現在: v35</div>
           </div>
           <button id="btnShowReleaseHistory" type="button" class="step-btn" style="color:#93c5fd;border-color:rgba(66,165,245,0.45);">更新履歴を見る</button>
         </div>
@@ -4684,7 +4707,7 @@
           </div>
           <div>
             <h3 id="whatsNewTitle" class="whats-new-title">アップデートのお知らせ</h3>
-            <p id="whatsNewSub" class="whats-new-sub mono">v34 に更新されました</p>
+            <p id="whatsNewSub" class="whats-new-sub mono">v35 に更新されました</p>
           </div>
         </div>
         <button id="btnCloseWhatsNewX" type="button" class="modal-close" aria-label="閉じる">✕</button>
@@ -5063,8 +5086,8 @@
         currentTime: 0,
         playbackRate: 1.0,
         pitchSemitones: 0,
-        engine: 'vocoder', // 'vocoder' | 'native' | 'tape'
-        lpfEnabled: true,
+        vocoderTone: 'balanced', // 'crisp' | 'balanced' | 'smooth'
+        lpfLevel: 'normal', // 'off' | 'light' | 'normal' | 'strong'
 
         // Track order mode & independent A-B section repeat toggle
         orderMode: 'stop', // 'loop1' | 'loopAll' | 'stop' | 'shuffle'
@@ -5246,14 +5269,14 @@
       }
 
       // Strictly mutually-exclusive active playback path:
-      //  - 'audioEl':      OS native <audio> element (native engine, large streamed WAV, or while PCM is decoding)
-      //  - 'bufferDirect': Native AudioBufferSourceNode (1.00x/±0 lossless passthrough OR tape variable-speed mode)
-      //  - 'vocoderDsp':   Identity phase-locked Phase Vocoder (only when speed != 1.00x or pitch != 0)
+      //  - 'audioEl':      Temporary low-memory OS playback (only while a huge file is open or PCM is still decoding)
+      //  - 'bufferDirect': Native AudioBufferSourceNode (1.00x / ±0 lossless direct passthrough, zero DSP)
+      //  - 'vocoderDsp':   Phase-locked Phase Vocoder (automatically used whenever speed != 1.00x or pitch != 0)
       function getActivePlaybackPath() {
-        if (!state.audioBuffer || state.isFallbackLargeFile || state.engine === 'native') {
+        if (!state.audioBuffer || state.isFallbackLargeFile) {
           return 'audioEl';
         }
-        if (state.engine === 'tape' || (state.engine === 'vocoder' && isDirectPassthrough())) {
+        if (isDirectPassthrough()) {
           return 'bufferDirect';
         }
         return 'vocoderDsp';
@@ -5543,8 +5566,8 @@
       function saveAppPrefs() {
         try {
           localStorage.setItem(LS_APP_PREFS_KEY, JSON.stringify({
-            engine: state.engine,
-            lpfEnabled: state.lpfEnabled,
+            vocoderTone: state.vocoderTone,
+            lpfLevel: state.lpfLevel,
             orderMode: state.orderMode,
             waveGainMode: state.waveGainMode,
             waveSymmetry: state.waveSymmetry,
@@ -5582,26 +5605,15 @@
           const p = JSON.parse(raw);
           if (!p || typeof p !== 'object') return;
 
-          if (['vocoder', 'native', 'tape'].includes(p.engine)) {
-            state.engine = p.engine;
-            const labels = { vocoder: 'ボコーダ', native: 'OS標準', tape: 'テープ' };
-            btnEngineQuick.textContent = labels[p.engine];
-            const cVoc = document.getElementById('btnEngVocoder');
-            const cNat = document.getElementById('btnEngNative');
-            const cTap = document.getElementById('btnEngTape');
-            cVoc.className = 'engine-card' + (p.engine === 'vocoder' ? ' active' : '');
-            cNat.className = 'engine-card' + (p.engine === 'native' ? ' active' : '');
-            cTap.className = 'engine-card' + (p.engine === 'tape' ? ' active-tape' : '');
-            cVoc.querySelector('.engine-name').textContent = (p.engine === 'vocoder' ? '● ' : '○ ') + 'ボコーダ（同一位相ロック・ロボット声対策 / 標準）';
-            cNat.querySelector('.engine-name').textContent = (p.engine === 'native' ? '● ' : '○ ') + 'OS標準（端末内蔵ストレッチ）';
-            cTap.querySelector('.engine-name').textContent = (p.engine === 'tape' ? '● ' : '○ ') + 'テープ再生（音程連動・DSP加工ゼロ）';
+          if (['crisp', 'balanced', 'smooth'].includes(p.vocoderTone)) {
+            state.vocoderTone = p.vocoderTone;
           }
-          if (typeof p.lpfEnabled === 'boolean') {
-            state.lpfEnabled = p.lpfEnabled;
-            const b = document.getElementById('btnToggleLpf');
-            b.textContent = state.lpfEnabled ? 'ON' : 'OFF';
-            b.classList.toggle('on', state.lpfEnabled);
+          if (['off', 'light', 'normal', 'strong'].includes(p.lpfLevel)) {
+            state.lpfLevel = p.lpfLevel;
+          } else if (typeof p.lpfEnabled === 'boolean') {
+            state.lpfLevel = p.lpfEnabled ? 'normal' : 'off';
           }
+          updateVocoderUI();
           if (['loop1', 'loopAll', 'stop', 'shuffle'].includes(p.orderMode)) {
             state.orderMode = p.orderMode;
             document.getElementById('btnOrderLoop1').classList.toggle('active', p.orderMode === 'loop1');
@@ -5991,6 +6003,8 @@
         prevAnaR: new Float32Array(PV_HALF),
         synPhaseL: new Float32Array(PV_HALF),
         synPhaseR: new Float32Array(PV_HALF),
+        prevMagMono: new Float32Array(PV_HALF),
+        transientCooldown: 0,
         peaks: new Uint16Array(PV_HALF),
         rotL: new Float32Array(PV_HALF),
         rotR: new Float32Array(PV_HALF)
@@ -6010,6 +6024,8 @@
         pv.olaR.fill(0);
         pv.olaReadPos = PV_HOP_SYN;
         pv.needsPhaseReset = true;
+        pv.prevMagMono.fill(0);
+        pv.transientCooldown = 0;
       }
 
       function readLinear(arr, pos) {
@@ -6092,20 +6108,54 @@
         const prevL = pv.prevAnaL, prevR = pv.prevAnaR;
         const synL = pv.synPhaseL, synR = pv.synPhaseR;
 
-        if (pv.needsPhaseReset) {
+        const prevMag = pv.prevMagMono;
+        const tone = state.vocoderTone || 'balanced';
+        const peakRadius = tone === 'crisp' ? 1 : (tone === 'smooth' ? 3 : 2);
+        const fluxThresh = tone === 'crisp' ? 0.34 : (tone === 'balanced' ? 0.50 : 999);
+        const cooldownHops = tone === 'crisp' ? 3 : 5;
+
+        if (pv.transientCooldown > 0) pv.transientCooldown--;
+
+        let isTransientAttack = false;
+        if (!pv.needsPhaseReset && fluxThresh < 10) {
+          let flux = 0;
+          let totalMag = 0;
+          for (let k = 2; k < PV_HALF - 1; k++) {
+            const cur = magMono[k];
+            totalMag += cur;
+            const diff = cur - prevMag[k];
+            if (diff > 0) flux += diff;
+          }
+          if (totalMag > 1.2 && (flux / totalMag) > fluxThresh && pv.transientCooldown <= 0) {
+            isTransientAttack = true;
+            pv.transientCooldown = cooldownHops;
+          }
+        }
+
+        if (pv.needsPhaseReset || isTransientAttack) {
           pv.needsPhaseReset = false;
           prevL.set(anaL);
           prevR.set(anaR);
           synL.set(anaL);
           synR.set(anaR);
         } else {
-          // Spectral peak detection
+          // Tunable-radius spectral peak detection (wider radius = smoother, narrower = crisper detail)
           const peaks = pv.peaks;
           let numPeaks = 0;
           peaks[numPeaks++] = 0;
           for (let k = 1; k < PV_HALF - 1; k++) {
             const m = magMono[k];
-            if (m >= magMono[k - 1] && m >= magMono[k + 1] && m > 1e-9) {
+            if (m <= 1e-9) continue;
+            let isPeak = true;
+            const loK = Math.max(0, k - peakRadius);
+            const hiK = Math.min(PV_HALF - 1, k + peakRadius);
+            for (let j = loK; j <= hiK; j++) {
+              if (j !== k && magMono[j] > m) {
+                isPeak = false;
+                break;
+              }
+            }
+            if (isPeak) {
               peaks[numPeaks++] = k;
             }
           }
@@ -6151,6 +6201,7 @@
           prevL.set(anaL);
           prevR.set(anaR);
         }
+        prevMag.set(magMono);
 
         // Reconstruct Hermitian-symmetric complex spectrum
         reL[0] = magL[0] * Math.cos(synL[0]); imL[0] = 0;
@@ -6264,7 +6315,7 @@
         if (!audioGraphReady || !audioCtx || !inputBusNode || !postFilterNode) return;
 
         // Only engage Low-pass filter when slowing down with LPF enabled (bypass completely at 1.00x!)
-        const needLpf = state.lpfEnabled && state.playbackRate < 0.98 && !isDirectPassthrough();
+        const needLpf = state.lpfLevel !== 'off' && state.playbackRate < 0.98 && !isDirectPassthrough();
         // Only engage Reverb convolver when reverb preset is selected
         const needReverb = state.reverbIndex > 0;
         // Only engage Limiter when volume boost > 102% (bypass completely at 100% so zero dynamics compression!)
@@ -6438,25 +6489,37 @@
       }
 
       function updateLowpassFilter() {
-        const activeSlowLpf = state.lpfEnabled && state.playbackRate < 0.98 && !isDirectPassthrough();
+        const lvl = state.lpfLevel || 'normal';
+        const activeSlowLpf = lvl !== 'off' && state.playbackRate < 0.98 && !isDirectPassthrough();
         let cutoff = 20000;
         if (activeSlowLpf) {
-          cutoff = Math.max(4600, Math.min(18000, 3600 + 13500 * state.playbackRate));
+          const r = state.playbackRate;
+          if (lvl === 'light') {
+            cutoff = Math.max(7000, Math.min(18500, 5800 + 13500 * r));
+          } else if (lvl === 'strong') {
+            cutoff = Math.max(3200, Math.min(15000, 2200 + 9500 * r));
+          } else {
+            cutoff = Math.max(4800, Math.min(17500, 3800 + 12500 * r));
+          }
         }
         if (audioCtx && lowpassNode) {
           lowpassNode.frequency.setTargetAtTime(cutoff, audioCtx.currentTime, 0.025);
           updateAudioRouting();
         }
+        const lvlLabels = { off: 'OFF', light: '弱', normal: '標準', strong: '強' };
         const el = document.getElementById('lpfStatusText');
         if (el) {
-          if (!state.lpfEnabled) {
-            el.textContent = 'フィルターOFF（原音帯域スルー）';
+          if (lvl === 'off') {
+            el.textContent = 'OFF（加工なし）';
           } else if (!activeSlowLpf) {
-            el.textContent = '等速時は完全バイパス（原音そのまま）';
+            el.textContent = `${lvlLabels[lvl]}（等速時はバイパス）`;
           } else {
-            el.textContent = `スロー時ローパス稼働中 (${(cutoff / 1000).toFixed(1)}kHz)`;
+            el.textContent = `${lvlLabels[lvl]} (${(cutoff / 1000).toFixed(1)}kHz)`;
           }
         }
+        document.querySelectorAll('.lpf-level-opt').forEach(btn => {
+          btn.classList.toggle('active-blue', btn.dataset.lpfLevel === lvl);
+        });
       }
 
       function getEffectiveWaveGain() {
@@ -6579,59 +6642,71 @@
         } catch (_) {}
       }
 
-      function setEngine(nextEngine) {
-        const valid = ['vocoder', 'native', 'tape'];
-        if (!valid.includes(nextEngine)) return;
+      const VOCODER_TONE_META = {
+        crisp: { pill: 'スロー:明瞭', short: 'くっきり', full: 'くっきり（アタック重視）' },
+        balanced: { pill: 'スロー:標準', short: '標準', full: '標準（バランス・おすすめ）' },
+        smooth: { pill: 'スロー:滑らか', short: 'なめらか', full: 'なめらか（響き重視）' }
+      };
 
-        if (state.hasAudio && state.isFallbackLargeFile && nextEngine !== 'native') {
-          showToast('超大容量ファイルのためOS標準エンジンを使用します');
-          nextEngine = 'native';
+      function updateVocoderUI() {
+        const tone = VOCODER_TONE_META[state.vocoderTone] ? state.vocoderTone : 'balanced';
+        state.vocoderTone = tone;
+        const meta = VOCODER_TONE_META[tone];
+        const isLowMem = Boolean(state.hasAudio && state.isFallbackLargeFile);
+
+        if (btnEngineQuick) {
+          btnEngineQuick.textContent = isLowMem ? '省メモリ' : meta.pill;
+          btnEngineQuick.classList.toggle('low-mem', isLowMem);
+          btnEngineQuick.title = isLowMem
+            ? '大容量ファイルのため一時的に省メモリ再生中（通常曲・録音では自動でボコーダーへ戻ります）'
+            : `スロー再生の質感: ${meta.full}（タップで切替）`;
         }
 
+        const valEl = document.getElementById('modalVocoderToneVal');
+        if (valEl) {
+          valEl.textContent = isLowMem ? `${meta.short}（この曲は省メモリ中）` : meta.short;
+        }
+
+        document.querySelectorAll('.vocoder-tone-card').forEach(card => {
+          const key = card.dataset.vocoderTone;
+          const active = key === tone;
+          card.classList.toggle('active', active);
+          const nameEl = card.querySelector('.engine-name');
+          if (nameEl && VOCODER_TONE_META[key]) {
+            nameEl.textContent = (active ? '● ' : '○ ') + VOCODER_TONE_META[key].full;
+          }
+        });
+      }
+
+      function setVocoderTone(nextTone, announce = false) {
+        if (!VOCODER_TONE_META[nextTone]) return;
+        state.vocoderTone = nextTone;
+        pv.transientCooldown = 0;
+        updateVocoderUI();
+        saveAppPrefs();
+        if (announce) {
+          showToast(`ボコーダー加減: ${VOCODER_TONE_META[nextTone].full}`);
+        }
+      }
+
+      // Temporary low-memory playback for huge files ONLY (never overwrites user's Vocoder settings!)
+      function enterLargeFileLowMemoryMode() {
         const wasPlaying = state.isPlaying;
         const curT = getLivePlayheadTime();
-        state.currentTime = curT;
-
+        state.isFallbackLargeFile = true;
         stopTapeSource();
-        if (!audioEl.paused) audioEl.pause();
-
-        state.engine = nextEngine;
-        const labels = { vocoder: 'ボコーダ', native: 'OS標準', tape: 'テープ' };
-        btnEngineQuick.textContent = labels[nextEngine];
-
-        const cVoc = document.getElementById('btnEngVocoder');
-        const cNat = document.getElementById('btnEngNative');
-        const cTap = document.getElementById('btnEngTape');
-        cVoc.className = 'engine-card' + (nextEngine === 'vocoder' ? ' active' : '');
-        cNat.className = 'engine-card' + (nextEngine === 'native' ? ' active' : '');
-        cTap.className = 'engine-card' + (nextEngine === 'tape' ? ' active-tape' : '');
-
-        cVoc.querySelector('.engine-name').textContent = (nextEngine === 'vocoder' ? '● ' : '○ ') + 'ボコーダ（同一位相ロック・ロボット声対策 / 標準）';
-        cNat.querySelector('.engine-name').textContent = (nextEngine === 'native' ? '● ' : '○ ') + 'OS標準（端末内蔵ストレッチ）';
-        cTap.querySelector('.engine-name').textContent = (nextEngine === 'tape' ? '● ' : '○ ') + 'テープ再生（音程連動・DSP加工ゼロ）';
-
+        audioEl.preservesPitch = true;
+        audioEl.mozPreservesPitch = true;
+        audioEl.webkitPreservesPitch = true;
+        audioEl.playbackRate = state.playbackRate;
         if (state.hasAudio) {
-          const path = getActivePlaybackPath();
-          if (path === 'vocoderDsp') {
-            resetVocoderAtSample(Math.floor(curT * state.audioBuffer.sampleRate));
-          } else if (path === 'bufferDirect') {
-            if (wasPlaying) startTapeSourceAt(curT);
-          } else {
-            audioEl.preservesPitch = true;
-            audioEl.mozPreservesPitch = true;
-            audioEl.webkitPreservesPitch = true;
-            audioEl.playbackRate = state.playbackRate;
-            audioEl.currentTime = curT;
-            if (wasPlaying) audioEl.play().catch(() => {});
-            if (state.isAnalyzingWave && nextEngine !== 'native') {
-              showToast(`波形解析完了後に「${labels[nextEngine]}」へ自動切替します`);
-            }
+          try { audioEl.currentTime = curT; } catch (_) {}
+          if (wasPlaying && audioEl.paused) {
+            audioEl.play().catch(() => {});
           }
-          updateLowpassFilter();
-          state.lastSyncTime = curT;
-          state.lastSyncPerf = performance.now();
         }
-        saveAppPrefs();
+        updateVocoderUI();
+        updateLowpassFilter();
       }
 
       // ==================== REAL PCM PYRAMID BUILDER & STREAMING WAV ENGINE ====================
@@ -8855,6 +8930,7 @@
             state.playlist[state.currentTrackIndex].isUnsavedRecording = isUnsavedRec;
           }
 
+          updateVocoderUI();
           updateWaveGainUI();
           applyMasterBoost();
           updateHeaderSubInfo();
@@ -8897,8 +8973,7 @@
           if (wavMeta && blob.size > 90 * 1024 * 1024) {
             (async () => {
               state.isAnalyzingWave = true;
-              state.isFallbackLargeFile = true;
-              setEngine('native');
+              enterLargeFileLowMemoryMode();
               showWaveProgress(1, '大容量WAV波形解析中', null);
 
               const pyr = await buildWavStreamPyramidAsync(
@@ -8927,8 +9002,7 @@
           if (!wavMeta && (resolvedDuration > 28 * 60 || blob.size > 60 * 1024 * 1024)) {
             (async () => {
               state.isAnalyzingWave = true;
-              state.isFallbackLargeFile = true;
-              setEngine('native');
+              enterLargeFileLowMemoryMode();
               showWaveProgress(1, '省メモリ波形解析中', null);
 
               const pyr = await buildCompressedStreamPyramidAsync(
@@ -9018,8 +9092,7 @@
 
               // If it's a WAV file and decodeAudioData failed (e.g. OOM on mobile), seamlessly fall back to streaming WAV waveform!
               if (wavMeta) {
-                state.isFallbackLargeFile = true;
-                setEngine('native');
+                enterLargeFileLowMemoryMode();
                 showWaveProgress(5, '省メモリ波形解析へ切替中', null);
                 const pyr = await buildWavStreamPyramidAsync(
                   blob,
@@ -9042,8 +9115,7 @@
               }
 
               // Seamlessly fall back to Zero-OOM Streaming Compressed Waveform Analysis (MP3 / M4A / OGG / FLAC / AAC)
-              state.isFallbackLargeFile = true;
-              setEngine('native');
+              enterLargeFileLowMemoryMode();
               showWaveProgress(4, '省メモリ波形解析へ切替中', null);
               const streamPyr = await buildCompressedStreamPyramidAsync(
                 blob,
@@ -9225,6 +9297,7 @@
         saveCurrentFileMemory(true);
         computeAutoGainsFromPyramid(pyramid);
         btnCutYellowSection.disabled = !state.wavMeta;
+        updateVocoderUI();
         updateWaveGainUI();
         applyMasterBoost();
         updateTimeUI();
@@ -9289,6 +9362,7 @@
         }
 
         btnCutYellowSection.disabled = false;
+        updateVocoderUI();
         updateWaveGainUI();
         applyMasterBoost();
         updateLowpassFilter();
@@ -10615,7 +10689,7 @@
             recStereoStatusNote.classList.add('hidden');
             recStereoStatusNote.textContent = '';
           } else if (stereoDeniedByOs) {
-            recStereoStatusNote.textContent = '※端末/Chromeの内蔵マイク仕様により1chモノラル入力中です（USB外部ステレオマイク接続時はステレオ録音可）';
+            recStereoStatusNote.textContent = '※Androidブラウザの仕様により1chモノラル録音中です（外部アプリのステレオ音源はそのまま再生可）';
             recStereoStatusNote.classList.remove('hidden');
           }
         }
@@ -15267,6 +15341,7 @@
         document.getElementById('speedSlider').value = state.playbackRate;
         document.getElementById('modalSpeedVal').textContent = `${state.playbackRate.toFixed(2)}x`;
         document.getElementById('pitchSlider').value = state.pitchSemitones;
+        updateVocoderUI();
         updateWaveGainUI();
         applyMasterBoost();
         setMicGain(state.micGain);
@@ -15579,11 +15654,22 @@
       document.addEventListener('webkitfullscreenchange', onFullscreenStateChanged);
 
       // ==================== GITHUB / PWA SOFTWARE UPDATE CHECK & APPLY ====================
-      const APP_VERSION = 'v34';
+      const APP_VERSION = 'v35';
 
       // Ordered newest-first; each release appends a new object at the top.
       // Users who skip multiple versions automatically see ALL unseen versions between lastSeen and current.
       const APP_RELEASE_NOTES = [
+        {
+          version: 'v35',
+          verNum: 35,
+          date: '2026/11/23',
+          title: 'ボコーダー一本化（自動復帰）とスロー再生の質感調整を追加',
+          items: [
+            '「OS標準」「テープ再生」のエンジン切替を廃止し、通常ファイルや録音では常に高音質ボコーダー（等速時は原音スルー）で再生されるよう一本化しました',
+            '大容量ファイルを開いた際の一時的な省メモリ再生が設定を上書きしないよう修正し、その後に録音や通常の曲を開いても自動でボコーダーへ復帰します',
+            'スロー再生の質感（ボコーダー加減）を「くっきり / 標準 / なめらか」の3段階で切替でき、高域スムージングも「OFF / 弱 / 標準 / 強」の4段階で細かく調整できるようになりました'
+          ]
+        },
         {
           version: 'v34',
           verNum: 34,
@@ -15988,45 +16074,53 @@
               title: '主な使い道',
               bullets: [
                 ['移調の練習', '楽譜と音源のキーが違うときや、歌いやすい高さに合わせて練習したいときに便利です。'],
-                ['音質について', '±0（原曲）かつ 1.00x のときは音質加工を完全に通さず、原音そのままのダイレクト再生になります。'],
-                ['注意', 'スロー再生エンジンが「テープ再生」または「OS標準」のときは、ピッチ単独変更は「ボコーダ」選択時に有効になります。']
+                ['音質について', '±0（原曲）かつ 1.00x のときはボコーダーを完全に素通りし、原音そのままのダイレクト再生になります。'],
+                ['大容量ファイル時', 'メモリ保護のため一時的に「省メモリ」再生になっている長尺ファイルでは、ピッチ単独変更は対象外となります。']
               ]
             }
           ]
         },
-        engine: {
-          title: 'スロー再生エンジン',
-          sub: '速度を変えたときの音の作り方を選べます',
-          summary: 'ゆっくり再生（0.50xなど）したときの音質の処理方式を切り替えます。基本は初期設定の「ボコーダ」がおすすめです。',
+        vocoderTone: {
+          title: 'スロー再生の質感（ボコーダー加減）',
+          sub: 'ゆっくり再生したときの音の輪郭となめらかさを調整',
+          summary: 'スロー再生・ピッチ変更時に働く高音質フェーズボコーダーの掛かり具合を3段階で調整できます。1.00x・原曲キー時は完全に素通りして原音のまま再生されます。',
           sections: [
             {
-              title: '3つのエンジンの違い',
+              title: '3つの加減の違い',
               bullets: [
-                ['ボコーダ（標準）', '音程を保ったまま速度を変えられます。ロボット声のような違和感を抑える位相ロック処理を搭載し、1.00x時は加工ゼロの原音そのまま再生します。'],
-                ['OS標準', 'スマホやブラウザ内蔵の標準機能で再生します。電池消費を抑えたいときや、非常に容量の大きいファイルで動作を軽くしたいとき向けです。'],
-                ['テープ再生', 'カセットテープを遅く回すように、速度と一緒に音程も低く（速くすると高く）なります。音程維持のデジタル加工を一切しないため、ノイズが原理上0%です。']
+                ['くっきり（アタック重視）', '音の立ち上がりを検知して位相をリセットします。フルートのタンギングやピアノの打鍵、速いパッセージの粒立ちをはっきり聴きたいときに最適です。'],
+                ['標準（バランス・おすすめ）', '強い立ち上がりの明瞭さと、伸ばす音の自然さをバランス良く両立します。普段の練習全般におすすめです。'],
+                ['なめらか（響き重視）', '広い帯域を連続して位相ロックします。ロングトーンやホールの豊かな残響で金属音・うねりを極力抑えたいときに最適です。']
+              ]
+            },
+            {
+              title: '大容量ファイル時の自動動作',
+              bullets: [
+                ['一時的な省メモリ再生と自動復帰', '1時間を超える長尺ファイルなどでは端末のメモリ保護のため一時的に「省メモリ」再生になりますが、通常の曲や録音へ戻ると自動でボコーダーに復帰します。']
               ]
             }
           ],
           tableTitle: '選び方の目安',
-          tableHeaders: ['エンジン', 'おすすめ用途'],
+          tableHeaders: ['設定', '向いている練習'],
           tableRows: [
-            ['ボコーダ', '楽器の耳コピ・運指確認・普段のスロー練習全般'],
-            ['OS標準', '長時間の省電力再生・超大容量ファイルの再生'],
-            ['テープ再生', '音程が変わってもよいのでデジタル歪みゼロで聴きたいとき']
+            ['くっきり', '速い連符・タンギング・リズムの粒立ち確認'],
+            ['標準', '耳コピ・運指確認・普段のスロー練習全般'],
+            ['なめらか', 'ロングトーン・音程確認・響きの大きいホール録音']
           ]
         },
         lpf: {
-          title: '高域スムージングフィルター',
-          sub: 'スロー再生時の耳障りな高音ノイズを軽減',
-          summary: 'ゆっくり再生したときに目立ちやすい「シャリシャリ・ザラザラした高い音」をなめらかに整えるフィルターです。基本は ON のままでOKです。',
+          title: '高域スムージング（ロボット声・金属音対策）',
+          sub: 'スロー再生時の耳障りな高音ノイズを4段階で軽減',
+          summary: 'ゆっくり再生したときに目立ちやすい「シャリシャリ・ザラザラした高い音」をなめらかに整えるフィルターの強さを選べます。基本は「標準」でOKです。',
           sections: [
             {
-              title: '動作のポイント',
+              title: '4段階の使い分け',
               bullets: [
-                ['ON（標準）', '速度を落としたときだけ自動で働き、聴き疲れしにくい自然な音にします。'],
-                ['OFF', '高い周波数を一切カットせずそのまま出します。金属音や息遣いの高域まで細部を確認したいときに試してください。'],
-                ['等速(1.00x)のとき', 'ONにしていても、1.00x・原曲キーの通常再生時は自動で完全にバイパスされ、原音のまま鳴ります。']
+                ['OFF', '高い周波数を一切カットせずそのまま出します。息遣いや倍音の細部まで確認したいとき向け。'],
+                ['弱', '高域の明るさを保ちつつ、耳に刺さる帯域だけ軽く抑えます。'],
+                ['標準（おすすめ）', '速度に応じて自動で最適に丸め、聴き疲れしにくい自然な音にします。'],
+                ['強', '0.30x〜0.50xの極スロー再生で金属音やロボット声っぽさをしっかり抑えたいとき向け。'],
+                ['等速(1.00x)のとき', 'どの強さを選んでいても、1.00x・原曲キーの通常再生時は完全にバイパスされ、原音のまま鳴ります。']
               ]
             }
           ]
@@ -16586,11 +16680,13 @@
       });
       btnEngineQuick.addEventListener('click', () => {
         initAudioGraph();
-        const seq = ['vocoder', 'native', 'tape'];
-        const next = seq[(seq.indexOf(state.engine) + 1) % seq.length];
-        setEngine(next);
-        const names = { vocoder: 'ボコーダ（標準）', native: 'OS標準', tape: 'テープ再生（加工ゼロ）' };
-        showToast(`再生エンジン: ${names[state.engine]}`);
+        if (state.hasAudio && state.isFallbackLargeFile) {
+          showToast('大容量ファイルのため省メモリ再生中（通常ファイル・録音では自動でボコーダーに戻ります）');
+          return;
+        }
+        const seq = ['crisp', 'balanced', 'smooth'];
+        const next = seq[(seq.indexOf(state.vocoderTone) + 1) % seq.length];
+        setVocoderTone(next, true);
       });
 
       // Order Mode Buttons
@@ -16695,17 +16791,24 @@
       document.getElementById('btnPitchReset').addEventListener('click', () => setPitch(0));
       document.getElementById('btnPitchP1').addEventListener('click', () => setPitch(state.pitchSemitones + 1));
 
-      document.getElementById('btnEngVocoder').addEventListener('click', () => { initAudioGraph(); setEngine('vocoder'); });
-      document.getElementById('btnEngNative').addEventListener('click', () => { initAudioGraph(); setEngine('native'); });
-      document.getElementById('btnEngTape').addEventListener('click', () => { initAudioGraph(); setEngine('tape'); });
+      document.querySelectorAll('.vocoder-tone-card').forEach(card => {
+        card.addEventListener('click', () => {
+          initAudioGraph();
+          setVocoderTone(card.dataset.vocoderTone, true);
+        });
+      });
 
-      document.getElementById('btnToggleLpf').addEventListener('click', () => {
-        state.lpfEnabled = !state.lpfEnabled;
-        const b = document.getElementById('btnToggleLpf');
-        b.textContent = state.lpfEnabled ? 'ON' : 'OFF';
-        b.classList.toggle('on', state.lpfEnabled);
-        updateLowpassFilter();
-        saveAppPrefs();
+      document.querySelectorAll('.lpf-level-opt').forEach(btn => {
+        btn.addEventListener('click', () => {
+          initAudioGraph();
+          const lvl = btn.dataset.lpfLevel;
+          if (!['off', 'light', 'normal', 'strong'].includes(lvl)) return;
+          state.lpfLevel = lvl;
+          updateLowpassFilter();
+          saveAppPrefs();
+          const labels = { off: 'OFF', light: '弱', normal: '標準', strong: '強' };
+          showToast(`高域スムージング: ${labels[lvl]}`);
+        });
       });
 
       document.querySelectorAll('.wave-gain-opt').forEach(btn => {
@@ -17038,6 +17141,8 @@
         setTimeout(() => maybeShowStartupWhatsNew(), 160);
 
         loadAppPrefs();
+        updateVocoderUI();
+        updateLowpassFilter();
         updateWaveGainUI();
         applyMasterBoost();
         setMicGain(state.micGain);
