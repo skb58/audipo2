@@ -8,7 +8,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="Audipo2">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="app-version" content="v35">
+  <meta name="app-version" content="v36">
   <link rel="manifest" href="./manifest.json">
   <title>Audipo風 練習プレイヤー＆レコーダー</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='bg' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%231b2030'/%3E%3Cstop offset='100%25' stop-color='%230d0f15'/%3E%3C/linearGradient%3E%3ClinearGradient id='wv' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0%25' stop-color='%2360c5ff'/%3E%3Cstop offset='100%25' stop-color='%232563eb'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='url(%23bg)'/%3E%3Crect x='1' y='1' width='62' height='62' rx='15' fill='none' stroke='%233b82f6' stroke-opacity='0.3' stroke-width='2'/%3E%3Cg fill='url(%23wv)'%3E%3Crect x='10' y='28' width='4.5' height='12' rx='2.25' opacity='0.6'/%3E%3Crect x='18' y='22' width='4.5' height='24' rx='2.25' opacity='0.85'/%3E%3Crect x='26' y='15' width='4.5' height='36' rx='2.25'/%3E%3Crect x='34' y='21' width='4.5' height='25' rx='2.25' opacity='0.9'/%3E%3Crect x='42' y='26' width='4.5' height='16' rx='2.25' opacity='0.75'/%3E%3Crect x='50' y='30' width='4.5' height='9' rx='2.25' opacity='0.5'/%3E%3C/g%3E%3Cpath d='M36.25 10.5c0-1.4 1.1-2.5 2.5-2.5h5.5c1.4 0 2.5 1.1 2.5 2.5v2.4c0 .8-.3 1.5-.9 2.1l-3.2 3.1c-.6.6-1.6.6-2.2 0l-3.2-3.1c-.6-.6-.9-1.3-.9-2.1v-2.4z' fill='%23facc15'/%3E%3C/svg%3E">
@@ -3567,6 +3567,315 @@
       box-shadow: 0 4px 16px rgba(34, 197, 94, 0.4);
     }
 
+    .share-mode-tabs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 5px;
+      padding: 4px;
+      margin-bottom: 10px;
+      border-radius: 11px;
+      background: #121217;
+      border: 1px solid var(--border-subtle);
+      flex-shrink: 0;
+    }
+
+    .share-mode-tab {
+      height: 33px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 800;
+      color: var(--text-sub);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: background-color 0.14s ease, color 0.14s ease;
+    }
+
+    .share-mode-tab.active {
+      background: linear-gradient(135deg, #2563eb 0%, #0284c7 100%);
+      color: #ffffff;
+      box-shadow: 0 2px 10px rgba(37, 99, 235, 0.35);
+    }
+
+    .share-mode-tab.active-pin {
+      background: linear-gradient(135deg, #ca8a04 0%, #eab308 100%);
+      color: #111113;
+      box-shadow: 0 2px 10px rgba(250, 204, 21, 0.32);
+    }
+
+    .share-mode-tab:disabled {
+      opacity: 0.35;
+      pointer-events: none;
+    }
+
+    .pin-scope-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 7px;
+    }
+
+    .pin-scope-btn {
+      padding: 10px 8px;
+      border-radius: 10px;
+      background: #1d1d24;
+      border: 1px solid var(--border-subtle);
+      color: #d4d4d8;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      text-align: center;
+      transition: transform 0.08s ease, background-color 0.12s ease, border-color 0.12s ease;
+    }
+
+    .pin-scope-btn:active {
+      transform: scale(0.96);
+    }
+
+    .pin-scope-btn.active {
+      background: rgba(250, 204, 21, 0.16);
+      border-color: var(--accent-yellow);
+      color: #fef08a;
+      box-shadow: 0 0 12px rgba(250, 204, 21, 0.18);
+    }
+
+    .pin-scope-btn:disabled {
+      opacity: 0.35;
+      pointer-events: none;
+    }
+
+    .pin-scope-title {
+      font-size: 12px;
+      font-weight: 800;
+      line-height: 1.25;
+    }
+
+    .pin-scope-sub {
+      font-size: 10px;
+      color: var(--text-sub);
+      line-height: 1.25;
+    }
+
+    .pin-scope-btn.active .pin-scope-sub {
+      color: #fde68a;
+    }
+
+    .pin-sub-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 7px;
+    }
+
+    .pin-sub-btn {
+      height: 36px;
+      border-radius: 9px;
+      background: #23232c;
+      border: 1px solid var(--border-strong);
+      color: #e4e4e7;
+      font-size: 11.5px;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      transition: transform 0.08s ease;
+    }
+
+    .pin-sub-btn:active {
+      transform: scale(0.96);
+    }
+
+    .pin-conflict-card {
+      width: 100%;
+      max-width: 410px;
+      max-height: 88dvh;
+      background: #1e1e24;
+      border: 1.5px solid rgba(250, 204, 21, 0.62);
+      border-radius: 17px;
+      padding: 16px 16px 14px;
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.88), 0 0 24px rgba(250, 204, 21, 0.14);
+      color: var(--text-main);
+    }
+
+    .pin-conflict-badge {
+      display: inline-flex;
+      align-items: center;
+      align-self: flex-start;
+      padding: 2px 9px;
+      border-radius: 999px;
+      font-size: 10.5px;
+      font-weight: 800;
+      margin-bottom: 8px;
+      background: rgba(250, 204, 21, 0.18);
+      border: 1px solid rgba(250, 204, 21, 0.55);
+      color: #fef08a;
+    }
+
+    .pin-conflict-file-box {
+      padding: 8px 10px;
+      border-radius: 10px;
+      background: #131318;
+      border: 1px solid var(--border-subtle);
+      margin-bottom: 10px;
+    }
+
+    .pin-conflict-fname {
+      font-size: 13px;
+      font-weight: 800;
+      color: #ffffff;
+      word-break: break-all;
+      line-height: 1.35;
+    }
+
+    .pin-conflict-fmeta {
+      font-size: 11px;
+      color: var(--text-sub);
+      margin-top: 2px;
+    }
+
+    .pin-compare-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 7px;
+      margin-bottom: 11px;
+    }
+
+    .pin-compare-col {
+      padding: 8px 9px;
+      border-radius: 10px;
+      background: #15151b;
+      border: 1px solid var(--border-subtle);
+      min-width: 0;
+    }
+
+    .pin-compare-col.incoming {
+      border-color: rgba(66, 165, 245, 0.48);
+      background: rgba(66, 165, 245, 0.08);
+    }
+
+    .pin-compare-label {
+      font-size: 10px;
+      font-weight: 800;
+      color: var(--text-sub);
+      margin-bottom: 3px;
+    }
+
+    .pin-compare-col.incoming .pin-compare-label {
+      color: #93c5fd;
+    }
+
+    .pin-compare-count {
+      font-size: 13px;
+      font-weight: 800;
+      color: #ffffff;
+      margin-bottom: 4px;
+    }
+
+    .pin-compare-list {
+      font-size: 10.5px;
+      line-height: 1.45;
+      color: #d4d4d8;
+      word-break: break-all;
+    }
+
+    .pin-apply-all-row {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      padding: 9px 10px;
+      margin-bottom: 11px;
+      border-radius: 10px;
+      background: rgba(250, 204, 21, 0.09);
+      border: 1px solid rgba(250, 204, 21, 0.36);
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 700;
+      color: #fef08a;
+    }
+
+    .pin-apply-all-row input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      accent-color: #facc15;
+      margin: 0;
+      flex-shrink: 0;
+    }
+
+    .pin-conflict-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+
+    .pin-act-btn {
+      width: 100%;
+      min-height: 41px;
+      padding: 8px 12px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 800;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 1px;
+      transition: transform 0.08s ease;
+    }
+
+    .pin-act-btn:active {
+      transform: scale(0.97);
+    }
+
+    .pin-act-btn small {
+      font-size: 10px;
+      font-weight: 600;
+      opacity: 0.85;
+    }
+
+    .pin-act-merge {
+      background: linear-gradient(135deg, #2563eb 0%, #0284c7 100%);
+      border: 1px solid rgba(147, 197, 253, 0.7);
+      color: #ffffff;
+    }
+
+    .pin-act-overwrite {
+      background: rgba(245, 158, 11, 0.2);
+      border: 1px solid rgba(245, 158, 11, 0.72);
+      color: #fef08a;
+    }
+
+    .pin-act-skip {
+      background: #272730;
+      border: 1px solid var(--border-strong);
+      color: #e4e4e7;
+    }
+
+    .pin-text-area {
+      width: 100%;
+      min-height: 130px;
+      padding: 9px 10px;
+      border-radius: 10px;
+      background: #111115;
+      border: 1px solid var(--border-strong);
+      color: #e4e4e7;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      line-height: 1.45;
+      resize: vertical;
+      outline: none;
+      user-select: text;
+      -webkit-user-select: text;
+    }
+
+    .pin-text-area:focus {
+      border-color: var(--accent-blue);
+    }
+
     .app-share-url-box {
       padding: 7px 10px;
       border-radius: 8px;
@@ -3675,6 +3984,7 @@
 
   <!-- Plain multi-file input with NO restrictive accept filter so Android opens native storage/SD picker -->
   <input type="file" id="fileInput" multiple class="sr-only">
+  <input type="file" id="pinImportInput" accept=".txt,.json,text/plain,application/json" multiple class="sr-only">
 
   <!-- ==================== 1. TOP HEADER BAR ==================== -->
   <header class="app-header">
@@ -3705,7 +4015,7 @@
         <span>保存</span>
       </button>
 
-      <button id="btnShareAudio" type="button" disabled class="hdr-btn hdr-btn-share" title="今の音声・録音を形式と音質を選んでシェア" aria-label="音声をシェア">
+      <button id="btnShareAudio" type="button" disabled class="hdr-btn hdr-btn-share" title="音声ファイルやピン情報をシェア" aria-label="音声・ピンをシェア">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
           <circle cx="18" cy="5" r="3"/>
           <circle cx="6" cy="12" r="3"/>
@@ -4540,6 +4850,10 @@
           <div class="engine-desc" style="margin-bottom:9px;">
             再生時間とファイルサイズで音源を判別し、ピン・名前・スキップ設定・再生位置を最大1000件まで自動記憶します（ファイル名を変えても引き継がれます）。
           </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:8px;">
+            <button id="btnImportPinsFile" type="button" class="step-btn" style="background:rgba(250,204,21,0.14);border-color:rgba(250,204,21,0.55);color:#fef08a;">ピンを読込 (ファイル)</button>
+            <button id="btnImportPinsText" type="button" class="step-btn" style="background:rgba(66,165,245,0.14);border-color:rgba(66,165,245,0.52);color:#bae6fd;">テキスト貼付で読込</button>
+          </div>
           <div style="display:flex;gap:8px;">
             <button id="btnClearSessionCache" type="button" class="step-btn" style="flex:1;">一時音源キャッシュ削除</button>
             <button id="btnClearPinMemory" type="button" class="step-btn" style="color:#fca5a5;border-color:rgba(239,68,68,0.45);">全ピン記憶を初期化</button>
@@ -4550,7 +4864,7 @@
         <div class="modal-section" style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
           <div>
             <div class="sec-title">バージョン情報</div>
-            <div id="settingsVersionLabel" class="engine-desc mono">現在: v35</div>
+            <div id="settingsVersionLabel" class="engine-desc mono">現在: v36</div>
           </div>
           <button id="btnShowReleaseHistory" type="button" class="step-btn" style="color:#93c5fd;border-color:rgba(66,165,245,0.45);">更新履歴を見る</button>
         </div>
@@ -4707,7 +5021,7 @@
           </div>
           <div>
             <h3 id="whatsNewTitle" class="whats-new-title">アップデートのお知らせ</h3>
-            <p id="whatsNewSub" class="whats-new-sub mono">v35 に更新されました</p>
+            <p id="whatsNewSub" class="whats-new-sub mono">v36 に更新されました</p>
           </div>
         </div>
         <button id="btnCloseWhatsNewX" type="button" class="modal-close" aria-label="閉じる">✕</button>
@@ -4792,7 +5106,12 @@
         <button id="btnCloseSaveExportX" type="button" class="modal-close" aria-label="閉じる">✕</button>
       </div>
 
-      <div class="modal-body" style="gap:10px;">
+      <div id="shareModalTabBar" class="share-mode-tabs hidden" role="tablist" aria-label="共有内容の切替">
+        <button id="tabShareAudio" type="button" class="share-mode-tab active" role="tab" aria-selected="true">音声ファイル</button>
+        <button id="tabSharePins" type="button" class="share-mode-tab" role="tab" aria-selected="false">ピン情報</button>
+      </div>
+
+      <div id="saveAudioPanel" class="modal-body" style="gap:10px;">
         <div id="saveShareNotice" class="save-share-notice hidden">
           共有用の一時ファイルのみ作成して送ります。ここで低音質を選んでも、元の音声・ファイル名・記憶済みピン・保存設定には一切影響しません。
         </div>
@@ -4871,9 +5190,133 @@
         </div>
       </div>
 
+      <!-- Pin Info Share Panel (shown when share tab = 'pins') -->
+      <div id="sharePinsPanel" class="modal-body hidden" style="gap:10px;">
+        <div class="save-share-notice" style="background:rgba(250,204,21,0.10);border-color:rgba(250,204,21,0.38);color:#fef08a;">
+          黄色ピン・マーク名・区間スキップ設定を共有用ファイル（.txt）として書き出します。受け取った側は「開く」または設定の「ピンを読込」から取り込めます。
+        </div>
+
+        <!-- Scope Selector -->
+        <div class="modal-section">
+          <div class="sec-head" style="margin-bottom:6px;">
+            <span class="sec-title">共有するピン情報の範囲</span>
+          </div>
+          <div class="pin-scope-grid">
+            <button id="btnPinScopeCurrent" type="button" data-pin-scope="current" class="pin-scope-btn active">
+              <span class="pin-scope-title">現在のファイルのみ</span>
+              <span id="pinScopeCurrentSub" class="pin-scope-sub mono">黄色ピン 0個</span>
+            </button>
+            <button id="btnPinScopeAll" type="button" data-pin-scope="all" class="pin-scope-btn">
+              <span class="pin-scope-title">すべてのファイル</span>
+              <span id="pinScopeAllSub" class="pin-scope-sub mono">0ファイル • 0個</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Pin File Name -->
+        <div class="modal-section">
+          <div class="sec-head" style="margin-bottom:6px;">
+            <span class="sec-title">ピンファイル名</span>
+            <button id="btnPinShareResetName" type="button" class="step-btn" style="padding:2px 8px;font-size:10px;">標準名に戻す</button>
+          </div>
+          <div class="save-name-row">
+            <input type="text" id="pinShareFileNameInput" class="text-input" placeholder="ファイル名を入力" autocomplete="off">
+            <span class="save-ext-badge mono">.txt</span>
+          </div>
+        </div>
+
+        <!-- Preview -->
+        <div class="save-preview-box">
+          <div id="pinSharePreviewSpec" class="save-preview-spec mono">対象: 0ファイル • 黄色ピン 0個</div>
+          <div id="pinSharePreviewSize" class="save-preview-size mono">サイズ: 約 1 KB • 形式: .txt (JSON)</div>
+        </div>
+
+        <!-- Sub actions: Direct Download / Copy Text -->
+        <div class="pin-sub-actions">
+          <button id="btnPinDownloadTxt" type="button" class="pin-sub-btn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#60b8ff" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 11 5 5 5-5"/><path d="M5 20h14"/></svg>
+            <span>ファイル保存 (.txt)</span>
+          </button>
+          <button id="btnPinCopyText" type="button" class="pin-sub-btn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fde047" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            <span>テキストコピー</span>
+          </button>
+        </div>
+      </div>
+
       <div class="modal-footer-row" style="margin-top:12px;">
         <button id="btnCancelSaveExport" type="button" class="danger-btn-safe" style="height:41px;border-radius:11px;">キャンセル</button>
         <button id="btnSaveExportRun" type="button" class="whats-new-ok-btn" style="height:41px;">この設定で保存</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== 12. PIN IMPORT CONFLICT / APPLY MODAL ==================== -->
+  <div id="pinImportConflictModal" class="modal-backdrop hidden" style="z-index:86;">
+    <div class="pin-conflict-card" role="dialog" aria-modal="true" aria-labelledby="pinConflictTitle">
+      <div id="pinConflictBadge" class="pin-conflict-badge mono">同じファイルが既にあります (1 / 1)</div>
+      <h3 id="pinConflictTitle" class="mark-edit-title" style="margin-bottom:9px;font-size:15.5px;">ピン情報の取り込み方法を選択</h3>
+
+      <div class="pin-conflict-file-box">
+        <div id="pinConflictFileName" class="pin-conflict-fname"></div>
+        <div id="pinConflictFileMeta" class="pin-conflict-fmeta mono"></div>
+      </div>
+
+      <div id="pinCompareGrid" class="pin-compare-grid">
+        <div class="pin-compare-col">
+          <div class="pin-compare-label">既存のピン</div>
+          <div id="pinCompareOldCount" class="pin-compare-count mono">0個</div>
+          <div id="pinCompareOldList" class="pin-compare-list mono"></div>
+        </div>
+        <div class="pin-compare-col incoming">
+          <div class="pin-compare-label">読み込むピン</div>
+          <div id="pinCompareNewCount" class="pin-compare-count mono">0個</div>
+          <div id="pinCompareNewList" class="pin-compare-list mono"></div>
+        </div>
+      </div>
+
+      <div id="pinUnmatchedNote" class="rec-mid-gain-warn hidden" style="margin-bottom:10px;"></div>
+
+      <label id="pinApplyAllRow" class="pin-apply-all-row">
+        <input type="checkbox" id="chkPinApplyAll">
+        <span id="pinApplyAllLabel">このあとすべてに適用する</span>
+      </label>
+
+      <div class="pin-conflict-actions">
+        <button id="btnPinConflictMerge" type="button" class="pin-act-btn pin-act-merge">
+          <span id="btnPinConflictMergeTitle">マージ（統合）</span>
+          <small id="btnPinConflictMergeSub">既存のピンを残したまま、新しいピンを追加</small>
+        </button>
+        <button id="btnPinConflictOverwrite" type="button" class="pin-act-btn pin-act-overwrite">
+          <span id="btnPinConflictOverwriteTitle">上書き</span>
+          <small id="btnPinConflictOverwriteSub">既存のピンを消して、読み込むピンで置き換え</small>
+        </button>
+        <button id="btnPinConflictSkip" type="button" class="pin-act-btn pin-act-skip">
+          <span id="btnPinConflictSkipTitle">スキップ</span>
+          <small id="btnPinConflictSkipSub">このファイルは変更しない</small>
+        </button>
+      </div>
+
+      <div class="mark-edit-footer" style="margin-top:8px;padding-top:4px;">
+        <button id="btnPinConflictCancel" type="button" class="mark-dialog-btn" style="color:#a1a1aa;font-size:12.5px;">インポートを中止</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== 13. PIN TEXT PASTE IMPORT MODAL ==================== -->
+  <div id="pinTextImportModal" class="modal-backdrop hidden" style="z-index:84;">
+    <div class="mark-edit-card" role="dialog" aria-modal="true" aria-labelledby="pinTextImportTitle" style="max-width:410px;">
+      <h3 id="pinTextImportTitle" class="mark-edit-title" style="margin-bottom:8px;font-size:15.5px;">テキスト貼付でピンを読み込む</h3>
+      <p style="margin:0 0 9px;font-size:11.5px;line-height:1.5;color:#a1a1aa;">
+        LINEやメール等で共有されたピン情報テキスト（JSON）を貼り付けてください。
+      </p>
+      <div style="display:flex;justify-content:flex-end;margin-bottom:6px;">
+        <button id="btnPinPasteClipboard" type="button" class="step-btn" style="color:#93c5fd;border-color:rgba(66,165,245,0.48);">クリップボードから貼付</button>
+      </div>
+      <textarea id="pinTextImportArea" class="pin-text-area" placeholder='{"format":"audipo2_pins_v1", ...}'></textarea>
+      <div class="mark-edit-footer" style="margin-top:10px;">
+        <button id="btnPinTextImportCancel" type="button" class="mark-dialog-btn" style="color:#a1a1aa;">キャンセル</button>
+        <button id="btnPinTextImportRun" type="button" class="mark-dialog-btn">読み込む</button>
       </div>
     </div>
   </div>
@@ -5541,6 +5984,7 @@
           state.currentMemoryKey = key;
           map[key] = snapshot;
           writeAllFileMemories(map);
+          updateShareButtonState();
 
           try {
             localStorage.setItem(LS_LAST_SESSION_KEY, JSON.stringify({
@@ -5814,11 +6258,17 @@
         }
       }
 
+      function updateShareButtonState() {
+        if (!btnShareAudio) return;
+        const memCount = Object.keys(readAllFileMemories()).length;
+        btnShareAudio.disabled = !(state.hasAudio || memCount > 0);
+      }
+
       function updateMemoryCountBadge() {
         const el = document.getElementById('modalMemoryCount');
-        if (!el) return;
         const count = Object.keys(readAllFileMemories()).length;
-        el.textContent = `${count} / ${MAX_REMEMBERED_FILES}件`;
+        if (el) el.textContent = `${count} / ${MAX_REMEMBERED_FILES}件`;
+        updateShareButtonState();
       }
 
       // ==================== SECTION & SKIP HELPERS ====================
@@ -10012,9 +10462,54 @@
       const btnSaveExportRun = document.getElementById('btnSaveExportRun');
       const btnCancelSaveExport = document.getElementById('btnCancelSaveExport');
       const btnCloseSaveExportX = document.getElementById('btnCloseSaveExportX');
+      const shareModalTabBar = document.getElementById('shareModalTabBar');
+      const tabShareAudio = document.getElementById('tabShareAudio');
+      const tabSharePins = document.getElementById('tabSharePins');
+      const saveAudioPanel = document.getElementById('saveAudioPanel');
+      const sharePinsPanel = document.getElementById('sharePinsPanel');
+      const btnPinScopeCurrent = document.getElementById('btnPinScopeCurrent');
+      const btnPinScopeAll = document.getElementById('btnPinScopeAll');
+      const pinScopeCurrentSub = document.getElementById('pinScopeCurrentSub');
+      const pinScopeAllSub = document.getElementById('pinScopeAllSub');
+      const pinShareFileNameInput = document.getElementById('pinShareFileNameInput');
+      const btnPinShareResetName = document.getElementById('btnPinShareResetName');
+      const pinSharePreviewSpec = document.getElementById('pinSharePreviewSpec');
+      const pinSharePreviewSize = document.getElementById('pinSharePreviewSize');
+      const btnPinDownloadTxt = document.getElementById('btnPinDownloadTxt');
+      const btnPinCopyText = document.getElementById('btnPinCopyText');
+      const pinImportInput = document.getElementById('pinImportInput');
+      const pinImportConflictModal = document.getElementById('pinImportConflictModal');
+      const pinConflictBadge = document.getElementById('pinConflictBadge');
+      const pinConflictTitle = document.getElementById('pinConflictTitle');
+      const pinConflictFileName = document.getElementById('pinConflictFileName');
+      const pinConflictFileMeta = document.getElementById('pinConflictFileMeta');
+      const pinCompareGrid = document.getElementById('pinCompareGrid');
+      const pinCompareOldCount = document.getElementById('pinCompareOldCount');
+      const pinCompareOldList = document.getElementById('pinCompareOldList');
+      const pinCompareNewCount = document.getElementById('pinCompareNewCount');
+      const pinCompareNewList = document.getElementById('pinCompareNewList');
+      const pinUnmatchedNote = document.getElementById('pinUnmatchedNote');
+      const pinApplyAllRow = document.getElementById('pinApplyAllRow');
+      const chkPinApplyAll = document.getElementById('chkPinApplyAll');
+      const pinApplyAllLabel = document.getElementById('pinApplyAllLabel');
+      const btnPinConflictMerge = document.getElementById('btnPinConflictMerge');
+      const btnPinConflictMergeTitle = document.getElementById('btnPinConflictMergeTitle');
+      const btnPinConflictMergeSub = document.getElementById('btnPinConflictMergeSub');
+      const btnPinConflictOverwrite = document.getElementById('btnPinConflictOverwrite');
+      const btnPinConflictOverwriteTitle = document.getElementById('btnPinConflictOverwriteTitle');
+      const btnPinConflictOverwriteSub = document.getElementById('btnPinConflictOverwriteSub');
+      const btnPinConflictSkip = document.getElementById('btnPinConflictSkip');
+      const btnPinConflictSkipTitle = document.getElementById('btnPinConflictSkipTitle');
+      const btnPinConflictSkipSub = document.getElementById('btnPinConflictSkipSub');
+      const btnPinConflictCancel = document.getElementById('btnPinConflictCancel');
+      const pinTextImportModal = document.getElementById('pinTextImportModal');
+      const pinTextImportArea = document.getElementById('pinTextImportArea');
 
       const saveExportState = {
         mode: 'save', // 'save' | 'share'
+        shareTab: 'audio', // 'audio' | 'pins'
+        pinScope: 'current', // 'current' | 'all'
+        pinNameEdited: false,
         probed: false,
         supportM4a: false,
         supportOgg: false,
@@ -10029,8 +10524,720 @@
         saveExportState.preparedShareFile = null;
         btnSaveExportRun.classList.remove('share-ready');
         if (!saveExportState.isExporting) {
-          btnSaveExportRun.textContent = saveExportState.mode === 'share' ? 'この設定でシェア' : 'この設定で保存';
+          if (saveExportState.mode === 'share') {
+            btnSaveExportRun.textContent = saveExportState.shareTab === 'pins' ? 'ピンファイルをシェア' : 'この設定でシェア';
+          } else {
+            btnSaveExportRun.textContent = 'この設定で保存';
+          }
         }
+      }
+
+      // ==================== PIN INFO EXPORT / SHARE / IMPORT ENGINE ====================
+      function makeDateStampYmd() {
+        const d = new Date();
+        const pad = (n) => String(n).padStart(2, '0');
+        return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+      }
+
+      function buildCurrentTrackPinRecord() {
+        if (!state.hasAudio) return null;
+        const origName = state.currentFileOrigName || trackTitleEl.textContent.trim() || 'audio';
+        const displayName = trackTitleEl.textContent.trim() || origName;
+        const size = state.currentFileSize || (state.rawBlob ? state.rawBlob.size : 0);
+        const dur = Math.round((Number(state.duration) || 0) * 1000) / 1000;
+        return {
+          origName,
+          displayName,
+          size: Math.max(0, Math.round(Number(size) || 0)),
+          duration: Math.max(0, dur),
+          markers: cloneMarkerList(state.markers).map(m => ({
+            time: Math.round(m.time * 1000) / 1000,
+            name: m.name || '',
+            enabled: m.enabled !== false,
+            sectionEnabled: m.sectionEnabled !== false
+          })),
+          startSectionEnabled: state.startSectionEnabled !== false,
+          tempMarker: state.tempMarker !== null ? Math.round(Number(state.tempMarker) * 1000) / 1000 : null,
+          currentTime: Math.round(Math.max(0, Math.min(dur || 0, Number(getLivePlayheadTime()) || 0)) * 1000) / 1000,
+          playbackRate: state.playbackRate,
+          pitchSemitones: state.pitchSemitones,
+          sectionRepeat: Boolean(state.sectionRepeat),
+          zoomWindowSeconds: state.zoomWindowSeconds,
+          updatedAt: Date.now()
+        };
+      }
+
+      function collectPinExportEntries(scope) {
+        if (scope === 'current') {
+          const cur = buildCurrentTrackPinRecord();
+          return cur ? [cur] : [];
+        }
+        // 'all': collect all stored memories + merge latest live state of current track
+        const map = readAllFileMemories();
+        const byKey = new Map();
+        Object.entries(map).forEach(([k, rec]) => {
+          if (!rec || typeof rec !== 'object') return;
+          const sz = Math.max(0, Math.round(Number(rec.size) || 0));
+          const dur = Math.round((Number(rec.duration) || 0) * 1000) / 1000;
+          const clean = {
+            origName: String(rec.origName || rec.displayName || 'audio'),
+            displayName: String(rec.displayName || rec.origName || 'audio'),
+            size: sz,
+            duration: dur,
+            markers: cloneMarkerList(rec.markers).map(m => ({
+              time: Math.round(m.time * 1000) / 1000,
+              name: m.name || '',
+              enabled: m.enabled !== false,
+              sectionEnabled: m.sectionEnabled !== false
+            })),
+            startSectionEnabled: rec.startSectionEnabled !== false,
+            tempMarker: typeof rec.tempMarker === 'number' && isFinite(rec.tempMarker) ? Math.round(rec.tempMarker * 1000) / 1000 : null,
+            currentTime: typeof rec.currentTime === 'number' && isFinite(rec.currentTime) ? Math.round(rec.currentTime * 1000) / 1000 : 0,
+            playbackRate: typeof rec.playbackRate === 'number' ? rec.playbackRate : 1.0,
+            pitchSemitones: typeof rec.pitchSemitones === 'number' ? rec.pitchSemitones : 0,
+            sectionRepeat: Boolean(rec.sectionRepeat),
+            zoomWindowSeconds: typeof rec.zoomWindowSeconds === 'number' ? rec.zoomWindowSeconds : 8.0,
+            updatedAt: Number(rec.updatedAt) || Date.now()
+          };
+          byKey.set(k, clean);
+        });
+        const cur = buildCurrentTrackPinRecord();
+        if (cur && cur.size > 0 && cur.duration > 0) {
+          const ck = state.currentMemoryKey || makeFileFingerprint(cur.size, cur.duration);
+          byKey.set(ck, cur);
+        }
+        return Array.from(byKey.values()).sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0));
+      }
+
+      function buildPinExportPayload(scope) {
+        const entries = collectPinExportEntries(scope);
+        const obj = {
+          format: 'audipo2_pins_v1',
+          appVersion: APP_VERSION,
+          scope: scope === 'current' ? 'current' : 'all',
+          exportedAt: new Date().toISOString(),
+          entries
+        };
+        const jsonText = JSON.stringify(obj, null, 2);
+        const totalPins = entries.reduce((sum, e) => sum + (e.markers ? e.markers.length : 0), 0);
+        return { obj, entries, totalPins, jsonText };
+      }
+
+      function getDefaultPinShareBaseName(scope) {
+        if (scope === 'current' && state.hasAudio) {
+          const base = sanitizeExportBaseName(trackTitleEl.textContent.trim() || state.currentFileOrigName || 'audio');
+          return `${base}_pins`;
+        }
+        return `audipo2_all_pins_${makeDateStampYmd()}`;
+      }
+
+      function sanitizePinBaseName(raw, scope) {
+        let s = String(raw || '').trim();
+        s = s.replace(/[\\\/:*?"<>|]/g, '_').replace(/\s+/g, ' ').trim();
+        s = s.replace(/\.(txt|json)$/i, '').trim();
+        return s || getDefaultPinShareBaseName(scope);
+      }
+
+      function updatePinSharePanelUI() {
+        const hasAudio = Boolean(state.hasAudio);
+        const curEntries = collectPinExportEntries('current');
+        const allEntries = collectPinExportEntries('all');
+        const curPins = curEntries.reduce((s, e) => s + e.markers.length, 0);
+        const allPins = allEntries.reduce((s, e) => s + e.markers.length, 0);
+
+        if (!hasAudio && saveExportState.pinScope === 'current') {
+          saveExportState.pinScope = 'all';
+          saveExportState.pinNameEdited = false;
+        } else if (allEntries.length === 0 && hasAudio) {
+          saveExportState.pinScope = 'current';
+        }
+
+        btnPinScopeCurrent.disabled = !hasAudio;
+        btnPinScopeAll.disabled = allEntries.length === 0;
+        btnPinScopeCurrent.classList.toggle('active', saveExportState.pinScope === 'current');
+        btnPinScopeAll.classList.toggle('active', saveExportState.pinScope === 'all');
+
+        pinScopeCurrentSub.textContent = hasAudio ? `黄色ピン ${curPins}個` : '音声未読込';
+        pinScopeAllSub.textContent = `${allEntries.length}ファイル • ${allPins}個`;
+
+        if (!saveExportState.pinNameEdited) {
+          pinShareFileNameInput.value = getDefaultPinShareBaseName(saveExportState.pinScope);
+        }
+
+        const payload = buildPinExportPayload(saveExportState.pinScope);
+        const byteSize = new Blob([payload.jsonText], { type: 'text/plain;charset=utf-8' }).size;
+        pinSharePreviewSpec.textContent = `対象: ${payload.entries.length}ファイル • 黄色ピン合計 ${payload.totalPins}個`;
+        pinSharePreviewSize.textContent = `ファイルサイズ: 約 ${formatBytesApprox(byteSize)} • 形式: .txt (JSONデータ)`;
+
+        const canExport = payload.entries.length > 0;
+        btnPinDownloadTxt.disabled = !canExport;
+        btnPinCopyText.disabled = !canExport;
+        if (saveExportState.mode === 'share' && saveExportState.shareTab === 'pins') {
+          btnSaveExportRun.disabled = !canExport;
+          btnSaveExportRun.textContent = 'ピンファイルをシェア';
+          btnSaveExportRun.classList.remove('share-ready');
+        }
+      }
+
+      async function executeShareOrDownloadPins(action = 'share') {
+        const scope = saveExportState.pinScope;
+        const payload = buildPinExportPayload(scope);
+        if (payload.entries.length === 0) {
+          showToast('共有できるピン情報がありません');
+          return;
+        }
+        const baseName = sanitizePinBaseName(pinShareFileNameInput.value, scope);
+        const finalName = `${baseName}.txt`;
+        const blob = new Blob([payload.jsonText], { type: 'text/plain;charset=utf-8' });
+
+        if (action === 'copy') {
+          let copied = false;
+          try {
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+              await navigator.clipboard.writeText(payload.jsonText);
+              copied = true;
+            }
+          } catch (_) {}
+          if (!copied) {
+            try {
+              const ta = document.createElement('textarea');
+              ta.value = payload.jsonText;
+              ta.style.position = 'fixed';
+              ta.style.opacity = '0';
+              document.body.appendChild(ta);
+              ta.select();
+              copied = document.execCommand('copy');
+              document.body.removeChild(ta);
+            } catch (_) {}
+          }
+          showToast(copied
+            ? `ピン情報をコピーしました（${payload.entries.length}曲・ピン${payload.totalPins}個）`
+            : 'コピーに失敗しました（ファイル保存をお試しください）');
+          return;
+        }
+
+        if (action === 'download') {
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = finalName;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          setTimeout(() => URL.revokeObjectURL(url), 4000);
+          saveExportModal.classList.add('hidden');
+          showToast(`ピンファイルを保存しました: ${finalName}`);
+          return;
+        }
+
+        // Native Web Share (.txt with text/plain works cleanly on Android Chrome / LINE / Mail)
+        const shareFile = new File([blob], finalName, { type: 'text/plain', lastModified: Date.now() });
+        const canNativeShare = Boolean(
+          navigator.share &&
+          (!navigator.canShare || navigator.canShare({ files: [shareFile] }))
+        );
+        if (!canNativeShare) {
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = finalName;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          setTimeout(() => URL.revokeObjectURL(url), 4000);
+          saveExportModal.classList.add('hidden');
+          showToast(`直接共有非対応のため保存しました: ${finalName}`);
+          return;
+        }
+        try {
+          await navigator.share({
+            files: [shareFile],
+            title: finalName
+          });
+          saveExportModal.classList.add('hidden');
+          showToast(`ピン情報をシェアしました（${payload.entries.length}曲・ピン${payload.totalPins}個）`);
+        } catch (err) {
+          if (err && err.name === 'AbortError') {
+            showToast('シェアをキャンセルしました');
+          } else {
+            console.warn('Pin file share failed, falling back to download:', err);
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = finalName;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            setTimeout(() => URL.revokeObjectURL(url), 4000);
+            saveExportModal.classList.add('hidden');
+            showToast(`共有できなかったため保存しました: ${finalName}`);
+          }
+        }
+      }
+
+      // ---------- Pin Import Parser, Conflict Modal & Merge/Overwrite/Skip Engine ----------
+      function normalizeImportedPinEntry(raw) {
+        if (!raw || typeof raw !== 'object') return null;
+        const origName = String(raw.origName || raw.displayName || 'audio').trim() || 'audio';
+        const displayName = String(raw.displayName || origName).trim() || origName;
+        const size = Math.max(0, Math.round(Number(raw.size) || 0));
+        const duration = Math.max(0, Math.round((Number(raw.duration) || 0) * 1000) / 1000);
+        const markers = cloneMarkerList(Array.isArray(raw.markers) ? raw.markers : [])
+          .filter(m => isFinite(m.time) && m.time >= 0 && (duration <= 0 || m.time < duration));
+        return {
+          origName,
+          displayName,
+          size,
+          duration,
+          markers,
+          startSectionEnabled: raw.startSectionEnabled !== false,
+          tempMarker: typeof raw.tempMarker === 'number' && isFinite(raw.tempMarker) && raw.tempMarker >= 0 ? raw.tempMarker : null,
+          currentTime: typeof raw.currentTime === 'number' && isFinite(raw.currentTime) && raw.currentTime >= 0 ? raw.currentTime : 0,
+          playbackRate: typeof raw.playbackRate === 'number' && isFinite(raw.playbackRate) ? Math.max(0.25, Math.min(2.0, raw.playbackRate)) : 1.0,
+          pitchSemitones: typeof raw.pitchSemitones === 'number' && isFinite(raw.pitchSemitones) ? Math.max(-6, Math.min(6, Math.round(raw.pitchSemitones))) : 0,
+          sectionRepeat: Boolean(raw.sectionRepeat),
+          zoomWindowSeconds: typeof raw.zoomWindowSeconds === 'number' && isFinite(raw.zoomWindowSeconds) ? raw.zoomWindowSeconds : 8.0,
+          updatedAt: Number(raw.updatedAt) || Date.now()
+        };
+      }
+
+      function parseAudipoPinData(rawText) {
+        if (typeof rawText !== 'string') return null;
+        let text = rawText.replace(/^\uFEFF/, '').trim();
+        if (!text) return null;
+
+        let parsed = null;
+        try {
+          parsed = JSON.parse(text);
+        } catch (_) {
+          // Tolerate extra message text pasted around the JSON payload (e.g., copied from LINE)
+          const firstBrace = text.indexOf('{');
+          const lastBrace = text.lastIndexOf('}');
+          if (firstBrace >= 0 && lastBrace > firstBrace) {
+            try {
+              parsed = JSON.parse(text.slice(firstBrace, lastBrace + 1));
+            } catch (__) {
+              return null;
+            }
+          }
+        }
+        if (!parsed || typeof parsed !== 'object') return null;
+        if (parsed.format !== 'audipo2_pins_v1' || !Array.isArray(parsed.entries)) return null;
+
+        const entries = [];
+        for (const item of parsed.entries) {
+          const clean = normalizeImportedPinEntry(item);
+          if (clean) entries.push(clean);
+        }
+        if (entries.length === 0) return null;
+        return {
+          scope: parsed.scope === 'current' ? 'current' : 'all',
+          entries
+        };
+      }
+
+      function formatPinPreviewList(markers) {
+        if (!markers || markers.length === 0) return '（ピンなし）';
+        const top = markers.slice(0, 3).map(m => m.name ? `${formatTime(m.time)} ${m.name}` : formatTime(m.time));
+        if (markers.length > 3) top.push(`…ほか${markers.length - 3}個`);
+        return top.join(' / ');
+      }
+
+      function hasMeaningfulPinData(rec) {
+        if (!rec) return false;
+        if (Array.isArray(rec.markers) && rec.markers.length > 0) return true;
+        if (rec.startSectionEnabled === false) return true;
+        if (typeof rec.tempMarker === 'number' && isFinite(rec.tempMarker)) return true;
+        if (rec.displayName && rec.origName && rec.displayName !== rec.origName) return true;
+        return false;
+      }
+
+      function mergePinRecords(existing, incoming, clampDuration = 0) {
+        const mergedMarkers = cloneMarkerList(existing.markers || []);
+        const incMarkers = cloneMarkerList(incoming.markers || []);
+        const maxDur = clampDuration > 0 ? clampDuration : Math.max(existing.duration || 0, incoming.duration || 0);
+
+        for (const inc of incMarkers) {
+          if (maxDur > 0 && (inc.time <= 0.05 || inc.time >= maxDur - 0.05)) continue;
+          const dup = mergedMarkers.find(ex => Math.abs(ex.time - inc.time) <= 0.25);
+          if (dup) {
+            if (!dup.name && inc.name) dup.name = inc.name;
+          } else {
+            mergedMarkers.push(makeMarkerObj(inc.time, inc.name, inc.enabled, inc.sectionEnabled));
+          }
+        }
+        mergedMarkers.sort((a, b) => a.time - b.time);
+
+        const keepExistingName = existing.displayName && existing.origName && existing.displayName !== existing.origName;
+        const incHasCustomName = incoming.displayName && incoming.origName && incoming.displayName !== incoming.origName;
+        const finalDisplayName = keepExistingName
+          ? existing.displayName
+          : (incHasCustomName ? incoming.displayName : (existing.displayName || incoming.displayName));
+
+        return {
+          ...existing,
+          displayName: finalDisplayName,
+          markers: mergedMarkers,
+          startSectionEnabled: existing.startSectionEnabled !== false ? (incoming.startSectionEnabled !== false) : false,
+          tempMarker: existing.tempMarker !== null && existing.tempMarker !== undefined ? existing.tempMarker : incoming.tempMarker,
+          updatedAt: Date.now()
+        };
+      }
+
+      function findMatchInMemoryMap(map, size, duration) {
+        const targetSize = Math.max(0, Math.round(Number(size) || 0));
+        if (targetSize <= 0) return null;
+        const hasDur = typeof duration === 'number' && isFinite(duration) && duration > 0;
+        if (hasDur) {
+          const exactKey = makeFileFingerprint(targetSize, duration);
+          if (map[exactKey]) return { key: exactKey, rec: map[exactKey] };
+        }
+        let best = null;
+        let bestDiff = Infinity;
+        for (const k in map) {
+          const rec = map[k];
+          if (!rec || Number(rec.size) !== targetSize) continue;
+          if (hasDur && typeof rec.duration === 'number' && rec.duration > 0) {
+            const diff = Math.abs(rec.duration - duration);
+            if (diff <= 0.65 && diff < bestDiff) {
+              bestDiff = diff;
+              best = { key: k, rec };
+            }
+          } else if (!hasDur || !(typeof rec.duration === 'number' && rec.duration > 0)) {
+            if (!best) best = { key: k, rec };
+          }
+        }
+        return best;
+      }
+
+      function doesEntryMatchCurrentTrack(entry) {
+        if (!state.hasAudio || !entry) return false;
+        const curSize = state.currentFileSize || (state.rawBlob ? state.rawBlob.size : 0);
+        if (curSize <= 0 || Number(entry.size) !== curSize) return false;
+        if (state.duration > 0 && entry.duration > 0) {
+          return Math.abs(state.duration - entry.duration) <= 0.65;
+        }
+        return true;
+      }
+
+      let pinConflictResolver = null;
+      function closePinConflictModal(result = { action: 'cancel', applyAll: false }) {
+        pinImportConflictModal.classList.add('hidden');
+        if (pinConflictResolver) {
+          const fn = pinConflictResolver;
+          pinConflictResolver = null;
+          fn(result);
+        }
+      }
+
+      function promptPinConflictDialog(opts) {
+        return new Promise((resolve) => {
+          pinConflictResolver = resolve;
+          const isUnmatched = opts.mode === 'unmatchedSingle';
+
+          chkPinApplyAll.checked = false;
+          pinCompareGrid.classList.remove('hidden');
+
+          if (isUnmatched) {
+            pinConflictBadge.textContent = '別の音源のピン情報です';
+            pinConflictTitle.textContent = 'いま開いている曲へ適用しますか？';
+            pinConflictFileName.textContent = opts.incoming.displayName || opts.incoming.origName;
+            pinConflictFileMeta.textContent = `読込元: ${formatBytesApprox(opts.incoming.size)} • ${formatTime(opts.incoming.duration)}`;
+            pinCompareOldCount.textContent = `今の曲 (${opts.currentMarkers.length}個)`;
+            pinCompareOldList.textContent = formatPinPreviewList(opts.currentMarkers);
+            pinCompareNewCount.textContent = `読込ピン (${opts.incoming.markers.length}個)`;
+            pinCompareNewList.textContent = formatPinPreviewList(opts.incoming.markers);
+            pinUnmatchedNote.textContent = `開いている曲「${opts.currentName}」(${formatTime(state.duration)}) とサイズ/長さが異なります。形式変換した別ファイルへピンを移す場合は「いま開いている曲へ適用」を選んでください。`;
+            pinUnmatchedNote.classList.remove('hidden');
+            pinApplyAllRow.classList.add('hidden');
+
+            const hasCurPins = opts.currentMarkers.length > 0;
+            btnPinConflictMergeTitle.textContent = hasCurPins ? 'いま開いている曲へマージ' : 'いま開いている曲へ適用';
+            btnPinConflictMergeSub.textContent = hasCurPins ? '今の曲のピンを残して、読込ピンを追加します' : 'いま開いている曲にこのピンを反映します';
+            btnPinConflictOverwriteTitle.textContent = hasCurPins ? 'いま開いている曲へ上書き' : '元ファイル情報で記憶のみ登録';
+            btnPinConflictOverwriteSub.textContent = hasCurPins ? '今の曲のピンを消して、読込ピンで置き換えます' : '同じ元ファイルを将来開いたときに自動復元されます';
+            btnPinConflictSkipTitle.textContent = hasCurPins ? '元ファイル情報で記憶のみ登録' : 'スキップ';
+            btnPinConflictSkipSub.textContent = hasCurPins ? '今の曲には適用せず、元ファイル用に記憶します' : '何もせず閉じます';
+          } else {
+            const idxStr = opts.totalConflicts > 1 ? ` (${opts.conflictIndex} / ${opts.totalConflicts}件目)` : '';
+            pinConflictBadge.textContent = `同じファイルが既にあります${idxStr}`;
+            pinConflictTitle.textContent = 'ピン情報の取り込み方法を選択';
+            pinConflictFileName.textContent = opts.existing.displayName || opts.incoming.displayName || opts.incoming.origName;
+            pinConflictFileMeta.textContent = `${formatBytesApprox(opts.incoming.size)} • ${formatTime(opts.incoming.duration || opts.existing.duration)}`;
+            pinCompareOldCount.textContent = `黄色ピン ${(opts.existing.markers || []).length}個`;
+            pinCompareOldList.textContent = formatPinPreviewList(opts.existing.markers);
+            pinCompareNewCount.textContent = `黄色ピン ${(opts.incoming.markers || []).length}個`;
+            pinCompareNewList.textContent = formatPinPreviewList(opts.incoming.markers);
+            pinUnmatchedNote.classList.add('hidden');
+
+            if (opts.remainingConflicts > 0) {
+              pinApplyAllLabel.textContent = `このあとすべてに適用する（残り ${opts.remainingConflicts}件の重複にも同じ処理）`;
+              pinApplyAllRow.classList.remove('hidden');
+            } else {
+              pinApplyAllRow.classList.add('hidden');
+            }
+
+            btnPinConflictMergeTitle.textContent = 'マージ（統合）';
+            btnPinConflictMergeSub.textContent = '既存のピンを残したまま、新しいピンを追加';
+            btnPinConflictOverwriteTitle.textContent = '上書き';
+            btnPinConflictOverwriteSub.textContent = '既存のピンを消して、読み込むピンで置き換え';
+            btnPinConflictSkipTitle.textContent = 'スキップ';
+            btnPinConflictSkipSub.textContent = 'このファイルは変更しない';
+          }
+
+          pinImportConflictModal.classList.remove('hidden');
+        });
+      }
+
+      function applyPinRecordToLiveTrack(rec, allowCustomTitle = true) {
+        if (!state.hasAudio || !rec) return;
+        const dur = state.duration > 0 ? state.duration : (rec.duration || 0);
+        state.markers = cloneMarkerList(rec.markers || []).filter(m => m.time > 0.05 && (dur <= 0 || m.time < dur - 0.05));
+        state.startSectionEnabled = rec.startSectionEnabled !== false;
+        if (typeof rec.tempMarker === 'number' && isFinite(rec.tempMarker) && rec.tempMarker >= 0 && (dur <= 0 || rec.tempMarker <= dur)) {
+          state.tempMarker = rec.tempMarker;
+        } else {
+          state.tempMarker = null;
+        }
+        if (allowCustomTitle && rec.displayName && rec.origName && rec.displayName !== rec.origName) {
+          trackTitleEl.textContent = rec.displayName;
+        }
+        if (state.playlist[state.currentTrackIndex]) {
+          state.playlist[state.currentTrackIndex].name = trackTitleEl.textContent.trim();
+          state.playlist[state.currentTrackIndex].markers = cloneMarkerList(state.markers);
+          state.playlist[state.currentTrackIndex].startSectionEnabled = state.startSectionEnabled;
+        }
+        updateHeaderSubInfo();
+        updatePinButtonsUI();
+        updateSectionBarUI();
+        renderMarkerList();
+        renderAllCanvases();
+      }
+
+      async function runPinImportFlow(entries, isSingleScope = false) {
+        if (!Array.isArray(entries) || entries.length === 0) {
+          showToast('読み込めるピン情報がありませんでした');
+          return;
+        }
+
+        // Work on a staged copy of memory so cancelling midway leaves existing data untouched!
+        const stagedMap = readAllFileMemories();
+        const curLiveRec = buildCurrentTrackPinRecord();
+        let liveTrackUpdatedRecord = null;
+        let liveTrackNeedsSave = false;
+
+        // Pre-classify entries to know exact conflict count for the "(1 / N件目)" & "残り M件" labels
+        const plan = entries.map((inc) => {
+          const hit = findMatchInMemoryMap(stagedMap, inc.size, inc.duration);
+          const matchesLive = doesEntryMatchCurrentTrack(inc);
+          let existingRec = hit ? hit.rec : null;
+          if (matchesLive && curLiveRec && (!existingRec || state.isUnsavedRecording)) {
+            existingRec = curLiveRec;
+          }
+          const isConflict = Boolean(existingRec && hasMeaningfulPinData(existingRec));
+          return { inc, hit, matchesLive, existingRec, isConflict };
+        });
+
+        const totalConflicts = plan.filter(p => p.isConflict).length;
+        let seenConflicts = 0;
+        let applyAllAction = null; // null | 'merge' | 'overwrite' | 'skip'
+        const stats = { added: 0, merged: 0, overwritten: 0, skipped: 0, appliedToCurrent: 0 };
+
+        for (let i = 0; i < plan.length; i++) {
+          const item = plan[i];
+          const { inc } = item;
+
+          // Re-check against stagedMap in case multiple imported files contained the same song
+          const hit = findMatchInMemoryMap(stagedMap, inc.size, inc.duration);
+          const matchesLive = doesEntryMatchCurrentTrack(inc);
+          let existingRec = hit ? hit.rec : null;
+          if (matchesLive && curLiveRec && !existingRec) {
+            existingRec = curLiveRec;
+          }
+          const isConflict = Boolean(existingRec && hasMeaningfulPinData(existingRec));
+
+          if (isConflict) {
+            seenConflicts++;
+            const remainingConflicts = Math.max(0, totalConflicts - seenConflicts);
+            let decision = applyAllAction;
+            if (!decision) {
+              const res = await promptPinConflictDialog({
+                mode: 'conflict',
+                existing: existingRec,
+                incoming: inc,
+                conflictIndex: seenConflicts,
+                totalConflicts,
+                remainingConflicts
+              });
+              if (res.action === 'cancel') {
+                showToast('ピン情報の読み込みをキャンセルしました');
+                return;
+              }
+              decision = res.action;
+              if (res.applyAll) {
+                applyAllAction = decision;
+              }
+            }
+
+            if (decision === 'skip') {
+              stats.skipped++;
+              continue;
+            }
+
+            const key = hit ? hit.key : makeFileFingerprint(inc.size, inc.duration);
+            let finalRec;
+            if (decision === 'merge') {
+              finalRec = mergePinRecords(existingRec, inc, matchesLive ? state.duration : 0);
+              stats.merged++;
+            } else {
+              finalRec = {
+                ...existingRec,
+                displayName: (inc.displayName && inc.origName && inc.displayName !== inc.origName) ? inc.displayName : (existingRec.displayName || inc.displayName),
+                markers: cloneMarkerList(inc.markers),
+                startSectionEnabled: inc.startSectionEnabled !== false,
+                tempMarker: inc.tempMarker,
+                updatedAt: Date.now()
+              };
+              stats.overwritten++;
+            }
+
+            if (matchesLive) {
+              liveTrackUpdatedRecord = finalRec;
+              if (!state.isUnsavedRecording && inc.size > 0 && inc.duration > 0) {
+                stagedMap[key] = finalRec;
+              } else {
+                liveTrackNeedsSave = true;
+              }
+            } else if (inc.size > 0 && inc.duration > 0) {
+              stagedMap[key] = finalRec;
+            }
+          } else {
+            // No meaningful conflict!
+            // Special helpful flow: 1-file import that does NOT match memory AND does NOT match current open track -> offer applying to open track!
+            if ((isSingleScope || entries.length === 1) && state.hasAudio && !matchesLive && !hit) {
+              const curHasPins = state.markers.length > 0;
+              const res = await promptPinConflictDialog({
+                mode: 'unmatchedSingle',
+                incoming: inc,
+                currentName: trackTitleEl.textContent.trim() || state.currentFileOrigName || '現在の曲',
+                currentMarkers: state.markers
+              });
+              if (res.action === 'cancel') {
+                showToast('ピン情報の読み込みをキャンセルしました');
+                return;
+              }
+
+              if (curHasPins) {
+                // merge = apply merge to current, overwrite = overwrite current, skip = store to memory only
+                if (res.action === 'merge') {
+                  const curSnap = buildCurrentTrackPinRecord();
+                  liveTrackUpdatedRecord = mergePinRecords(curSnap, inc, state.duration);
+                  liveTrackNeedsSave = true;
+                  stats.appliedToCurrent++;
+                } else if (res.action === 'overwrite') {
+                  const curSnap = buildCurrentTrackPinRecord();
+                  liveTrackUpdatedRecord = {
+                    ...curSnap,
+                    markers: cloneMarkerList(inc.markers).filter(m => m.time > 0.05 && m.time < state.duration - 0.05),
+                    startSectionEnabled: inc.startSectionEnabled !== false,
+                    tempMarker: inc.tempMarker !== null && inc.tempMarker <= state.duration ? inc.tempMarker : null,
+                    updatedAt: Date.now()
+                  };
+                  liveTrackNeedsSave = true;
+                  stats.appliedToCurrent++;
+                } else {
+                  if (inc.size > 0 && inc.duration > 0) {
+                    stagedMap[makeFileFingerprint(inc.size, inc.duration)] = inc;
+                    stats.added++;
+                  } else {
+                    stats.skipped++;
+                  }
+                }
+              } else {
+                // merge = apply directly to current, overwrite = store to memory only, skip = skip
+                if (res.action === 'merge') {
+                  const curSnap = buildCurrentTrackPinRecord();
+                  liveTrackUpdatedRecord = {
+                    ...curSnap,
+                    markers: cloneMarkerList(inc.markers).filter(m => m.time > 0.05 && m.time < state.duration - 0.05),
+                    startSectionEnabled: inc.startSectionEnabled !== false,
+                    tempMarker: inc.tempMarker !== null && inc.tempMarker <= state.duration ? inc.tempMarker : null,
+                    updatedAt: Date.now()
+                  };
+                  liveTrackNeedsSave = true;
+                  stats.appliedToCurrent++;
+                } else if (res.action === 'overwrite') {
+                  if (inc.size > 0 && inc.duration > 0) {
+                    stagedMap[makeFileFingerprint(inc.size, inc.duration)] = inc;
+                    stats.added++;
+                  } else {
+                    stats.skipped++;
+                  }
+                } else {
+                  stats.skipped++;
+                }
+              }
+            } else {
+              // Clean add (or populate an existing 0-pin entry)
+              const key = hit ? hit.key : makeFileFingerprint(inc.size, inc.duration);
+              const nextRec = hit ? { ...hit.rec, ...inc, updatedAt: Date.now() } : { ...inc, updatedAt: Date.now() };
+              if (matchesLive) {
+                liveTrackUpdatedRecord = nextRec;
+                if (!state.isUnsavedRecording && inc.size > 0 && inc.duration > 0) {
+                  stagedMap[key] = nextRec;
+                } else {
+                  liveTrackNeedsSave = true;
+                }
+              } else if (inc.size > 0 && inc.duration > 0) {
+                stagedMap[key] = nextRec;
+              }
+              stats.added++;
+            }
+          }
+        }
+
+        // Commit staged changes atomically
+        writeAllFileMemories(stagedMap);
+
+        if (liveTrackUpdatedRecord) {
+          applyPinRecordToLiveTrack(liveTrackUpdatedRecord, false);
+          if (liveTrackNeedsSave || !state.isUnsavedRecording) {
+            saveCurrentFileMemory(true);
+          }
+        }
+
+        updateMemoryCountBadge();
+        updateStartupLastFileHint();
+        updateShareButtonState();
+        renderPlaylist();
+
+        const parts = [];
+        if (stats.appliedToCurrent > 0) parts.push(`今の曲へ適用 ${stats.appliedToCurrent}件`);
+        if (stats.added > 0) parts.push(`新規 ${stats.added}件`);
+        if (stats.merged > 0) parts.push(`マージ ${stats.merged}件`);
+        if (stats.overwritten > 0) parts.push(`上書き ${stats.overwritten}件`);
+        if (stats.skipped > 0) parts.push(`スキップ ${stats.skipped}件`);
+        showToast(parts.length > 0 ? `ピン読込完了: ${parts.join(' / ')}` : 'ピン情報の変更はありませんでした');
+      }
+
+      async function tryParsePinFiles(fileList) {
+        const allEntries = [];
+        let singleScope = true;
+        let validFileCount = 0;
+        for (const f of fileList) {
+          if (!f || f.size > 20 * 1024 * 1024) continue;
+          try {
+            const txt = await f.text();
+            const parsed = parseAudipoPinData(txt);
+            if (parsed && parsed.entries.length > 0) {
+              validFileCount++;
+              if (parsed.scope !== 'current' || parsed.entries.length > 1) singleScope = false;
+              allEntries.push(...parsed.entries);
+            }
+          } catch (_) {}
+        }
+        if (validFileCount > 1) singleScope = false;
+        return { validFileCount, singleScope, entries: allEntries };
       }
 
       async function probeWebCodecsExportSupport() {
@@ -10124,15 +11331,34 @@
 
       function updateSaveExportModalUI() {
         const isShare = saveExportState.mode === 'share';
+        const isPinTab = isShare && saveExportState.shareTab === 'pins';
         const fmt = saveExportState.selectedFormat;
         const meta = SAVE_FORMAT_META[fmt] || SAVE_FORMAT_META.wav;
         const hasBuf = Boolean(state.audioBuffer);
         const showOrig = canShowOrigCopyFormat();
 
-        saveExportTitle.textContent = isShare ? '音声ファイルをシェア' : '音声ファイルを保存';
-        saveExportSub.textContent = isShare ? 'LINE・メール等へ送る形式・音質を選択' : '形式・音質・ファイル名を選択';
+        shareModalTabBar.classList.toggle('hidden', !isShare);
+        tabShareAudio.disabled = !state.hasAudio;
+        tabShareAudio.classList.toggle('active', isShare && !isPinTab);
+        tabShareAudio.setAttribute('aria-selected', String(isShare && !isPinTab));
+        tabSharePins.classList.toggle('active-pin', isPinTab);
+        tabSharePins.setAttribute('aria-selected', String(isPinTab));
+
+        saveAudioPanel.classList.toggle('hidden', isPinTab);
+        sharePinsPanel.classList.toggle('hidden', !isPinTab);
+
         saveExportIconSave.classList.toggle('hidden', isShare);
         saveExportIconShare.classList.toggle('hidden', !isShare);
+
+        if (isPinTab) {
+          saveExportTitle.textContent = 'ピン情報をシェア';
+          saveExportSub.textContent = '現在の曲または全曲のピンを書き出して共有';
+          updatePinSharePanelUI();
+          return;
+        }
+
+        saveExportTitle.textContent = isShare ? '音声ファイルをシェア' : '音声ファイルを保存';
+        saveExportSub.textContent = isShare ? 'LINE・メール等へ送る形式・音質を選択' : '形式・音質・ファイル名を選択';
         saveShareNotice.classList.toggle('hidden', !isShare);
 
         if (!saveExportState.isExporting) {
@@ -10260,12 +11486,23 @@
         savePreviewSize.textContent = `予想ファイルサイズ: 約 ${formatBytesApprox(estBytes)}${ratioNote}`;
       }
 
-      async function openSaveExportModal(mode = 'save') {
-        if (!state.audioBuffer && !state.rawBlob) return;
+      async function openSaveExportModal(mode = 'save', opts = {}) {
+        const targetMode = mode === 'share' ? 'share' : 'save';
+        const hasAudioData = Boolean(state.hasAudio && (state.audioBuffer || state.rawBlob));
+        const memCount = Object.keys(readAllFileMemories()).length;
+        if (targetMode === 'save' && !hasAudioData) return;
+        if (targetMode === 'share' && !hasAudioData && memCount === 0) {
+          showToast('共有できる音声またはピン情報がありません');
+          return;
+        }
         await probeWebCodecsExportSupport();
 
-        const targetMode = mode === 'share' ? 'share' : 'save';
         saveExportState.mode = targetMode;
+        saveExportState.shareTab = targetMode === 'share'
+          ? (opts.initialTab === 'pins' || !hasAudioData ? 'pins' : 'audio')
+          : 'audio';
+        saveExportState.pinScope = hasAudioData ? 'current' : 'all';
+        saveExportState.pinNameEdited = false;
         saveExportState.isExporting = false;
         saveExportState.cancelled = false;
         saveExportState.preparedShareFile = null;
@@ -10368,7 +11605,12 @@
       }
 
       async function executeSaveExport() {
-        if (saveExportState.isExporting || (!state.audioBuffer && !state.rawBlob)) return;
+        if (saveExportState.isExporting) return;
+        if (saveExportState.mode === 'share' && saveExportState.shareTab === 'pins') {
+          await executeShareOrDownloadPins('share');
+          return;
+        }
+        if (!state.audioBuffer && !state.rawBlob) return;
 
         const isShare = saveExportState.mode === 'share';
 
@@ -10554,6 +11796,101 @@
       btnCloseSaveExportX.addEventListener('click', closeSaveExportModal);
       saveExportModal.addEventListener('click', (e) => {
         if (e.target === saveExportModal && !saveExportState.isExporting) closeSaveExportModal();
+      });
+
+      tabShareAudio.addEventListener('click', () => {
+        if (saveExportState.isExporting || tabShareAudio.disabled) return;
+        saveExportState.shareTab = 'audio';
+        updateSaveExportModalUI();
+      });
+      tabSharePins.addEventListener('click', () => {
+        if (saveExportState.isExporting) return;
+        saveExportState.shareTab = 'pins';
+        updateSaveExportModalUI();
+      });
+      btnPinScopeCurrent.addEventListener('click', () => {
+        if (btnPinScopeCurrent.disabled) return;
+        saveExportState.pinScope = 'current';
+        saveExportState.pinNameEdited = false;
+        updatePinSharePanelUI();
+      });
+      btnPinScopeAll.addEventListener('click', () => {
+        if (btnPinScopeAll.disabled) return;
+        saveExportState.pinScope = 'all';
+        saveExportState.pinNameEdited = false;
+        updatePinSharePanelUI();
+      });
+      pinShareFileNameInput.addEventListener('input', () => {
+        saveExportState.pinNameEdited = true;
+      });
+      btnPinShareResetName.addEventListener('click', () => {
+        saveExportState.pinNameEdited = false;
+        pinShareFileNameInput.value = getDefaultPinShareBaseName(saveExportState.pinScope);
+        pinShareFileNameInput.focus();
+      });
+      btnPinDownloadTxt.addEventListener('click', () => executeShareOrDownloadPins('download'));
+      btnPinCopyText.addEventListener('click', () => executeShareOrDownloadPins('copy'));
+
+      // Pin Conflict Modal Listeners
+      btnPinConflictMerge.addEventListener('click', () => closePinConflictModal({ action: 'merge', applyAll: Boolean(chkPinApplyAll.checked) }));
+      btnPinConflictOverwrite.addEventListener('click', () => closePinConflictModal({ action: 'overwrite', applyAll: Boolean(chkPinApplyAll.checked) }));
+      btnPinConflictSkip.addEventListener('click', () => closePinConflictModal({ action: 'skip', applyAll: Boolean(chkPinApplyAll.checked) }));
+      btnPinConflictCancel.addEventListener('click', () => closePinConflictModal({ action: 'cancel', applyAll: false }));
+
+      // Pin Import from Settings (File & Text Paste)
+      document.getElementById('btnImportPinsFile').addEventListener('click', () => {
+        pinImportInput.value = '';
+        pinImportInput.click();
+      });
+      pinImportInput.addEventListener('change', async (e) => {
+        const files = e.target.files ? Array.from(e.target.files) : [];
+        pinImportInput.value = '';
+        if (files.length === 0) return;
+        const parsed = await tryParsePinFiles(files);
+        if (parsed.validFileCount === 0 || parsed.entries.length === 0) {
+          showToast('有効なピン情報ファイル（.txt / .json）ではありませんでした');
+          return;
+        }
+        settingsModal.classList.add('hidden');
+        await runPinImportFlow(parsed.entries, parsed.singleScope);
+      });
+
+      function closePinTextImportModal() {
+        pinTextImportModal.classList.add('hidden');
+      }
+      document.getElementById('btnImportPinsText').addEventListener('click', () => {
+        pinTextImportArea.value = '';
+        pinTextImportModal.classList.remove('hidden');
+        setTimeout(() => pinTextImportArea.focus(), 50);
+      });
+      document.getElementById('btnPinPasteClipboard').addEventListener('click', async () => {
+        try {
+          if (navigator.clipboard && navigator.clipboard.readText) {
+            const txt = await navigator.clipboard.readText();
+            if (txt) {
+              pinTextImportArea.value = txt;
+              showToast('クリップボードから貼り付けました');
+              return;
+            }
+          }
+          showToast('入力欄を長押しして貼り付けてください');
+        } catch (_) {
+          showToast('入力欄を長押しして貼り付けてください');
+        }
+      });
+      document.getElementById('btnPinTextImportCancel').addEventListener('click', closePinTextImportModal);
+      pinTextImportModal.addEventListener('click', (e) => {
+        if (e.target === pinTextImportModal) closePinTextImportModal();
+      });
+      document.getElementById('btnPinTextImportRun').addEventListener('click', async () => {
+        const parsed = parseAudipoPinData(pinTextImportArea.value);
+        if (!parsed || parsed.entries.length === 0) {
+          showToast('有効なピン情報テキストが見つかりませんでした');
+          return;
+        }
+        closePinTextImportModal();
+        settingsModal.classList.add('hidden');
+        await runPinImportFlow(parsed.entries, parsed.scope === 'current' && parsed.entries.length === 1);
       });
 
       // ==================== HIGH-FIDELITY RAW PCM RECORDING (AUDIOWORKLET + DIRECT PATH) ====================
@@ -15369,42 +16706,55 @@
       // ==================== WIRE ALL EVENT LISTENERS ====================
       fileInput.addEventListener('change', async (e) => {
         const files = e.target.files ? Array.from(e.target.files) : [];
+        fileInput.value = '';
         if (files.length === 0) return;
-        const valid = files.filter(isAudioCandidate);
-        if (valid.length === 0) {
-          showToast('音声ファイル（.m4a / .mp3 / .wav 等）を選択してください');
-          fileInput.value = '';
+
+        const audioFiles = files.filter(isAudioCandidate);
+        const nonAudioFiles = files.filter(f => !isAudioCandidate(f));
+        const pinResult = nonAudioFiles.length > 0
+          ? await tryParsePinFiles(nonAudioFiles)
+          : { validFileCount: 0, singleScope: false, entries: [] };
+
+        if (audioFiles.length === 0 && pinResult.entries.length === 0) {
+          showToast('音声ファイルまたはピン情報ファイル（.txt / .json）を選択してください');
           return;
         }
-        let targetIdx = -1;
-        for (let k = 0; k < valid.length; k++) {
-          const f = valid[k];
-          const existingIdx = state.playlist.findIndex(item => (item.origName || item.name) === f.name && item.blob && item.blob.size === f.size);
-          if (existingIdx >= 0) {
-            state.playlist[existingIdx].blob = f;
-            if (k === 0) targetIdx = existingIdx;
-          } else {
-            const mem = lookupFileMemory(f.size, null);
-            const newIdx = state.playlist.length;
-            const customTitle = (mem && mem.displayName && mem.displayName !== mem.origName) ? mem.displayName : f.name;
-            state.playlist.push({
-              name: customTitle,
-              origName: f.name,
-              blob: f,
-              markers: mem ? cloneMarkerList(mem.markers) : [],
-              startSectionEnabled: mem ? (mem.startSectionEnabled !== false) : true
-            });
-            if (k === 0) targetIdx = newIdx;
+
+        settingsModal.classList.add('hidden');
+
+        if (audioFiles.length > 0) {
+          let targetIdx = -1;
+          for (let k = 0; k < audioFiles.length; k++) {
+            const f = audioFiles[k];
+            const existingIdx = state.playlist.findIndex(item => (item.origName || item.name) === f.name && item.blob && item.blob.size === f.size);
+            if (existingIdx >= 0) {
+              state.playlist[existingIdx].blob = f;
+              if (k === 0) targetIdx = existingIdx;
+            } else {
+              const mem = lookupFileMemory(f.size, null);
+              const newIdx = state.playlist.length;
+              const customTitle = (mem && mem.displayName && mem.displayName !== mem.origName) ? mem.displayName : f.name;
+              state.playlist.push({
+                name: customTitle,
+                origName: f.name,
+                blob: f,
+                markers: mem ? cloneMarkerList(mem.markers) : [],
+                startSectionEnabled: mem ? (mem.startSectionEnabled !== false) : true
+              });
+              if (k === 0) targetIdx = newIdx;
+            }
+          }
+          state.currentTrackIndex = targetIdx >= 0 ? targetIdx : 0;
+          const firstFile = audioFiles[0];
+          const loadRes = await loadAudioBlob(firstFile, firstFile.name, [], false, null, true, { origName: firstFile.name, restoreFromMemory: true, persistSession: true });
+          if (pinResult.entries.length === 0 && (!loadRes || !loadRes.restoredFromMem)) {
+            showToast(audioFiles.length > 1 ? `${audioFiles.length}個のローカルファイルを読み込みました` : `読込完了: ${firstFile.name}`);
           }
         }
-        state.currentTrackIndex = targetIdx >= 0 ? targetIdx : 0;
-        const firstFile = valid[0];
-        const loadRes = await loadAudioBlob(firstFile, firstFile.name, [], false, null, true, { origName: firstFile.name, restoreFromMemory: true, persistSession: true });
-        if (!loadRes || !loadRes.restoredFromMem) {
-          showToast(valid.length > 1 ? `${valid.length}個のローカルファイルを読み込みました` : `読込完了: ${firstFile.name}`);
+
+        if (pinResult.entries.length > 0) {
+          await runPinImportFlow(pinResult.entries, pinResult.singleScope);
         }
-        fileInput.value = '';
-        settingsModal.classList.add('hidden');
       });
 
       // Header & Startup Actions
@@ -15654,11 +17004,22 @@
       document.addEventListener('webkitfullscreenchange', onFullscreenStateChanged);
 
       // ==================== GITHUB / PWA SOFTWARE UPDATE CHECK & APPLY ====================
-      const APP_VERSION = 'v35';
+      const APP_VERSION = 'v36';
 
       // Ordered newest-first; each release appends a new object at the top.
       // Users who skip multiple versions automatically see ALL unseen versions between lastSeen and current.
       const APP_RELEASE_NOTES = [
+        {
+          version: 'v36',
+          verNum: 36,
+          date: '2026/11/23',
+          title: 'ピン情報の共有・エクスポートとインポート（マージ/上書き/スキップ選択）を追加',
+          items: [
+            '右上の共有ボタンに「音声ファイル / ピン情報」タブを追加し、現在のファイルのみ・またはすべてのファイルのピン情報を .txt（JSON）ファイル共有・ダウンロード保存・テキストコピーできるようになりました',
+            'ピン情報の取り込みは、いつもの「開く」ボタン（音声ファイルとの同時選択にも対応）および設定画面の「ピンを読込 (ファイル)」「テキスト貼付で読込」から行えます',
+            '同じファイルのピンが既に記憶されている場合は「マージ（統合）」「上書き」「スキップ」を選べ、複数重複時はファイルごとに選ぶか「このあとすべてに適用する」を一括選択できます'
+          ]
+        },
         {
           version: 'v35',
           verNum: 35,
@@ -16232,6 +17593,7 @@
               bullets: [
                 ['時間とサイズで自動判別', 'ファイル名ではなく「再生時間＋ファイルサイズ」で音源を判別するため、スマホ側でファイル名を変更してもピンが引き継がれます。区間削除後の新しいサイズ・ピン位置にも追従します。'],
                 ['未保存の録音について', '録音直後の未保存データは1000件の保存枠を使わず、一時キャッシュ枠にのみ保持されます。「保存」すると正式に1000件枠へ登録されます。'],
+                ['ピンの共有・読込（バックアップ）', '右上の共有ボタンの「ピン情報」タブから、現在の曲だけ・または全曲分のピンを .txt ファイルやテキストとして書き出せます。取り込みは普段の「開く」ボタン（音源との同時選択も可）またはここの「ピンを読込」「テキスト貼付で読込」から行え、同じファイルが既にある場合はファイルごと／すべてに適用で「マージ・上書き・スキップ」を選べます。'],
                 ['一時音源キャッシュ削除', '次回起動時に前回の音源を自動で開き直す一時データだけを削除します（1000件のピン記憶は消えません）。'],
                 ['全ピン記憶を初期化', 'これまで記憶した最大1000ファイル分のピン情報をすべて消去します。']
               ]
@@ -17038,7 +18400,11 @@
 
       window.addEventListener('popstate', () => {
         // 1. Close topmost open modal if any
-        if (clearPinMemoryConfirmModal && !clearPinMemoryConfirmModal.classList.contains('hidden')) {
+        if (pinImportConflictModal && !pinImportConflictModal.classList.contains('hidden')) {
+          closePinConflictModal({ action: 'cancel', applyAll: false });
+        } else if (pinTextImportModal && !pinTextImportModal.classList.contains('hidden')) {
+          closePinTextImportModal();
+        } else if (clearPinMemoryConfirmModal && !clearPinMemoryConfirmModal.classList.contains('hidden')) {
           closeClearPinMemoryModal();
         } else if (settingHelpModal && !settingHelpModal.classList.contains('hidden')) {
           closeSettingHelpModal();
