@@ -8,7 +8,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="Audipo2">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="app-version" content="v39">
+  <meta name="app-version" content="v40">
   <link rel="manifest" href="./manifest.json">
   <title>Audipo風 練習プレイヤー＆レコーダー</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='bg' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%231b2030'/%3E%3Cstop offset='100%25' stop-color='%230d0f15'/%3E%3C/linearGradient%3E%3ClinearGradient id='wv' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0%25' stop-color='%2360c5ff'/%3E%3Cstop offset='100%25' stop-color='%232563eb'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='url(%23bg)'/%3E%3Crect x='1' y='1' width='62' height='62' rx='15' fill='none' stroke='%233b82f6' stroke-opacity='0.3' stroke-width='2'/%3E%3Cg fill='url(%23wv)'%3E%3Crect x='10' y='28' width='4.5' height='12' rx='2.25' opacity='0.6'/%3E%3Crect x='18' y='22' width='4.5' height='24' rx='2.25' opacity='0.85'/%3E%3Crect x='26' y='15' width='4.5' height='36' rx='2.25'/%3E%3Crect x='34' y='21' width='4.5' height='25' rx='2.25' opacity='0.9'/%3E%3Crect x='42' y='26' width='4.5' height='16' rx='2.25' opacity='0.75'/%3E%3Crect x='50' y='30' width='4.5' height='9' rx='2.25' opacity='0.5'/%3E%3C/g%3E%3Cpath d='M36.25 10.5c0-1.4 1.1-2.5 2.5-2.5h5.5c1.4 0 2.5 1.1 2.5 2.5v2.4c0 .8-.3 1.5-.9 2.1l-3.2 3.1c-.6.6-1.6.6-2.2 0l-3.2-3.1c-.6-.6-.9-1.3-.9-2.1v-2.4z' fill='%23facc15'/%3E%3C/svg%3E">
@@ -4747,8 +4747,17 @@
                 <div class="tr-key-note">APIキーはこの端末内にのみ保存され、GoogleのGemini API以外へ送信されません。</div>
               </div>
 
-              <!-- Shared Utterance Pause Grouping Sensitivity -->
+              <!-- Skip Musical Performance Toggle (Fast Speech-Only Mode) -->
               <div class="tr-set-row" style="padding-top:5px;border-top:1px solid var(--border-subtle);">
+                <span class="tr-set-label">演奏中をスキップ（高速化）</span>
+                <div class="tr-pill-group">
+                  <button type="button" data-tr-skipmusic="1" class="tr-mini-pill tr-skipmusic-btn active">ON（推奨・高速）</button>
+                  <button type="button" data-tr-skipmusic="0" class="tr-mini-pill tr-skipmusic-btn">OFF（全体）</button>
+                </div>
+              </div>
+
+              <!-- Shared Utterance Pause Grouping Sensitivity -->
+              <div class="tr-set-row">
                 <span class="tr-set-label">発話の区切り（間）</span>
                 <div class="tr-pill-group">
                   <button type="button" data-tr-pause="0.5" class="tr-mini-pill tr-pause-btn mono">短め 0.5s</button>
@@ -5334,7 +5343,7 @@
         <div class="modal-section" style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
           <div>
             <div class="sec-title">バージョン情報</div>
-            <div id="settingsVersionLabel" class="engine-desc mono">現在: v39</div>
+            <div id="settingsVersionLabel" class="engine-desc mono">現在: v40</div>
           </div>
           <button id="btnShowReleaseHistory" type="button" class="step-btn" style="color:#93c5fd;border-color:rgba(66,165,245,0.45);">更新履歴を見る</button>
         </div>
@@ -5491,7 +5500,7 @@
           </div>
           <div>
             <h3 id="whatsNewTitle" class="whats-new-title">アップデートのお知らせ</h3>
-            <p id="whatsNewSub" class="whats-new-sub mono">v39 に更新されました</p>
+            <p id="whatsNewSub" class="whats-new-sub mono">v40 に更新されました</p>
           </div>
         </div>
         <button id="btnCloseWhatsNewX" type="button" class="modal-close" aria-label="閉じる">✕</button>
@@ -6039,6 +6048,8 @@
         transcriptWhisperModel: 'onnx-community/whisper-tiny',
         transcriptGeminiModel: 'auto',
         transcriptPauseSec: 0.8,
+        transcriptSkipMusic: true,
+        transcriptLastSkippedSec: 0,
         transcriptRunning: false,
         transcriptCancelled: false,
         transcriptActiveIdx: -1,
@@ -6629,7 +6640,8 @@
             transcriptEngine: state.transcriptEngine,
             transcriptWhisperModel: state.transcriptWhisperModel,
             transcriptGeminiModel: state.transcriptGeminiModel,
-            transcriptPauseSec: state.transcriptPauseSec
+            transcriptPauseSec: state.transcriptPauseSec,
+            transcriptSkipMusic: state.transcriptSkipMusic
           }));
         } catch (_) {}
       }
@@ -6751,6 +6763,9 @@
           }
           if (typeof p.transcriptPauseSec === 'number' && [0.5, 0.8, 1.3].includes(p.transcriptPauseSec)) {
             state.transcriptPauseSec = p.transcriptPauseSec;
+          }
+          if (typeof p.transcriptSkipMusic === 'boolean') {
+            state.transcriptSkipMusic = p.transcriptSkipMusic;
           }
         } catch (_) {}
       }
@@ -15962,6 +15977,10 @@
         document.querySelectorAll('.tr-wmodel-btn').forEach(b => {
           b.classList.toggle('active', b.dataset.trWmodel === state.transcriptWhisperModel);
         });
+        document.querySelectorAll('.tr-skipmusic-btn').forEach(b => {
+          const want = b.dataset.trSkipmusic === '1';
+          b.classList.toggle('active', want === Boolean(state.transcriptSkipMusic));
+        });
         document.querySelectorAll('.tr-pause-btn').forEach(b => {
           b.classList.toggle('active', Math.abs(parseFloat(b.dataset.trPause) - state.transcriptPauseSec) < 0.05);
         });
@@ -16047,9 +16066,10 @@
 
         if (segs.length === 0) {
           const modeLabel = state.transcriptEngine === 'gemini'
-            ? 'Gemini API（高精度・高速・要APIキー）'
-            : 'スマホ内AI Whisper（無料・APIキー不要）';
-          transcriptListWrap.innerHTML = `<div class="tr-empty-box">下の<strong>「文字起こし開始」</strong>を押すと、現在の音声を発話のまとまりごとに区切ってリスト化します。<br><span style="font-size:11px;color:#93c5fd;">現在: ${escapeHtml(modeLabel)}</span><br><span style="font-size:10.5px;color:#71717a;">リストを選ぶとその発話位置へジャンプできます。</span></div>`;
+            ? 'Gemini API（高精度・要APIキー）'
+            : 'スマホ内AI Whisper（無料）';
+          const skipLabel = state.transcriptSkipMusic ? '演奏中スキップ: ON（高速）' : '演奏中スキップ: OFF（全体）';
+          transcriptListWrap.innerHTML = `<div class="tr-empty-box">下の<strong>「文字起こし開始」</strong>を押すと、現在の音声を発話のまとまりごとに区切ってリスト化します。<br><span style="font-size:11px;color:#93c5fd;">現在: ${escapeHtml(modeLabel)}</span><br><span style="font-size:10.5px;color:#6ee7b7;">${escapeHtml(skipLabel)}（右上の「設定」で変更可）</span></div>`;
           updateTranscriptUI();
           return;
         }
@@ -16283,28 +16303,202 @@
         return out;
       }
 
-      // ---------- Adaptive RMS VAD Utterance Grouping (発話のまとまりごと) ----------
-      function detectUtteranceGroups(pcm16k, sr = 16000, pauseSec = 0.8, maxSegSec = 24.0) {
-        const frameLen = Math.round(sr * 0.020); // 20ms
+      // ---------- Acoustic Speech vs. Musical Performance Classifier + Adaptive Utterance Grouping ----------
+      const _yinDiffBuf = new Float32Array(100);
+      const _yinCmndfBuf = new Float32Array(100);
+      const _yinDecimBuf = new Float32Array(160);
+
+      // Fast 8kHz YIN CMNDF fundamental pitch & periodicity estimator on a 20ms (320-sample @ 16kHz) frame
+      function estimateYinPitch8k(pcm16k, sampleStart, meanVal, scale) {
+        const W = 64;
+        const maxLag = 96; // 8000 / 96 = 83.3 Hz .. 8000 / 6 = 1333 Hz
+        for (let i = 0; i < 160; i++) {
+          _yinDecimBuf[i] = (pcm16k[sampleStart + (i << 1)] * scale) - meanVal;
+        }
+        const diff = _yinDiffBuf;
+        const cmndf = _yinCmndfBuf;
+        diff[0] = 0;
+        cmndf[0] = 1;
+        let running = 0;
+        for (let tau = 1; tau <= maxLag; tau++) {
+          let sumSq = 0;
+          for (let j = 0; j < W; j++) {
+            const d = _yinDecimBuf[j] - _yinDecimBuf[j + tau];
+            sumSq += d * d;
+          }
+          diff[tau] = sumSq;
+          running += sumSq;
+          cmndf[tau] = running > 1e-12 ? (sumSq * tau) / running : 1.0;
+        }
+
+        let bestTau = 0;
+        for (let tau = 6; tau < maxLag; tau++) {
+          if (cmndf[tau] < 0.22 && cmndf[tau] <= cmndf[tau - 1] && cmndf[tau] <= cmndf[tau + 1]) {
+            bestTau = tau;
+            break;
+          }
+        }
+        if (bestTau === 0) {
+          let minVal = 1.0;
+          let minTau = 0;
+          for (let tau = 6; tau <= maxLag; tau++) {
+            if (cmndf[tau] < minVal) {
+              minVal = cmndf[tau];
+              minTau = tau;
+            }
+          }
+          if (minVal < 0.45) bestTau = minTau;
+        }
+        if (bestTau > 0) {
+          const periodicity = Math.max(0, 1.0 - cmndf[bestTau]);
+          return { f0: 8000.0 / bestTau, periodicity };
+        }
+        return { f0: 0, periodicity: 0 };
+      }
+
+      // Evaluates a frame range [fStart, fEnd) and returns speech likelihood score (higher = Speech, lower = Music/Applause)
+      function computeSpeechLikelihood(rms, zcr, f0Arr, perArr, fStart, fEnd, refP90) {
+        const nf = fEnd - fStart;
+        if (nf < 6) return 0.5;
+        const durSec = nf * 0.020;
+
+        let localMax = 0;
+        for (let f = fStart; f < fEnd; f++) {
+          if (rms[f] > localMax) localMax = rms[f];
+        }
+        const activeTh = Math.max(0.0025, Math.min(refP90 * 0.22, localMax * 0.24));
+
+        const actZcr = [];
+        const actF0 = [];
+        let perSum = 0;
+        let perCount = 0;
+
+        for (let f = fStart; f < fEnd; f++) {
+          if (rms[f] >= activeTh) {
+            actZcr.push(zcr[f]);
+            if (perArr[f] >= 0) {
+              perSum += perArr[f];
+              perCount++;
+              if (f0Arr[f] > 0) actF0.push(f0Arr[f]);
+            }
+          }
+        }
+        if (actZcr.length < 4) return 0.5;
+
+        // Cue 1: Syllable-rate energy modulation (3-frame smoothed RMS pulses per second; speech = 2.2..7.8 syl/s)
+        const sylThresh = Math.max(activeTh * 1.15, localMax * 0.36);
+        let pulses = 0;
+        let inPulse = false;
+        for (let f = fStart; f < fEnd; f++) {
+          const prev = f > fStart ? rms[f - 1] : rms[f];
+          const next = f + 1 < fEnd ? rms[f + 1] : rms[f];
+          const sm = 0.25 * prev + 0.5 * rms[f] + 0.25 * next;
+          if (!inPulse && sm >= sylThresh) {
+            inPulse = true;
+            pulses++;
+          } else if (inPulse && sm < sylThresh * 0.72) {
+            inPulse = false;
+          }
+        }
+        const sylRate = pulses / Math.max(0.2, durSec);
+
+        // Cue 2: Consonant-vowel ZCR contrast (p90 - p20 of active ZCR)
+        actZcr.sort((a, b) => a - b);
+        const zLo = actZcr[Math.floor(actZcr.length * 0.20)] || 0;
+        const zHi = actZcr[Math.min(actZcr.length - 1, Math.floor(actZcr.length * 0.90))] || 0;
+        const zcrSpread = zHi - zLo;
+
+        // Cue 3: Musical pitch lock (consecutive sampled frames within ±50 cents, tolerating vibrato)
+        let locked = 0;
+        let tonalPairs = 0;
+        let highPitchCount = 0;
+        for (let i = 0; i < actF0.length; i++) {
+          if (actF0[i] > 285.0) highPitchCount++;
+          if (i > 0) {
+            tonalPairs++;
+            const ratio = actF0[i] / actF0[i - 1];
+            if (ratio > 0.9715 && ratio < 1.0293) {
+              locked++;
+            }
+          }
+        }
+        const pitchLock = tonalPairs > 0 ? (locked / tonalPairs) : 0;
+        const highPitchRatio = actF0.length > 0 ? (highPitchCount / actF0.length) : 0;
+        const meanPer = perCount > 0 ? (perSum / perCount) : 0;
+
+        let score = 0.45;
+        // Consonant-vowel ZCR contrast
+        if (zcrSpread >= 0.16) score += 0.30;
+        else if (zcrSpread >= 0.08) score += 0.15;
+        else score -= 0.24;
+
+        // Syllable-rate modulation + human vocal pitch register
+        if (sylRate >= 2.2 && sylRate <= 7.8) {
+          score += 0.28;
+          if (highPitchRatio < 0.22 && meanPer >= 0.35) score += 0.14;
+        } else if (sylRate < 1.6) {
+          score -= 0.16;
+        }
+
+        // Musical sustained pitch penalty
+        if (pitchLock >= 0.65) score -= 0.35;
+        else if (pitchLock >= 0.40) score -= 0.18;
+
+        // High-register instrumental melody penalty (flute / upper woodwind / violin > D4)
+        if (highPitchRatio >= 0.55) score -= 0.30;
+        else if (highPitchRatio >= 0.25) score -= 0.14;
+
+        // Applause / broadband noise penalty
+        if (meanPer < 0.22 && zcrSpread < 0.12) {
+          score -= 0.35;
+        }
+
+        return score;
+      }
+
+      async function detectUtteranceGroupsAsync(pcm16k, sr = 16000, pauseSec = 0.8, maxSegSec = 24.0, skipMusic = true, onProgress = null) {
+        const frameLen = Math.round(sr * 0.020); // 20ms (320 samples)
         const numFrames = Math.floor(pcm16k.length / frameLen);
         const totalDur = pcm16k.length / sr;
-        if (numFrames <= 0 || totalDur <= 0.05) return [];
+        if (numFrames <= 0 || totalDur <= 0.05) {
+          return { segments: [], skippedMusicSec: 0 };
+        }
 
         const isI16 = pcm16k instanceof Int16Array;
         const scale = isI16 ? 0.000030517578125 : 1.0;
 
         const rms = new Float32Array(numFrames);
+        const zcr = skipMusic ? new Float32Array(numFrames) : null;
+        const f0Arr = skipMusic ? new Float32Array(numFrames) : null;
+        const perArr = skipMusic ? new Float32Array(numFrames) : null;
+        if (perArr) perArr.fill(-1);
+
+        // Pass 1: Compute 20ms RMS & ZCR across the recording (yield periodically on long files)
         for (let f = 0; f < numFrames; f++) {
           const base = f * frameLen;
           let mean = 0;
           for (let i = 0; i < frameLen; i++) mean += pcm16k[base + i] * scale;
           mean /= frameLen;
+
           let sq = 0;
+          let crossings = 0;
+          let prevSign = (pcm16k[base] * scale - mean) >= 0;
           for (let i = 0; i < frameLen; i++) {
             const d = (pcm16k[base + i] * scale) - mean;
             sq += d * d;
+            if (zcr && i > 0) {
+              const curSign = d >= 0;
+              if (curSign !== prevSign) crossings++;
+              prevSign = curSign;
+            }
           }
           rms[f] = Math.sqrt(sq / frameLen);
+          if (zcr) zcr[f] = crossings / (frameLen - 1);
+
+          if ((f & 8191) === 8191) {
+            if (onProgress) onProgress((f / numFrames) * 0.5);
+            await new Promise(r => setTimeout(r, 0));
+          }
         }
 
         const sorted = new Float32Array(rms);
@@ -16313,9 +16507,30 @@
         const p90 = sorted[Math.min(numFrames - 1, Math.floor(numFrames * 0.90))] || 0;
 
         const segments = [];
+        let skippedMusicSec = 0;
+
         if (p90 >= 0.0012) {
           const enterTh = Math.max(0.0042, noise * 2.4, noise + (p90 - noise) * 0.14);
           const exitTh = enterTh * 0.65;
+
+          // Pass 2 (when skipMusic is ON): Extract YIN pitch & periodicity on every 2nd active frame (40ms step)
+          if (skipMusic && f0Arr && perArr) {
+            for (let f = 0; f < numFrames; f += 2) {
+              if (rms[f] >= exitTh) {
+                const base = f * frameLen;
+                let mean = 0;
+                for (let i = 0; i < frameLen; i++) mean += pcm16k[base + i] * scale;
+                mean /= frameLen;
+                const { f0, periodicity } = estimateYinPitch8k(pcm16k, base, mean, scale);
+                f0Arr[f] = f0;
+                perArr[f] = periodicity;
+              }
+              if ((f & 4095) === 4094) {
+                if (onProgress) onProgress(0.5 + (f / numFrames) * 0.45);
+                await new Promise(r => setTimeout(r, 0));
+              }
+            }
+          }
 
           const raw = [];
           let inSpeech = false;
@@ -16332,7 +16547,7 @@
           }
           if (inSpeech) raw.push([startF * 0.020, numFrames * 0.020]);
 
-          // Merge adjacent speech islands separated by less than pauseSec -> natural utterance groups
+          // Merge adjacent active islands separated by less than pauseSec
           const merged = [];
           for (let i = 0; i < raw.length; i++) {
             const seg = raw[i];
@@ -16343,9 +16558,63 @@
             }
           }
 
-          for (let i = 0; i < merged.length; i++) {
-            let s = merged[i][0];
-            const e = merged[i][1];
+          // Filter out musical performance sections when skipMusic is enabled
+          let candidateRanges = [];
+          if (!skipMusic) {
+            candidateRanges = merged;
+          } else {
+            const SPEECH_SCORE_TH = 0.44;
+            for (let i = 0; i < merged.length; i++) {
+              const s = merged[i][0];
+              const e = merged[i][1];
+              const dur = e - s;
+              if (dur < 0.25) continue;
+
+              const f0 = Math.max(0, Math.floor(s / 0.020));
+              const f1 = Math.min(numFrames, Math.ceil(e / 0.020));
+
+              if (dur <= 7.5) {
+                const sc = computeSpeechLikelihood(rms, zcr, f0Arr, perArr, f0, f1, p90);
+                if (sc >= SPEECH_SCORE_TH) {
+                  candidateRanges.push([s, e]);
+                } else {
+                  skippedMusicSec += dur;
+                }
+              } else {
+                // Long continuous block (e.g. piece + MC without long silence): scan with 3.0s window / 1.5s step
+                const winSec = 3.0;
+                const stepSec = 1.5;
+                const speechWins = [];
+                for (let ws = s; ws < e; ws += stepSec) {
+                  const we = Math.min(e, ws + winSec);
+                  if (we - ws < 0.8 && speechWins.length > 0) break;
+                  const wf0 = Math.max(0, Math.floor(ws / 0.020));
+                  const wf1 = Math.min(numFrames, Math.ceil(we / 0.020));
+                  const sc = computeSpeechLikelihood(rms, zcr, f0Arr, perArr, wf0, wf1, p90);
+                  if (sc >= SPEECH_SCORE_TH) {
+                    const padS = Math.max(s, ws - 0.35);
+                    const padE = Math.min(e, we + 0.35);
+                    if (speechWins.length > 0 && (padS - speechWins[speechWins.length - 1][1]) < pauseSec) {
+                      speechWins[speechWins.length - 1][1] = Math.max(speechWins[speechWins.length - 1][1], padE);
+                    } else {
+                      speechWins.push([padS, padE]);
+                    }
+                  }
+                }
+                let keptInBlock = 0;
+                for (let w = 0; w < speechWins.length; w++) {
+                  const [ks, ke] = speechWins[w];
+                  keptInBlock += (ke - ks);
+                  candidateRanges.push([ks, ke]);
+                }
+                skippedMusicSec += Math.max(0, dur - keptInBlock);
+              }
+            }
+          }
+
+          for (let i = 0; i < candidateRanges.length; i++) {
+            let s = candidateRanges[i][0];
+            const e = candidateRanges[i][1];
             if (e - s < 0.25) continue;
             while (e - s > maxSegSec) {
               const fLo = Math.min(numFrames - 1, Math.floor((s + 12.0) / 0.020));
@@ -16358,8 +16627,7 @@
               const splitT = Math.max(s + 4.0, bestF * 0.020);
               segments.push({
                 start: Math.max(0, s - 0.12),
-                end: Math.min(totalDur, splitT + 0.12),
-                avgRms: bestV
+                end: Math.min(totalDur, splitT + 0.12)
               });
               s = splitT;
             }
@@ -16370,18 +16638,19 @@
           }
         }
 
-        // Fallback to uniform 20s slices if audio is continuous wall-to-wall sound or very quiet
-        if (segments.length === 0 && totalDur > 0.25) {
+        // Fallback to uniform 20s slices ONLY when skipMusic is OFF and audio is continuous wall-to-wall sound
+        if (!skipMusic && segments.length === 0 && totalDur > 0.25) {
           const step = Math.min(maxSegSec, 20.0);
           for (let s = 0; s < totalDur; s += step) {
             const e = Math.min(totalDur, s + step);
             if (e - s >= 0.3) segments.push({ start: s, end: e });
           }
         }
-        return segments;
+        if (onProgress) onProgress(1.0);
+        return { segments, skippedMusicSec: Math.round(skippedMusicSec) };
       }
 
-      // ---------- Helper: Encode 16kHz Mono Float32 Slice as Compact 16-bit WAV Blob ----------
+      // ---------- Helper: Encode 16kHz Mono Float32/Int16 Slice as Compact 16-bit WAV Blob ----------
       function encodeMono16kWavBlob(pcm16k, startSample = 0, endSample = pcm16k.length) {
         const s0 = Math.max(0, Math.floor(startSample));
         const s1 = Math.min(pcm16k.length, Math.ceil(endSample));
@@ -16418,6 +16687,76 @@
         return new Blob([ab], { type: 'audio/wav' });
       }
 
+      // Pack multiple speech ranges [start, end] into a single compact 16kHz WAV + segment offset map
+      function encodeSpeechRangesWavBlob(pcm16k, ranges) {
+        let totalSamples = 0;
+        const slices = [];
+        for (const r of ranges) {
+          const s0 = Math.max(0, Math.floor(r.start * 16000));
+          const s1 = Math.min(pcm16k.length, Math.ceil(r.end * 16000));
+          if (s1 - s0 < 400) continue;
+          slices.push({
+            s0,
+            s1,
+            origStartSec: s0 / 16000,
+            packedStartSec: totalSamples / 16000,
+            packedEndSec: (totalSamples + (s1 - s0)) / 16000
+          });
+          totalSamples += (s1 - s0);
+        }
+        const len = Math.max(1, totalSamples);
+        const ab = new ArrayBuffer(44 + len * 2);
+        const dv = new DataView(ab);
+        const wStr = (off, s) => { for (let i = 0; i < s.length; i++) dv.setUint8(off + i, s.charCodeAt(i)); };
+        wStr(0, 'RIFF');
+        dv.setUint32(4, 36 + len * 2, true);
+        wStr(8, 'WAVE');
+        wStr(12, 'fmt ');
+        dv.setUint32(16, 16, true);
+        dv.setUint16(20, 1, true);
+        dv.setUint16(22, 1, true);
+        dv.setUint32(24, 16000, true);
+        dv.setUint32(28, 32000, true);
+        dv.setUint16(32, 2, true);
+        dv.setUint16(34, 16, true);
+        wStr(36, 'data');
+        dv.setUint32(40, len * 2, true);
+        let off = 44;
+        const isI16 = pcm16k instanceof Int16Array;
+        for (const sl of slices) {
+          if (isI16) {
+            for (let i = sl.s0; i < sl.s1; i++) {
+              dv.setInt16(off, pcm16k[i], true);
+              off += 2;
+            }
+          } else {
+            for (let i = sl.s0; i < sl.s1; i++) {
+              const clamped = Math.max(-1, Math.min(1, pcm16k[i]));
+              dv.setInt16(off, Math.round(clamped * 32767), true);
+              off += 2;
+            }
+          }
+        }
+        return {
+          blob: new Blob([ab], { type: 'audio/wav' }),
+          slices,
+          totalSec: totalSamples / 16000
+        };
+      }
+
+      function mapPackedTimeToOriginal(packedSec, slices, fallbackMaxSec) {
+        if (!slices || slices.length === 0) return Math.max(0, Math.min(fallbackMaxSec, packedSec));
+        for (let i = 0; i < slices.length; i++) {
+          const sl = slices[i];
+          if (packedSec >= sl.packedStartSec - 0.05 && packedSec <= sl.packedEndSec + 0.05) {
+            const delta = Math.max(0, Math.min(sl.packedEndSec - sl.packedStartSec, packedSec - sl.packedStartSec));
+            return Math.max(0, Math.min(fallbackMaxSec, sl.origStartSec + delta));
+          }
+        }
+        const last = slices[slices.length - 1];
+        return Math.max(0, Math.min(fallbackMaxSec, last.origStartSec + (last.packedEndSec - last.packedStartSec)));
+      }
+
       function blobToBase64(blob) {
         return new Promise((resolve, reject) => {
           const reader = new FileReader();
@@ -16442,23 +16781,44 @@
 
       async function runWhisperTranscription() {
         const modelId = state.transcriptWhisperModel || 'onnx-community/whisper-tiny';
-        updateTranscriptProgress(true, '音声を16kHzへ変換中...', 4);
+        const skipMusic = Boolean(state.transcriptSkipMusic);
+        state.transcriptLastSkippedSec = 0;
+        updateTranscriptProgress(true, '音声を16kHzへ変換中...', 3);
 
         const pcm16k = await getMono16kForCurrentAudio((frac) => {
-          updateTranscriptProgress(true, `音声を16kHzへ変換中 (${Math.round(frac * 100)}%)...`, 2 + frac * 10);
+          updateTranscriptProgress(true, `音声を16kHzへ変換中 (${Math.round(frac * 100)}%)...`, 2 + frac * 8);
         });
         if (state.transcriptCancelled) return;
         if (!pcm16k || pcm16k.length < 1600) {
           throw new Error('この音声形式の抽出に対応できませんでした');
         }
 
-        const groups = detectUtteranceGroups(pcm16k, 16000, state.transcriptPauseSec, 24.0);
+        const scanLabel = skipMusic ? '演奏区間を自動スキップ・発話を検出中' : '発話区間を検出中';
+        updateTranscriptProgress(true, `${scanLabel}...`, 11);
+        const { segments: groups, skippedMusicSec } = await detectUtteranceGroupsAsync(
+          pcm16k,
+          16000,
+          state.transcriptPauseSec,
+          24.0,
+          skipMusic,
+          (frac) => {
+            updateTranscriptProgress(true, `${scanLabel} (${Math.round(frac * 100)}%)...`, 11 + frac * 5);
+          }
+        );
+        if (state.transcriptCancelled) return;
+        state.transcriptLastSkippedSec = skippedMusicSec;
+
         if (groups.length === 0) {
+          state.transcriptSegments = [];
+          renderTranscriptList();
+          if (skipMusic && skippedMusicSec > 0) {
+            throw new Error('演奏区間のみ検出されました（設定で「演奏中をスキップ」をOFFにすると全体を実行できます）');
+          }
           throw new Error('発話区間を検出できませんでした');
         }
 
         if (!whisperRuntime.tfMod) {
-          updateTranscriptProgress(true, 'スマホ内AIエンジンを読込中...', 12);
+          updateTranscriptProgress(true, 'スマホ内AIエンジンを読込中...', 17);
           try {
             whisperRuntime.tfMod = await import('https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.4.0');
           } catch (e) {
@@ -16476,11 +16836,11 @@
         }
 
         if (!whisperRuntime.pipe || whisperRuntime.loadedModelId !== modelId) {
-          updateTranscriptProgress(true, 'Whisperモデルを準備中（初回のみ数秒〜数十秒）...', 15);
+          updateTranscriptProgress(true, 'Whisperモデルを準備中（初回のみ数秒〜数十秒）...', 20);
           const progressCb = (info) => {
             if (state.transcriptCancelled || !info) return;
             if (typeof info.progress === 'number' && isFinite(info.progress)) {
-              const p = 15 + Math.min(35, info.progress * 0.35);
+              const p = 20 + Math.min(30, info.progress * 0.30);
               updateTranscriptProgress(true, `モデル読込中 (${Math.round(info.progress)}%)...`, p);
             }
           };
@@ -16505,12 +16865,13 @@
 
         const pipe = whisperRuntime.pipe;
         const total = groups.length;
+        const skipHint = (skipMusic && skippedMusicSec >= 5) ? ` [演奏${formatTime(skippedMusicSec)}スキップ]` : '';
 
         for (let i = 0; i < total; i++) {
           if (state.transcriptCancelled) return;
           const g = groups[i];
           const pct = 50 + Math.round((i / total) * 48);
-          updateTranscriptProgress(true, `発話グループを文字起こし中 (${i + 1} / ${total})...`, pct);
+          updateTranscriptProgress(true, `発話グループを文字起こし中 (${i + 1} / ${total})${skipHint}...`, pct);
 
           const s0 = Math.max(0, Math.floor(g.start * 16000));
           const s1 = Math.min(pcm16k.length, Math.ceil(g.end * 16000));
@@ -16704,13 +17065,17 @@
           throw new Error('Gemini APIキーを入力して「保存」を押してください');
         }
 
+        const skipMusic = Boolean(state.transcriptSkipMusic);
+        state.transcriptLastSkippedSec = 0;
+
         updateTranscriptProgress(true, '利用可能なGeminiモデルを確認中...', 8);
         const candidates = await resolveGeminiModelCandidates(apiKey);
         if (state.transcriptCancelled) return;
 
-        // Fast path: if original compressed blob (non-WAV) is <= 13MB and duration <= 12 min, send directly!
+        // Fast path: if skipMusic is OFF and original compressed blob (non-WAV) is <= 13MB and duration <= 12 min, send directly!
         const origExt = getOrigFileExt();
         const canSendRawCompressed = Boolean(
+          !skipMusic &&
           state.rawBlob &&
           origExt !== '.wav' &&
           state.rawBlob.size > 0 &&
@@ -16730,41 +17095,111 @@
           state.transcriptSegments = segs;
           renderTranscriptList();
         } else {
-          // Downsample to compact 16kHz mono 16-bit WAV (streaming Zero-OOM) and chunk in 5-minute blocks if long
-          updateTranscriptProgress(true, '送信用の軽量音声(16kHz)を作成中...', 14);
+          // Downsample to compact 16kHz mono 16-bit WAV (streaming Zero-OOM)
+          updateTranscriptProgress(true, '送信用の軽量音声(16kHz)を作成中...', 12);
           const pcm16k = await getMono16kForCurrentAudio((frac) => {
-            updateTranscriptProgress(true, `送信用音声を抽出中 (${Math.round(frac * 100)}%)...`, 12 + frac * 16);
+            updateTranscriptProgress(true, `送信用音声を抽出中 (${Math.round(frac * 100)}%)...`, 12 + frac * 14);
           });
           if (state.transcriptCancelled) return;
           if (!pcm16k || pcm16k.length < 1600) {
             throw new Error('送信用の音声データを準備できませんでした');
           }
 
-          const chunkSec = 300; // 5 minutes (~9.6MB WAV)
-          const chunkSamples = chunkSec * 16000;
-          const totalChunks = Math.max(1, Math.ceil(pcm16k.length / chunkSamples));
+          const maxDurSec = state.duration || (pcm16k.length / 16000);
 
-          for (let c = 0; c < totalChunks; c++) {
+          if (skipMusic) {
+            updateTranscriptProgress(true, '演奏区間をスキップして発話部分を抽出中...', 27);
+            const { segments: speechGroups, skippedMusicSec } = await detectUtteranceGroupsAsync(
+              pcm16k,
+              16000,
+              state.transcriptPauseSec,
+              24.0,
+              true,
+              (frac) => {
+                updateTranscriptProgress(true, `演奏区間を判別中 (${Math.round(frac * 100)}%)...`, 27 + frac * 6);
+              }
+            );
             if (state.transcriptCancelled) return;
-            const s0 = c * chunkSamples;
-            const s1 = Math.min(pcm16k.length, s0 + chunkSamples);
-            const offsetSec = s0 / 16000;
-            const wavBlob = encodeMono16kWavBlob(pcm16k, s0, s1);
+            state.transcriptLastSkippedSec = skippedMusicSec;
 
-            const pct = 30 + Math.round((c / totalChunks) * 65);
-            const chunkMsg = totalChunks > 1
-              ? `Gemini APIで文字起こし中 (${c + 1} / ${totalChunks})...`
-              : 'Gemini APIで文字起こし中...';
-            updateTranscriptProgress(true, chunkMsg, pct);
+            if (speechGroups.length === 0) {
+              if (skippedMusicSec > 0) {
+                throw new Error('演奏区間のみ検出されました（設定で「演奏中をスキップ」をOFFにすると全体を実行できます）');
+              }
+              throw new Error('発話区間を検出できませんでした');
+            }
 
-            const { text } = await callGeminiTranscribeBlob(apiKey, candidates, wavBlob, 'audio/wav', state.transcriptPauseSec);
-            if (state.transcriptCancelled) return;
+            // Batch speech groups into ~240-second packed WAV blocks and remap timestamps back to original audio time
+            const batches = [];
+            let curBatch = [];
+            let curDur = 0;
+            for (const g of speechGroups) {
+              const gd = Math.max(0.1, g.end - g.start);
+              if (curBatch.length > 0 && curDur + gd > 240) {
+                batches.push(curBatch);
+                curBatch = [];
+                curDur = 0;
+              }
+              curBatch.push(g);
+              curDur += gd;
+            }
+            if (curBatch.length > 0) batches.push(curBatch);
 
-            const segs = parseGeminiTranscriptJson(text, offsetSec, state.duration || (pcm16k.length / 16000));
-            if (segs.length > 0) {
-              state.transcriptSegments.push(...segs);
-              state.transcriptSegments.sort((a, b) => a.start - b.start);
-              renderTranscriptList();
+            const skipHint = skippedMusicSec >= 5 ? ` [演奏${formatTime(skippedMusicSec)}スキップ]` : '';
+            for (let b = 0; b < batches.length; b++) {
+              if (state.transcriptCancelled) return;
+              const packed = encodeSpeechRangesWavBlob(pcm16k, batches[b]);
+              const pct = 35 + Math.round((b / batches.length) * 60);
+              const msg = batches.length > 1
+                ? `Gemini APIで発話区間を文字起こし中 (${b + 1} / ${batches.length})${skipHint}...`
+                : `Gemini APIで発話区間を文字起こし中${skipHint}...`;
+              updateTranscriptProgress(true, msg, pct);
+
+              const { text } = await callGeminiTranscribeBlob(apiKey, candidates, packed.blob, 'audio/wav', state.transcriptPauseSec);
+              if (state.transcriptCancelled) return;
+
+              const rawSegs = parseGeminiTranscriptJson(text, 0, packed.totalSec + 5);
+              if (rawSegs.length > 0) {
+                for (const s of rawSegs) {
+                  const origStart = mapPackedTimeToOriginal(s.start, packed.slices, maxDurSec);
+                  const origEnd = Math.max(origStart, mapPackedTimeToOriginal(s.end, packed.slices, maxDurSec));
+                  state.transcriptSegments.push({
+                    start: Math.round(origStart * 100) / 100,
+                    end: Math.round(origEnd * 100) / 100,
+                    text: s.text
+                  });
+                }
+                state.transcriptSegments.sort((a, b) => a.start - b.start);
+                renderTranscriptList();
+              }
+            }
+          } else {
+            const chunkSec = 300; // 5 minutes (~9.6MB WAV)
+            const chunkSamples = chunkSec * 16000;
+            const totalChunks = Math.max(1, Math.ceil(pcm16k.length / chunkSamples));
+
+            for (let c = 0; c < totalChunks; c++) {
+              if (state.transcriptCancelled) return;
+              const s0 = c * chunkSamples;
+              const s1 = Math.min(pcm16k.length, s0 + chunkSamples);
+              const offsetSec = s0 / 16000;
+              const wavBlob = encodeMono16kWavBlob(pcm16k, s0, s1);
+
+              const pct = 30 + Math.round((c / totalChunks) * 65);
+              const chunkMsg = totalChunks > 1
+                ? `Gemini APIで文字起こし中 (${c + 1} / ${totalChunks})...`
+                : 'Gemini APIで文字起こし中...';
+              updateTranscriptProgress(true, chunkMsg, pct);
+
+              const { text } = await callGeminiTranscribeBlob(apiKey, candidates, wavBlob, 'audio/wav', state.transcriptPauseSec);
+              if (state.transcriptCancelled) return;
+
+              const segs = parseGeminiTranscriptJson(text, offsetSec, maxDurSec);
+              if (segs.length > 0) {
+                state.transcriptSegments.push(...segs);
+                state.transcriptSegments.sort((a, b) => a.start - b.start);
+                renderTranscriptList();
+              }
             }
           }
         }
@@ -16798,8 +17233,10 @@
             showToast('文字起こしを中止しました');
           } else {
             const cnt = state.transcriptSegments.length;
+            const sk = state.transcriptLastSkippedSec || 0;
+            const skipNote = (state.transcriptSkipMusic && sk >= 5) ? ` • 演奏 ${formatTime(sk)} スキップ` : '';
             showToast(cnt > 0
-              ? `文字起こし完了（${cnt}グループ）`
+              ? `文字起こし完了（${cnt}グループ${skipNote}）`
               : '発話テキストが検出されませんでした');
           }
         } catch (err) {
@@ -18816,11 +19253,22 @@
       document.addEventListener('webkitfullscreenchange', onFullscreenStateChanged);
 
       // ==================== GITHUB / PWA SOFTWARE UPDATE CHECK & APPLY ====================
-      const APP_VERSION = 'v39';
+      const APP_VERSION = 'v40';
 
       // Ordered newest-first; each release appends a new object at the top.
       // Users who skip multiple versions automatically see ALL unseen versions between lastSeen and current.
       const APP_RELEASE_NOTES = [
+        {
+          version: 'v40',
+          verNum: 40,
+          date: '2026/11/23',
+          title: '文字起こしで楽器演奏中の区間を自動スキップして大幅高速化',
+          items: [
+            '話し声（音節リズム・子音と母音の変化・抑揚）と楽器演奏（持続音・音程の安定・高音域・拍手）を自動判別し、演奏中の区間をスキップしてMCや会話部分だけを高速に文字起こしできるようになりました',
+            'スマホ内AI（Whisper）とGemini APIの両方で有効（初期設定ON）になり、演奏が大半を占める長時間録音でも待ち時間を大幅に短縮します',
+            '演奏中も含めて全体を文字起こししたい場合は、文字起こし画面右上の「設定」から「演奏中をスキップ（高速化）」をOFFに切り替えられます'
+          ]
+        },
         {
           version: 'v39',
           verNum: 39,
@@ -19853,6 +20301,16 @@
           state.transcriptWhisperModel = btn.dataset.trWmodel;
           saveAppPrefs();
           updateTranscriptUI();
+        });
+      });
+
+      document.querySelectorAll('.tr-skipmusic-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          state.transcriptSkipMusic = btn.dataset.trSkipmusic === '1';
+          saveAppPrefs();
+          updateTranscriptUI();
+          renderTranscriptList();
+          showToast(state.transcriptSkipMusic ? '演奏中をスキップ: ON（高速）' : '演奏中をスキップ: OFF（全体を実行）');
         });
       });
 
