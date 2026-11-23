@@ -8,7 +8,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="Audipo2">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="app-version" content="v29">
+  <meta name="app-version" content="v30">
   <link rel="manifest" href="./manifest.json">
   <title>Audipo風 練習プレイヤー＆レコーダー</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='bg' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%231b2030'/%3E%3Cstop offset='100%25' stop-color='%230d0f15'/%3E%3C/linearGradient%3E%3ClinearGradient id='wv' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0%25' stop-color='%2360c5ff'/%3E%3Cstop offset='100%25' stop-color='%232563eb'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='url(%23bg)'/%3E%3Crect x='1' y='1' width='62' height='62' rx='15' fill='none' stroke='%233b82f6' stroke-opacity='0.3' stroke-width='2'/%3E%3Cg fill='url(%23wv)'%3E%3Crect x='10' y='28' width='4.5' height='12' rx='2.25' opacity='0.6'/%3E%3Crect x='18' y='22' width='4.5' height='24' rx='2.25' opacity='0.85'/%3E%3Crect x='26' y='15' width='4.5' height='36' rx='2.25'/%3E%3Crect x='34' y='21' width='4.5' height='25' rx='2.25' opacity='0.9'/%3E%3Crect x='42' y='26' width='4.5' height='16' rx='2.25' opacity='0.75'/%3E%3Crect x='50' y='30' width='4.5' height='9' rx='2.25' opacity='0.5'/%3E%3C/g%3E%3Cpath d='M36.25 10.5c0-1.4 1.1-2.5 2.5-2.5h5.5c1.4 0 2.5 1.1 2.5 2.5v2.4c0 .8-.3 1.5-.9 2.1l-3.2 3.1c-.6.6-1.6.6-2.2 0l-3.2-3.1c-.6-.6-.9-1.3-.9-2.1v-2.4z' fill='%23facc15'/%3E%3C/svg%3E">
@@ -198,18 +198,12 @@
       color: #e4e4e7;
     }
 
-    .hdr-btn-fs {
+    .hdr-btn-share {
       width: 32px;
       padding: 0;
-      background: #202027;
-      border-color: var(--border-strong);
-      color: #d4d4d8;
-    }
-
-    .hdr-btn-fs.active {
-      background: var(--accent-blue-bg);
-      border-color: rgba(66, 165, 245, 0.72);
-      color: #93c5fd;
+      background: rgba(34, 197, 94, 0.14);
+      border-color: rgba(34, 197, 94, 0.52);
+      color: #86efac;
     }
 
     .rec-dot {
@@ -3418,6 +3412,94 @@
       transition: width 0.1s linear;
     }
 
+    .save-share-notice {
+      background: rgba(34, 197, 94, 0.11);
+      border: 1px solid rgba(34, 197, 94, 0.38);
+      border-radius: 10px;
+      padding: 8px 10px;
+      font-size: 11px;
+      line-height: 1.5;
+      color: #bbf7d0;
+    }
+
+    .whats-new-ok-btn.share-ready {
+      background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+      border-color: #86efac;
+      color: #052e16;
+      box-shadow: 0 4px 16px rgba(34, 197, 94, 0.4);
+    }
+
+    .app-share-url-box {
+      padding: 7px 10px;
+      border-radius: 8px;
+      background: #101014;
+      border: 1px solid var(--border-subtle);
+      color: #93c5fd;
+      font-size: 11.5px;
+      word-break: break-all;
+      margin-bottom: 9px;
+      user-select: text;
+      -webkit-user-select: text;
+    }
+
+    .app-share-primary-btn {
+      width: 100%;
+      height: 38px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, rgba(66, 165, 245, 0.25) 0%, rgba(37, 99, 235, 0.32) 100%);
+      border: 1px solid rgba(96, 165, 250, 0.65);
+      color: #e0f2fe;
+      font-size: 12.5px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      margin-bottom: 7px;
+      transition: transform 0.08s ease;
+    }
+
+    .app-share-primary-btn:active {
+      transform: scale(0.97);
+    }
+
+    .app-share-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 6px;
+    }
+
+    .app-share-btn {
+      height: 34px;
+      border-radius: 9px;
+      background: #23232c;
+      border: 1px solid var(--border-strong);
+      color: #e4e4e7;
+      font-size: 11.5px;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      transition: transform 0.08s ease;
+    }
+
+    .app-share-btn:active {
+      transform: scale(0.95);
+    }
+
+    .app-share-btn-line {
+      background: rgba(6, 199, 85, 0.16);
+      border-color: rgba(6, 199, 85, 0.55);
+      color: #86efac;
+    }
+
+    .app-share-btn-mail {
+      background: rgba(245, 158, 11, 0.15);
+      border-color: rgba(245, 158, 11, 0.5);
+      color: #fde68a;
+    }
+
     /* Toast Notification (never uses alert/confirm) */
     .toast-banner {
       position: fixed;
@@ -3485,18 +3567,13 @@
         <span>保存</span>
       </button>
 
-      <button id="btnFullscreenToggle" type="button" class="hdr-btn hdr-btn-fs" title="全画面表示の切替（アドレスバー非表示）" aria-label="全画面表示">
-        <svg id="iconFsEnter" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M8 3H5a2 2 0 0 0-2 2v3"/>
-          <path d="M21 8V5a2 2 0 0 0-2-2h-3"/>
-          <path d="M3 16v3a2 2 0 0 0 2 2h3"/>
-          <path d="M16 21h3a2 2 0 0 0 2-2v-3"/>
-        </svg>
-        <svg id="iconFsExit" class="hidden" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M8 3v3a2 2 0 0 1-2 2H3"/>
-          <path d="M21 8h-3a2 2 0 0 1-2-2V3"/>
-          <path d="M3 16h3a2 2 0 0 1 2 2v3"/>
-          <path d="M16 21v-3a2 2 0 0 1 2-2h3"/>
+      <button id="btnShareAudio" type="button" disabled class="hdr-btn hdr-btn-share" title="今の音声・録音を形式と音質を選んでシェア" aria-label="音声をシェア">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="18" cy="5" r="3"/>
+          <circle cx="6" cy="12" r="3"/>
+          <circle cx="18" cy="19" r="3"/>
+          <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
+          <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
         </svg>
       </button>
     </div>
@@ -4301,9 +4378,33 @@
         <div class="modal-section" style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
           <div>
             <div class="sec-title">バージョン情報</div>
-            <div id="settingsVersionLabel" class="engine-desc mono">現在: v29</div>
+            <div id="settingsVersionLabel" class="engine-desc mono">現在: v30</div>
           </div>
           <button id="btnShowReleaseHistory" type="button" class="step-btn" style="color:#93c5fd;border-color:rgba(66,165,245,0.45);">更新履歴を見る</button>
+        </div>
+
+        <!-- Share App URL -->
+        <div class="modal-section">
+          <div class="sec-head" style="margin-bottom:6px;">
+            <span class="sec-title">このアプリをシェア</span>
+            <span class="engine-desc">LINE・メールで共有</span>
+          </div>
+          <div class="app-share-url-box mono">https://skb58.github.io/audipo2/</div>
+          <button id="btnShareAppNative" type="button" class="app-share-primary-btn">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="18" cy="5" r="3"/>
+              <circle cx="6" cy="12" r="3"/>
+              <circle cx="18" cy="19" r="3"/>
+              <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
+              <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+            </svg>
+            <span>共有メニューで送る（LINE・メール等）</span>
+          </button>
+          <div class="app-share-grid">
+            <button id="btnShareAppLine" type="button" class="app-share-btn app-share-btn-line">LINEで送る</button>
+            <button id="btnShareAppMail" type="button" class="app-share-btn app-share-btn-mail">メールで送る</button>
+            <button id="btnCopyAppUrl" type="button" class="app-share-btn">URLコピー</button>
+          </div>
         </div>
       </div>
 
@@ -4434,7 +4535,7 @@
           </div>
           <div>
             <h3 id="whatsNewTitle" class="whats-new-title">アップデートのお知らせ</h3>
-            <p id="whatsNewSub" class="whats-new-sub mono">v29 に更新されました</p>
+            <p id="whatsNewSub" class="whats-new-sub mono">v30 に更新されました</p>
           </div>
         </div>
         <button id="btnCloseWhatsNewX" type="button" class="modal-close" aria-label="閉じる">✕</button>
@@ -4498,10 +4599,17 @@
       <div class="whats-new-head">
         <div class="whats-new-title-wrap">
           <div class="whats-new-icon" aria-hidden="true">
-            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+            <svg id="saveExportIconSave" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
               <path d="M12 3v12"/>
               <path d="m7 11 5 5 5-5"/>
               <path d="M5 20h14"/>
+            </svg>
+            <svg id="saveExportIconShare" class="hidden" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="18" cy="5" r="3"/>
+              <circle cx="6" cy="12" r="3"/>
+              <circle cx="18" cy="19" r="3"/>
+              <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
+              <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
             </svg>
           </div>
           <div>
@@ -4513,6 +4621,9 @@
       </div>
 
       <div class="modal-body" style="gap:10px;">
+        <div id="saveShareNotice" class="save-share-notice hidden">
+          共有用の一時ファイルのみ作成して送ります。ここで低音質を選んでも、元の音声・ファイル名・記憶済みピン・保存設定には一切影響しません。
+        </div>
         <!-- File Name -->
         <div class="modal-section">
           <div class="sec-head" style="margin-bottom:6px;">
@@ -4675,13 +4786,11 @@
       const btnRecordHeader = document.getElementById('btnRecordHeader');
       const recHeaderLabel = document.getElementById('recHeaderLabel');
       const btnSaveWav = document.getElementById('btnSaveWav');
-      const btnFullscreenToggle = document.getElementById('btnFullscreenToggle');
+      const btnShareAudio = document.getElementById('btnShareAudio');
       const btnAppUpdate = document.getElementById('btnAppUpdate');
       const iconAppUpdate = document.getElementById('iconAppUpdate');
       const appUpdateBtnLabel = document.getElementById('appUpdateBtnLabel');
       const settingsUpdateDot = document.getElementById('settingsUpdateDot');
-      const iconFsEnter = document.getElementById('iconFsEnter');
-      const iconFsExit = document.getElementById('iconFsExit');
       const recTimerText = document.getElementById('recTimerText');
       const recMeterBar = document.getElementById('recMeterBar');
       const recMarkerCountBadge = document.getElementById('recMarkerCountBadge');
@@ -4856,6 +4965,8 @@
         recAutoNormalize: false, // Default OFF for raw untouched PCM
         exportFormat: 'wav', // 'wav' | 'm4a' | 'ogg' | 'orig'
         exportQualityByFormat: { wav: '24bit', m4a: '192', ogg: '128', orig: 'copy' },
+        shareFormat: 'm4a', // 'wav' | 'm4a' | 'ogg' | 'orig' (independent from Save!)
+        shareQualityByFormat: { wav: '16bit', m4a: '128', ogg: '96', orig: 'copy' },
         micDeviceId: '',
 
         // Acoustic Reverb Presets
@@ -5296,7 +5407,9 @@
             kbdOctave: state.kbdOctave,
             kbdTranspose: state.kbdTranspose,
             exportFormat: state.exportFormat,
-            exportQualityByFormat: state.exportQualityByFormat
+            exportQualityByFormat: state.exportQualityByFormat,
+            shareFormat: state.shareFormat,
+            shareQualityByFormat: state.shareQualityByFormat
           }));
         } catch (_) {}
       }
@@ -5405,6 +5518,17 @@
             };
           } else {
             state.exportQualityByFormat.wav = state.recBitDepth === 16 ? '16bit' : '24bit';
+          }
+          if (['wav', 'm4a', 'ogg'].includes(p.shareFormat)) {
+            state.shareFormat = p.shareFormat;
+          }
+          if (p.shareQualityByFormat && typeof p.shareQualityByFormat === 'object') {
+            state.shareQualityByFormat = {
+              wav: ['24bit', '16bit', '16bit_mono'].includes(p.shareQualityByFormat.wav) ? p.shareQualityByFormat.wav : '16bit',
+              m4a: ['256', '192', '128', '96'].includes(p.shareQualityByFormat.m4a) ? p.shareQualityByFormat.m4a : '128',
+              ogg: ['192', '128', '96', '64'].includes(p.shareQualityByFormat.ogg) ? p.shareQualityByFormat.ogg : '96',
+              orig: 'copy'
+            };
           }
         } catch (_) {}
       }
@@ -6860,6 +6984,7 @@
           state.hasAudio = true;
           startupOverlay.classList.add('hidden');
           btnSaveWav.disabled = false;
+          btnShareAudio.disabled = false;
           btnToggleSectionSkip.disabled = false;
           btnCutYellowSection.disabled = !(preDecodedBuffer || wavMeta);
           trackTitleEl.textContent = finalDisplayName;
@@ -7791,6 +7916,11 @@
       };
 
       const saveExportModal = document.getElementById('saveExportModal');
+      const saveExportTitle = document.getElementById('saveExportTitle');
+      const saveExportSub = document.getElementById('saveExportSub');
+      const saveExportIconSave = document.getElementById('saveExportIconSave');
+      const saveExportIconShare = document.getElementById('saveExportIconShare');
+      const saveShareNotice = document.getElementById('saveShareNotice');
       const saveFileNameInput = document.getElementById('saveFileNameInput');
       const saveFileExtBadge = document.getElementById('saveFileExtBadge');
       const saveFormatGrid = document.getElementById('saveFormatGrid');
@@ -7811,14 +7941,24 @@
       const btnCloseSaveExportX = document.getElementById('btnCloseSaveExportX');
 
       const saveExportState = {
+        mode: 'save', // 'save' | 'share'
         probed: false,
         supportM4a: false,
         supportOgg: false,
         selectedFormat: 'wav',
         selectedQuality: '24bit',
         isExporting: false,
-        cancelled: false
+        cancelled: false,
+        preparedShareFile: null
       };
+
+      function clearPreparedShareFile() {
+        saveExportState.preparedShareFile = null;
+        btnSaveExportRun.classList.remove('share-ready');
+        if (!saveExportState.isExporting) {
+          btnSaveExportRun.textContent = saveExportState.mode === 'share' ? 'この設定でシェア' : 'この設定で保存';
+        }
+      }
 
       async function probeWebCodecsExportSupport() {
         if (saveExportState.probed) return;
@@ -7867,6 +8007,17 @@
         return '.wav';
       }
 
+      function getMimeTypeForExt(ext, fallbackType = '') {
+        const e = String(ext || '').toLowerCase();
+        if (e === '.wav') return 'audio/wav';
+        if (e === '.m4a') return 'audio/mp4';
+        if (e === '.ogg' || e === '.opus') return 'audio/ogg';
+        if (e === '.mp3') return 'audio/mpeg';
+        if (e === '.flac') return 'audio/flac';
+        if (e === '.webm') return 'audio/webm';
+        return fallbackType || 'application/octet-stream';
+      }
+
       function canShowOrigCopyFormat() {
         if (!state.rawBlob) return false;
         if (!state.audioBuffer) return true;
@@ -7894,11 +8045,32 @@
         return (SAVE_FORMAT_META[fmt] && SAVE_FORMAT_META[fmt].ext) || '.wav';
       }
 
+      function getActiveQualMap() {
+        return saveExportState.mode === 'share' ? state.shareQualityByFormat : state.exportQualityByFormat;
+      }
+
       function updateSaveExportModalUI() {
+        const isShare = saveExportState.mode === 'share';
         const fmt = saveExportState.selectedFormat;
         const meta = SAVE_FORMAT_META[fmt] || SAVE_FORMAT_META.wav;
         const hasBuf = Boolean(state.audioBuffer);
         const showOrig = canShowOrigCopyFormat();
+
+        saveExportTitle.textContent = isShare ? '音声ファイルをシェア' : '音声ファイルを保存';
+        saveExportSub.textContent = isShare ? 'LINE・メール等へ送る形式・音質を選択' : '形式・音質・ファイル名を選択';
+        saveExportIconSave.classList.toggle('hidden', isShare);
+        saveExportIconShare.classList.toggle('hidden', !isShare);
+        saveShareNotice.classList.toggle('hidden', !isShare);
+
+        if (!saveExportState.isExporting) {
+          if (isShare && saveExportState.preparedShareFile) {
+            btnSaveExportRun.textContent = '共有メニューを開く（準備完了）';
+            btnSaveExportRun.classList.add('share-ready');
+          } else {
+            btnSaveExportRun.textContent = isShare ? 'この設定でシェア' : 'この設定で保存';
+            btnSaveExportRun.classList.remove('share-ready');
+          }
+        }
 
         btnSaveFmtOrig.classList.toggle('hidden', !showOrig);
         saveFormatGrid.classList.toggle('has-orig', showOrig);
@@ -7927,7 +8099,9 @@
         saveFileExtBadge.textContent = getSelectedExportExt();
         saveFormatLabel.textContent = meta.label;
         saveFormatHint.textContent = (!hasBuf && state.isAnalyzingWave)
-          ? '波形解析中のため現在は「元のまま」保存できます（完了後にM4A/OGG等へ変換可能）。'
+          ? (isShare
+            ? '波形解析中のため現在は「元のまま」シェアできます（完了後にM4A/OGG等へ変換可能）。'
+            : '波形解析中のため現在は「元のまま」保存できます（完了後にM4A/OGG等へ変換可能）。')
           : meta.hint;
 
         // Render quality options for selected format
@@ -7962,7 +8136,8 @@
           btn.addEventListener('click', () => {
             if (saveExportState.isExporting) return;
             saveExportState.selectedQuality = q.id;
-            state.exportQualityByFormat[fmt] = q.id;
+            getActiveQualMap()[fmt] = q.id;
+            clearPreparedShareFile();
             updateSaveExportModalUI();
           });
           saveQualityGrid.appendChild(btn);
@@ -8012,38 +8187,41 @@
         savePreviewSize.textContent = `予想ファイルサイズ: 約 ${formatBytesApprox(estBytes)}${ratioNote}`;
       }
 
-      async function openSaveExportModal() {
+      async function openSaveExportModal(mode = 'save') {
         if (!state.audioBuffer && !state.rawBlob) return;
         await probeWebCodecsExportSupport();
 
+        const targetMode = mode === 'share' ? 'share' : 'save';
+        saveExportState.mode = targetMode;
         saveExportState.isExporting = false;
         saveExportState.cancelled = false;
+        saveExportState.preparedShareFile = null;
         saveProgressBox.classList.add('hidden');
         saveProgressBar.style.width = '0%';
         btnSaveExportRun.disabled = false;
-        btnSaveExportRun.textContent = 'この設定で保存';
+        btnSaveExportRun.classList.remove('share-ready');
         saveFileNameInput.disabled = false;
 
         // Pre-fill base name without extension
         const currentTitle = trackTitleEl.textContent.trim() || makeRecordingFilename();
         saveFileNameInput.value = currentTitle.replace(/\.(wav|m4a|mp3|ogg|opus|flac|aac|webm)$/i, '');
 
-        // Choose default format respecting availability & user's previous preference
+        // Choose default format independently for Save vs Share
         const hasBuf = Boolean(state.audioBuffer);
-        let prefFmt = state.exportFormat || 'wav';
+        let prefFmt = targetMode === 'share' ? (state.shareFormat || 'm4a') : (state.exportFormat || 'wav');
         if (!hasBuf) {
           prefFmt = canShowOrigCopyFormat() ? 'orig' : 'wav';
         } else if (prefFmt === 'm4a' && !saveExportState.supportM4a) {
-          prefFmt = 'wav';
+          prefFmt = saveExportState.supportOgg && targetMode === 'share' ? 'ogg' : 'wav';
         } else if (prefFmt === 'ogg' && !saveExportState.supportOgg) {
           prefFmt = 'wav';
         } else if (prefFmt === 'orig' && !canShowOrigCopyFormat()) {
-          prefFmt = 'wav';
+          prefFmt = targetMode === 'share' && saveExportState.supportM4a ? 'm4a' : 'wav';
         }
 
+        const qualMap = targetMode === 'share' ? state.shareQualityByFormat : state.exportQualityByFormat;
         saveExportState.selectedFormat = prefFmt;
-        saveExportState.selectedQuality = (state.exportQualityByFormat && state.exportQualityByFormat[prefFmt])
-          || SAVE_FORMAT_META[prefFmt].qualities[0].id;
+        saveExportState.selectedQuality = (qualMap && qualMap[prefFmt]) || SAVE_FORMAT_META[prefFmt].qualities[0].id;
 
         updateSaveExportModalUI();
         saveExportModal.classList.remove('hidden');
@@ -8054,11 +8232,78 @@
           saveExportState.cancelled = true;
           return;
         }
+        clearPreparedShareFile();
         saveExportModal.classList.add('hidden');
+      }
+
+      async function invokeNativeFileShare(shareFile) {
+        const sizeStr = formatBytesApprox(shareFile.size);
+        const canNativeShare = Boolean(
+          navigator.share &&
+          (!navigator.canShare || navigator.canShare({ files: [shareFile] }))
+        );
+
+        if (!canNativeShare) {
+          // Graceful non-destructive fallback when browser doesn't support Web Share file payloads
+          const url = URL.createObjectURL(shareFile);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = shareFile.name;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          setTimeout(() => URL.revokeObjectURL(url), 4000);
+          clearPreparedShareFile();
+          saveExportModal.classList.add('hidden');
+          showToast(`ファイル直接共有に非対応のため共有用ファイルを保存しました (${sizeStr}・元データ影響なし)`);
+          return;
+        }
+
+        try {
+          await navigator.share({
+            files: [shareFile],
+            title: shareFile.name
+          });
+          clearPreparedShareFile();
+          saveExportModal.classList.add('hidden');
+          showToast(`シェアしました: ${shareFile.name} (${sizeStr})`);
+        } catch (shareErr) {
+          if (shareErr && shareErr.name === 'AbortError') {
+            clearPreparedShareFile();
+            saveExportModal.classList.add('hidden');
+            showToast('シェアをキャンセルしました');
+          } else if (shareErr && shareErr.name === 'NotAllowedError') {
+            // User gesture expired during long encoding: cache File so one fresh tap opens share sheet immediately
+            saveExportState.preparedShareFile = shareFile;
+            updateSaveExportModalUI();
+            showToast('変換完了！「共有メニューを開く」をもう一度タップしてください');
+          } else {
+            console.warn('Web Share file failed, falling back to non-destructive download:', shareErr);
+            const url = URL.createObjectURL(shareFile);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = shareFile.name;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            setTimeout(() => URL.revokeObjectURL(url), 4000);
+            clearPreparedShareFile();
+            saveExportModal.classList.add('hidden');
+            showToast(`直接共有できなかったため共有用ファイルを保存しました (${sizeStr}・元データ影響なし)`);
+          }
+        }
       }
 
       async function executeSaveExport() {
         if (saveExportState.isExporting || (!state.audioBuffer && !state.rawBlob)) return;
+
+        const isShare = saveExportState.mode === 'share';
+
+        // If a share file was already encoded and waiting for a fresh user tap, share immediately!
+        if (isShare && saveExportState.preparedShareFile) {
+          await invokeNativeFileShare(saveExportState.preparedShareFile);
+          return;
+        }
 
         const fmt = saveExportState.selectedFormat;
         const qual = saveExportState.selectedQuality;
@@ -8069,27 +8314,30 @@
         saveExportState.isExporting = true;
         saveExportState.cancelled = false;
         btnSaveExportRun.disabled = true;
-        btnSaveExportRun.textContent = '書き出し中...';
+        btnSaveExportRun.textContent = isShare ? '共有用ファイル作成中...' : '書き出し中...';
         saveFileNameInput.disabled = true;
         saveProgressBox.classList.remove('hidden');
-        saveProgressLabel.textContent = '書き出し準備中...';
+        saveProgressLabel.textContent = isShare ? '共有用データを準備中...' : '書き出し準備中...';
         saveProgressPct.textContent = '0%';
         saveProgressBar.style.width = '0%';
 
-        // Persist user's chosen format & quality for next time
-        if (fmt !== 'orig') {
-          state.exportFormat = fmt;
-        }
-        state.exportQualityByFormat[fmt] = qual;
-        if (fmt === 'wav' && (qual === '24bit' || qual === '16bit')) {
-          state.recBitDepth = qual === '24bit' ? 24 : 16;
-          updateRecSettingsUI();
+        // Persist user's chosen format & quality separately for Share vs Save
+        if (isShare) {
+          if (fmt !== 'orig') state.shareFormat = fmt;
+          state.shareQualityByFormat[fmt] = qual;
+        } else {
+          if (fmt !== 'orig') state.exportFormat = fmt;
+          state.exportQualityByFormat[fmt] = qual;
+          if (fmt === 'wav' && (qual === '24bit' || qual === '16bit')) {
+            state.recBitDepth = qual === '24bit' ? 24 : 16;
+            updateRecSettingsUI();
+          }
         }
         saveAppPrefs();
 
         const setProgress = (pct, label) => {
           const p = Math.max(0, Math.min(100, Math.round(pct)));
-          saveProgressLabel.textContent = label || '書き出し中...';
+          saveProgressLabel.textContent = label || (isShare ? '共有用ファイル作成中...' : '書き出し中...');
           saveProgressPct.textContent = `${p}%`;
           saveProgressBar.style.width = `${p}%`;
         };
@@ -8121,10 +8369,24 @@
           }
 
           if (saveExportState.cancelled || !blob) {
-            showToast('保存をキャンセルしました');
+            showToast(isShare ? 'シェアをキャンセルしました' : '保存をキャンセルしました');
             return;
           }
 
+          // ==================== SHARE MODE: STRICTLY NON-DESTRUCTIVE ====================
+          // Never touches state.rawBlob, audioBuffer, filename, playlist, IDB session, or pin memory!
+          if (isShare) {
+            const mime = getMimeTypeForExt(ext, blob.type);
+            const shareFile = new File([blob], finalName, { type: mime, lastModified: Date.now() });
+            saveExportState.isExporting = false;
+            btnSaveExportRun.disabled = false;
+            saveFileNameInput.disabled = false;
+            saveProgressBox.classList.add('hidden');
+            await invokeNativeFileShare(shareFile);
+            return;
+          }
+
+          // ==================== SAVE MODE ====================
           const url = URL.createObjectURL(blob);
           const a = document.createElement('a');
           a.href = url;
@@ -8165,15 +8427,18 @@
           showToast(wasUnsaved ? `保存しました: ${finalName} (${sizeStr}・ピン記憶済)` : `保存しました: ${finalName} (${sizeStr})`);
         } catch (err) {
           if (err && err.message === 'cancelled') {
-            showToast('保存をキャンセルしました');
+            showToast(isShare ? 'シェアをキャンセルしました' : '保存をキャンセルしました');
           } else {
             console.error('Export failed:', err);
-            showToast(`書き出しに失敗しました（WAV形式をお試しください）`);
+            showToast('書き出しに失敗しました（WAV形式をお試しください）');
           }
         } finally {
           saveExportState.isExporting = false;
           btnSaveExportRun.disabled = false;
-          btnSaveExportRun.textContent = 'この設定で保存';
+          if (!(saveExportState.mode === 'share' && saveExportState.preparedShareFile)) {
+            btnSaveExportRun.textContent = saveExportState.mode === 'share' ? 'この設定でシェア' : 'この設定で保存';
+            btnSaveExportRun.classList.remove('share-ready');
+          }
           saveFileNameInput.disabled = false;
           saveProgressBox.classList.add('hidden');
         }
@@ -8184,8 +8449,9 @@
           if (saveExportState.isExporting || btn.disabled) return;
           const fmt = btn.dataset.saveFmt;
           saveExportState.selectedFormat = fmt;
-          saveExportState.selectedQuality = (state.exportQualityByFormat && state.exportQualityByFormat[fmt])
-            || SAVE_FORMAT_META[fmt].qualities[0].id;
+          const qMap = getActiveQualMap();
+          saveExportState.selectedQuality = (qMap && qMap[fmt]) || SAVE_FORMAT_META[fmt].qualities[0].id;
+          clearPreparedShareFile();
           updateSaveExportModalUI();
         });
       });
@@ -8193,7 +8459,14 @@
       document.getElementById('btnSaveResetTimestamp').addEventListener('click', () => {
         if (saveExportState.isExporting) return;
         saveFileNameInput.value = makeRecordingFilename().replace(/\.wav$/i, '');
+        clearPreparedShareFile();
         saveFileNameInput.focus();
+      });
+
+      saveFileNameInput.addEventListener('input', () => {
+        if (saveExportState.preparedShareFile) {
+          clearPreparedShareFile();
+        }
       });
 
       saveFileNameInput.addEventListener('keydown', (e) => {
@@ -12819,43 +13092,77 @@
       });
       document.getElementById('btnRecStop').addEventListener('click', stopRecording);
       document.getElementById('btnRecAddMarker').addEventListener('click', addMarkerDuringRecording);
-      btnSaveWav.addEventListener('click', openSaveExportModal);
+      btnSaveWav.addEventListener('click', () => openSaveExportModal('save'));
+      btnShareAudio.addEventListener('click', () => openSaveExportModal('share'));
 
-      // Fullscreen toggle (hides address bar in normal browser tabs)
+      // ==================== APP URL SHARE (LINE / MAIL / WEB SHARE / COPY) ====================
+      const APP_PUBLIC_URL = 'https://skb58.github.io/audipo2/';
+      const APP_SHARE_TITLE = 'Audipo風 練習プレイヤー＆レコーダー';
+      const APP_SHARE_TEXT = '高音質スロー再生・区間リピート・24bit録音・チューナー＆メトロノームが使える練習アプリです。';
+
+      async function copyTextToClipboard(text) {
+        try {
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            await navigator.clipboard.writeText(text);
+            return true;
+          }
+        } catch (_) {}
+        try {
+          const ta = document.createElement('textarea');
+          ta.value = text;
+          ta.setAttribute('readonly', '');
+          ta.style.position = 'fixed';
+          ta.style.opacity = '0';
+          document.body.appendChild(ta);
+          ta.select();
+          const ok = document.execCommand('copy');
+          document.body.removeChild(ta);
+          return ok;
+        } catch (_) {
+          return false;
+        }
+      }
+
+      document.getElementById('btnShareAppNative').addEventListener('click', async () => {
+        if (navigator.share) {
+          try {
+            await navigator.share({
+              title: APP_SHARE_TITLE,
+              text: APP_SHARE_TEXT,
+              url: APP_PUBLIC_URL
+            });
+            return;
+          } catch (err) {
+            if (err && err.name === 'AbortError') return;
+          }
+        }
+        const ok = await copyTextToClipboard(APP_PUBLIC_URL);
+        showToast(ok ? '共有URLをコピーしました' : APP_PUBLIC_URL);
+      });
+
+      document.getElementById('btnShareAppLine').addEventListener('click', () => {
+        const msg = `${APP_SHARE_TITLE}\n${APP_SHARE_TEXT}\n${APP_PUBLIC_URL}`;
+        const lineUrl = `https://line.me/R/share?text=${encodeURIComponent(msg)}`;
+        window.open(lineUrl, '_blank', 'noopener,noreferrer');
+      });
+
+      document.getElementById('btnShareAppMail').addEventListener('click', () => {
+        const subject = encodeURIComponent(APP_SHARE_TITLE);
+        const body = encodeURIComponent(`${APP_SHARE_TEXT}\n\n${APP_PUBLIC_URL}`);
+        window.location.href = `mailto:?subject=${subject}&body=${body}`;
+      });
+
+      document.getElementById('btnCopyAppUrl').addEventListener('click', async () => {
+        const ok = await copyTextToClipboard(APP_PUBLIC_URL);
+        showToast(ok ? 'アプリURLをコピーしました' : 'コピーに失敗しました');
+      });
+
+      // Fullscreen state helper (used by 2-octave landscape keyboard mode)
       function isInFullscreen() {
         return Boolean(document.fullscreenElement || document.webkitFullscreenElement);
       }
 
-      function updateFullscreenUI() {
-        const fs = isInFullscreen();
-        btnFullscreenToggle.classList.toggle('active', fs);
-        iconFsEnter.classList.toggle('hidden', fs);
-        iconFsExit.classList.toggle('hidden', !fs);
-      }
-
-      async function toggleFullscreenMode() {
-        try {
-          if (isInFullscreen()) {
-            if (document.exitFullscreen) await document.exitFullscreen();
-            else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
-          } else {
-            const el = document.documentElement;
-            if (el.requestFullscreen) await el.requestFullscreen({ navigationUI: 'hide' });
-            else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
-            else {
-              showToast('メニューの「ホーム画面に追加」から起動するとアドレスバーが消えます');
-              return;
-            }
-          }
-        } catch (err) {
-          console.warn('Fullscreen toggle failed:', err);
-          showToast('このブラウザではメニューの「ホーム画面に追加」で全画面化できます');
-        }
-      }
-
-      btnFullscreenToggle.addEventListener('click', toggleFullscreenMode);
       const onFullscreenStateChanged = () => {
-        updateFullscreenUI();
         syncAppViewportHeight(true);
         if (state.upperPage === 'kbd' && kbd.landscapeLocked) {
           tryLockLandscapeOrientation();
@@ -12876,11 +13183,22 @@
       document.addEventListener('webkitfullscreenchange', onFullscreenStateChanged);
 
       // ==================== GITHUB / PWA SOFTWARE UPDATE CHECK & APPLY ====================
-      const APP_VERSION = 'v29';
+      const APP_VERSION = 'v30';
 
       // Ordered newest-first; each release appends a new object at the top.
       // Users who skip multiple versions automatically see ALL unseen versions between lastSeen and current.
       const APP_RELEASE_NOTES = [
+        {
+          version: 'v30',
+          verNum: 30,
+          date: '2026/11/23',
+          title: '録音の形式選択シェア＆アプリURLシェア機能を追加',
+          items: [
+            'メイン画面右上のボタンを「音声ファイルをシェア」に変更し、保存時と同じように形式（WAV / M4A / OGG）・音質・ファイル名を選んでLINEやメール等へ直接シェアできるようにしました',
+            'シェア時に低音質を選んでも、元の音声ファイルや記憶済みピン・保存側の設定には一切影響せず共有用ファイルのみを作成します',
+            '設定画面の最後に「このアプリをシェア」項目を追加し、公開URL（https://skb58.github.io/audipo2/）を共有メニュー・LINE・メール・URLコピーで手軽に送れるようにしました'
+          ]
+        },
         {
           version: 'v29',
           verNum: 29,
