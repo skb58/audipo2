@@ -8,7 +8,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="Audipo2">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="app-version" content="v42">
+  <meta name="app-version" content="v43">
   <link rel="manifest" href="./manifest.json">
   <title>Audipo風 練習プレイヤー＆レコーダー</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='bg' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%231b2030'/%3E%3Cstop offset='100%25' stop-color='%230d0f15'/%3E%3C/linearGradient%3E%3ClinearGradient id='wv' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0%25' stop-color='%2360c5ff'/%3E%3Cstop offset='100%25' stop-color='%232563eb'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='url(%23bg)'/%3E%3Crect x='1' y='1' width='62' height='62' rx='15' fill='none' stroke='%233b82f6' stroke-opacity='0.3' stroke-width='2'/%3E%3Cg fill='url(%23wv)'%3E%3Crect x='10' y='28' width='4.5' height='12' rx='2.25' opacity='0.6'/%3E%3Crect x='18' y='22' width='4.5' height='24' rx='2.25' opacity='0.85'/%3E%3Crect x='26' y='15' width='4.5' height='36' rx='2.25'/%3E%3Crect x='34' y='21' width='4.5' height='25' rx='2.25' opacity='0.9'/%3E%3Crect x='42' y='26' width='4.5' height='16' rx='2.25' opacity='0.75'/%3E%3Crect x='50' y='30' width='4.5' height='9' rx='2.25' opacity='0.5'/%3E%3C/g%3E%3Cpath d='M36.25 10.5c0-1.4 1.1-2.5 2.5-2.5h5.5c1.4 0 2.5 1.1 2.5 2.5v2.4c0 .8-.3 1.5-.9 2.1l-3.2 3.1c-.6.6-1.6.6-2.2 0l-3.2-3.1c-.6-.6-.9-1.3-.9-2.1v-2.4z' fill='%23facc15'/%3E%3C/svg%3E">
@@ -1570,6 +1570,13 @@
       font-weight: 700;
       color: #d4d4d8;
       white-space: nowrap;
+    }
+
+    .tr-set-label-group {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      min-width: 0;
     }
 
     .tr-pill-group {
@@ -4707,6 +4714,7 @@
                 <button id="btnTrEngWhisper" type="button" data-tr-engine="whisper" class="tr-engine-btn active-whisper">スマホAI (無料)</button>
                 <button id="btnTrEngGemini" type="button" data-tr-engine="gemini" class="tr-engine-btn">Gemini API (高精度)</button>
               </div>
+              <button type="button" class="setting-help-btn" data-help-key="trEngine" title="文字起こしエンジンの違い・設定ガイド" aria-label="文字起こしエンジンの説明">?</button>
               <button id="btnTrSettingsToggle" type="button" class="tr-gear-btn" title="文字起こしの詳細設定を開く/閉じる">
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <line x1="4" y1="6" x2="20" y2="6"/><circle cx="9" cy="6" r="2" fill="currentColor"/>
@@ -4722,7 +4730,10 @@
               <!-- Whisper Options -->
               <div id="trWhisperOpts">
                 <div class="tr-set-row" style="margin-bottom:6px;">
-                  <span class="tr-set-label">Whisperモデル</span>
+                  <span class="tr-set-label-group">
+                    <span class="tr-set-label">Whisperモデル</span>
+                    <button type="button" class="setting-help-btn" data-help-key="trWhisperModel" aria-label="Whisperモデルの説明">?</button>
+                  </span>
                   <div class="tr-pill-group">
                     <button type="button" data-tr-wmodel="onnx-community/whisper-tiny" class="tr-mini-pill tr-wmodel-btn active">軽量 tiny (~75MB)</button>
                     <button type="button" data-tr-wmodel="onnx-community/whisper-base" class="tr-mini-pill tr-wmodel-btn">高精度 base (~140MB)</button>
@@ -4734,7 +4745,10 @@
               <!-- Gemini API Options -->
               <div id="trGeminiOpts" class="hidden" style="display:flex;flex-direction:column;gap:6px;">
                 <div class="tr-set-row">
-                  <span class="tr-set-label">Gemini APIキー</span>
+                  <span class="tr-set-label-group">
+                    <span class="tr-set-label">Gemini APIキー</span>
+                    <button type="button" class="setting-help-btn" data-help-key="trGeminiKey" aria-label="Gemini APIキーの説明">?</button>
+                  </span>
                   <span id="trGeminiKeyStatus" class="mono" style="font-size:10px;color:#fca5a5;">未設定</span>
                 </div>
                 <div class="tr-key-row">
@@ -4743,7 +4757,10 @@
                   <button id="btnTrKeySave" type="button" class="tr-mini-pill active" style="height:32px;">保存</button>
                 </div>
                 <div class="tr-set-row">
-                  <span class="tr-set-label">使用モデル</span>
+                  <span class="tr-set-label-group">
+                    <span class="tr-set-label">使用モデル</span>
+                    <button type="button" class="setting-help-btn" data-help-key="trGeminiModel" aria-label="Gemini使用モデルの説明">?</button>
+                  </span>
                   <select id="selectTrGeminiModel" class="tr-key-input mono" style="height:28px;font-size:11px;flex:0 1 190px;">
                     <option value="auto">自動選択（推奨Flash）</option>
                     <option value="gemini-3.5-flash">gemini-3.5-flash</option>
@@ -4756,7 +4773,10 @@
 
               <!-- Skip Musical Performance Toggle (Fast Speech-Only Mode) -->
               <div class="tr-set-row" style="padding-top:5px;border-top:1px solid var(--border-subtle);">
-                <span class="tr-set-label">演奏中をスキップ（高速化）</span>
+                <span class="tr-set-label-group">
+                  <span class="tr-set-label">演奏中をスキップ（高速化）</span>
+                  <button type="button" class="setting-help-btn" data-help-key="trSkipMusic" aria-label="演奏中をスキップの説明">?</button>
+                </span>
                 <div class="tr-pill-group">
                   <button type="button" data-tr-skipmusic="1" class="tr-mini-pill tr-skipmusic-btn active">ON（推奨・高速）</button>
                   <button type="button" data-tr-skipmusic="0" class="tr-mini-pill tr-skipmusic-btn">OFF（全体）</button>
@@ -4765,7 +4785,10 @@
 
               <!-- Shared Utterance Pause Grouping Sensitivity -->
               <div class="tr-set-row">
-                <span class="tr-set-label">発話の区切り（間）</span>
+                <span class="tr-set-label-group">
+                  <span class="tr-set-label">発話の区切り（間）</span>
+                  <button type="button" class="setting-help-btn" data-help-key="trPause" aria-label="発話の区切り（間）の説明">?</button>
+                </span>
                 <div class="tr-pill-group">
                   <button type="button" data-tr-pause="0.5" class="tr-mini-pill tr-pause-btn mono">短め 0.5s</button>
                   <button type="button" data-tr-pause="0.8" class="tr-mini-pill tr-pause-btn mono active">標準 0.8s</button>
@@ -5350,7 +5373,7 @@
         <div class="modal-section" style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
           <div>
             <div class="sec-title">バージョン情報</div>
-            <div id="settingsVersionLabel" class="engine-desc mono">現在: v42</div>
+            <div id="settingsVersionLabel" class="engine-desc mono">現在: v43</div>
           </div>
           <button id="btnShowReleaseHistory" type="button" class="step-btn" style="color:#93c5fd;border-color:rgba(66,165,245,0.45);">更新履歴を見る</button>
         </div>
@@ -5507,7 +5530,7 @@
           </div>
           <div>
             <h3 id="whatsNewTitle" class="whats-new-title">アップデートのお知らせ</h3>
-            <p id="whatsNewSub" class="whats-new-sub mono">v42 に更新されました</p>
+            <p id="whatsNewSub" class="whats-new-sub mono">v43 に更新されました</p>
           </div>
         </div>
         <button id="btnCloseWhatsNewX" type="button" class="modal-close" aria-label="閉じる">✕</button>
@@ -19352,11 +19375,21 @@
       document.addEventListener('webkitfullscreenchange', onFullscreenStateChanged);
 
       // ==================== GITHUB / PWA SOFTWARE UPDATE CHECK & APPLY ====================
-      const APP_VERSION = 'v42';
+      const APP_VERSION = 'v43';
 
       // Ordered newest-first; each release appends a new object at the top.
       // Users who skip multiple versions automatically see ALL unseen versions between lastSeen and current.
       const APP_RELEASE_NOTES = [
+        {
+          version: 'v43',
+          verNum: 43,
+          date: '2026/11/24',
+          title: '文字起こし設定画面の各項目に「?」くわしい説明ガイドを追加',
+          items: [
+            '文字起こし画面の上部バーおよび「設定」内の全項目（エンジン切替・Whisperモデル・Gemini APIキー・使用モデル・演奏中をスキップ・発話の区切り（間））に「?」ボタンを追加しました',
+            '他の設定画面と同じポップアップ形式で、各設定の意味や使い分けの目安をいつでも確認できます'
+          ]
+        },
         {
           version: 'v42',
           verNum: 42,
@@ -20008,6 +20041,99 @@
                 ['ピンの共有・読込（バックアップ）', '右上の共有ボタンの「ピン情報」タブから、現在の曲だけ・または全曲分のピンを .txt ファイルやテキストとして書き出せます。取り込みは普段の「開く」ボタン（音源との同時選択も可）またはここの「ピンを読込」「テキスト貼付で読込」から行え、同じファイルが既にある場合はファイルごと／すべてに適用で「マージ・上書き・スキップ」を選べます。'],
                 ['一時音源キャッシュ削除', '次回起動時に前回の音源を自動で開き直す一時データだけを削除します（1000件のピン記憶は消えません）。'],
                 ['全ピン記憶を初期化', 'これまで記憶した最大1000ファイル分のピン情報をすべて消去します。']
+              ]
+            }
+          ]
+        },
+        trEngine: {
+          title: '文字起こしエンジン切替',
+          sub: 'スマホAI（無料）と Gemini API（高精度）の使い分け',
+          summary: '録音のMC・講評・会話部分を「発話のまとまりごと」に文字起こしし、リストをタップしてその場所へジャンプしたり、黄色ピンをワンタップで追加できます。',
+          tableTitle: '2つのエンジンの違い',
+          tableHeaders: ['エンジン', '特徴・おすすめ場面'],
+          tableRows: [
+            ['スマホAI (無料)', 'APIキー不要・完全無料。スマホ端末内だけでAI処理を行うため、音声データが外部サーバーへ送信されません（初回のみモデルをキャッシュ）。'],
+            ['Gemini API (高精度)', 'Google AI Studioで取得したAPIキーを設定すると利用可能。専門用語・固有名詞・長い講評も高速かつ高精度に文字起こしできます。']
+          ],
+          sections: [
+            {
+              title: '便利な使い方',
+              bullets: [
+                ['発話ブロック全体を一括変換', '各行の最初だけでなく、検出された発話ブロックの先頭から末尾までをまとめて文字起こしします。'],
+                ['自動保存・自動復元', '文字起こし結果はファイルごとに端末内へ自動保存され、次回同じ音声を開いたときも再実行せずにすぐ見返せます。']
+              ]
+            }
+          ]
+        },
+        trWhisperModel: {
+          title: 'Whisperモデル（スマホAI）',
+          sub: '処理速度と認識精度のバランス選択',
+          summary: '端末内で動作する音声認識AIモデルのサイズを選びます。初回実行時に1度だけダウンロードされ、2回目以降はオフラインでも高速に起動します。',
+          tableTitle: 'モデルの選び方',
+          tableHeaders: ['モデル', '容量・特徴'],
+          tableRows: [
+            ['軽量 tiny (~75MB)', '初期設定。ダウンロードが速く、スマホのメモリ消費も少ないため長時間の練習録音でも軽快に動作します。'],
+            ['高精度 base (~140MB)', 'tinyより語彙が多く、早口や少し離れた位置からの話し声もより正確に聞き取れます（処理時間はやや長くなります）。']
+          ]
+        },
+        trGeminiKey: {
+          title: 'Gemini APIキー',
+          sub: 'Google AI Studio の無料／有料APIキー設定',
+          summary: 'Google AI Studio で発行した「AIza...」から始まるAPIキーを貼り付けて「保存」を押すと、Gemini APIによる高精度な文字起こしが使えるようになります。',
+          sections: [
+            {
+              title: 'プライバシーとセキュリティ',
+              bullets: [
+                ['端末内のみに保存', '入力したAPIキーはお使いのブラウザ（localStorage）内にのみ保存され、GoogleのGemini APIサーバー以外へ送信されることは一切ありません。'],
+                ['軽量音声で高速送信', '長いファイルでも自動で16kHzモノラルに圧縮・分割して送信するため、通信量を抑えつつ高速に処理できます。']
+              ]
+            }
+          ]
+        },
+        trGeminiModel: {
+          title: 'Gemini 使用モデル',
+          sub: '文字起こしに使うGeminiモデルの選択',
+          summary: '通常は初期設定の「自動選択（推奨Flash）」のままで、利用可能な最新の高速Flashモデルを自動判別して使用します。',
+          sections: [
+            {
+              title: '選択肢の目安',
+              bullets: [
+                ['自動選択（推奨Flash）', 'APIキーで利用可能な最新のFlash系モデルを自動選択し、万一非対応モデルがあっても別のFlashモデルへ自動フォールバックします。'],
+                ['個別モデル指定', '特定のバージョン（gemini-3.5-flash / flash-lite / 2.5-flash）に固定して実行したい場合に選びます。']
+              ]
+            }
+          ]
+        },
+        trSkipMusic: {
+          title: '演奏中をスキップ（高速化）',
+          sub: '楽器演奏を自動除外してMC・講評だけを高速抽出',
+          summary: '音節リズム・子音と母音の変化・音程の持続時間（YINピッチ解析）から「話し声」と「楽器演奏・拍手」を自動判別し、演奏中の区間をスキップして文字起こし時間を大幅に短縮します。',
+          sections: [
+            {
+              title: 'ON と OFF の使い分け',
+              bullets: [
+                ['ON（推奨・高速）', '録音の大半が楽器演奏で、曲の合間の先生からのアドバイスやMCだけを素早く文字起こししたいときに最適です。スマホAI・Gemini APIの両方で有効になります。'],
+                ['OFF（全体）', '小声のつぶやきや楽器のすぐ近くでの短い一言など、演奏スキップで除外されてしまう箇所も含めて音声全体を対象にしたいときに使います。']
+              ]
+            }
+          ]
+        },
+        trPause: {
+          title: '発話の区切り（間）',
+          sub: 'リストの1行（1ブロック）を区切る無音の長さ',
+          summary: '声と声のあいだに何秒以上の無音（息継ぎ・沈黙）が空いたら、次の発話ブロック（#1, #2...）として切り分けるかを決める基準値です。',
+          tableTitle: '3つの区切り基準',
+          tableHeaders: ['設定値', '特徴・おすすめ場面'],
+          tableRows: [
+            ['短め 0.5s', '短い息継ぎや文節ごとに細かく行を分けたいとき。ピンを細かく打ちたい場面に便利です。'],
+            ['標準 0.8s', '会話やMC、講評の自然な句切れをバランスよく1つのまとまりにまとめます（迷ったらこれ）。'],
+            ['長め 1.3s', '考えながらゆっくり話すときなど、1秒前後の間が空いても途中で切らず1つの文章にまとめたいときに適しています。']
+          ],
+          sections: [
+            {
+              title: '補足',
+              bullets: [
+                ['ブロック全体を文字起こし', '各ブロックの最初だけでなく、区切られたブロックの先頭から末尾まで全体が文字起こしされます（長い発話は最大約24秒単位で自動分割）。']
               ]
             }
           ]
