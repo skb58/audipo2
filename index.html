@@ -8,7 +8,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="Audipo2">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="app-version" content="v41">
+  <meta name="app-version" content="v42">
   <link rel="manifest" href="./manifest.json">
   <title>Audipo風 練習プレイヤー＆レコーダー</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='bg' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%231b2030'/%3E%3Cstop offset='100%25' stop-color='%230d0f15'/%3E%3C/linearGradient%3E%3ClinearGradient id='wv' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0%25' stop-color='%2360c5ff'/%3E%3Cstop offset='100%25' stop-color='%232563eb'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='url(%23bg)'/%3E%3Crect x='1' y='1' width='62' height='62' rx='15' fill='none' stroke='%233b82f6' stroke-opacity='0.3' stroke-width='2'/%3E%3Cg fill='url(%23wv)'%3E%3Crect x='10' y='28' width='4.5' height='12' rx='2.25' opacity='0.6'/%3E%3Crect x='18' y='22' width='4.5' height='24' rx='2.25' opacity='0.85'/%3E%3Crect x='26' y='15' width='4.5' height='36' rx='2.25'/%3E%3Crect x='34' y='21' width='4.5' height='25' rx='2.25' opacity='0.9'/%3E%3Crect x='42' y='26' width='4.5' height='16' rx='2.25' opacity='0.75'/%3E%3Crect x='50' y='30' width='4.5' height='9' rx='2.25' opacity='0.5'/%3E%3C/g%3E%3Cpath d='M36.25 10.5c0-1.4 1.1-2.5 2.5-2.5h5.5c1.4 0 2.5 1.1 2.5 2.5v2.4c0 .8-.3 1.5-.9 2.1l-3.2 3.1c-.6.6-1.6.6-2.2 0l-3.2-3.1c-.6-.6-.9-1.3-.9-2.1v-2.4z' fill='%23facc15'/%3E%3C/svg%3E">
@@ -5350,7 +5350,7 @@
         <div class="modal-section" style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
           <div>
             <div class="sec-title">バージョン情報</div>
-            <div id="settingsVersionLabel" class="engine-desc mono">現在: v41</div>
+            <div id="settingsVersionLabel" class="engine-desc mono">現在: v42</div>
           </div>
           <button id="btnShowReleaseHistory" type="button" class="step-btn" style="color:#93c5fd;border-color:rgba(66,165,245,0.45);">更新履歴を見る</button>
         </div>
@@ -5507,7 +5507,7 @@
           </div>
           <div>
             <h3 id="whatsNewTitle" class="whats-new-title">アップデートのお知らせ</h3>
-            <p id="whatsNewSub" class="whats-new-sub mono">v41 に更新されました</p>
+            <p id="whatsNewSub" class="whats-new-sub mono">v42 に更新されました</p>
           </div>
         </div>
         <button id="btnCloseWhatsNewX" type="button" class="modal-close" aria-label="閉じる">✕</button>
@@ -6133,6 +6133,7 @@
         isDraggingOverview: false,
         isDraggingZoom: false,
         isPinchingZoom: false,
+        zoomWasInertiaOnDown: false,
         zoomDragStartX: 0,
         zoomDragStartY: 0,
         zoomDragStartTime: 0,
@@ -7377,9 +7378,11 @@
           pv.olaReadPos++;
         }
 
-        state.currentTime = Math.min(state.duration, pv.analysisPos / bufSr);
-        state.lastSyncTime = state.currentTime;
-        state.lastSyncPerf = performance.now();
+        if (!isWaveScrubbing()) {
+          state.currentTime = Math.min(state.duration, pv.analysisPos / bufSr);
+          state.lastSyncTime = state.currentTime;
+          state.lastSyncPerf = performance.now();
+        }
 
         if (pv.pendingEnd) {
           pv.pendingEnd = false;
@@ -14515,9 +14518,16 @@
       });
 
       // ==================== TRANSPORT, PLAYHEAD INTERPOLATION & PLAYLIST ====================
-      function getLivePlayheadTime() {
+      function isWaveScrubbing() {
+        return Boolean(state.isDraggingZoom || state.isPinchingZoom || state.isInertiaActive);
+      }
+
+      function getLiveAudioPlayheadTime() {
         if (!state.hasAudio) return 0;
         const path = getActivePlaybackPath();
+        if (state.isPlaying && path === 'vocoderDsp' && state.audioBuffer) {
+          return Math.min(state.duration, pv.analysisPos / state.audioBuffer.sampleRate);
+        }
         if (state.isPlaying && path === 'bufferDirect' && tapeSourceNode) {
           return getTapeCurrentTime();
         }
@@ -14527,9 +14537,17 @@
         return state.currentTime;
       }
 
+      function getLivePlayheadTime() {
+        if (!state.hasAudio) return 0;
+        if (isWaveScrubbing()) {
+          return state.currentTime;
+        }
+        return getLiveAudioPlayheadTime();
+      }
+
       function getSmoothPlayheadTime() {
         if (!state.hasAudio) return 0;
-        if (!state.isPlaying || state.isDraggingOverview || state.isDraggingZoom || state.isPinchingZoom || state.isInertiaActive) {
+        if (!state.isPlaying || state.isDraggingOverview || isWaveScrubbing()) {
           return state.currentTime;
         }
         if (getActivePlaybackPath() === 'bufferDirect' && tapeSourceNode) {
@@ -14653,7 +14671,12 @@
       }
 
       function pausePlayback() {
-        if (state.isPlaying) {
+        const wasScrubbing = isWaveScrubbing();
+        stopInertia(false);
+        state.isDraggingZoom = false;
+        state.isPinchingZoom = false;
+        state.zoomWasInertiaOnDown = false;
+        if (state.isPlaying && !wasScrubbing) {
           state.currentTime = getLivePlayheadTime();
         }
         state.isPlaying = false;
@@ -15329,9 +15352,27 @@
           }
         }
 
-        // Fixed Center White Playhead
-        ctx.strokeStyle = '#ffffff';
-        ctx.lineWidth = 2;
+        // While dragging/gliding waveform during playback, show actual playing audio position in subtle dashed cyan
+        if (state.hasAudio && state.isPlaying && isWaveScrubbing()) {
+          const liveAudioT = getLiveAudioPlayheadTime();
+          if (liveAudioT >= winStart && liveAudioT <= winEnd) {
+            const liveX = (liveAudioT - winStart) * pxPerSec;
+            ctx.save();
+            ctx.strokeStyle = 'rgba(56, 189, 248, 0.72)';
+            ctx.lineWidth = 1.5;
+            ctx.setLineDash([4, 3]);
+            ctx.beginPath();
+            ctx.moveTo(liveX, 0);
+            ctx.lineTo(liveX, H);
+            ctx.stroke();
+            ctx.restore();
+          }
+        }
+
+        // Fixed Center Playhead / Scrub Target Line
+        const scrubbingActive = state.hasAudio && state.isPlaying && isWaveScrubbing();
+        ctx.strokeStyle = scrubbingActive ? '#fde047' : '#ffffff';
+        ctx.lineWidth = scrubbingActive ? 2.2 : 2;
         ctx.beginPath();
         ctx.moveTo(centerX, 0);
         ctx.lineTo(centerX, H);
@@ -15597,18 +15638,17 @@
 
       function startInertia(velSecPerMs) {
         stopInertia(false);
-        if (!state.hasAudio || !isFinite(velSecPerMs) || Math.abs(velSecPerMs) < 1e-6) return;
+        if (!state.hasAudio || !isFinite(velSecPerMs) || Math.abs(velSecPerMs) < 1e-6) return false;
 
         const rect = zoomCanvas.getBoundingClientRect();
         const W = Math.max(1, rect.width);
         // Minimum stopping velocity equivalent to ~0.015 px/ms on screen (consistent across all zoom levels!)
         const minStopSecPerMs = (0.015 / W) * state.zoomWindowSeconds;
-        if (Math.abs(velSecPerMs) <= minStopSecPerMs) return;
+        if (Math.abs(velSecPerMs) <= minStopSecPerMs) return false;
 
         state.isInertiaActive = true;
         state.zoomVelSecPerMs = velSecPerMs;
         let lastTs = performance.now();
-        let lastAudioSyncPerf = lastTs;
 
         const tick = (now) => {
           if (!state.isInertiaActive || !state.hasAudio) return;
@@ -15624,10 +15664,8 @@
             return;
           }
 
-          // While playing, throttle audio seek to ~110ms intervals so playback never crackles during glide
-          const shouldSyncAudio = !state.isPlaying || (now - lastAudioSyncPerf >= 110);
-          if (shouldSyncAudio) lastAudioSyncPerf = now;
-          seekTo(nextT, { keepInertia: true, setGreenPin: false, deferAudioSeek: !shouldSyncAudio });
+          // Keep audio playing uninterrupted during inertial glide; jump once when glide settles
+          seekTo(nextT, { keepInertia: true, setGreenPin: false, deferAudioSeek: true });
 
           // Smooth iOS/Android-like exponential deceleration (0.955 per 16.67ms frame)
           state.zoomVelSecPerMs *= Math.pow(0.955, dt / 16.67);
@@ -15638,6 +15676,7 @@
           state.inertiaRafId = requestAnimationFrame(tick);
         };
         state.inertiaRafId = requestAnimationFrame(tick);
+        return true;
       }
 
       function setZoomSpan(sec) {
@@ -15651,6 +15690,7 @@
       zoomCanvas.addEventListener('touchstart', (e) => {
         if (!state.hasAudio) return;
         e.preventDefault();
+        const wasCoasting = state.isInertiaActive;
         stopInertia(false);
 
         if (e.touches.length === 1) {
@@ -15658,6 +15698,7 @@
           const now = performance.now();
           state.isPinchingZoom = false;
           state.isDraggingZoom = true;
+          state.zoomWasInertiaOnDown = wasCoasting;
           state.zoomDragStartX = t.clientX;
           state.zoomDragStartY = t.clientY;
           state.zoomDragStartTime = state.currentTime;
@@ -15670,6 +15711,7 @@
         } else if (e.touches.length >= 2) {
           state.isDraggingZoom = false;
           state.isPinchingZoom = true;
+          state.zoomWasInertiaOnDown = false;
           state.zoomMoved = true;
           zoomTrackSamples = [];
           const t0 = e.touches[0], t1 = e.touches[1];
@@ -15699,7 +15741,7 @@
           const midX = (t0.clientX + t1.clientX) * 0.5 - rect.left;
           const ratio = Math.max(0, Math.min(1, midX / W));
           const anchoredCenter = state.pinchAnchorTime - (ratio - 0.5) * newWin;
-          seekTo(anchoredCenter, { keepInertia: true, setGreenPin: false });
+          seekTo(anchoredCenter, { keepInertia: true, setGreenPin: false, deferAudioSeek: true });
         } else if (state.isDraggingZoom && e.touches.length === 1) {
           const t = e.touches[0];
           const now = performance.now();
@@ -15712,8 +15754,8 @@
 
           const totalDx = t.clientX - state.zoomDragStartX;
           const deltaSec = -(totalDx / W) * state.zoomWindowSeconds;
-          // keepInertia: true avoids resetting velocity; setGreenPin: false preserves green pin position!
-          seekTo(state.zoomDragStartTime + deltaSec, { keepInertia: true, setGreenPin: false });
+          // Move waveform visually only; keep audio playing smoothly until finger lifts off
+          seekTo(state.zoomDragStartTime + deltaSec, { keepInertia: true, setGreenPin: false, deferAudioSeek: true });
         }
       }, { passive: false });
 
@@ -15732,37 +15774,49 @@
           zoomTrackSamples = [{ x: t.clientX, t: now }];
         } else if (e.touches.length === 0) {
           const wasDrag = state.isDraggingZoom;
-          const wasTap = wasDrag && !state.zoomMoved && (performance.now() - state.zoomTapStartPerf) < 280;
+          const wasPinch = state.isPinchingZoom;
+          const wasCoastingOnDown = state.zoomWasInertiaOnDown;
+          const wasTap = wasDrag && !state.zoomMoved && !wasCoastingOnDown && (performance.now() - state.zoomTapStartPerf) < 280;
           state.isDraggingZoom = false;
           state.isPinchingZoom = false;
+          state.zoomWasInertiaOnDown = false;
 
           const rect = zoomCanvas.getBoundingClientRect();
           const W = Math.max(1, rect.width);
 
           if (wasTap) {
             const offsetFrac = ((state.zoomDragStartX - rect.left) - W * 0.5) / W;
-            seekTo(state.zoomDragStartTime + offsetFrac * state.zoomWindowSeconds, { setGreenPin: false });
+            seekTo(state.zoomDragStartTime + offsetFrac * state.zoomWindowSeconds, { setGreenPin: false, deferAudioSeek: false });
           } else if (wasDrag) {
             const releaseVel = computeZoomReleaseVelocitySecPerMs(W);
-            if (Math.abs(releaseVel) > 0) {
-              startInertia(releaseVel);
+            if (!startInertia(releaseVel)) {
+              seekTo(state.currentTime, { setGreenPin: false, deferAudioSeek: false });
             }
+          } else if (wasPinch) {
+            seekTo(state.currentTime, { setGreenPin: false, deferAudioSeek: false });
           }
           zoomTrackSamples = [];
         }
       });
 
       zoomCanvas.addEventListener('touchcancel', () => {
+        const hadGesture = state.isDraggingZoom || state.isPinchingZoom;
         state.isDraggingZoom = false;
         state.isPinchingZoom = false;
+        state.zoomWasInertiaOnDown = false;
         zoomTrackSamples = [];
+        if (hadGesture && state.hasAudio) {
+          seekTo(state.currentTime, { setGreenPin: false, deferAudioSeek: false });
+        }
       });
 
       zoomCanvas.addEventListener('mousedown', (e) => {
         if (!state.hasAudio || e.button !== 0) return;
+        const wasCoasting = state.isInertiaActive;
         stopInertia(false);
         const now = performance.now();
         state.isDraggingZoom = true;
+        state.zoomWasInertiaOnDown = wasCoasting;
         state.zoomDragStartX = e.clientX;
         state.zoomDragStartY = e.clientY;
         state.zoomDragStartTime = state.currentTime;
@@ -15787,24 +15841,26 @@
         state.zoomLastPerf = now;
 
         const deltaSec = -((e.clientX - state.zoomDragStartX) / W) * state.zoomWindowSeconds;
-        seekTo(state.zoomDragStartTime + deltaSec, { keepInertia: true, setGreenPin: false });
+        seekTo(state.zoomDragStartTime + deltaSec, { keepInertia: true, setGreenPin: false, deferAudioSeek: true });
       });
 
       window.addEventListener('mouseup', () => {
         if (!state.isDraggingZoom) return;
-        const wasClick = !state.zoomMoved && (performance.now() - state.zoomTapStartPerf) < 280;
+        const wasCoastingOnDown = state.zoomWasInertiaOnDown;
+        const wasClick = !state.zoomMoved && !wasCoastingOnDown && (performance.now() - state.zoomTapStartPerf) < 280;
         state.isDraggingZoom = false;
+        state.zoomWasInertiaOnDown = false;
 
         const rect = zoomCanvas.getBoundingClientRect();
         const W = Math.max(1, rect.width);
 
         if (wasClick) {
           const offsetFrac = ((state.zoomDragStartX - rect.left) - W * 0.5) / W;
-          seekTo(state.zoomDragStartTime + offsetFrac * state.zoomWindowSeconds, { setGreenPin: false });
+          seekTo(state.zoomDragStartTime + offsetFrac * state.zoomWindowSeconds, { setGreenPin: false, deferAudioSeek: false });
         } else {
           const releaseVel = computeZoomReleaseVelocitySecPerMs(W);
-          if (Math.abs(releaseVel) > 0) {
-            startInertia(releaseVel);
+          if (!startInertia(releaseVel)) {
+            seekTo(state.currentTime, { setGreenPin: false, deferAudioSeek: false });
           }
         }
         zoomTrackSamples = [];
@@ -15826,7 +15882,10 @@
 
       // ==================== 60/120FPS ANIMATION & PLAYBACK SYNC LOOP ====================
       function animationLoop() {
-        if (state.hasAudio && state.isPlaying && !state.isDraggingOverview && !state.isDraggingZoom && !state.isPinchingZoom) {
+        if (state.hasAudio && state.isPlaying && isWaveScrubbing()) {
+          // Audio keeps playing smoothly without seeking while user drags/glides waveform; refresh live audio line
+          renderAllCanvases();
+        } else if (state.hasAudio && state.isPlaying && !state.isDraggingOverview && !isWaveScrubbing()) {
           if (getActivePlaybackPath() === 'bufferDirect' && tapeSourceNode) {
             state.currentTime = getTapeCurrentTime();
             const skipDest = resolveSkipTarget(state.currentTime);
@@ -19293,11 +19352,21 @@
       document.addEventListener('webkitfullscreenchange', onFullscreenStateChanged);
 
       // ==================== GITHUB / PWA SOFTWARE UPDATE CHECK & APPLY ====================
-      const APP_VERSION = 'v41';
+      const APP_VERSION = 'v42';
 
       // Ordered newest-first; each release appends a new object at the top.
       // Users who skip multiple versions automatically see ALL unseen versions between lastSeen and current.
       const APP_RELEASE_NOTES = [
+        {
+          version: 'v42',
+          verNum: 42,
+          date: '2026/11/23',
+          title: '波形を指で移動中は音をそのまま流し、指を離したタイミングでその位置へジャンプするよう改善',
+          items: [
+            '再生中に下の拡大波形を指でドラッグ（またはフリック滑走）している間は、現在の再生音を途切れや雑音なくそのまま流し続け、指を離して波形移動が終わったタイミングで選択位置へジャンプするようにしました',
+            '波形の移動中は、実際に再生中の位置を水色の点線ラインで、離したときにジャンプする移動先を中央の黄色ラインで分かりやすく表示します'
+          ]
+        },
         {
           version: 'v41',
           verNum: 41,
