@@ -8,7 +8,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="Audipo2">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="app-version" content="v40">
+  <meta name="app-version" content="v41">
   <link rel="manifest" href="./manifest.json">
   <title>Audipo風 練習プレイヤー＆レコーダー</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='bg' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%231b2030'/%3E%3Cstop offset='100%25' stop-color='%230d0f15'/%3E%3C/linearGradient%3E%3ClinearGradient id='wv' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0%25' stop-color='%2360c5ff'/%3E%3Cstop offset='100%25' stop-color='%232563eb'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='url(%23bg)'/%3E%3Crect x='1' y='1' width='62' height='62' rx='15' fill='none' stroke='%233b82f6' stroke-opacity='0.3' stroke-width='2'/%3E%3Cg fill='url(%23wv)'%3E%3Crect x='10' y='28' width='4.5' height='12' rx='2.25' opacity='0.6'/%3E%3Crect x='18' y='22' width='4.5' height='24' rx='2.25' opacity='0.85'/%3E%3Crect x='26' y='15' width='4.5' height='36' rx='2.25'/%3E%3Crect x='34' y='21' width='4.5' height='25' rx='2.25' opacity='0.9'/%3E%3Crect x='42' y='26' width='4.5' height='16' rx='2.25' opacity='0.75'/%3E%3Crect x='50' y='30' width='4.5' height='9' rx='2.25' opacity='0.5'/%3E%3C/g%3E%3Cpath d='M36.25 10.5c0-1.4 1.1-2.5 2.5-2.5h5.5c1.4 0 2.5 1.1 2.5 2.5v2.4c0 .8-.3 1.5-.9 2.1l-3.2 3.1c-.6.6-1.6.6-2.2 0l-3.2-3.1c-.6-.6-.9-1.3-.9-2.1v-2.4z' fill='%23facc15'/%3E%3C/svg%3E">
@@ -2698,6 +2698,13 @@
       background: #3e3e46;
     }
 
+    .mark-action-block.is-playing {
+      background: rgba(66, 165, 245, 0.22);
+      border-color: var(--accent-blue);
+      color: #93c5fd;
+      box-shadow: 0 0 12px rgba(66, 165, 245, 0.25);
+    }
+
     .mark-switch-row {
       display: flex;
       align-items: center;
@@ -5343,7 +5350,7 @@
         <div class="modal-section" style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
           <div>
             <div class="sec-title">バージョン情報</div>
-            <div id="settingsVersionLabel" class="engine-desc mono">現在: v40</div>
+            <div id="settingsVersionLabel" class="engine-desc mono">現在: v41</div>
           </div>
           <button id="btnShowReleaseHistory" type="button" class="step-btn" style="color:#93c5fd;border-color:rgba(66,165,245,0.45);">更新履歴を見る</button>
         </div>
@@ -5500,7 +5507,7 @@
           </div>
           <div>
             <h3 id="whatsNewTitle" class="whats-new-title">アップデートのお知らせ</h3>
-            <p id="whatsNewSub" class="whats-new-sub mono">v40 に更新されました</p>
+            <p id="whatsNewSub" class="whats-new-sub mono">v41 に更新されました</p>
           </div>
         </div>
         <button id="btnCloseWhatsNewX" type="button" class="modal-close" aria-label="閉じる">✕</button>
@@ -14351,7 +14358,19 @@
       const toggleEditMarkEnabled = document.getElementById('toggleEditMarkEnabled');
       const toggleEditSectionEnabled = document.getElementById('toggleEditSectionEnabled');
 
-      let editingMarkTarget = null; // { isStart: boolean, markerId: string|null, draftTime: number, draftEnabled: boolean, draftSectionEnabled: boolean }
+      let editingMarkTarget = null; // { isStart: boolean, markerId: string|null, draftTime: number, draftEnabled: boolean, draftSectionEnabled: boolean, startedPreview: boolean }
+
+      const PREVIEW_PLAY_SVG = '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M7 5.5v13a1.4 1.4 0 0 0 2.13 1.2l10.2-6.5a1.4 1.4 0 0 0 0-2.4L9.13 4.3A1.4 1.4 0 0 0 7 5.5Z"/></svg>';
+      const PREVIEW_STOP_SVG = '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="6" width="12" height="12" rx="2.5"/></svg>';
+
+      function updateEditMarkPreviewUI() {
+        if (!btnEditMarkPreview) return;
+        const playing = Boolean(state.isPlaying);
+        btnEditMarkPreview.classList.toggle('is-playing', playing);
+        btnEditMarkPreview.innerHTML = playing
+          ? `${PREVIEW_STOP_SVG}<span>試し再生を停止</span>`
+          : `${PREVIEW_PLAY_SVG}<span>試しにここから再生</span>`;
+      }
 
       function openMarkEditModal(markerId = null) {
         if (!state.hasAudio) return;
@@ -14363,7 +14382,8 @@
             markerId: null,
             draftTime: 0,
             draftEnabled: true,
-            draftSectionEnabled: state.startSectionEnabled !== false
+            draftSectionEnabled: state.startSectionEnabled !== false,
+            startedPreview: false
           };
           editMarkNameInput.value = '0:00 (曲頭)';
           editMarkNameInput.disabled = true;
@@ -14378,7 +14398,8 @@
             markerId: m.id,
             draftTime: m.time,
             draftEnabled: m.enabled !== false,
-            draftSectionEnabled: m.sectionEnabled !== false
+            draftSectionEnabled: m.sectionEnabled !== false,
+            startedPreview: false
           };
           editMarkNameInput.value = m.name || '';
           editMarkNameInput.disabled = false;
@@ -14390,6 +14411,7 @@
 
         toggleEditMarkEnabled.classList.toggle('on', editingMarkTarget.draftEnabled);
         toggleEditSectionEnabled.classList.toggle('on', editingMarkTarget.draftSectionEnabled);
+        updateEditMarkPreviewUI();
         markEditModal.classList.remove('hidden');
 
         if (!editingMarkTarget.isStart) {
@@ -14398,6 +14420,9 @@
       }
 
       function closeMarkEditModal() {
+        if (editingMarkTarget && editingMarkTarget.startedPreview && state.isPlaying) {
+          pausePlayback();
+        }
         editingMarkTarget = null;
         markEditModal.classList.add('hidden');
       }
@@ -14408,6 +14433,9 @@
           const deltaSec = (parseInt(btn.dataset.ms, 10) || 0) / 1000;
           editingMarkTarget.draftTime = Math.max(0.05, Math.min(state.duration - 0.05, editingMarkTarget.draftTime + deltaSec));
           editMarkTimeText.textContent = formatTimeMs(editingMarkTarget.draftTime);
+          if (state.isPlaying) {
+            seekTo(editingMarkTarget.draftTime, { setGreenPin: false });
+          }
         });
       });
 
@@ -14425,9 +14453,18 @@
 
       btnEditMarkPreview.addEventListener('click', () => {
         if (!editingMarkTarget) return;
+        if (state.isPlaying) {
+          editingMarkTarget.startedPreview = false;
+          pausePlayback();
+          updateEditMarkPreviewUI();
+          showToast('試し再生を停止しました');
+          return;
+        }
         const previewT = editingMarkTarget.draftTime;
+        editingMarkTarget.startedPreview = true;
         seekTo(previewT, { setGreenPin: false });
-        if (!state.isPlaying) startPlayback();
+        startPlayback();
+        updateEditMarkPreviewUI();
         showToast(`試し再生: ${formatTime(previewT)}`);
       });
 
@@ -14638,6 +14675,9 @@
         iconPlay.classList.toggle('hidden', state.isPlaying);
         iconPause.classList.toggle('hidden', !state.isPlaying);
         btnPlayPause.classList.toggle('playing', state.isPlaying);
+        if (typeof updateEditMarkPreviewUI === 'function') {
+          updateEditMarkPreviewUI();
+        }
       }
 
       function updateTimeUI() {
@@ -19253,11 +19293,22 @@
       document.addEventListener('webkitfullscreenchange', onFullscreenStateChanged);
 
       // ==================== GITHUB / PWA SOFTWARE UPDATE CHECK & APPLY ====================
-      const APP_VERSION = 'v40';
+      const APP_VERSION = 'v41';
 
       // Ordered newest-first; each release appends a new object at the top.
       // Users who skip multiple versions automatically see ALL unseen versions between lastSeen and current.
       const APP_RELEASE_NOTES = [
+        {
+          version: 'v41',
+          verNum: 41,
+          date: '2026/11/23',
+          title: 'マーク編集画面の「試しにここから再生」から停止できるように改善',
+          items: [
+            'ピン（マーク）の編集画面で「試しにここから再生」を押したあと、同じボタンが「試し再生を停止」に切り替わり、タップでいつでも再生を停止できるようになりました',
+            '試し再生中に時刻の微調整ボタン（-0.5s / -50ms / +50ms / +0.5s）を押すと、調整後の位置へ即座に追従して再生確認できます',
+            '試し再生を開始したまま編集画面を閉じた場合（OK・キャンセル）も自動で再生を停止します'
+          ]
+        },
         {
           version: 'v40',
           verNum: 40,
