@@ -8,7 +8,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="Audipo2">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="app-version" content="v36">
+  <meta name="app-version" content="v37">
   <link rel="manifest" href="./manifest.json">
   <title>Audipo風 練習プレイヤー＆レコーダー</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='bg' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%231b2030'/%3E%3Cstop offset='100%25' stop-color='%230d0f15'/%3E%3C/linearGradient%3E%3ClinearGradient id='wv' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0%25' stop-color='%2360c5ff'/%3E%3Cstop offset='100%25' stop-color='%232563eb'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='url(%23bg)'/%3E%3Crect x='1' y='1' width='62' height='62' rx='15' fill='none' stroke='%233b82f6' stroke-opacity='0.3' stroke-width='2'/%3E%3Cg fill='url(%23wv)'%3E%3Crect x='10' y='28' width='4.5' height='12' rx='2.25' opacity='0.6'/%3E%3Crect x='18' y='22' width='4.5' height='24' rx='2.25' opacity='0.85'/%3E%3Crect x='26' y='15' width='4.5' height='36' rx='2.25'/%3E%3Crect x='34' y='21' width='4.5' height='25' rx='2.25' opacity='0.9'/%3E%3Crect x='42' y='26' width='4.5' height='16' rx='2.25' opacity='0.75'/%3E%3Crect x='50' y='30' width='4.5' height='9' rx='2.25' opacity='0.5'/%3E%3C/g%3E%3Cpath d='M36.25 10.5c0-1.4 1.1-2.5 2.5-2.5h5.5c1.4 0 2.5 1.1 2.5 2.5v2.4c0 .8-.3 1.5-.9 2.1l-3.2 3.1c-.6.6-1.6.6-2.2 0l-3.2-3.1c-.6-.6-.9-1.3-.9-2.1v-2.4z' fill='%23facc15'/%3E%3C/svg%3E">
@@ -258,9 +258,9 @@
 
     .upper-pager-track {
       display: flex;
-      width: 400%;
+      width: 500%;
       height: 100%;
-      transform: translate3d(-50%, 0, 0);
+      transform: translate3d(-40%, 0, 0);
       transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
       will-change: transform;
     }
@@ -274,19 +274,23 @@
     }
 
     .upper-pager-track.page-metro {
-      transform: translate3d(-25%, 0, 0);
+      transform: translate3d(-20%, 0, 0);
     }
 
     .upper-pager-track.page-wave {
-      transform: translate3d(-50%, 0, 0);
+      transform: translate3d(-40%, 0, 0);
     }
 
     .upper-pager-track.page-pins {
-      transform: translate3d(-75%, 0, 0);
+      transform: translate3d(-60%, 0, 0);
+    }
+
+    .upper-pager-track.page-transcript {
+      transform: translate3d(-80%, 0, 0);
     }
 
     .upper-page {
-      width: 25%;
+      width: 20%;
       height: 100%;
       flex-shrink: 0;
       position: relative;
@@ -1445,6 +1449,376 @@
     .upper-dot.active-pins {
       background: var(--accent-yellow);
       transform: scale(1.28);
+    }
+
+    .upper-dot.active-transcript {
+      background: #34d399;
+      transform: scale(1.3);
+      box-shadow: 0 0 6px rgba(52, 211, 153, 0.85);
+    }
+
+    .upper-dot.transcript-running-hint {
+      background: #34d399;
+      animation: pulseDot 0.9s infinite ease-in-out;
+    }
+
+    /* ==================== PAGE 4 (FAR RIGHT): SPEECH TRANSCRIPTION (UTTERANCE GROUPS) ==================== */
+    .upper-page-transcript {
+      display: flex;
+      flex-direction: column;
+      background: var(--bg-base);
+    }
+
+    .tr-topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+      padding: 6px 8px 5px;
+      background: #15151a;
+      border-bottom: 1px solid var(--border-subtle);
+      flex-shrink: 0;
+    }
+
+    .tr-engine-tabs {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      padding: 2px;
+      border-radius: 9px;
+      background: #0f0f13;
+      border: 1px solid var(--border-subtle);
+      flex: 1;
+      min-width: 0;
+    }
+
+    .tr-engine-btn {
+      flex: 1;
+      height: 27px;
+      padding: 0 6px;
+      border-radius: 7px;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-sub);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      transition: background-color 0.14s ease, color 0.14s ease;
+    }
+
+    .tr-engine-btn:active {
+      transform: scale(0.96);
+    }
+
+    .tr-engine-btn.active-whisper {
+      background: rgba(52, 211, 153, 0.22);
+      color: #a7f3d0;
+      box-shadow: inset 0 0 0 1px rgba(52, 211, 153, 0.65);
+    }
+
+    .tr-engine-btn.active-gemini {
+      background: rgba(66, 165, 245, 0.24);
+      color: #bae6fd;
+      box-shadow: inset 0 0 0 1px rgba(96, 165, 250, 0.7);
+    }
+
+    .tr-gear-btn {
+      height: 31px;
+      padding: 0 9px;
+      border-radius: 8px;
+      background: #22222b;
+      border: 1px solid var(--border-strong);
+      color: #e4e4e7;
+      font-size: 11px;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      flex-shrink: 0;
+      white-space: nowrap;
+    }
+
+    .tr-gear-btn:active {
+      transform: scale(0.95);
+    }
+
+    .tr-gear-btn.open {
+      background: rgba(66, 165, 245, 0.2);
+      border-color: var(--accent-blue);
+      color: #bae6fd;
+    }
+
+    .tr-settings-drawer {
+      padding: 8px 9px;
+      background: #17171d;
+      border-bottom: 1px solid var(--border-strong);
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      flex-shrink: 0;
+    }
+
+    .tr-set-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+    }
+
+    .tr-set-label {
+      font-size: 10.5px;
+      font-weight: 700;
+      color: #d4d4d8;
+      white-space: nowrap;
+    }
+
+    .tr-pill-group {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      flex-wrap: nowrap;
+    }
+
+    .tr-mini-pill {
+      height: 25px;
+      padding: 0 8px;
+      border-radius: 7px;
+      background: #22222a;
+      border: 1px solid var(--border-subtle);
+      color: #a1a1aa;
+      font-size: 10.5px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .tr-mini-pill.active {
+      background: rgba(52, 211, 153, 0.2);
+      border-color: #34d399;
+      color: #a7f3d0;
+    }
+
+    .tr-key-row {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .tr-key-input {
+      flex: 1;
+      min-width: 0;
+      height: 32px;
+      padding: 0 9px;
+      border-radius: 8px;
+      background: #101014;
+      border: 1px solid var(--border-strong);
+      color: #ffffff;
+      font-size: 11.5px;
+      outline: none;
+      user-select: text;
+      -webkit-user-select: text;
+    }
+
+    .tr-key-input:focus {
+      border-color: var(--accent-blue);
+    }
+
+    .tr-key-note {
+      font-size: 10px;
+      line-height: 1.4;
+      color: var(--text-sub);
+    }
+
+    .tr-progress-box {
+      padding: 6px 9px;
+      background: #131820;
+      border-bottom: 1px solid rgba(52, 211, 153, 0.35);
+      flex-shrink: 0;
+    }
+
+    .tr-progress-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      color: #a7f3d0;
+      margin-bottom: 5px;
+    }
+
+    .tr-progress-track {
+      width: 100%;
+      height: 5px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.08);
+      overflow: hidden;
+    }
+
+    .tr-progress-fill {
+      height: 100%;
+      width: 0%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #34d399 0%, #38bdf8 100%);
+      transition: width 0.16s ease-out;
+    }
+
+    .tr-list {
+      flex: 1;
+      min-height: 0;
+      overflow-y: auto;
+      overflow-x: hidden;
+      -webkit-overflow-scrolling: touch;
+      touch-action: pan-y;
+      padding: 7px 8px 5px;
+    }
+
+    .tr-empty-box {
+      padding: 18px 14px;
+      text-align: center;
+      color: var(--text-sub);
+      font-size: 12px;
+      line-height: 1.6;
+      background: #16161c;
+      border: 1px dashed var(--border-strong);
+      border-radius: 12px;
+      margin-top: 6px;
+    }
+
+    .tr-empty-box strong {
+      color: #e4e4e7;
+    }
+
+    .tr-item {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding: 8px 10px;
+      margin-bottom: 6px;
+      border-radius: 10px;
+      background: #1a1a20;
+      border: 1px solid var(--border-subtle);
+      cursor: pointer;
+      transition: background-color 0.12s ease, border-color 0.12s ease, box-shadow 0.12s ease;
+    }
+
+    .tr-item:active {
+      background: #25252f;
+    }
+
+    .tr-item.active-utterance {
+      background: rgba(52, 211, 153, 0.14);
+      border-color: rgba(52, 211, 153, 0.88);
+      box-shadow: inset 3.5px 0 0 #34d399, 0 0 12px rgba(52, 211, 153, 0.18);
+    }
+
+    .tr-item-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+    }
+
+    .tr-item-meta {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      min-width: 0;
+    }
+
+    .tr-idx-badge {
+      padding: 1px 6px;
+      border-radius: 999px;
+      background: #272732;
+      color: #a7f3d0;
+      font-size: 10px;
+      font-weight: 800;
+      flex-shrink: 0;
+    }
+
+    .tr-time-range {
+      font-size: 11px;
+      font-weight: 700;
+      color: #93c5fd;
+    }
+
+    .tr-now-badge {
+      padding: 1px 6px;
+      border-radius: 999px;
+      font-size: 9.5px;
+      font-weight: 800;
+      background: #34d399;
+      color: #052e16;
+    }
+
+    .tr-pin-add-btn {
+      height: 24px;
+      padding: 0 7px;
+      border-radius: 6px;
+      background: rgba(250, 204, 21, 0.13);
+      border: 1px solid rgba(250, 204, 21, 0.45);
+      color: #fde047;
+      font-size: 10px;
+      font-weight: 800;
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      flex-shrink: 0;
+    }
+
+    .tr-pin-add-btn:active {
+      transform: scale(0.92);
+      background: rgba(250, 204, 21, 0.28);
+    }
+
+    .tr-text {
+      font-size: 12.5px;
+      line-height: 1.52;
+      color: #f4f4f6;
+      word-break: break-word;
+      user-select: text;
+      -webkit-user-select: text;
+    }
+
+    .tr-footer {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      padding: 5px 6px 14px;
+      background: #141418;
+      border-top: 1px solid var(--border-subtle);
+      flex-shrink: 0;
+    }
+
+    .tr-run-btn {
+      flex: 1.6 1 0;
+      height: 34px;
+      padding: 0 10px;
+      border-radius: 9px;
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      border: 1px solid rgba(167, 243, 208, 0.65);
+      color: #032117;
+      font-size: 12px;
+      font-weight: 800;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      white-space: nowrap;
+    }
+
+    .tr-run-btn:active {
+      transform: scale(0.96);
+    }
+
+    .tr-run-btn.running {
+      background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+      border-color: #fca5a5;
+      color: #ffffff;
+    }
+
+    .tr-run-btn:disabled {
+      opacity: 0.4;
+      pointer-events: none;
     }
 
     .pad-btn {
@@ -4307,7 +4681,7 @@
             </div>
           </div>
 
-          <!-- Page 2 (Right): Audipo-style Pin List -->
+          <!-- Page 3 (Right): Audipo-style Pin List -->
           <div id="upperPagePins" class="upper-page upper-page-pins">
             <div id="upperMarkerListWrap" class="upper-pin-list"></div>
             <div class="upper-pin-footer">
@@ -4317,6 +4691,100 @@
               <button id="btnClearAllMarkersUpper" type="button" class="pin-foot-btn pin-foot-btn-clear" title="すべての黄色ピンを削除">全削除</button>
             </div>
           </div>
+
+          <!-- Page 4 (Far Right): Speech Transcription (Utterance Groups) -->
+          <div id="upperPageTranscript" class="upper-page upper-page-transcript">
+            <div class="tr-topbar">
+              <div class="tr-engine-tabs" role="tablist" aria-label="文字起こしエンジン切替">
+                <button id="btnTrEngWhisper" type="button" data-tr-engine="whisper" class="tr-engine-btn active-whisper">スマホAI (無料)</button>
+                <button id="btnTrEngGemini" type="button" data-tr-engine="gemini" class="tr-engine-btn">Gemini API (高精度)</button>
+              </div>
+              <button id="btnTrSettingsToggle" type="button" class="tr-gear-btn" title="文字起こしの詳細設定を開く/閉じる">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="4" y1="6" x2="20" y2="6"/><circle cx="9" cy="6" r="2" fill="currentColor"/>
+                  <line x1="4" y1="12" x2="20" y2="12"/><circle cx="15" cy="12" r="2" fill="currentColor"/>
+                  <line x1="4" y1="18" x2="20" y2="18"/><circle cx="10" cy="18" r="2" fill="currentColor"/>
+                </svg>
+                <span>設定</span>
+              </button>
+            </div>
+
+            <!-- Collapsible Inline Settings Drawer -->
+            <div id="trSettingsDrawer" class="tr-settings-drawer hidden">
+              <!-- Whisper Options -->
+              <div id="trWhisperOpts">
+                <div class="tr-set-row" style="margin-bottom:6px;">
+                  <span class="tr-set-label">Whisperモデル</span>
+                  <div class="tr-pill-group">
+                    <button type="button" data-tr-wmodel="onnx-community/whisper-tiny" class="tr-mini-pill tr-wmodel-btn active">軽量 tiny (~75MB)</button>
+                    <button type="button" data-tr-wmodel="onnx-community/whisper-base" class="tr-mini-pill tr-wmodel-btn">高精度 base (~140MB)</button>
+                  </div>
+                </div>
+                <div class="tr-key-note">初回のみAIモデルを端末へキャッシュします（無料・音声は外部送信されません）。</div>
+              </div>
+
+              <!-- Gemini API Options -->
+              <div id="trGeminiOpts" class="hidden" style="display:flex;flex-direction:column;gap:6px;">
+                <div class="tr-set-row">
+                  <span class="tr-set-label">Gemini APIキー</span>
+                  <span id="trGeminiKeyStatus" class="mono" style="font-size:10px;color:#fca5a5;">未設定</span>
+                </div>
+                <div class="tr-key-row">
+                  <input id="inputTrGeminiKey" type="password" class="tr-key-input mono" placeholder="AIza... (Google AI Studioのキー)" autocomplete="off">
+                  <button id="btnTrKeyShow" type="button" class="tr-mini-pill" style="height:32px;">表示</button>
+                  <button id="btnTrKeySave" type="button" class="tr-mini-pill active" style="height:32px;">保存</button>
+                </div>
+                <div class="tr-set-row">
+                  <span class="tr-set-label">使用モデル</span>
+                  <select id="selectTrGeminiModel" class="tr-key-input mono" style="height:28px;font-size:11px;flex:0 1 190px;">
+                    <option value="auto">自動選択（推奨Flash）</option>
+                    <option value="gemini-3.5-flash">gemini-3.5-flash</option>
+                    <option value="gemini-3.5-flash-lite">gemini-3.5-flash-lite</option>
+                    <option value="gemini-2.5-flash">gemini-2.5-flash</option>
+                  </select>
+                </div>
+                <div class="tr-key-note">APIキーはこの端末内にのみ保存され、GoogleのGemini API以外へ送信されません。</div>
+              </div>
+
+              <!-- Shared Utterance Pause Grouping Sensitivity -->
+              <div class="tr-set-row" style="padding-top:5px;border-top:1px solid var(--border-subtle);">
+                <span class="tr-set-label">発話の区切り（間）</span>
+                <div class="tr-pill-group">
+                  <button type="button" data-tr-pause="0.5" class="tr-mini-pill tr-pause-btn mono">短め 0.5s</button>
+                  <button type="button" data-tr-pause="0.8" class="tr-mini-pill tr-pause-btn mono active">標準 0.8s</button>
+                  <button type="button" data-tr-pause="1.3" class="tr-mini-pill tr-pause-btn mono">長め 1.3s</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Live Progress Bar -->
+            <div id="trProgressBox" class="tr-progress-box hidden">
+              <div class="tr-progress-head">
+                <span id="trProgressText">準備中...</span>
+                <span id="trProgressPct" class="mono">0%</span>
+              </div>
+              <div class="tr-progress-track">
+                <div id="trProgressFill" class="tr-progress-fill"></div>
+              </div>
+            </div>
+
+            <!-- Scrollable Utterance Group List -->
+            <div id="transcriptListWrap" class="tr-list"></div>
+
+            <!-- Footer Actions -->
+            <div class="tr-footer">
+              <button id="btnTranscriptRun" type="button" class="tr-run-btn">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/>
+                  <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+                  <line x1="12" y1="19" x2="12" y2="22"/>
+                </svg>
+                <span id="btnTranscriptRunLabel">文字起こし開始</span>
+              </button>
+              <button id="btnTranscriptCopy" type="button" class="pin-foot-btn" style="flex:0 0 auto;padding:0 10px;" title="文字起こし結果をクリップボードにコピー">コピー</button>
+              <button id="btnTranscriptClear" type="button" class="pin-foot-btn pin-foot-btn-clear" title="この曲の文字起こし結果を消去">消去</button>
+            </div>
+          </div>
         </div>
 
         <div class="upper-page-dots" aria-hidden="true">
@@ -4324,6 +4792,7 @@
           <span id="dotUpperMetro" class="upper-dot"></span>
           <span id="dotUpperWave" class="upper-dot active"></span>
           <span id="dotUpperPins" class="upper-dot"></span>
+          <span id="dotUpperTranscript" class="upper-dot"></span>
         </div>
       </div>
 
@@ -4864,7 +5333,7 @@
         <div class="modal-section" style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
           <div>
             <div class="sec-title">バージョン情報</div>
-            <div id="settingsVersionLabel" class="engine-desc mono">現在: v36</div>
+            <div id="settingsVersionLabel" class="engine-desc mono">現在: v37</div>
           </div>
           <button id="btnShowReleaseHistory" type="button" class="step-btn" style="color:#93c5fd;border-color:rgba(66,165,245,0.45);">更新履歴を見る</button>
         </div>
@@ -5021,7 +5490,7 @@
           </div>
           <div>
             <h3 id="whatsNewTitle" class="whats-new-title">アップデートのお知らせ</h3>
-            <p id="whatsNewSub" class="whats-new-sub mono">v36 に更新されました</p>
+            <p id="whatsNewSub" class="whats-new-sub mono">v37 に更新されました</p>
           </div>
         </div>
         <button id="btnCloseWhatsNewX" type="button" class="modal-close" aria-label="閉じる">✕</button>
@@ -5496,6 +5965,28 @@
       const tunerMeterBars = document.getElementById('tunerMeterBars');
       const upperPagePins = document.getElementById('upperPagePins');
       const upperMarkerListWrap = document.getElementById('upperMarkerListWrap');
+      const dotUpperTranscript = document.getElementById('dotUpperTranscript');
+      const upperPageTranscript = document.getElementById('upperPageTranscript');
+      const btnTrEngWhisper = document.getElementById('btnTrEngWhisper');
+      const btnTrEngGemini = document.getElementById('btnTrEngGemini');
+      const btnTrSettingsToggle = document.getElementById('btnTrSettingsToggle');
+      const trSettingsDrawer = document.getElementById('trSettingsDrawer');
+      const trWhisperOpts = document.getElementById('trWhisperOpts');
+      const trGeminiOpts = document.getElementById('trGeminiOpts');
+      const trGeminiKeyStatus = document.getElementById('trGeminiKeyStatus');
+      const inputTrGeminiKey = document.getElementById('inputTrGeminiKey');
+      const btnTrKeyShow = document.getElementById('btnTrKeyShow');
+      const btnTrKeySave = document.getElementById('btnTrKeySave');
+      const selectTrGeminiModel = document.getElementById('selectTrGeminiModel');
+      const trProgressBox = document.getElementById('trProgressBox');
+      const trProgressText = document.getElementById('trProgressText');
+      const trProgressPct = document.getElementById('trProgressPct');
+      const trProgressFill = document.getElementById('trProgressFill');
+      const transcriptListWrap = document.getElementById('transcriptListWrap');
+      const btnTranscriptRun = document.getElementById('btnTranscriptRun');
+      const btnTranscriptRunLabel = document.getElementById('btnTranscriptRunLabel');
+      const btnTranscriptCopy = document.getElementById('btnTranscriptCopy');
+      const btnTranscriptClear = document.getElementById('btnTranscriptClear');
 
       // ==================== APPLICATION STATE ====================
       let nextMarkerUid = 1;
@@ -5540,6 +6031,16 @@
         markers: [],
         startSectionEnabled: true,
         tempMarker: null,
+
+        // Speech Transcription (Utterance Groups) state
+        transcriptSegments: [], // { start, end, text }
+        transcriptEngine: 'whisper', // 'whisper' | 'gemini'
+        transcriptWhisperModel: 'onnx-community/whisper-tiny',
+        transcriptGeminiModel: 'auto',
+        transcriptPauseSec: 0.8,
+        transcriptRunning: false,
+        transcriptCancelled: false,
+        transcriptActiveIdx: -1,
 
         // Undo snapshot for audio section cut
         undoCutSnapshot: null,
@@ -5795,6 +6296,7 @@
       const LS_LAST_SESSION_KEY = 'audipo2_last_session_v1';
       const LS_TEMP_SESSION_STATE_KEY = 'audipo2_temp_session_state_v1';
       const LS_LAST_SEEN_VERSION_KEY = 'audipo2_last_seen_version_v1';
+      const LS_GEMINI_API_KEY = 'audipo2_gemini_api_key_v1';
       const IDB_NAME = 'audipo2_session_db_v1';
       const IDB_STORE = 'session_store';
       const MAX_REMEMBERED_FILES = 1000;
@@ -5955,6 +6457,13 @@
             pitchSemitones: state.pitchSemitones,
             sectionRepeat: Boolean(state.sectionRepeat),
             zoomWindowSeconds: state.zoomWindowSeconds,
+            transcriptSegments: Array.isArray(state.transcriptSegments) && state.transcriptSegments.length > 0
+              ? state.transcriptSegments.slice(0, 600).map(s => ({
+                  start: Math.round((Number(s.start) || 0) * 1000) / 1000,
+                  end: Math.round((Number(s.end) || 0) * 1000) / 1000,
+                  text: String(s.text || '')
+                }))
+              : [],
             updatedAt: Date.now()
           };
 
@@ -6037,7 +6546,11 @@
             exportFormat: state.exportFormat,
             exportQualityByFormat: state.exportQualityByFormat,
             shareFormat: state.shareFormat,
-            shareQualityByFormat: state.shareQualityByFormat
+            shareQualityByFormat: state.shareQualityByFormat,
+            transcriptEngine: state.transcriptEngine,
+            transcriptWhisperModel: state.transcriptWhisperModel,
+            transcriptGeminiModel: state.transcriptGeminiModel,
+            transcriptPauseSec: state.transcriptPauseSec
           }));
         } catch (_) {}
       }
@@ -6147,6 +6660,18 @@
               ogg: ['192', '128', '96', '64'].includes(p.shareQualityByFormat.ogg) ? p.shareQualityByFormat.ogg : '96',
               orig: 'copy'
             };
+          }
+          if (['whisper', 'gemini'].includes(p.transcriptEngine)) {
+            state.transcriptEngine = p.transcriptEngine;
+          }
+          if (['onnx-community/whisper-tiny', 'onnx-community/whisper-base'].includes(p.transcriptWhisperModel)) {
+            state.transcriptWhisperModel = p.transcriptWhisperModel;
+          }
+          if (typeof p.transcriptGeminiModel === 'string' && p.transcriptGeminiModel.trim()) {
+            state.transcriptGeminiModel = p.transcriptGeminiModel.trim();
+          }
+          if (typeof p.transcriptPauseSec === 'number' && [0.5, 0.8, 1.3].includes(p.transcriptPauseSec)) {
+            state.transcriptPauseSec = p.transcriptPauseSec;
           }
         } catch (_) {}
       }
@@ -9334,6 +9859,21 @@
           }
           state.restoredFromMemory = restoredFromMem;
 
+          // Cancel any running transcription for previous track and restore saved transcript if present
+          if (state.transcriptRunning) {
+            state.transcriptCancelled = true;
+          }
+          state.transcriptSegments = (mem && Array.isArray(mem.transcriptSegments))
+            ? mem.transcriptSegments
+                .filter(s => s && typeof s.text === 'string' && s.text.trim())
+                .map(s => ({
+                  start: Math.max(0, Math.min(resolvedDuration, Number(s.start) || 0)),
+                  end: Math.max(0, Math.min(resolvedDuration, Number(s.end) || Number(s.start) || 0)),
+                  text: String(s.text).trim()
+                }))
+            : [];
+          state.transcriptActiveIdx = -1;
+
           state.wavMeta = wavMeta;
           state.duration = resolvedDuration;
           state.currentTime = Math.max(0, Math.min(resolvedDuration, finalCurrentTime));
@@ -9388,6 +9928,7 @@
           updatePinButtonsUI();
           updateSectionBarUI();
           renderMarkerList();
+          renderTranscriptList();
           renderAllCanvases();
 
           // Persist current file memory immediately (skipped automatically if unsaved recording)
@@ -13140,6 +13681,7 @@
           btnToggleSectionSkip.innerHTML = `${SKIP_ICON_SVG}<span>区間スキップ</span>`;
         }
         syncActiveSectionHighlightInLists(sec);
+        syncActiveTranscriptHighlight();
       }
 
       function escapeHtml(str) {
@@ -14419,7 +14961,7 @@
       }
 
       // Home-Screen-Style 3-Page Horizontal Swipe Pager (Left: Metronome / Center: Waveform / Right: Pin List)
-      const UPPER_PAGES = ['kbd', 'metro', 'wave', 'pins'];
+      const UPPER_PAGES = ['kbd', 'metro', 'wave', 'pins', 'transcript'];
 
       const pagerDrag = {
         active: false,
@@ -14969,12 +15511,17 @@
         const isMetro = state.upperPage === 'metro';
         const isWave = state.upperPage === 'wave';
         const isPins = state.upperPage === 'pins';
+        const isTr = state.upperPage === 'transcript';
 
         dotUpperKbd.classList.toggle('active-kbd', isKbd);
         dotUpperMetro.classList.toggle('active-metro', isMetro);
         dotUpperMetro.classList.toggle('metro-running-hint', !isMetro && state.metroRunning);
         dotUpperWave.classList.toggle('active', isWave);
         dotUpperPins.classList.toggle('active-pins', isPins);
+        if (dotUpperTranscript) {
+          dotUpperTranscript.classList.toggle('active-transcript', isTr);
+          dotUpperTranscript.classList.toggle('transcript-running-hint', !isTr && state.transcriptRunning);
+        }
       }
 
       function setUpperPage(page, opts = {}) {
@@ -14990,6 +15537,7 @@
         upperPagerTrack.classList.toggle('page-metro', nextPage === 'metro');
         upperPagerTrack.classList.toggle('page-wave', nextPage === 'wave');
         upperPagerTrack.classList.toggle('page-pins', nextPage === 'pins');
+        upperPagerTrack.classList.toggle('page-transcript', nextPage === 'transcript');
 
         if (prevPage === 'kbd' && nextPage !== 'kbd') {
           stopAllKeyboardNotes();
@@ -15005,8 +15553,871 @@
           if (opts.scrollActive !== false) {
             requestAnimationFrame(() => scrollActiveMarkerIntoView(upperMarkerListWrap));
           }
+        } else if (nextPage === 'transcript') {
+          updateTranscriptUI();
+          renderTranscriptList();
+          if (opts.scrollActive !== false) {
+            requestAnimationFrame(() => scrollActiveTranscriptIntoView());
+          }
         } else if (nextPage === 'wave') {
           renderOverviewCanvas();
+        }
+      }
+
+      // ==================== SPEECH TRANSCRIPTION ENGINE (MODE C: WHISPER ON-DEVICE + GEMINI API) ====================
+      const whisperRuntime = {
+        tfMod: null,
+        pipe: null,
+        loadedModelId: null
+      };
+
+      function getSavedGeminiApiKey() {
+        try {
+          return String(localStorage.getItem(LS_GEMINI_API_KEY) || '').trim();
+        } catch (_) {
+          return '';
+        }
+      }
+
+      function setSavedGeminiApiKey(keyStr) {
+        const clean = String(keyStr || '').trim();
+        try {
+          if (clean) localStorage.setItem(LS_GEMINI_API_KEY, clean);
+          else localStorage.removeItem(LS_GEMINI_API_KEY);
+        } catch (_) {}
+      }
+
+      function updateTranscriptProgress(visible, text = '', pct = 0) {
+        if (!trProgressBox) return;
+        trProgressBox.classList.toggle('hidden', !visible);
+        if (visible) {
+          const p = Math.max(0, Math.min(100, Math.round(pct)));
+          trProgressText.textContent = text;
+          trProgressPct.textContent = `${p}%`;
+          trProgressFill.style.width = `${p}%`;
+        }
+      }
+
+      function updateTranscriptUI() {
+        const isGemini = state.transcriptEngine === 'gemini';
+        const hasKey = Boolean(getSavedGeminiApiKey());
+
+        btnTrEngWhisper.classList.toggle('active-whisper', !isGemini);
+        btnTrEngGemini.classList.toggle('active-gemini', isGemini);
+        trWhisperOpts.classList.toggle('hidden', isGemini);
+        trGeminiOpts.classList.toggle('hidden', !isGemini);
+        if (!isGemini) {
+          trGeminiOpts.style.display = 'none';
+        } else {
+          trGeminiOpts.style.display = 'flex';
+        }
+
+        document.querySelectorAll('.tr-wmodel-btn').forEach(b => {
+          b.classList.toggle('active', b.dataset.trWmodel === state.transcriptWhisperModel);
+        });
+        document.querySelectorAll('.tr-pause-btn').forEach(b => {
+          b.classList.toggle('active', Math.abs(parseFloat(b.dataset.trPause) - state.transcriptPauseSec) < 0.05);
+        });
+
+        if (trGeminiKeyStatus) {
+          trGeminiKeyStatus.textContent = hasKey ? '保存済 ✓' : '未設定';
+          trGeminiKeyStatus.style.color = hasKey ? '#86efac' : '#fca5a5';
+        }
+        if (selectTrGeminiModel && [...selectTrGeminiModel.options].some(o => o.value === state.transcriptGeminiModel)) {
+          selectTrGeminiModel.value = state.transcriptGeminiModel;
+        }
+
+        btnTranscriptRun.classList.toggle('running', state.transcriptRunning);
+        btnTranscriptRun.disabled = !state.hasAudio && !state.transcriptRunning;
+        btnTranscriptRunLabel.textContent = state.transcriptRunning
+          ? '中止する'
+          : (state.transcriptSegments.length > 0 ? '再文字起こし' : '文字起こし開始');
+        btnTranscriptCopy.disabled = state.transcriptSegments.length === 0;
+        btnTranscriptClear.disabled = state.transcriptSegments.length === 0 || state.transcriptRunning;
+        updateUpperDotsUI();
+      }
+
+      function scrollActiveTranscriptIntoView() {
+        if (!transcriptListWrap) return;
+        const activeEl = transcriptListWrap.querySelector('.tr-item.active-utterance');
+        if (!activeEl) return;
+        requestAnimationFrame(() => {
+          const boxRect = transcriptListWrap.getBoundingClientRect();
+          const elRect = activeEl.getBoundingClientRect();
+          const desiredTop = transcriptListWrap.scrollTop + (elRect.top - boxRect.top) - (boxRect.height * 0.42) + (elRect.height * 0.5);
+          transcriptListWrap.scrollTop = Math.max(0, desiredTop);
+          upperPagerViewport.scrollLeft = 0;
+        });
+      }
+
+      function findActiveTranscriptIndex(t) {
+        const segs = state.transcriptSegments;
+        if (!segs || segs.length === 0) return -1;
+        for (let i = 0; i < segs.length; i++) {
+          if (t >= segs[i].start - 0.08 && t <= segs[i].end + 0.15) {
+            return i;
+          }
+        }
+        // Fallback: highlight most recent started utterance if within 1.2s of its end
+        for (let i = segs.length - 1; i >= 0; i--) {
+          if (t >= segs[i].start - 0.08 && t <= segs[i].end + 1.2) {
+            return i;
+          }
+        }
+        return -1;
+      }
+
+      function syncActiveTranscriptHighlight() {
+        if (!transcriptListWrap || state.transcriptSegments.length === 0) return;
+        const liveT = getLivePlayheadTime();
+        const nextIdx = findActiveTranscriptIndex(liveT);
+        if (nextIdx === state.transcriptActiveIdx) return;
+        state.transcriptActiveIdx = nextIdx;
+        const items = transcriptListWrap.querySelectorAll('.tr-item[data-tr-idx]');
+        items.forEach((el) => {
+          const idx = parseInt(el.dataset.trIdx, 10);
+          const isAct = idx === nextIdx;
+          el.classList.toggle('active-utterance', isAct);
+          const badge = el.querySelector('.tr-now-badge');
+          if (badge) badge.classList.toggle('hidden', !isAct);
+        });
+        if (state.upperPage === 'transcript' && state.isPlaying && nextIdx >= 0) {
+          scrollActiveTranscriptIntoView();
+        }
+      }
+
+      function renderTranscriptList() {
+        if (!transcriptListWrap) return;
+        transcriptListWrap.innerHTML = '';
+        const segs = state.transcriptSegments || [];
+        state.transcriptActiveIdx = findActiveTranscriptIndex(getLivePlayheadTime());
+
+        if (!state.hasAudio) {
+          transcriptListWrap.innerHTML = '<div class="tr-empty-box">音声ファイルを開くか録音すると、ここで<strong>発話のまとまりごと</strong>に文字起こしできます。<br>リストをタップするとその場所へジャンプします。</div>';
+          updateTranscriptUI();
+          return;
+        }
+
+        if (segs.length === 0) {
+          const modeLabel = state.transcriptEngine === 'gemini'
+            ? 'Gemini API（高精度・高速・要APIキー）'
+            : 'スマホ内AI Whisper（無料・APIキー不要）';
+          transcriptListWrap.innerHTML = `<div class="tr-empty-box">下の<strong>「文字起こし開始」</strong>を押すと、現在の音声を発話のまとまりごとに区切ってリスト化します。<br><span style="font-size:11px;color:#93c5fd;">現在: ${escapeHtml(modeLabel)}</span><br><span style="font-size:10.5px;color:#71717a;">リストを選ぶとその発話位置へジャンプできます。</span></div>`;
+          updateTranscriptUI();
+          return;
+        }
+
+        const frag = document.createDocumentFragment();
+        segs.forEach((seg, idx) => {
+          const isAct = idx === state.transcriptActiveIdx;
+          const card = document.createElement('div');
+          card.className = 'tr-item' + (isAct ? ' active-utterance' : '');
+          card.dataset.trIdx = String(idx);
+
+          const head = document.createElement('div');
+          head.className = 'tr-item-head';
+
+          const meta = document.createElement('div');
+          meta.className = 'tr-item-meta';
+          const rangeText = seg.end > seg.start + 0.15
+            ? `${formatTime(seg.start)} 〜 ${formatTime(seg.end)}`
+            : formatTime(seg.start);
+          meta.innerHTML = `<span class="tr-idx-badge mono">#${idx + 1}</span><span class="tr-time-range mono">${rangeText}</span><span class="tr-now-badge${isAct ? '' : ' hidden'}">再生中</span>`;
+
+          const pinBtn = document.createElement('button');
+          pinBtn.type = 'button';
+          pinBtn.className = 'tr-pin-add-btn';
+          pinBtn.title = 'この発話の開始位置に黄色ピンを追加';
+          pinBtn.innerHTML = '<span>▼+</span><span>ピン</span>';
+          pinBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (!state.hasAudio || state.duration <= 0) return;
+            const t = Math.max(0.06, Math.min(state.duration - 0.06, seg.start));
+            const shortTitle = String(seg.text || '').replace(/\s+/g, ' ').trim().slice(0, 14);
+            const dup = state.markers.find(m => Math.abs(m.time - t) <= 0.35);
+            if (dup) {
+              if (!dup.name && shortTitle) dup.name = shortTitle;
+              showToast(`既に近くに黄色ピンがあります (${formatTime(dup.time)})`);
+            } else {
+              state.markers.push(makeMarkerObj(t, shortTitle, true, true));
+              state.markers.sort((a, b) => a.time - b.time);
+              showToast(`黄色ピンを追加: ${formatTime(t)} ${shortTitle}`);
+            }
+            syncCurrentPlaylistMarkers();
+            updateHeaderSubInfo();
+            updatePinButtonsUI();
+            updateSectionBarUI();
+            renderMarkerList();
+            renderAllCanvases();
+            saveCurrentFileMemory(true);
+          });
+
+          head.appendChild(meta);
+          head.appendChild(pinBtn);
+
+          const textEl = document.createElement('div');
+          textEl.className = 'tr-text';
+          textEl.textContent = seg.text;
+
+          card.appendChild(head);
+          card.appendChild(textEl);
+
+          card.addEventListener('click', () => {
+            if (performance.now() < pagerDrag.suppressClickUntil) return;
+            seekTo(seg.start, { setGreenPin: false });
+            syncActiveTranscriptHighlight();
+          });
+
+          frag.appendChild(card);
+        });
+
+        transcriptListWrap.appendChild(frag);
+        updateTranscriptUI();
+      }
+
+      // ---------- 16kHz Mono PCM Extraction (Works with AudioBuffer, Large WAV, or Compressed Blobs) ----------
+      function downsampleAudioBufferTo16kMono(audioBuf) {
+        const srcSr = audioBuf.sampleRate;
+        const targetSr = 16000;
+        const numCh = audioBuf.numberOfChannels;
+        const ch0 = audioBuf.getChannelData(0);
+        const ch1 = numCh > 1 ? audioBuf.getChannelData(1) : null;
+        const srcLen = audioBuf.length;
+
+        if (srcSr === targetSr) {
+          const out = new Float32Array(srcLen);
+          if (ch1) {
+            for (let i = 0; i < srcLen; i++) out[i] = (ch0[i] + ch1[i]) * 0.5;
+          } else {
+            out.set(ch0);
+          }
+          return out;
+        }
+
+        const ratio = srcSr / targetSr;
+        const outLen = Math.max(1, Math.floor(srcLen / ratio));
+        const out = new Float32Array(outLen);
+        for (let i = 0; i < outLen; i++) {
+          const s0 = Math.floor(i * ratio);
+          const s1 = Math.min(srcLen, Math.max(s0 + 1, Math.floor((i + 1) * ratio)));
+          let sum = 0;
+          if (ch1) {
+            for (let j = s0; j < s1; j++) sum += (ch0[j] + ch1[j]) * 0.5;
+          } else {
+            for (let j = s0; j < s1; j++) sum += ch0[j];
+          }
+          out[i] = sum / (s1 - s0);
+        }
+        return out;
+      }
+
+      async function streamWavTo16kMono(blob, wavMeta, onProgress) {
+        const { audioFormat, numChannels, sampleRate, blockAlign, bitsPerSample, dataOffset, totalFrames } = wavMeta;
+        const targetSr = 16000;
+        const ratio = sampleRate / targetSr;
+        const outLen = Math.max(1, Math.floor(totalFrames / ratio));
+        const out = new Float32Array(outLen);
+        const bytesPerSample = bitsPerSample >> 3;
+        const scanCh = Math.min(2, numChannels);
+        const framesPerChunk = Math.max(4096, Math.floor((2 * 1024 * 1024) / blockAlign));
+
+        let frameCursor = 0;
+        let outIdx = 0;
+        let accum = 0;
+        let accumCount = 0;
+        let nextBoundary = ratio;
+
+        while (frameCursor < totalFrames && outIdx < outLen) {
+          if (state.transcriptCancelled) return null;
+          const take = Math.min(framesPerChunk, totalFrames - frameCursor);
+          const byteStart = dataOffset + frameCursor * blockAlign;
+          const ab = await blob.slice(byteStart, byteStart + take * blockAlign).arrayBuffer();
+          const dv = new DataView(ab);
+          const u8 = new Uint8Array(ab);
+          const is16 = audioFormat === 1 && bitsPerSample === 16;
+          const is24 = audioFormat === 1 && bitsPerSample === 24;
+          const is32f = audioFormat === 3 && bitsPerSample === 32;
+
+          for (let f = 0; f < take; f++) {
+            const fByte = f * blockAlign;
+            let mono = 0;
+            for (let c = 0; c < scanCh; c++) {
+              const p = fByte + c * bytesPerSample;
+              let v = 0;
+              if (is16) v = dv.getInt16(p, true) * 0.000030517578125;
+              else if (is24) {
+                let s24 = u8[p] | (u8[p + 1] << 8) | (u8[p + 2] << 16);
+                if (s24 & 0x800000) s24 -= 0x1000000;
+                v = s24 * 1.1920928955078125e-7;
+              } else if (is32f) {
+                v = dv.getFloat32(p, true);
+              } else if (audioFormat === 1 && bitsPerSample === 8) {
+                v = (u8[p] - 128) * 0.0078125;
+              } else if (audioFormat === 1 && bitsPerSample === 32) {
+                v = dv.getInt32(p, true) * 4.656612873077393e-10;
+              }
+              mono += v;
+            }
+            if (scanCh > 1) mono *= 0.5;
+            accum += mono;
+            accumCount++;
+            const absFrame = frameCursor + f + 1;
+            if (absFrame >= nextBoundary && outIdx < outLen) {
+              out[outIdx++] = accum / Math.max(1, accumCount);
+              accum = 0;
+              accumCount = 0;
+              nextBoundary += ratio;
+            }
+          }
+          frameCursor += take;
+          if (onProgress) onProgress(frameCursor / totalFrames);
+          await new Promise(r => setTimeout(r, 0));
+        }
+        return out;
+      }
+
+      async function getMono16kForCurrentAudio(onProgress) {
+        if (state.audioBuffer) {
+          if (onProgress) onProgress(0.5);
+          const pcm = downsampleAudioBufferTo16kMono(state.audioBuffer);
+          if (onProgress) onProgress(1.0);
+          return pcm;
+        }
+        if (state.wavMeta && state.rawBlob) {
+          return await streamWavTo16kMono(state.rawBlob, state.wavMeta, onProgress);
+        }
+        if (state.rawBlob && state.rawBlob.size <= 80 * 1024 * 1024) {
+          initAudioGraph();
+          const ab = await state.rawBlob.arrayBuffer();
+          const decoded = await audioCtx.decodeAudioData(ab);
+          if (onProgress) onProgress(1.0);
+          return downsampleAudioBufferTo16kMono(decoded);
+        }
+        return null;
+      }
+
+      // ---------- Adaptive RMS VAD Utterance Grouping (発話のまとまりごと) ----------
+      function detectUtteranceGroups(pcm16k, sr = 16000, pauseSec = 0.8, maxSegSec = 24.0) {
+        const frameLen = Math.round(sr * 0.020); // 20ms
+        const numFrames = Math.floor(pcm16k.length / frameLen);
+        const totalDur = pcm16k.length / sr;
+        if (numFrames <= 0 || totalDur <= 0.05) return [];
+
+        const rms = new Float32Array(numFrames);
+        for (let f = 0; f < numFrames; f++) {
+          const base = f * frameLen;
+          let mean = 0;
+          for (let i = 0; i < frameLen; i++) mean += pcm16k[base + i];
+          mean /= frameLen;
+          let sq = 0;
+          for (let i = 0; i < frameLen; i++) {
+            const d = pcm16k[base + i] - mean;
+            sq += d * d;
+          }
+          rms[f] = Math.sqrt(sq / frameLen);
+        }
+
+        const sorted = Array.from(rms).sort((a, b) => a - b);
+        const noise = sorted[Math.floor(numFrames * 0.15)] || 0;
+        const p90 = sorted[Math.min(numFrames - 1, Math.floor(numFrames * 0.90))] || 0;
+
+        const segments = [];
+        if (p90 >= 0.0012) {
+          const enterTh = Math.max(0.0042, noise * 2.4, noise + (p90 - noise) * 0.14);
+          const exitTh = enterTh * 0.65;
+
+          const raw = [];
+          let inSpeech = false;
+          let startF = 0;
+          for (let f = 0; f < numFrames; f++) {
+            const v = rms[f];
+            if (!inSpeech && v >= enterTh) {
+              inSpeech = true;
+              startF = f;
+            } else if (inSpeech && v < exitTh) {
+              inSpeech = false;
+              raw.push([startF * 0.020, f * 0.020]);
+            }
+          }
+          if (inSpeech) raw.push([startF * 0.020, numFrames * 0.020]);
+
+          // Merge adjacent speech islands separated by less than pauseSec -> natural utterance groups
+          const merged = [];
+          for (let i = 0; i < raw.length; i++) {
+            const seg = raw[i];
+            if (merged.length > 0 && (seg[0] - merged[merged.length - 1][1]) < pauseSec) {
+              merged[merged.length - 1][1] = seg[1];
+            } else {
+              merged.push([seg[0], seg[1]]);
+            }
+          }
+
+          for (let i = 0; i < merged.length; i++) {
+            let s = merged[i][0];
+            const e = merged[i][1];
+            if (e - s < 0.25) continue;
+            while (e - s > maxSegSec) {
+              const fLo = Math.min(numFrames - 1, Math.floor((s + 12.0) / 0.020));
+              const fHi = Math.min(numFrames - 1, Math.floor((s + maxSegSec) / 0.020));
+              let bestF = fHi;
+              let bestV = Infinity;
+              for (let f = fLo; f <= fHi; f++) {
+                if (rms[f] < bestV) { bestV = rms[f]; bestF = f; }
+              }
+              const splitT = Math.max(s + 4.0, bestF * 0.020);
+              segments.push({
+                start: Math.max(0, s - 0.12),
+                end: Math.min(totalDur, splitT + 0.12),
+                avgRms: bestV
+              });
+              s = splitT;
+            }
+            segments.push({
+              start: Math.max(0, s - 0.12),
+              end: Math.min(totalDur, e + 0.18)
+            });
+          }
+        }
+
+        // Fallback to uniform 20s slices if audio is continuous wall-to-wall sound or very quiet
+        if (segments.length === 0 && totalDur > 0.25) {
+          const step = Math.min(maxSegSec, 20.0);
+          for (let s = 0; s < totalDur; s += step) {
+            const e = Math.min(totalDur, s + step);
+            if (e - s >= 0.3) segments.push({ start: s, end: e });
+          }
+        }
+        return segments;
+      }
+
+      // ---------- Helper: Encode 16kHz Mono Float32 Slice as Compact 16-bit WAV Blob ----------
+      function encodeMono16kWavBlob(pcm16k, startSample = 0, endSample = pcm16k.length) {
+        const s0 = Math.max(0, Math.floor(startSample));
+        const s1 = Math.min(pcm16k.length, Math.ceil(endSample));
+        const len = Math.max(1, s1 - s0);
+        const ab = new ArrayBuffer(44 + len * 2);
+        const dv = new DataView(ab);
+        const wStr = (off, s) => { for (let i = 0; i < s.length; i++) dv.setUint8(off + i, s.charCodeAt(i)); };
+        wStr(0, 'RIFF');
+        dv.setUint32(4, 36 + len * 2, true);
+        wStr(8, 'WAVE');
+        wStr(12, 'fmt ');
+        dv.setUint32(16, 16, true);
+        dv.setUint16(20, 1, true);
+        dv.setUint16(22, 1, true);
+        dv.setUint32(24, 16000, true);
+        dv.setUint32(28, 32000, true);
+        dv.setUint16(32, 2, true);
+        dv.setUint16(34, 16, true);
+        wStr(36, 'data');
+        dv.setUint32(40, len * 2, true);
+        let off = 44;
+        for (let i = s0; i < s1; i++) {
+          const clamped = Math.max(-1, Math.min(1, pcm16k[i]));
+          dv.setInt16(off, Math.round(clamped * 32767), true);
+          off += 2;
+        }
+        return new Blob([ab], { type: 'audio/wav' });
+      }
+
+      function blobToBase64(blob) {
+        return new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => {
+            const res = String(reader.result || '');
+            const comma = res.indexOf(',');
+            resolve(comma >= 0 ? res.slice(comma + 1) : res);
+          };
+          reader.onerror = () => reject(reader.error || new Error('Base64 read error'));
+          reader.readAsDataURL(blob);
+        });
+      }
+
+      // ---------- Engine A: On-Device Whisper via Transformers.js v3 (Dynamic ESM Import on demand) ----------
+      function cleanWhisperText(raw) {
+        let s = String(raw || '').trim();
+        // Strip bracketed Whisper noise tags like [音楽] / (拍手) if isolated
+        s = s.replace(/\s+/g, ' ').trim();
+        if (!s || /^[.,。、！？!?\-\s・…]+$/.test(s)) return '';
+        return s;
+      }
+
+      async function runWhisperTranscription() {
+        const modelId = state.transcriptWhisperModel || 'onnx-community/whisper-tiny';
+        updateTranscriptProgress(true, '音声を16kHzへ変換中...', 4);
+
+        const pcm16k = await getMono16kForCurrentAudio((frac) => {
+          updateTranscriptProgress(true, '音声を解析準備中...', 2 + frac * 8);
+        });
+        if (state.transcriptCancelled) return;
+        if (!pcm16k || pcm16k.length < 1600) {
+          throw new Error('音声データの抽出に失敗しました（超大容量圧縮ファイルはGemini APIをお試しください）');
+        }
+
+        const groups = detectUtteranceGroups(pcm16k, 16000, state.transcriptPauseSec, 24.0);
+        if (groups.length === 0) {
+          throw new Error('発話区間を検出できませんでした');
+        }
+
+        if (!whisperRuntime.tfMod) {
+          updateTranscriptProgress(true, 'スマホ内AIエンジンを読込中...', 12);
+          try {
+            whisperRuntime.tfMod = await import('https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.4.0');
+          } catch (e) {
+            throw new Error('Whisperエンジンの読込に失敗しました（初回はネット接続が必要です）');
+          }
+        }
+        if (state.transcriptCancelled) return;
+
+        const tf = whisperRuntime.tfMod;
+        tf.env.allowLocalModels = false;
+        tf.env.useBrowserCache = true;
+        if (tf.env.backends && tf.env.backends.onnx && tf.env.backends.onnx.wasm) {
+          tf.env.backends.onnx.wasm.numThreads = 1;
+          tf.env.backends.onnx.wasm.proxy = false;
+        }
+
+        if (!whisperRuntime.pipe || whisperRuntime.loadedModelId !== modelId) {
+          updateTranscriptProgress(true, 'Whisperモデルを準備中（初回のみ数秒〜数十秒）...', 15);
+          const progressCb = (info) => {
+            if (state.transcriptCancelled || !info) return;
+            if (typeof info.progress === 'number' && isFinite(info.progress)) {
+              const p = 15 + Math.min(35, info.progress * 0.35);
+              updateTranscriptProgress(true, `モデル読込中 (${Math.round(info.progress)}%)...`, p);
+            }
+          };
+          try {
+            whisperRuntime.pipe = await tf.pipeline('automatic-speech-recognition', modelId, {
+              dtype: 'q8',
+              device: 'wasm',
+              progress_callback: progressCb
+            });
+          } catch (_) {
+            whisperRuntime.pipe = await tf.pipeline('automatic-speech-recognition', modelId, {
+              device: 'wasm',
+              progress_callback: progressCb
+            });
+          }
+          whisperRuntime.loadedModelId = modelId;
+        }
+        if (state.transcriptCancelled) return;
+
+        state.transcriptSegments = [];
+        renderTranscriptList();
+
+        const pipe = whisperRuntime.pipe;
+        const total = groups.length;
+
+        for (let i = 0; i < total; i++) {
+          if (state.transcriptCancelled) return;
+          const g = groups[i];
+          const pct = 50 + Math.round((i / total) * 48);
+          updateTranscriptProgress(true, `発話グループを文字起こし中 (${i + 1} / ${total})...`, pct);
+
+          const s0 = Math.max(0, Math.floor(g.start * 16000));
+          const s1 = Math.min(pcm16k.length, Math.ceil(g.end * 16000));
+          if (s1 - s0 < 1600) continue;
+          const slice = pcm16k.slice(s0, s1);
+
+          // Yield frame so UI stays responsive & cancel button reacts immediately
+          await new Promise(r => setTimeout(r, 15));
+          if (state.transcriptCancelled) return;
+
+          const out = await pipe(slice, {
+            language: 'japanese',
+            task: 'transcribe',
+            condition_on_previous_text: false
+          });
+          if (state.transcriptCancelled) return;
+
+          const txt = cleanWhisperText(out && out.text ? out.text : '');
+          if (txt) {
+            state.transcriptSegments.push({
+              start: Math.round(g.start * 100) / 100,
+              end: Math.round(g.end * 100) / 100,
+              text: txt
+            });
+            renderTranscriptList();
+          }
+        }
+
+        updateTranscriptProgress(true, '文字起こし完了', 100);
+        saveCurrentFileMemory(true);
+      }
+
+      // ---------- Engine B: Gemini API (Self-healing Model Selection + Chunking for Long Audio) ----------
+      function parseTimestampToSec(val) {
+        if (typeof val === 'number' && isFinite(val)) return Math.max(0, val);
+        const s = String(val || '').trim();
+        if (!s) return 0;
+        if (/^\d+(\.\d+)?$/.test(s)) return Math.max(0, parseFloat(s));
+        const parts = s.split(':').map(Number);
+        if (parts.some(n => !isFinite(n))) return 0;
+        if (parts.length === 2) return Math.max(0, parts[0] * 60 + parts[1]);
+        if (parts.length === 3) return Math.max(0, parts[0] * 3600 + parts[1] * 60 + parts[2]);
+        return 0;
+      }
+
+      function parseGeminiTranscriptJson(rawText, offsetSec, maxDurSec) {
+        let txt = String(rawText || '').trim();
+        if (!txt) return [];
+        // Strip markdown code fences if present
+        txt = txt.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '').trim();
+
+        let parsed = null;
+        try {
+          parsed = JSON.parse(txt);
+        } catch (_) {
+          const a0 = txt.indexOf('[');
+          const a1 = txt.lastIndexOf(']');
+          if (a0 >= 0 && a1 > a0) {
+            try { parsed = JSON.parse(txt.slice(a0, a1 + 1)); } catch (__) {}
+          }
+        }
+
+        let arr = Array.isArray(parsed) ? parsed : (parsed && Array.isArray(parsed.segments) ? parsed.segments : (parsed && Array.isArray(parsed.utterances) ? parsed.utterances : null));
+        if (!arr) return [];
+
+        const out = [];
+        for (const item of arr) {
+          if (!item || typeof item !== 'object') continue;
+          const text = String(item.text || item.transcript || item.utterance || '').trim();
+          if (!text) continue;
+          const relStart = parseTimestampToSec(item.start ?? item.startSec ?? item.start_time ?? 0);
+          let relEnd = parseTimestampToSec(item.end ?? item.endSec ?? item.end_time ?? relStart);
+          if (relEnd < relStart) relEnd = relStart;
+          const absStart = Math.max(0, Math.min(maxDurSec, offsetSec + relStart));
+          const absEnd = Math.max(absStart, Math.min(maxDurSec, offsetSec + relEnd));
+          out.push({
+            start: Math.round(absStart * 100) / 100,
+            end: Math.round(absEnd * 100) / 100,
+            text
+          });
+        }
+        return out;
+      }
+
+      async function resolveGeminiModelCandidates(apiKey) {
+        const preferred = state.transcriptGeminiModel || 'auto';
+        const defaults = ['gemini-3.5-flash', 'gemini-3.5-flash-lite', 'gemini-2.5-flash', 'gemini-2.0-flash'];
+        if (preferred !== 'auto') {
+          return [preferred, ...defaults.filter(m => m !== preferred)];
+        }
+        try {
+          const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${encodeURIComponent(apiKey)}`);
+          if (res.ok) {
+            const data = await res.json();
+            const list = Array.isArray(data && data.models) ? data.models : [];
+            const flashIds = list
+              .filter(m =>
+                m &&
+                typeof m.name === 'string' &&
+                Array.isArray(m.supportedGenerationMethods) &&
+                m.supportedGenerationMethods.includes('generateContent') &&
+                /gemini/i.test(m.name) &&
+                /flash/i.test(m.name) &&
+                !/tts|image|embedding|aqa|veo|imagen/i.test(m.name)
+              )
+              .map(m => m.name.replace(/^models\//, ''));
+            if (flashIds.length > 0) {
+              // Prioritize known stable ordering, then newest version strings descending
+              const rank = (id) => {
+                const idx = defaults.indexOf(id);
+                if (idx >= 0) return 1000 - idx * 10;
+                const verM = id.match(/gemini-(\d+(?:\.\d+)?)/i);
+                const ver = verM ? parseFloat(verM[1]) : 0;
+                const litePenalty = /lite/i.test(id) ? -0.2 : 0;
+                const expPenalty = /preview|exp/i.test(id) ? -0.5 : 0;
+                return ver * 10 + litePenalty + expPenalty;
+              };
+              flashIds.sort((a, b) => rank(b) - rank(a));
+              return [...new Set([...flashIds.slice(0, 4), ...defaults])];
+            }
+          }
+        } catch (_) {}
+        return defaults;
+      }
+
+      async function callGeminiTranscribeBlob(apiKey, modelCandidates, blob, mimeType, pauseSec) {
+        const b64 = await blobToBase64(blob);
+        const pauseLabel = pauseSec <= 0.6 ? '短めの間（約0.5秒）' : (pauseSec >= 1.1 ? '長めの間（約1.3秒）' : '自然な間（約0.8秒）');
+        const prompt = [
+          'この音声の話し言葉を正確に文字起こししてください。',
+          `発話のまとまりごと（${pauseLabel}や話題・文の切れ目ごと）に区切って、JSON配列のみを返してください。`,
+          '各要素は {"start": 開始秒数(数値), "end": 終了秒数(数値), "text": "発話テキスト"} の形式にしてください。',
+          '楽器演奏のみ・無音・拍手だけの区間は含めないでください。発話が全くない場合は空配列 [] を返してください。'
+        ].join('
+');
+
+        const bodyObj = {
+          contents: [{
+            parts: [
+              { text: prompt },
+              { inline_data: { mime_type: mimeType, data: b64 } }
+            ]
+          }],
+          generationConfig: {
+            temperature: 0.1,
+            responseMimeType: 'application/json'
+          }
+        };
+
+        let lastErrMsg = 'Gemini APIリクエストに失敗しました';
+        for (let i = 0; i < modelCandidates.length; i++) {
+          if (state.transcriptCancelled) return { text: '', modelUsed: '' };
+          const modelId = modelCandidates[i];
+          const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(modelId)}:generateContent?key=${encodeURIComponent(apiKey)}`;
+          const res = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(bodyObj)
+          });
+          if (res.ok) {
+            const data = await res.json();
+            const parts = data && data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts;
+            const outText = Array.isArray(parts) ? parts.map(p => p.text || '').join('
+') : '';
+            return { text: outText, modelUsed: modelId };
+          }
+          let errDetail = '';
+          try {
+            const errJson = await res.json();
+            errDetail = errJson && errJson.error && errJson.error.message ? errJson.error.message : '';
+          } catch (_) {}
+          if (res.status === 404 && i < modelCandidates.length - 1) {
+            lastErrMsg = `モデル ${modelId} 非対応: ${errDetail}`;
+            continue;
+          }
+          if (res.status === 400 || res.status === 401 || res.status === 403) {
+            throw new Error(`APIキーまたは権限エラー (${res.status}): ${errDetail || '設定を確認してください'}`);
+          }
+          if (res.status === 429) {
+            throw new Error('Gemini APIの利用上限(429)に達しました。少し待ってから再試行してください');
+          }
+          throw new Error(`Gemini APIエラー (${res.status}): ${errDetail || '通信に失敗しました'}`);
+        }
+        throw new Error(lastErrMsg);
+      }
+
+      async function runGeminiTranscription() {
+        const apiKey = getSavedGeminiApiKey();
+        if (!apiKey) {
+          trSettingsDrawer.classList.remove('hidden');
+          btnTrSettingsToggle.classList.add('open');
+          inputTrGeminiKey.focus();
+          throw new Error('Gemini APIキーを入力して「保存」を押してください');
+        }
+
+        updateTranscriptProgress(true, '利用可能なGeminiモデルを確認中...', 8);
+        const candidates = await resolveGeminiModelCandidates(apiKey);
+        if (state.transcriptCancelled) return;
+
+        // Fast path: if original compressed blob (non-WAV) is <= 13MB and duration <= 12 min, send directly!
+        const origExt = getOrigFileExt();
+        const canSendRawCompressed = Boolean(
+          state.rawBlob &&
+          origExt !== '.wav' &&
+          state.rawBlob.size > 0 &&
+          state.rawBlob.size <= 13 * 1024 * 1024 &&
+          state.duration <= 720
+        );
+
+        state.transcriptSegments = [];
+        renderTranscriptList();
+
+        if (canSendRawCompressed) {
+          const mime = getMimeTypeForExt(origExt, state.rawBlob.type || 'audio/mp4');
+          updateTranscriptProgress(true, 'Gemini APIで文字起こし中...', 45);
+          const { text } = await callGeminiTranscribeBlob(apiKey, candidates, state.rawBlob, mime, state.transcriptPauseSec);
+          if (state.transcriptCancelled) return;
+          const segs = parseGeminiTranscriptJson(text, 0, state.duration || 99999);
+          state.transcriptSegments = segs;
+          renderTranscriptList();
+        } else {
+          // Downsample to compact 16kHz mono 16-bit WAV and chunk in 5-minute blocks if long
+          updateTranscriptProgress(true, '送信用の軽量音声(16kHz)を作成中...', 18);
+          const pcm16k = await getMono16kForCurrentAudio((frac) => {
+            updateTranscriptProgress(true, '送信用音声を準備中...', 12 + frac * 16);
+          });
+          if (state.transcriptCancelled) return;
+          if (!pcm16k || pcm16k.length < 1600) {
+            throw new Error('送信用の音声データを準備できませんでした');
+          }
+
+          const chunkSec = 300; // 5 minutes (~9.6MB WAV)
+          const chunkSamples = chunkSec * 16000;
+          const totalChunks = Math.max(1, Math.ceil(pcm16k.length / chunkSamples));
+
+          for (let c = 0; c < totalChunks; c++) {
+            if (state.transcriptCancelled) return;
+            const s0 = c * chunkSamples;
+            const s1 = Math.min(pcm16k.length, s0 + chunkSamples);
+            const offsetSec = s0 / 16000;
+            const wavBlob = encodeMono16kWavBlob(pcm16k, s0, s1);
+
+            const pct = 30 + Math.round((c / totalChunks) * 65);
+            const chunkMsg = totalChunks > 1
+              ? `Gemini APIで文字起こし中 (${c + 1} / ${totalChunks})...`
+              : 'Gemini APIで文字起こし中...';
+            updateTranscriptProgress(true, chunkMsg, pct);
+
+            const { text } = await callGeminiTranscribeBlob(apiKey, candidates, wavBlob, 'audio/wav', state.transcriptPauseSec);
+            if (state.transcriptCancelled) return;
+
+            const segs = parseGeminiTranscriptJson(text, offsetSec, state.duration || (pcm16k.length / 16000));
+            if (segs.length > 0) {
+              state.transcriptSegments.push(...segs);
+              state.transcriptSegments.sort((a, b) => a.start - b.start);
+              renderTranscriptList();
+            }
+          }
+        }
+
+        updateTranscriptProgress(true, '文字起こし完了', 100);
+        saveCurrentFileMemory(true);
+      }
+
+      async function startOrCancelTranscription() {
+        if (state.transcriptRunning) {
+          state.transcriptCancelled = true;
+          updateTranscriptProgress(true, '中止しています...', 0);
+          return;
+        }
+        if (!state.hasAudio) {
+          showToast('先に音声を開くか録音してください');
+          return;
+        }
+
+        state.transcriptRunning = true;
+        state.transcriptCancelled = false;
+        updateTranscriptUI();
+
+        try {
+          if (state.transcriptEngine === 'gemini') {
+            await runGeminiTranscription();
+          } else {
+            await runWhisperTranscription();
+          }
+          if (state.transcriptCancelled) {
+            showToast('文字起こしを中止しました');
+          } else {
+            const cnt = state.transcriptSegments.length;
+            showToast(cnt > 0
+              ? `文字起こし完了（${cnt}グループ）`
+              : '発話テキストが検出されませんでした');
+          }
+        } catch (err) {
+          console.error('Transcription error:', err);
+          if (!state.transcriptCancelled) {
+            showToast(err && err.message ? err.message : '文字起こしに失敗しました');
+          }
+        } finally {
+          state.transcriptRunning = false;
+          state.transcriptCancelled = false;
+          updateTranscriptUI();
+          setTimeout(() => {
+            if (!state.transcriptRunning) updateTranscriptProgress(false);
+          }, 900);
         }
       }
 
@@ -17004,11 +18415,22 @@
       document.addEventListener('webkitfullscreenchange', onFullscreenStateChanged);
 
       // ==================== GITHUB / PWA SOFTWARE UPDATE CHECK & APPLY ====================
-      const APP_VERSION = 'v36';
+      const APP_VERSION = 'v37';
 
       // Ordered newest-first; each release appends a new object at the top.
       // Users who skip multiple versions automatically see ALL unseen versions between lastSeen and current.
       const APP_RELEASE_NOTES = [
+        {
+          version: 'v37',
+          verNum: 37,
+          date: '2026/11/23',
+          title: 'ピン一覧の右ページに「文字起こし」画面を追加（スマホAI / Gemini API切替）',
+          items: [
+            'ピン一覧からさらに右へスワイプできる5ページ目として「文字起こし」ページを追加しました',
+            '無料・APIキー不要の「スマホ内AI (Whisper)」と高精度・高速な「Gemini API」をワンタップで切り替えられ、現在の録音・音声を発話のまとまりごと（無音の間ごと）にリスト化します',
+            '文字起こしリストの行をタップするとその発話位置へ即座にジャンプし、再生中の行を自動ハイライトするほか、1タップで黄色ピン登録やテキストコピー、ファイルごとの結果自動記憶にも対応しています'
+          ]
+        },
         {
           version: 'v36',
           verNum: 36,
@@ -17975,6 +19397,110 @@
 
       document.getElementById('btnClearAllMarkersUpper').addEventListener('click', openClearAllMarkersConfirm);
 
+      // Transcript Page Controls
+      const syncTrEngineSwitch = (eng) => {
+        if (state.transcriptRunning) {
+          showToast('文字起こし実行中はエンジンを切り替えられません');
+          return;
+        }
+        state.transcriptEngine = eng === 'gemini' ? 'gemini' : 'whisper';
+        saveAppPrefs();
+        updateTranscriptUI();
+        renderTranscriptList();
+        if (state.transcriptEngine === 'gemini' && !getSavedGeminiApiKey()) {
+          trSettingsDrawer.classList.remove('hidden');
+          btnTrSettingsToggle.classList.add('open');
+          showToast('Gemini APIキーを設定してください');
+        }
+      };
+      btnTrEngWhisper.addEventListener('click', () => syncTrEngineSwitch('whisper'));
+      btnTrEngGemini.addEventListener('click', () => syncTrEngineSwitch('gemini'));
+
+      btnTrSettingsToggle.addEventListener('click', () => {
+        const opening = trSettingsDrawer.classList.contains('hidden');
+        trSettingsDrawer.classList.toggle('hidden', !opening);
+        btnTrSettingsToggle.classList.toggle('open', opening);
+        if (opening) {
+          inputTrGeminiKey.value = getSavedGeminiApiKey();
+          updateTranscriptUI();
+        }
+      });
+
+      document.querySelectorAll('.tr-wmodel-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          state.transcriptWhisperModel = btn.dataset.trWmodel;
+          saveAppPrefs();
+          updateTranscriptUI();
+        });
+      });
+
+      document.querySelectorAll('.tr-pause-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const val = parseFloat(btn.dataset.trPause);
+          if (isFinite(val)) {
+            state.transcriptPauseSec = val;
+            saveAppPrefs();
+            updateTranscriptUI();
+          }
+        });
+      });
+
+      btnTrKeyShow.addEventListener('click', () => {
+        const showing = inputTrGeminiKey.type === 'text';
+        inputTrGeminiKey.type = showing ? 'password' : 'text';
+        btnTrKeyShow.textContent = showing ? '表示' : '隠す';
+      });
+
+      btnTrKeySave.addEventListener('click', () => {
+        const val = inputTrGeminiKey.value.trim();
+        setSavedGeminiApiKey(val);
+        updateTranscriptUI();
+        showToast(val ? 'Gemini APIキーを端末に保存しました' : 'Gemini APIキーを削除しました');
+      });
+
+      selectTrGeminiModel.addEventListener('change', () => {
+        state.transcriptGeminiModel = selectTrGeminiModel.value || 'auto';
+        saveAppPrefs();
+      });
+
+      btnTranscriptRun.addEventListener('click', startOrCancelTranscription);
+
+      btnTranscriptCopy.addEventListener('click', async () => {
+        if (state.transcriptSegments.length === 0) return;
+        const lines = state.transcriptSegments.map((s) => `[${formatTime(s.start)}〜${formatTime(s.end)}] ${s.text}`);
+        const fullText = lines.join('
+');
+        let copied = false;
+        try {
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            await navigator.clipboard.writeText(fullText);
+            copied = true;
+          }
+        } catch (_) {}
+        if (!copied) {
+          try {
+            const ta = document.createElement('textarea');
+            ta.value = fullText;
+            ta.style.position = 'fixed';
+            ta.style.opacity = '0';
+            document.body.appendChild(ta);
+            ta.select();
+            copied = document.execCommand('copy');
+            document.body.removeChild(ta);
+          } catch (_) {}
+        }
+        showToast(copied ? `文字起こし（${state.transcriptSegments.length}件）をコピーしました` : 'コピーに失敗しました');
+      });
+
+      btnTranscriptClear.addEventListener('click', () => {
+        if (state.transcriptRunning || state.transcriptSegments.length === 0) return;
+        state.transcriptSegments = [];
+        state.transcriptActiveIdx = -1;
+        renderTranscriptList();
+        saveCurrentFileMemory(true);
+        showToast('文字起こし結果を消去しました');
+      });
+
       // Section Action Bar Listeners: tapping section bar jumps to Upper Right Page (Pin List) & scrolls to current section
       currentSectionInfo.addEventListener('click', () => {
         if (!state.hasAudio) return;
@@ -18524,6 +20050,8 @@
         updateSectionBarUI();
         updateStartupLastFileHint();
         renderMarkerList();
+        updateTranscriptUI();
+        renderTranscriptList();
         renderAllCanvases();
         initBackButtonGuard();
         requestAnimationFrame(animationLoop);
