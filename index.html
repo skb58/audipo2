@@ -8,7 +8,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="Audipo2">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="app-version" content="v38">
+  <meta name="app-version" content="v39">
   <link rel="manifest" href="./manifest.json">
   <title>Audipo風 練習プレイヤー＆レコーダー</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='bg' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%231b2030'/%3E%3Cstop offset='100%25' stop-color='%230d0f15'/%3E%3C/linearGradient%3E%3ClinearGradient id='wv' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0%25' stop-color='%2360c5ff'/%3E%3Cstop offset='100%25' stop-color='%232563eb'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='url(%23bg)'/%3E%3Crect x='1' y='1' width='62' height='62' rx='15' fill='none' stroke='%233b82f6' stroke-opacity='0.3' stroke-width='2'/%3E%3Cg fill='url(%23wv)'%3E%3Crect x='10' y='28' width='4.5' height='12' rx='2.25' opacity='0.6'/%3E%3Crect x='18' y='22' width='4.5' height='24' rx='2.25' opacity='0.85'/%3E%3Crect x='26' y='15' width='4.5' height='36' rx='2.25'/%3E%3Crect x='34' y='21' width='4.5' height='25' rx='2.25' opacity='0.9'/%3E%3Crect x='42' y='26' width='4.5' height='16' rx='2.25' opacity='0.75'/%3E%3Crect x='50' y='30' width='4.5' height='9' rx='2.25' opacity='0.5'/%3E%3C/g%3E%3Cpath d='M36.25 10.5c0-1.4 1.1-2.5 2.5-2.5h5.5c1.4 0 2.5 1.1 2.5 2.5v2.4c0 .8-.3 1.5-.9 2.1l-3.2 3.1c-.6.6-1.6.6-2.2 0l-3.2-3.1c-.6-.6-.9-1.3-.9-2.1v-2.4z' fill='%23facc15'/%3E%3C/svg%3E">
@@ -5334,7 +5334,7 @@
         <div class="modal-section" style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
           <div>
             <div class="sec-title">バージョン情報</div>
-            <div id="settingsVersionLabel" class="engine-desc mono">現在: v38</div>
+            <div id="settingsVersionLabel" class="engine-desc mono">現在: v39</div>
           </div>
           <button id="btnShowReleaseHistory" type="button" class="step-btn" style="color:#93c5fd;border-color:rgba(66,165,245,0.45);">更新履歴を見る</button>
         </div>
@@ -5491,7 +5491,7 @@
           </div>
           <div>
             <h3 id="whatsNewTitle" class="whats-new-title">アップデートのお知らせ</h3>
-            <p id="whatsNewSub" class="whats-new-sub mono">v38 に更新されました</p>
+            <p id="whatsNewSub" class="whats-new-sub mono">v39 に更新されました</p>
           </div>
         </div>
         <button id="btnCloseWhatsNewX" type="button" class="modal-close" aria-label="閉じる">✕</button>
@@ -6298,6 +6298,7 @@
       const LS_TEMP_SESSION_STATE_KEY = 'audipo2_temp_session_state_v1';
       const LS_LAST_SEEN_VERSION_KEY = 'audipo2_last_seen_version_v1';
       const LS_GEMINI_API_KEY = 'audipo2_gemini_api_key_v1';
+      const LS_TRANSCRIPTS_KEY = 'audipo2_transcripts_v1';
       const IDB_NAME = 'audipo2_session_db_v1';
       const IDB_STORE = 'session_store';
       const MAX_REMEMBERED_FILES = 1000;
@@ -6428,6 +6429,68 @@
       let saveMemTimer = null;
       let lastPeriodicSavePerf = 0;
 
+      function readTranscriptStore() {
+        try {
+          const raw = localStorage.getItem(LS_TRANSCRIPTS_KEY);
+          if (!raw) return {};
+          const parsed = JSON.parse(raw);
+          return (parsed && typeof parsed === 'object') ? parsed : {};
+        } catch (_) {
+          return {};
+        }
+      }
+
+      function saveTranscriptForFile(size, duration, segments) {
+        if (!size || size <= 0) return;
+        const key = makeFileFingerprint(size, duration || 0);
+        const store = readTranscriptStore();
+        if (!Array.isArray(segments) || segments.length === 0) {
+          if (Object.prototype.hasOwnProperty.call(store, key)) {
+            delete store[key];
+            try { localStorage.setItem(LS_TRANSCRIPTS_KEY, JSON.stringify(store)); } catch (_) {}
+          }
+          return;
+        }
+        store[key] = {
+          size,
+          duration: Math.round((Number(duration) || 0) * 1000) / 1000,
+          segments: segments.slice(0, 600).map(s => ({
+            start: Math.round((Number(s.start) || 0) * 1000) / 1000,
+            end: Math.round((Number(s.end) || 0) * 1000) / 1000,
+            text: String(s.text || '')
+          })),
+          updatedAt: Date.now()
+        };
+        let entries = Object.entries(store).sort((a, b) => (b[1]?.updatedAt || 0) - (a[1]?.updatedAt || 0));
+        if (entries.length > 40) entries = entries.slice(0, 40);
+        while (entries.length > 0) {
+          try {
+            localStorage.setItem(LS_TRANSCRIPTS_KEY, JSON.stringify(Object.fromEntries(entries)));
+            return;
+          } catch (_) {
+            entries.pop();
+          }
+        }
+      }
+
+      function lookupTranscriptForFile(size, duration = null) {
+        if (!size || size <= 0) return [];
+        const store = readTranscriptStore();
+        const exactKey = makeFileFingerprint(size, duration || 0);
+        if (store[exactKey] && Array.isArray(store[exactKey].segments)) {
+          return store[exactKey].segments;
+        }
+        for (const k in store) {
+          const rec = store[k];
+          if (rec && Number(rec.size) === Number(size) && Array.isArray(rec.segments)) {
+            if (!duration || !rec.duration || Math.abs(rec.duration - duration) <= 0.75) {
+              return rec.segments;
+            }
+          }
+        }
+        return [];
+      }
+
       function saveCurrentFileMemory(immediate = false) {
         if (!state.hasAudio) return;
         const doSave = () => {
@@ -6435,36 +6498,46 @@
           saveMemTimer = null;
           lastPeriodicSavePerf = performance.now();
 
+          // Adopt audioEl.duration if metadata resolved after initial load
+          if (!state.durationProbed && audioEl && isFinite(audioEl.duration) && audioEl.duration > 0) {
+            state.duration = audioEl.duration;
+            state.durationProbed = true;
+            state.numRows = computeRows(state.duration);
+          }
+
           const liveTime = getLivePlayheadTime();
           const origName = state.currentFileOrigName || trackTitleEl.textContent.trim() || 'audio';
           const size = state.currentFileSize || (state.rawBlob ? state.rawBlob.size : 0);
           const dur = Number(state.duration) || 0;
-          if (size <= 0 || dur <= 0) return;
-
-          // Do not persist a bogus fallback 30s key before actual duration is resolved
-          if (!state.durationProbed && !state.audioBuffer && !state.wavMeta) return;
+          if (size <= 0) return;
 
           const displayName = trackTitleEl.textContent.trim() || origName;
+          const hasUserPinsOrEdits = (
+            state.markers.length > 0 ||
+            state.tempMarker !== null ||
+            state.startSectionEnabled === false ||
+            displayName !== origName
+          );
+          const hasReliableDur = Boolean(state.durationProbed || state.audioBuffer || state.wavMeta);
+
+          // Skip only if duration isn't resolved yet AND user hasn't made any pins/edits yet
+          if (!hasReliableDur && !hasUserPinsOrEdits) return;
+
+          const effectiveDur = hasReliableDur ? Math.max(0.1, dur) : 0;
+          const maxPos = dur > 0 ? dur : Math.max(30, liveTime);
           const snapshot = {
             origName,
             displayName,
             size,
-            duration: Math.round(dur * 1000) / 1000,
+            duration: Math.round(effectiveDur * 1000) / 1000,
             markers: cloneMarkerList(state.markers),
             startSectionEnabled: state.startSectionEnabled !== false,
             tempMarker: state.tempMarker !== null ? Number(state.tempMarker) : null,
-            currentTime: Math.max(0, Math.min(dur, Number(liveTime) || 0)),
+            currentTime: Math.max(0, Math.min(maxPos, Number(liveTime) || 0)),
             playbackRate: state.playbackRate,
             pitchSemitones: state.pitchSemitones,
             sectionRepeat: Boolean(state.sectionRepeat),
             zoomWindowSeconds: state.zoomWindowSeconds,
-            transcriptSegments: Array.isArray(state.transcriptSegments) && state.transcriptSegments.length > 0
-              ? state.transcriptSegments.slice(0, 600).map(s => ({
-                  start: Math.round((Number(s.start) || 0) * 1000) / 1000,
-                  end: Math.round((Number(s.end) || 0) * 1000) / 1000,
-                  text: String(s.text || '')
-                }))
-              : [],
             updatedAt: Date.now()
           };
 
@@ -6477,23 +6550,28 @@
           }
 
           clearTempSessionState();
-          const key = makeFileFingerprint(size, dur);
+          const key = makeFileFingerprint(size, effectiveDur);
           const map = readAllFileMemories();
 
-          // Migrate legacy key or minor duration-refinement key cleanly in place so no duplicate entry remains
+          // Migrate legacy/zero-duration key or minor duration-refinement key cleanly in place so no duplicate entry remains
           if (state.currentMemoryKey && state.currentMemoryKey !== key && map[state.currentMemoryKey]) {
             const prevRec = map[state.currentMemoryKey];
             const sameSize = Number(prevRec.size) === size;
             const legacyNoDur = !(typeof prevRec.duration === 'number' && prevRec.duration > 0);
-            const minorDurDrift = typeof prevRec.duration === 'number' && Math.abs(prevRec.duration - dur) <= 1.0;
+            const minorDurDrift = typeof prevRec.duration === 'number' && Math.abs(prevRec.duration - effectiveDur) <= 1.0;
             if (sameSize && (legacyNoDur || minorDurDrift)) {
               delete map[state.currentMemoryKey];
             }
+          }
+          const zeroDurKey = makeFileFingerprint(size, 0);
+          if (zeroDurKey !== key && map[zeroDurKey]) {
+            delete map[zeroDurKey];
           }
 
           state.currentMemoryKey = key;
           map[key] = snapshot;
           writeAllFileMemories(map);
+          saveTranscriptForFile(size, effectiveDur, state.transcriptSegments);
           updateShareButtonState();
 
           try {
@@ -8038,13 +8116,201 @@
         };
       }
 
+      // ---------- Memory-Compact Int16 16kHz Mono Stream Accumulator (1.92 MB/min -> handles 130MB+ MP3s!) ----------
+      function createMono16kStreamAccumulator(estimatedDurationSec = 60) {
+        const targetSr = 16000;
+        const estSamples = Math.max(targetSr, Math.round(Math.max(1, Number(estimatedDurationSec) || 60) * targetSr));
+        let cap = Math.max(32768, Math.ceil(estSamples * 1.08) + 4096);
+        let buf = new Int16Array(cap);
+        let len = 0;
+
+        let activeSr = 0;
+        let ratio = 1;
+        let accum = 0;
+        let accumCount = 0;
+        let nextBoundary = 1;
+        let srcFrameCounter = 0;
+
+        let sF32 = null;
+        let sI16 = null;
+        let sI32 = null;
+        let sU8 = null;
+
+        const ensureCap = (needed) => {
+          if (needed < cap) return;
+          let nextCap = cap;
+          while (nextCap <= needed) nextCap = Math.ceil(nextCap * 1.35) + 16384;
+          const nb = new Int16Array(nextCap);
+          nb.set(buf, 0);
+          buf = nb;
+          cap = nextCap;
+        };
+
+        const configureSr = (sr) => {
+          const cleanSr = Math.max(8000, Math.round(Number(sr) || 48000));
+          if (cleanSr !== activeSr) {
+            activeSr = cleanSr;
+            ratio = cleanSr / targetSr;
+            accum = 0;
+            accumCount = 0;
+            nextBoundary = ratio;
+            srcFrameCounter = 0;
+          }
+        };
+
+        const pushMonoSample = (m) => {
+          accum += m;
+          accumCount++;
+          srcFrameCounter++;
+          if (srcFrameCounter >= nextBoundary) {
+            ensureCap(len);
+            const avg = accum / Math.max(1, accumCount);
+            const clamped = avg < -1 ? -1 : (avg > 1 ? 1 : avg);
+            buf[len++] = Math.round(clamped * 32767);
+            accum = 0;
+            accumCount = 0;
+            nextBoundary += ratio;
+          }
+        };
+
+        const pushAudioBuffer = (audioBuf) => {
+          if (!audioBuf || audioBuf.length <= 0) return;
+          configureSr(audioBuf.sampleRate);
+          const ch0 = audioBuf.getChannelData(0);
+          const ch1 = audioBuf.numberOfChannels > 1 ? audioBuf.getChannelData(1) : null;
+          const n = audioBuf.length;
+          if (ch1) {
+            for (let i = 0; i < n; i++) pushMonoSample((ch0[i] + ch1[i]) * 0.5);
+          } else {
+            for (let i = 0; i < n; i++) pushMonoSample(ch0[i]);
+          }
+        };
+
+        // Note: does NOT close audioData; caller's finally block closes it
+        const pushAudioData = (audioData) => {
+          const frames = audioData.numberOfFrames;
+          if (frames <= 0) return;
+          configureSr(audioData.sampleRate);
+          const chs = Math.max(1, audioData.numberOfChannels);
+          const fmt = String(audioData.format || 'f32-planar');
+          const isPlanar = fmt.endsWith('-planar');
+          const baseType = isPlanar ? fmt.slice(0, -7) : fmt;
+          const scanCh = Math.min(2, chs);
+
+          const scale = baseType === 'f32' ? 1.0
+            : (baseType === 's16' ? 0.000030517578125
+            : (baseType === 's32' ? 4.656612873077393e-10 : 0.0078125));
+          const offsetU8 = baseType === 'u8' ? 128 : 0;
+
+          if (isPlanar) {
+            const copyPlane = (planeIdx) => {
+              if (baseType === 'f32') {
+                if (!sF32 || sF32.length < frames) sF32 = new Float32Array(frames);
+                const v = sF32.subarray(0, frames);
+                audioData.copyTo(v, { planeIndex: planeIdx });
+                return v;
+              }
+              if (baseType === 's16') {
+                if (!sI16 || sI16.length < frames) sI16 = new Int16Array(frames);
+                const v = sI16.subarray(0, frames);
+                audioData.copyTo(v, { planeIndex: planeIdx });
+                return v;
+              }
+              if (baseType === 's32') {
+                if (!sI32 || sI32.length < frames) sI32 = new Int32Array(frames);
+                const v = sI32.subarray(0, frames);
+                audioData.copyTo(v, { planeIndex: planeIdx });
+                return v;
+              }
+              if (!sU8 || sU8.length < frames) sU8 = new Uint8Array(frames);
+              const v = sU8.subarray(0, frames);
+              audioData.copyTo(v, { planeIndex: planeIdx });
+              return v;
+            };
+
+            const p0Raw = copyPlane(0);
+            if (scanCh === 2) {
+              const p0Copy = p0Raw.slice(0);
+              const p1Raw = copyPlane(1);
+              for (let i = 0; i < frames; i++) {
+                const v0 = (p0Copy[i] - offsetU8) * scale;
+                const v1 = (p1Raw[i] - offsetU8) * scale;
+                pushMonoSample((v0 + v1) * 0.5);
+              }
+            } else {
+              for (let i = 0; i < frames; i++) {
+                pushMonoSample((p0Raw[i] - offsetU8) * scale);
+              }
+            }
+          } else {
+            const totalVals = frames * chs;
+            let raw;
+            if (baseType === 'f32') {
+              if (!sF32 || sF32.length < totalVals) sF32 = new Float32Array(totalVals);
+              raw = sF32.subarray(0, totalVals);
+            } else if (baseType === 's16') {
+              if (!sI16 || sI16.length < totalVals) sI16 = new Int16Array(totalVals);
+              raw = sI16.subarray(0, totalVals);
+            } else if (baseType === 's32') {
+              if (!sI32 || sI32.length < totalVals) sI32 = new Int32Array(totalVals);
+              raw = sI32.subarray(0, totalVals);
+            } else {
+              if (!sU8 || sU8.length < totalVals) sU8 = new Uint8Array(totalVals);
+              raw = sU8.subarray(0, totalVals);
+            }
+            audioData.copyTo(raw, { planeIndex: 0 });
+            if (scanCh === 2) {
+              for (let f = 0; f < frames; f++) {
+                const idx = f * chs;
+                const v0 = (raw[idx] - offsetU8) * scale;
+                const v1 = (raw[idx + 1] - offsetU8) * scale;
+                pushMonoSample((v0 + v1) * 0.5);
+              }
+            } else {
+              for (let f = 0; f < frames; f++) {
+                pushMonoSample((raw[f * chs] - offsetU8) * scale);
+              }
+            }
+          }
+        };
+
+        const reset = () => {
+          len = 0;
+          activeSr = 0;
+          accum = 0;
+          accumCount = 0;
+          nextBoundary = 1;
+          srcFrameCounter = 0;
+        };
+
+        const finalizeInt16 = () => {
+          if (accumCount > 0) {
+            ensureCap(len);
+            const avg = accum / accumCount;
+            const clamped = avg < -1 ? -1 : (avg > 1 ? 1 : avg);
+            buf[len++] = Math.round(clamped * 32767);
+            accum = 0;
+            accumCount = 0;
+          }
+          return buf.subarray(0, len);
+        };
+
+        return {
+          get length() { return len; },
+          pushAudioBuffer,
+          pushAudioData,
+          reset,
+          finalizeInt16
+        };
+      }
+
       // ---------- Universal Zero-OOM Streaming Waveform Builder (MP3 / M4A-MP4 / OGG / FLAC / WebM / ADTS-AAC) ----------
-      function createStreamPyramidAccumulator(sampleRate, estimatedTotalFrames) {
+      function createStreamPyramidAccumulator(sampleRate, estimatedTotalFrames, extraSink = null, skipPyramid = false) {
         const sr = Math.max(8000, Math.round(Number(sampleRate) || 48000));
         const estFrames = Math.max(sr, Math.round(Number(estimatedTotalFrames) || sr * 60));
         const baseBin = chooseAdaptiveBaseBin(estFrames);
         const estBins = Math.max(1, Math.ceil(estFrames / baseBin));
-        let capBins = Math.max(1024, Math.ceil(estBins * 1.1) + 64);
+        let capBins = skipPyramid ? 4 : Math.max(1024, Math.ceil(estBins * 1.1) + 64);
         let min0 = new Float32Array(capBins);
         let max0 = new Float32Array(capBins);
         let curBin = 0;
@@ -8060,7 +8326,7 @@
         let scratchU8 = null;
 
         const ensureBinCapacity = (needed) => {
-          if (needed < capBins) return;
+          if (skipPyramid || needed < capBins) return;
           let nextCap = capBins;
           while (nextCap <= needed) nextCap = Math.ceil(nextCap * 1.4) + 256;
           const nMin = new Float32Array(nextCap);
@@ -8093,6 +8359,7 @@
         };
 
         const pushPlanarFloat = (ch0, ch1, len) => {
+          if (skipPyramid) { totalSamples += len; return; }
           if (ch1) {
             for (let i = 0; i < len; i++) {
               const v0 = ch0[i];
@@ -8109,6 +8376,13 @@
 
         const pushAudioBuffer = (audioBuf) => {
           if (!audioBuf || audioBuf.length <= 0) return;
+          if (extraSink && extraSink.pushAudioBuffer) {
+            extraSink.pushAudioBuffer(audioBuf);
+          }
+          if (skipPyramid) {
+            totalSamples += audioBuf.length;
+            return;
+          }
           const ch0 = audioBuf.getChannelData(0);
           const ch1 = audioBuf.numberOfChannels > 1 ? audioBuf.getChannelData(1) : null;
           pushPlanarFloat(ch0, ch1, audioBuf.length);
@@ -8117,6 +8391,13 @@
         const pushAudioData = (audioData) => {
           try {
             const frames = audioData.numberOfFrames;
+            if (extraSink && extraSink.pushAudioData) {
+              extraSink.pushAudioData(audioData);
+            }
+            if (skipPyramid) {
+              totalSamples += Math.max(0, frames);
+              return;
+            }
             const chs = Math.max(1, audioData.numberOfChannels);
             const fmt = String(audioData.format || 'f32-planar');
             if (frames <= 0) return;
@@ -8425,7 +8706,7 @@
         return null;
       }
 
-      async function buildMp3StreamPyramidAsync(blob, durationHint, onProgress, onPartialPyramid, isCancelled) {
+      async function buildMp3StreamPyramidAsync(blob, durationHint, onProgress, onPartialPyramid, isCancelled, extraSink = null, skipPyramid = false) {
         const info = await findMp3StreamStart(blob);
         if (!info) return null;
         if (isCancelled && isCancelled()) return null;
@@ -8434,7 +8715,7 @@
         const sr = header.sampleRate;
         const ch = header.channels;
         const estFrames = Math.max(sr, Math.round((durationHint > 0 ? durationHint : (blob.size * 8 / Math.max(32000, header.bitrate))) * sr));
-        const acc = createStreamPyramidAccumulator(sr, estFrames);
+        const acc = createStreamPyramidAccumulator(sr, estFrames, extraSink, skipPyramid);
 
         // Try WebCodecs AudioDecoder ('mp3') first; fall back automatically to chunked decodeAudioData
         let wcRunner = null;
@@ -8455,7 +8736,8 @@
         // Helper for chunked decodeAudioData fallback (frame-aligned ~1.5MB slices)
         const runChunkedFallback = async (resumeOffset) => {
           initAudioGraph();
-          const fbAcc = resumeOffset === startOffset ? acc : createStreamPyramidAccumulator(sr, estFrames);
+          if (resumeOffset === startOffset && extraSink && extraSink.reset) extraSink.reset();
+          const fbAcc = resumeOffset === startOffset ? acc : createStreamPyramidAccumulator(sr, estFrames, extraSink, skipPyramid);
           let fPos = resumeOffset;
           let rem = new Uint8Array(0);
           const batchTargetBytes = 1536 * 1024;
@@ -8876,7 +9158,7 @@
         return null;
       }
 
-      async function buildMp4StreamPyramidAsync(blob, durationHint, onProgress, onPartialPyramid, isCancelled) {
+      async function buildMp4StreamPyramidAsync(blob, durationHint, onProgress, onPartialPyramid, isCancelled, extraSink = null, skipPyramid = false) {
         // Locate moov box via top-level 16-byte header hops (never loads mdat into RAM)
         let pos = 0;
         let moovRange = null;
@@ -8913,7 +9195,7 @@
         const sr = track.sampleRate;
         const durSec = track.durationSec > 0 ? track.durationSec : (durationHint > 0 ? durationHint : 60);
         const estFrames = Math.max(sr, Math.round(durSec * sr));
-        const acc = createStreamPyramidAccumulator(sr, estFrames);
+        const acc = createStreamPyramidAccumulator(sr, estFrames, extraSink, skipPyramid);
 
         // Expand chunk map into compact per-chunk descriptors: { offset, firstSample, sampleCount, totalBytes }
         const chunks = [];
@@ -8970,7 +9252,8 @@
         const runAacMiniM4aFallback = async () => {
           if (!track.isAac) return null;
           initAudioGraph();
-          const fbAcc = createStreamPyramidAccumulator(sr, estFrames);
+          if (extraSink && extraSink.reset) extraSink.reset();
+          const fbAcc = createStreamPyramidAccumulator(sr, estFrames, extraSink, skipPyramid);
           let pendingFrames = [];
           let pendingBytes = 0;
 
@@ -9145,7 +9428,7 @@
         return desc;
       }
 
-      async function buildOggStreamPyramidAsync(blob, durationHint, onProgress, onPartialPyramid, isCancelled) {
+      async function buildOggStreamPyramidAsync(blob, durationHint, onProgress, onPartialPyramid, isCancelled, extraSink = null, skipPyramid = false) {
         const chunkBytes = 2 * 1024 * 1024;
         const startPerf = performance.now();
         let lastPartialPerf = startPerf;
@@ -9186,7 +9469,7 @@
           if (codecKind === 'opus' && headerPackets.length < 2) {
             headerPackets.push(pkt);
             const estFrames = Math.max(sampleRate, Math.round((durationHint > 0 ? durationHint : 60) * sampleRate));
-            acc = createStreamPyramidAccumulator(sampleRate, estFrames);
+            acc = createStreamPyramidAccumulator(sampleRate, estFrames, extraSink, skipPyramid);
             wcRunner = await createWebCodecsDecoderRunner(
               { codec: 'opus', sampleRate: 48000, numberOfChannels: channels, description: headerPackets[0] },
               (ad) => acc.pushAudioData(ad)
@@ -9205,7 +9488,7 @@
             headerPackets.push(pkt);
             if (headerPackets.length === 3) {
               const estFrames = Math.max(sampleRate, Math.round((durationHint > 0 ? durationHint : 60) * sampleRate));
-              acc = createStreamPyramidAccumulator(sampleRate, estFrames);
+              acc = createStreamPyramidAccumulator(sampleRate, estFrames, extraSink, skipPyramid);
               const desc = buildVorbisXiphDescription(headerPackets[0], headerPackets[1], headerPackets[2]);
               wcRunner = await createWebCodecsDecoderRunner(
                 { codec: 'vorbis', sampleRate, numberOfChannels: channels, description: desc },
@@ -9385,7 +9668,7 @@
         return crc === u8[p];
       }
 
-      async function buildFlacStreamPyramidAsync(blob, durationHint, onProgress, onPartialPyramid, isCancelled) {
+      async function buildFlacStreamPyramidAsync(blob, durationHint, onProgress, onPartialPyramid, isCancelled, extraSink = null, skipPyramid = false) {
         if (blob.size < 42) return null;
         // Parse metadata blocks to extract STREAMINFO & find exact first frame offset
         let pos = 4;
@@ -9430,7 +9713,7 @@
         minFlacHdrUnknownLen[8 + 17] = 0;
 
         const estFrames = totalSamplesMeta > 0 ? totalSamplesMeta : Math.round((durationHint > 0 ? durationHint : 60) * sampleRate);
-        const acc = createStreamPyramidAccumulator(sampleRate, estFrames);
+        const acc = createStreamPyramidAccumulator(sampleRate, estFrames, extraSink, skipPyramid);
         const wcRunner = await createWebCodecsDecoderRunner(
           { codec: 'flac', sampleRate, numberOfChannels: Math.min(2, channels), description: minFlacHdr },
           (ad) => acc.pushAudioData(ad)
@@ -9565,7 +9848,7 @@
         return { hdrLen, frameLen, profile, sampleRate: srTbl[srIdx], channels: ch };
       }
 
-      async function buildAdtsStreamPyramidAsync(blob, durationHint, onProgress, onPartialPyramid, isCancelled) {
+      async function buildAdtsStreamPyramidAsync(blob, durationHint, onProgress, onPartialPyramid, isCancelled, extraSink = null, skipPyramid = false) {
         const probe = new Uint8Array(await blob.slice(0, Math.min(blob.size, 65536)).arrayBuffer());
         let firstOff = -1;
         let firstHdr = null;
@@ -9586,7 +9869,7 @@
         const ch = firstHdr.channels;
         const asc = makeAacAudioSpecificConfig(sr, ch);
         const estFrames = Math.max(sr, Math.round((durationHint > 0 ? durationHint : 60) * sr));
-        const acc = createStreamPyramidAccumulator(sr, estFrames);
+        const acc = createStreamPyramidAccumulator(sr, estFrames, extraSink, skipPyramid);
         const wcRunner = await createWebCodecsDecoderRunner(
           { codec: `mp4a.40.${firstHdr.profile || 2}`, sampleRate: sr, numberOfChannels: ch, description: asc },
           (ad) => acc.pushAudioData(ad)
@@ -9669,7 +9952,7 @@
       }
 
       // ---------- 6. Unified Compressed Format Dispatcher ----------
-      async function buildCompressedStreamPyramidAsync(blob, fileName, durationHint, onProgress, onPartialPyramid, isCancelled) {
+      async function buildCompressedStreamPyramidAsync(blob, fileName, durationHint, onProgress, onPartialPyramid, isCancelled, extraSink = null, skipPyramid = false) {
         if (!blob || blob.size < 32) return null;
         const head = new Uint8Array(await blob.slice(0, Math.min(blob.size, 32)).arrayBuffer());
         if (isCancelled && isCancelled()) return null;
@@ -9680,19 +9963,19 @@
 
         // 1. ISO BMFF (M4A / MP4)
         if (fcc4 === 'ftyp' || lowerName.endsWith('.m4a') || lowerName.endsWith('.mp4')) {
-          const pyr = await buildMp4StreamPyramidAsync(blob, durationHint, onProgress, onPartialPyramid, isCancelled);
+          const pyr = await buildMp4StreamPyramidAsync(blob, durationHint, onProgress, onPartialPyramid, isCancelled, extraSink, skipPyramid);
           if (pyr) return pyr;
         }
 
         // 2. OGG (Opus / Vorbis)
         if (fcc0 === 'OggS' || lowerName.endsWith('.ogg') || lowerName.endsWith('.opus') || lowerName.endsWith('.oga')) {
-          const pyr = await buildOggStreamPyramidAsync(blob, durationHint, onProgress, onPartialPyramid, isCancelled);
+          const pyr = await buildOggStreamPyramidAsync(blob, durationHint, onProgress, onPartialPyramid, isCancelled, extraSink, skipPyramid);
           if (pyr) return pyr;
         }
 
         // 3. Native FLAC
         if (fcc0 === 'fLaC' || lowerName.endsWith('.flac')) {
-          const pyr = await buildFlacStreamPyramidAsync(blob, durationHint, onProgress, onPartialPyramid, isCancelled);
+          const pyr = await buildFlacStreamPyramidAsync(blob, durationHint, onProgress, onPartialPyramid, isCancelled, extraSink, skipPyramid);
           if (pyr) return pyr;
         }
 
@@ -9702,13 +9985,13 @@
           (head[0] === 0xff && (head[1] & 0xe0) === 0xe0) ||
           lowerName.endsWith('.mp3')
         ) {
-          const pyr = await buildMp3StreamPyramidAsync(blob, durationHint, onProgress, onPartialPyramid, isCancelled);
+          const pyr = await buildMp3StreamPyramidAsync(blob, durationHint, onProgress, onPartialPyramid, isCancelled, extraSink, skipPyramid);
           if (pyr) return pyr;
         }
 
         // 5. Raw ADTS AAC
         if ((head[0] === 0xff && (head[1] & 0xf6) === 0xf0) || lowerName.endsWith('.aac')) {
-          const pyr = await buildAdtsStreamPyramidAsync(blob, durationHint, onProgress, onPartialPyramid, isCancelled);
+          const pyr = await buildAdtsStreamPyramidAsync(blob, durationHint, onProgress, onPartialPyramid, isCancelled, extraSink, skipPyramid);
           if (pyr) return pyr;
         }
 
@@ -9746,15 +10029,30 @@
         return new Promise(resolve => {
           const a = document.createElement('audio');
           a.preload = 'metadata';
-          a.onloadedmetadata = () => {
-            const d = isFinite(a.duration) && a.duration > 0 ? a.duration : 0;
-            a.removeAttribute('src');
-            resolve(d);
+          let settled = false;
+          const finish = (val) => {
+            if (settled) return;
+            settled = true;
+            clearTimeout(timer);
+            a.onloadedmetadata = null;
+            a.ondurationchange = null;
+            a.oncanplay = null;
+            a.onerror = null;
+            try { a.removeAttribute('src'); a.load(); } catch (_) {}
+            resolve(val);
           };
-          a.onerror = () => {
-            a.removeAttribute('src');
-            resolve(0);
+          const checkDur = () => {
+            if (isFinite(a.duration) && a.duration > 0) {
+              finish(a.duration);
+            }
           };
+          const timer = setTimeout(() => {
+            finish(isFinite(a.duration) && a.duration > 0 ? a.duration : 0);
+          }, 1500);
+          a.onloadedmetadata = checkDur;
+          a.ondurationchange = checkDur;
+          a.oncanplay = checkDur;
+          a.onerror = () => finish(0);
           a.src = url;
         });
       }
@@ -9860,30 +10158,42 @@
           }
           state.restoredFromMemory = restoredFromMem;
 
+          // When duration wasn't resolved yet (e.g. Android content:// URI or VBR MP3), expand placeholder span so pins >30s are NEVER clipped!
+          const maxPinTime = finalMarkers.reduce((mx, m) => Math.max(mx, Number(m.time) || 0), 0);
+          const safeInitialDuration = durationProbed
+            ? resolvedDuration
+            : Math.max(resolvedDuration, maxPinTime + 5, finalCurrentTime + 5, (finalTempMarker || 0) + 5);
+
           // Cancel any running transcription for previous track and restore saved transcript if present
           if (state.transcriptRunning) {
             state.transcriptCancelled = true;
           }
-          state.transcriptSegments = (mem && Array.isArray(mem.transcriptSegments))
-            ? mem.transcriptSegments
-                .filter(s => s && typeof s.text === 'string' && s.text.trim())
-                .map(s => ({
-                  start: Math.max(0, Math.min(resolvedDuration, Number(s.start) || 0)),
-                  end: Math.max(0, Math.min(resolvedDuration, Number(s.end) || Number(s.start) || 0)),
-                  text: String(s.text).trim()
-                }))
+          const savedTr = !isUnsavedRec
+            ? lookupTranscriptForFile(blob.size, durationProbed ? resolvedDuration : null)
             : [];
+          const rawTrList = savedTr.length > 0
+            ? savedTr
+            : ((mem && Array.isArray(mem.transcriptSegments)) ? mem.transcriptSegments : []);
+          state.transcriptSegments = rawTrList
+            .filter(s => s && typeof s.text === 'string' && s.text.trim())
+            .map(s => ({
+              start: Math.max(0, Math.min(safeInitialDuration, Number(s.start) || 0)),
+              end: Math.max(0, Math.min(safeInitialDuration, Number(s.end) || Number(s.start) || 0)),
+              text: String(s.text).trim()
+            }));
           state.transcriptActiveIdx = -1;
 
           state.wavMeta = wavMeta;
-          state.duration = resolvedDuration;
-          state.currentTime = Math.max(0, Math.min(resolvedDuration, finalCurrentTime));
+          state.duration = safeInitialDuration;
+          state.currentTime = Math.max(0, Math.min(safeInitialDuration, finalCurrentTime));
           state.lastSyncTime = state.currentTime;
           state.lastSyncPerf = performance.now();
-          state.numRows = computeRows(resolvedDuration);
-          state.markers = finalMarkers.filter(m => m.time > 0.05 && m.time < resolvedDuration - 0.05);
+          state.numRows = computeRows(safeInitialDuration);
+          state.markers = durationProbed
+            ? finalMarkers.filter(m => m.time > 0.05 && m.time < safeInitialDuration - 0.05)
+            : finalMarkers.filter(m => m.time > 0.05);
           state.startSectionEnabled = finalStartSecEnabled;
-          state.tempMarker = (finalTempMarker !== null && finalTempMarker >= 0 && finalTempMarker <= resolvedDuration) ? finalTempMarker : null;
+          state.tempMarker = (finalTempMarker !== null && finalTempMarker >= 0 && (!durationProbed || finalTempMarker <= safeInitialDuration)) ? finalTempMarker : null;
           state.autoWaveGain = 1.0;
           state.autoBoostGain = 1.0;
 
@@ -9896,6 +10206,42 @@
           audioEl.mozPreservesPitch = true;
           audioEl.webkitPreservesPitch = true;
           audioEl.playbackRate = state.playbackRate;
+
+          const onAudioElMetaOrDur = () => {
+            if (isCancelled()) return;
+            const d = audioEl.duration;
+            if (isFinite(d) && d > 0 && (!state.durationProbed || Math.abs(state.duration - d) > 0.25)) {
+              const wasUnprobed = !state.durationProbed;
+              state.duration = d;
+              state.durationProbed = true;
+              state.numRows = computeRows(d);
+              if (wasUnprobed && !state.restoredFromMemory && !state.isUnsavedRecording && state.markers.length === 0) {
+                const lateHit = lookupFileMemoryEntry(state.currentFileSize, d);
+                if (lateHit && lateHit.rec) {
+                  state.currentMemoryKey = lateHit.key;
+                  state.restoredFromMemory = true;
+                  if (Array.isArray(lateHit.rec.markers)) {
+                    state.markers = cloneMarkerList(lateHit.rec.markers).filter(m => m.time > 0.05 && m.time < d - 0.05);
+                  }
+                  state.startSectionEnabled = lateHit.rec.startSectionEnabled !== false;
+                  if (typeof lateHit.rec.currentTime === 'number' && isFinite(lateHit.rec.currentTime) && state.currentTime <= 0.1) {
+                    state.currentTime = Math.max(0, Math.min(d, lateHit.rec.currentTime));
+                    state.lastSyncTime = state.currentTime;
+                  }
+                  renderMarkerList();
+                  updateHeaderSubInfo();
+                }
+              }
+              updateTimeUI();
+              updatePinButtonsUI();
+              updateSectionBarUI();
+              renderAllCanvases();
+              saveCurrentFileMemory(true);
+            }
+          };
+          audioEl.addEventListener('loadedmetadata', onAudioElMetaOrDur, { once: true });
+          audioEl.addEventListener('durationchange', onAudioElMetaOrDur);
+
           if (state.currentTime > 0.05) {
             const restoreT = state.currentTime;
             audioEl.addEventListener('loadedmetadata', () => {
@@ -15776,8 +16122,8 @@
         updateTranscriptUI();
       }
 
-      // ---------- 16kHz Mono PCM Extraction (Works with AudioBuffer, Large WAV, or Compressed Blobs) ----------
-      function downsampleAudioBufferTo16kMono(audioBuf) {
+      // ---------- 16kHz Mono Int16 PCM Extraction (Zero-OOM Streaming for 130MB+ MP3 / M4A / OGG / FLAC / WAV) ----------
+      function downsampleAudioBufferTo16kInt16(audioBuf) {
         const srcSr = audioBuf.sampleRate;
         const targetSr = 16000;
         const numCh = audioBuf.numberOfChannels;
@@ -15786,18 +16132,18 @@
         const srcLen = audioBuf.length;
 
         if (srcSr === targetSr) {
-          const out = new Float32Array(srcLen);
-          if (ch1) {
-            for (let i = 0; i < srcLen; i++) out[i] = (ch0[i] + ch1[i]) * 0.5;
-          } else {
-            out.set(ch0);
+          const out = new Int16Array(srcLen);
+          for (let i = 0; i < srcLen; i++) {
+            const v = ch1 ? (ch0[i] + ch1[i]) * 0.5 : ch0[i];
+            const c = v < -1 ? -1 : (v > 1 ? 1 : v);
+            out[i] = Math.round(c * 32767);
           }
           return out;
         }
 
         const ratio = srcSr / targetSr;
         const outLen = Math.max(1, Math.floor(srcLen / ratio));
-        const out = new Float32Array(outLen);
+        const out = new Int16Array(outLen);
         for (let i = 0; i < outLen; i++) {
           const s0 = Math.floor(i * ratio);
           const s1 = Math.min(srcLen, Math.max(s0 + 1, Math.floor((i + 1) * ratio)));
@@ -15807,17 +16153,19 @@
           } else {
             for (let j = s0; j < s1; j++) sum += ch0[j];
           }
-          out[i] = sum / (s1 - s0);
+          const avg = sum / (s1 - s0);
+          const c = avg < -1 ? -1 : (avg > 1 ? 1 : avg);
+          out[i] = Math.round(c * 32767);
         }
         return out;
       }
 
-      async function streamWavTo16kMono(blob, wavMeta, onProgress) {
+      async function streamWavTo16kInt16(blob, wavMeta, onProgress) {
         const { audioFormat, numChannels, sampleRate, blockAlign, bitsPerSample, dataOffset, totalFrames } = wavMeta;
         const targetSr = 16000;
         const ratio = sampleRate / targetSr;
         const outLen = Math.max(1, Math.floor(totalFrames / ratio));
-        const out = new Float32Array(outLen);
+        const out = new Int16Array(outLen);
         const bytesPerSample = bitsPerSample >> 3;
         const scanCh = Math.min(2, numChannels);
         const framesPerChunk = Math.max(4096, Math.floor((2 * 1024 * 1024) / blockAlign));
@@ -15864,7 +16212,9 @@
             accumCount++;
             const absFrame = frameCursor + f + 1;
             if (absFrame >= nextBoundary && outIdx < outLen) {
-              out[outIdx++] = accum / Math.max(1, accumCount);
+              const avg = accum / Math.max(1, accumCount);
+              const c = avg < -1 ? -1 : (avg > 1 ? 1 : avg);
+              out[outIdx++] = Math.round(c * 32767);
               accum = 0;
               accumCount = 0;
               nextBoundary += ratio;
@@ -15874,27 +16224,63 @@
           if (onProgress) onProgress(frameCursor / totalFrames);
           await new Promise(r => setTimeout(r, 0));
         }
-        return out;
+        return out.subarray(0, outIdx);
       }
 
       async function getMono16kForCurrentAudio(onProgress) {
         if (state.audioBuffer) {
           if (onProgress) onProgress(0.5);
-          const pcm = downsampleAudioBufferTo16kMono(state.audioBuffer);
+          const pcm = downsampleAudioBufferTo16kInt16(state.audioBuffer);
           if (onProgress) onProgress(1.0);
           return pcm;
         }
         if (state.wavMeta && state.rawBlob) {
-          return await streamWavTo16kMono(state.rawBlob, state.wavMeta, onProgress);
+          return await streamWavTo16kInt16(state.rawBlob, state.wavMeta, onProgress);
         }
-        if (state.rawBlob && state.rawBlob.size <= 80 * 1024 * 1024) {
-          initAudioGraph();
-          const ab = await state.rawBlob.arrayBuffer();
-          const decoded = await audioCtx.decodeAudioData(ab);
-          if (onProgress) onProgress(1.0);
-          return downsampleAudioBufferTo16kMono(decoded);
+        if (state.rawBlob) {
+          // 1. Zero-OOM streaming extraction for any size MP3 / M4A / OGG / FLAC / AAC (130MB+ supported!)
+          const estDur = state.durationProbed ? state.duration : Math.max(60, state.rawBlob.size / 24000);
+          const m16Acc = createMono16kStreamAccumulator(estDur);
+          const streamRes = await buildCompressedStreamPyramidAsync(
+            state.rawBlob,
+            state.currentFileOrigName || trackTitleEl.textContent.trim() || 'audio.mp3',
+            estDur,
+            (frac) => { if (onProgress) onProgress(frac); },
+            null,
+            () => Boolean(state.transcriptCancelled),
+            m16Acc,
+            true
+          );
+          if (state.transcriptCancelled) return null;
+          const streamedPcm = m16Acc.finalizeInt16();
+          if (streamRes && streamedPcm.length >= 1600) {
+            if (onProgress) onProgress(1.0);
+            return streamedPcm;
+          }
+
+          // 2. Fallback for uncommon containers <= 90MB via Web Audio decodeAudioData
+          if (state.rawBlob.size <= 90 * 1024 * 1024) {
+            initAudioGraph();
+            const ab = await state.rawBlob.arrayBuffer();
+            const decoded = await audioCtx.decodeAudioData(ab);
+            if (onProgress) onProgress(1.0);
+            return downsampleAudioBufferTo16kInt16(decoded);
+          }
         }
         return null;
+      }
+
+      function slice16kToFloat32(pcm16k, s0, s1) {
+        const start = Math.max(0, Math.floor(s0));
+        const end = Math.min(pcm16k.length, Math.ceil(s1));
+        const n = Math.max(0, end - start);
+        const out = new Float32Array(n);
+        if (pcm16k instanceof Int16Array) {
+          for (let i = 0; i < n; i++) out[i] = pcm16k[start + i] * 0.000030517578125;
+        } else {
+          out.set(pcm16k.subarray(start, end));
+        }
+        return out;
       }
 
       // ---------- Adaptive RMS VAD Utterance Grouping (発話のまとまりごと) ----------
@@ -15904,21 +16290,25 @@
         const totalDur = pcm16k.length / sr;
         if (numFrames <= 0 || totalDur <= 0.05) return [];
 
+        const isI16 = pcm16k instanceof Int16Array;
+        const scale = isI16 ? 0.000030517578125 : 1.0;
+
         const rms = new Float32Array(numFrames);
         for (let f = 0; f < numFrames; f++) {
           const base = f * frameLen;
           let mean = 0;
-          for (let i = 0; i < frameLen; i++) mean += pcm16k[base + i];
+          for (let i = 0; i < frameLen; i++) mean += pcm16k[base + i] * scale;
           mean /= frameLen;
           let sq = 0;
           for (let i = 0; i < frameLen; i++) {
-            const d = pcm16k[base + i] - mean;
+            const d = (pcm16k[base + i] * scale) - mean;
             sq += d * d;
           }
           rms[f] = Math.sqrt(sq / frameLen);
         }
 
-        const sorted = Array.from(rms).sort((a, b) => a - b);
+        const sorted = new Float32Array(rms);
+        sorted.sort();
         const noise = sorted[Math.floor(numFrames * 0.15)] || 0;
         const p90 = sorted[Math.min(numFrames - 1, Math.floor(numFrames * 0.90))] || 0;
 
@@ -16013,10 +16403,17 @@
         wStr(36, 'data');
         dv.setUint32(40, len * 2, true);
         let off = 44;
-        for (let i = s0; i < s1; i++) {
-          const clamped = Math.max(-1, Math.min(1, pcm16k[i]));
-          dv.setInt16(off, Math.round(clamped * 32767), true);
-          off += 2;
+        if (pcm16k instanceof Int16Array) {
+          for (let i = s0; i < s1; i++) {
+            dv.setInt16(off, pcm16k[i], true);
+            off += 2;
+          }
+        } else {
+          for (let i = s0; i < s1; i++) {
+            const clamped = Math.max(-1, Math.min(1, pcm16k[i]));
+            dv.setInt16(off, Math.round(clamped * 32767), true);
+            off += 2;
+          }
         }
         return new Blob([ab], { type: 'audio/wav' });
       }
@@ -16048,11 +16445,11 @@
         updateTranscriptProgress(true, '音声を16kHzへ変換中...', 4);
 
         const pcm16k = await getMono16kForCurrentAudio((frac) => {
-          updateTranscriptProgress(true, '音声を解析準備中...', 2 + frac * 8);
+          updateTranscriptProgress(true, `音声を16kHzへ変換中 (${Math.round(frac * 100)}%)...`, 2 + frac * 10);
         });
         if (state.transcriptCancelled) return;
         if (!pcm16k || pcm16k.length < 1600) {
-          throw new Error('音声データの抽出に失敗しました（超大容量圧縮ファイルはGemini APIをお試しください）');
+          throw new Error('この音声形式の抽出に対応できませんでした');
         }
 
         const groups = detectUtteranceGroups(pcm16k, 16000, state.transcriptPauseSec, 24.0);
@@ -16118,7 +16515,7 @@
           const s0 = Math.max(0, Math.floor(g.start * 16000));
           const s1 = Math.min(pcm16k.length, Math.ceil(g.end * 16000));
           if (s1 - s0 < 1600) continue;
-          const slice = pcm16k.slice(s0, s1);
+          const slice = slice16kToFloat32(pcm16k, s0, s1);
 
           // Yield frame so UI stays responsive & cancel button reacts immediately
           await new Promise(r => setTimeout(r, 15));
@@ -16333,10 +16730,10 @@
           state.transcriptSegments = segs;
           renderTranscriptList();
         } else {
-          // Downsample to compact 16kHz mono 16-bit WAV and chunk in 5-minute blocks if long
-          updateTranscriptProgress(true, '送信用の軽量音声(16kHz)を作成中...', 18);
+          // Downsample to compact 16kHz mono 16-bit WAV (streaming Zero-OOM) and chunk in 5-minute blocks if long
+          updateTranscriptProgress(true, '送信用の軽量音声(16kHz)を作成中...', 14);
           const pcm16k = await getMono16kForCurrentAudio((frac) => {
-            updateTranscriptProgress(true, '送信用音声を準備中...', 12 + frac * 16);
+            updateTranscriptProgress(true, `送信用音声を抽出中 (${Math.round(frac * 100)}%)...`, 12 + frac * 16);
           });
           if (state.transcriptCancelled) return;
           if (!pcm16k || pcm16k.length < 1600) {
@@ -18133,6 +18530,11 @@
         settingsModal.classList.add('hidden');
 
         if (audioFiles.length > 0) {
+          // Immediately commit current track's pins & playhead to playlist + storage before loading new files!
+          if (state.hasAudio) {
+            syncCurrentPlaylistMarkers();
+            saveCurrentFileMemory(true);
+          }
           let targetIdx = -1;
           for (let k = 0; k < audioFiles.length; k++) {
             const f = audioFiles[k];
@@ -18414,11 +18816,22 @@
       document.addEventListener('webkitfullscreenchange', onFullscreenStateChanged);
 
       // ==================== GITHUB / PWA SOFTWARE UPDATE CHECK & APPLY ====================
-      const APP_VERSION = 'v38';
+      const APP_VERSION = 'v39';
 
       // Ordered newest-first; each release appends a new object at the top.
       // Users who skip multiple versions automatically see ALL unseen versions between lastSeen and current.
       const APP_RELEASE_NOTES = [
+        {
+          version: 'v39',
+          verNum: 39,
+          date: '2026/11/23',
+          title: 'ピン記憶の確実な保存改善＆130MB超の大容量MP3の文字起こしに対応',
+          items: [
+            'ピンを作成したあと別ファイルを開いて元のファイルへ戻った際に、長さ取得前（Android端末の一部ファイル等）や切替タイミングでピンが消える不具合を修正し、確実に保存・復元されるようにしました',
+            '文字起こしデータをピン記憶とは別領域へ保存するようにし、長時間の文字起こし後もピン記憶が安定して保持されるようにしました',
+            '130MB超の大容量MP3・M4A・OGG・FLACファイルでも省メモリ分割ストリーム抽出により、スマホAI（Whisper）・Gemini APIのどちらでも文字起こしできるようになりました'
+          ]
+        },
         {
           version: 'v38',
           verNum: 38,
