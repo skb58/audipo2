@@ -8,7 +8,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="Audipo2">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="app-version" content="v31">
+  <meta name="app-version" content="v32">
   <link rel="manifest" href="./manifest.json">
   <title>Audipo風 練習プレイヤー＆レコーダー</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='bg' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%231b2030'/%3E%3Cstop offset='100%25' stop-color='%230d0f15'/%3E%3C/linearGradient%3E%3ClinearGradient id='wv' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0%25' stop-color='%2360c5ff'/%3E%3Cstop offset='100%25' stop-color='%232563eb'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='url(%23bg)'/%3E%3Crect x='1' y='1' width='62' height='62' rx='15' fill='none' stroke='%233b82f6' stroke-opacity='0.3' stroke-width='2'/%3E%3Cg fill='url(%23wv)'%3E%3Crect x='10' y='28' width='4.5' height='12' rx='2.25' opacity='0.6'/%3E%3Crect x='18' y='22' width='4.5' height='24' rx='2.25' opacity='0.85'/%3E%3Crect x='26' y='15' width='4.5' height='36' rx='2.25'/%3E%3Crect x='34' y='21' width='4.5' height='25' rx='2.25' opacity='0.9'/%3E%3Crect x='42' y='26' width='4.5' height='16' rx='2.25' opacity='0.75'/%3E%3Crect x='50' y='30' width='4.5' height='9' rx='2.25' opacity='0.5'/%3E%3C/g%3E%3Cpath d='M36.25 10.5c0-1.4 1.1-2.5 2.5-2.5h5.5c1.4 0 2.5 1.1 2.5 2.5v2.4c0 .8-.3 1.5-.9 2.1l-3.2 3.1c-.6.6-1.6.6-2.2 0l-3.2-3.1c-.6-.6-.9-1.3-.9-2.1v-2.4z' fill='%23facc15'/%3E%3C/svg%3E">
@@ -4378,7 +4378,7 @@
         <div class="modal-section" style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
           <div>
             <div class="sec-title">バージョン情報</div>
-            <div id="settingsVersionLabel" class="engine-desc mono">現在: v31</div>
+            <div id="settingsVersionLabel" class="engine-desc mono">現在: v32</div>
           </div>
           <button id="btnShowReleaseHistory" type="button" class="step-btn" style="color:#93c5fd;border-color:rgba(66,165,245,0.45);">更新履歴を見る</button>
         </div>
@@ -4535,7 +4535,7 @@
           </div>
           <div>
             <h3 id="whatsNewTitle" class="whats-new-title">アップデートのお知らせ</h3>
-            <p id="whatsNewSub" class="whats-new-sub mono">v31 に更新されました</p>
+            <p id="whatsNewSub" class="whats-new-sub mono">v32 に更新されました</p>
           </div>
         </div>
         <button id="btnCloseWhatsNewX" type="button" class="modal-close" aria-label="閉じる">✕</button>
@@ -6807,6 +6807,1683 @@
         };
       }
 
+      // ---------- Universal Zero-OOM Streaming Waveform Builder (MP3 / M4A-MP4 / OGG / FLAC / WebM / ADTS-AAC) ----------
+      function createStreamPyramidAccumulator(sampleRate, estimatedTotalFrames) {
+        const sr = Math.max(8000, Math.round(Number(sampleRate) || 48000));
+        const estFrames = Math.max(sr, Math.round(Number(estimatedTotalFrames) || sr * 60));
+        const baseBin = chooseAdaptiveBaseBin(estFrames);
+        const estBins = Math.max(1, Math.ceil(estFrames / baseBin));
+        let capBins = Math.max(1024, Math.ceil(estBins * 1.1) + 64);
+        let min0 = new Float32Array(capBins);
+        let max0 = new Float32Array(capBins);
+        let curBin = 0;
+        let curInBin = 0;
+        let curLo = 1.0;
+        let curHi = -1.0;
+        let totalSamples = 0;
+        let peak = 0;
+
+        let scratchF32 = null;
+        let scratchI16 = null;
+        let scratchI32 = null;
+        let scratchU8 = null;
+
+        const ensureBinCapacity = (needed) => {
+          if (needed < capBins) return;
+          let nextCap = capBins;
+          while (nextCap <= needed) nextCap = Math.ceil(nextCap * 1.4) + 256;
+          const nMin = new Float32Array(nextCap);
+          const nMax = new Float32Array(nextCap);
+          nMin.set(min0, 0);
+          nMax.set(max0, 0);
+          min0 = nMin;
+          max0 = nMax;
+          capBins = nextCap;
+        };
+
+        const commitSamplePair = (loVal, hiVal) => {
+          if (loVal < curLo) curLo = loVal;
+          if (hiVal > curHi) curHi = hiVal;
+          curInBin++;
+          totalSamples++;
+          if (curInBin >= baseBin) {
+            ensureBinCapacity(curBin);
+            const lo = curLo > curHi ? 0 : curLo;
+            const hi = curLo > curHi ? 0 : curHi;
+            min0[curBin] = lo;
+            max0[curBin] = hi;
+            const a = Math.max(Math.abs(lo), Math.abs(hi));
+            if (a > peak) peak = a;
+            curBin++;
+            curInBin = 0;
+            curLo = 1.0;
+            curHi = -1.0;
+          }
+        };
+
+        const pushPlanarFloat = (ch0, ch1, len) => {
+          if (ch1) {
+            for (let i = 0; i < len; i++) {
+              const v0 = ch0[i];
+              const v1 = ch1[i];
+              commitSamplePair(v0 < v1 ? v0 : v1, v0 > v1 ? v0 : v1);
+            }
+          } else {
+            for (let i = 0; i < len; i++) {
+              const v0 = ch0[i];
+              commitSamplePair(v0, v0);
+            }
+          }
+        };
+
+        const pushAudioBuffer = (audioBuf) => {
+          if (!audioBuf || audioBuf.length <= 0) return;
+          const ch0 = audioBuf.getChannelData(0);
+          const ch1 = audioBuf.numberOfChannels > 1 ? audioBuf.getChannelData(1) : null;
+          pushPlanarFloat(ch0, ch1, audioBuf.length);
+        };
+
+        const pushAudioData = (audioData) => {
+          try {
+            const frames = audioData.numberOfFrames;
+            const chs = Math.max(1, audioData.numberOfChannels);
+            const fmt = String(audioData.format || 'f32-planar');
+            if (frames <= 0) return;
+
+            const isPlanar = fmt.endsWith('-planar');
+            const baseType = isPlanar ? fmt.slice(0, -7) : fmt;
+            const scanCh = Math.min(2, chs);
+
+            if (isPlanar) {
+              const copyPlane = (planeIdx) => {
+                if (baseType === 'f32') {
+                  if (!scratchF32 || scratchF32.length < frames) scratchF32 = new Float32Array(frames);
+                  const view = scratchF32.subarray(0, frames);
+                  audioData.copyTo(view, { planeIndex: planeIdx });
+                  return view;
+                }
+                if (baseType === 's16') {
+                  if (!scratchI16 || scratchI16.length < frames) scratchI16 = new Int16Array(frames);
+                  const view = scratchI16.subarray(0, frames);
+                  audioData.copyTo(view, { planeIndex: planeIdx });
+                  return view;
+                }
+                if (baseType === 's32') {
+                  if (!scratchI32 || scratchI32.length < frames) scratchI32 = new Int32Array(frames);
+                  const view = scratchI32.subarray(0, frames);
+                  audioData.copyTo(view, { planeIndex: planeIdx });
+                  return view;
+                }
+                if (!scratchU8 || scratchU8.length < frames) scratchU8 = new Uint8Array(frames);
+                const view = scratchU8.subarray(0, frames);
+                audioData.copyTo(view, { planeIndex: planeIdx });
+                return view;
+              };
+
+              const scale = baseType === 'f32' ? 1.0
+                : (baseType === 's16' ? 0.000030517578125
+                : (baseType === 's32' ? 4.656612873077393e-10 : 0.0078125));
+              const offsetU8 = baseType === 'u8' ? 128 : 0;
+
+              // Copy plane 0 into a dedicated buffer if stereo so plane 1 doesn't overwrite it
+              const p0Raw = copyPlane(0);
+              if (scanCh === 2) {
+                const p0Copy = p0Raw.slice(0);
+                const p1Raw = copyPlane(1);
+                if (baseType === 'f32') {
+                  pushPlanarFloat(p0Copy, p1Raw, frames);
+                } else {
+                  for (let i = 0; i < frames; i++) {
+                    const v0 = (p0Copy[i] - offsetU8) * scale;
+                    const v1 = (p1Raw[i] - offsetU8) * scale;
+                    commitSamplePair(v0 < v1 ? v0 : v1, v0 > v1 ? v0 : v1);
+                  }
+                }
+              } else {
+                if (baseType === 'f32') {
+                  pushPlanarFloat(p0Raw, null, frames);
+                } else {
+                  for (let i = 0; i < frames; i++) {
+                    const v0 = (p0Raw[i] - offsetU8) * scale;
+                    commitSamplePair(v0, v0);
+                  }
+                }
+              }
+            } else {
+              const totalVals = frames * chs;
+              const scale = baseType === 'f32' ? 1.0
+                : (baseType === 's16' ? 0.000030517578125
+                : (baseType === 's32' ? 4.656612873077393e-10 : 0.0078125));
+              const offsetU8 = baseType === 'u8' ? 128 : 0;
+              let buf;
+              if (baseType === 'f32') {
+                if (!scratchF32 || scratchF32.length < totalVals) scratchF32 = new Float32Array(totalVals);
+                buf = scratchF32.subarray(0, totalVals);
+              } else if (baseType === 's16') {
+                if (!scratchI16 || scratchI16.length < totalVals) scratchI16 = new Int16Array(totalVals);
+                buf = scratchI16.subarray(0, totalVals);
+              } else if (baseType === 's32') {
+                if (!scratchI32 || scratchI32.length < totalVals) scratchI32 = new Int32Array(totalVals);
+                buf = scratchI32.subarray(0, totalVals);
+              } else {
+                if (!scratchU8 || scratchU8.length < totalVals) scratchU8 = new Uint8Array(totalVals);
+                buf = scratchU8.subarray(0, totalVals);
+              }
+              audioData.copyTo(buf, { planeIndex: 0 });
+              if (scanCh === 2) {
+                for (let f = 0; f < frames; f++) {
+                  const idx = f * chs;
+                  const v0 = (buf[idx] - offsetU8) * scale;
+                  const v1 = (buf[idx + 1] - offsetU8) * scale;
+                  commitSamplePair(v0 < v1 ? v0 : v1, v0 > v1 ? v0 : v1);
+                }
+              } else {
+                for (let f = 0; f < frames; f++) {
+                  const v0 = (buf[f * chs] - offsetU8) * scale;
+                  commitSamplePair(v0, v0);
+                }
+              }
+            }
+          } finally {
+            try { audioData.close(); } catch (_) {}
+          }
+        };
+
+        const snapshot = (isFinal) => {
+          if (isFinal) {
+            if (curInBin > 0) {
+              ensureBinCapacity(curBin);
+              const lo = curLo > curHi ? 0 : curLo;
+              const hi = curLo > curHi ? 0 : curHi;
+              min0[curBin] = lo;
+              max0[curBin] = hi;
+              const a = Math.max(Math.abs(lo), Math.abs(hi));
+              if (a > peak) peak = a;
+              curBin++;
+              curInBin = 0;
+              curLo = 1.0;
+              curHi = -1.0;
+            }
+            const finalBins = Math.max(1, curBin);
+            const mMin = min0.slice(0, finalBins);
+            const mMax = max0.slice(0, finalBins);
+            const levels = buildUpperPyramidLevels(baseBin, mMin, mMax);
+            const finalSamples = Math.max(1, totalSamples);
+            return {
+              sampleRate: sr,
+              totalSamples: finalSamples,
+              duration: finalSamples / sr,
+              peak,
+              levels
+            };
+          }
+          const spanBins = Math.max(estBins, curBin + 1);
+          ensureBinCapacity(spanBins);
+          const viewMin = min0.subarray(0, spanBins);
+          const viewMax = max0.subarray(0, spanBins);
+          const levels = buildUpperPyramidLevels(baseBin, viewMin, viewMax);
+          const totalS = Math.max(estFrames, totalSamples);
+          return {
+            sampleRate: sr,
+            totalSamples: totalS,
+            scannedSamples: totalSamples,
+            duration: totalS / sr,
+            peak: Math.max(peak, 0.02),
+            levels
+          };
+        };
+
+        return {
+          get sampleRate() { return sr; },
+          get totalSamples() { return totalSamples; },
+          pushAudioBuffer,
+          pushAudioData,
+          snapshot
+        };
+      }
+
+      // ---------- Helper: WebCodecs AudioDecoder with Backpressure ----------
+      async function createWebCodecsDecoderRunner(config, onAudioData) {
+        if (typeof AudioDecoder === 'undefined' || typeof EncodedAudioChunk === 'undefined') {
+          return null;
+        }
+        try {
+          const sup = await AudioDecoder.isConfigSupported(config);
+          if (!sup || !sup.supported) return null;
+        } catch (_) {
+          return null;
+        }
+
+        let fatalError = null;
+        let drainResolve = null;
+
+        const decoder = new AudioDecoder({
+          output: (audioData) => {
+            onAudioData(audioData);
+            if (drainResolve && decoder.decodeQueueSize <= 12) {
+              const fn = drainResolve;
+              drainResolve = null;
+              fn();
+            }
+          },
+          error: (err) => {
+            fatalError = err || new Error('AudioDecoder error');
+            if (drainResolve) {
+              const fn = drainResolve;
+              drainResolve = null;
+              fn();
+            }
+          }
+        });
+
+        decoder.configure(config);
+
+        return {
+          async decodeChunk(bytes, timestampUs, durationUs) {
+            if (fatalError) throw fatalError;
+            const chunk = new EncodedAudioChunk({
+              type: 'key',
+              timestamp: Math.max(0, Math.round(timestampUs)),
+              duration: durationUs > 0 ? Math.round(durationUs) : undefined,
+              data: bytes
+            });
+            decoder.decode(chunk);
+            if (decoder.decodeQueueSize >= 28) {
+              await new Promise((resolve) => {
+                drainResolve = resolve;
+                setTimeout(() => {
+                  if (drainResolve === resolve) {
+                    drainResolve = null;
+                    resolve();
+                  }
+                }, 40);
+              });
+            }
+            if (fatalError) throw fatalError;
+          },
+          async flushAndClose() {
+            try {
+              if (!fatalError && decoder.state === 'configured') {
+                await decoder.flush();
+              }
+            } finally {
+              try { if (decoder.state !== 'closed') decoder.close(); } catch (_) {}
+            }
+            if (fatalError) throw fatalError;
+          },
+          abort() {
+            try { if (decoder.state !== 'closed') decoder.close(); } catch (_) {}
+          }
+        };
+      }
+
+      // ---------- 1. MP3 Frame Header Parser & Zero-OOM Streaming Decoder ----------
+      function parseMp3FrameHeader(u8, off) {
+        if (off + 4 > u8.length) return null;
+        if (u8[off] !== 0xff || (u8[off + 1] & 0xe0) !== 0xe0) return null;
+        const b1 = u8[off + 1];
+        const b2 = u8[off + 2];
+        const b3 = u8[off + 3];
+        const verId = (b1 >> 3) & 3;
+        const layerBits = (b1 >> 1) & 3;
+        if (verId === 1 || layerBits === 0) return null;
+        const brIdx = (b2 >> 4) & 0x0f;
+        const srIdx = (b2 >> 2) & 0x03;
+        if (brIdx === 0 || brIdx === 15 || srIdx === 3) return null;
+        const padding = (b2 >> 1) & 1;
+        const channels = ((b3 >> 6) & 3) === 3 ? 1 : 2;
+
+        const srMap = {
+          3: [44100, 48000, 32000],
+          2: [22050, 24000, 16000],
+          0: [11025, 12000, 8000]
+        };
+        const sampleRate = srMap[verId][srIdx];
+
+        let brTbl;
+        if (verId === 3) {
+          brTbl = layerBits === 3
+            ? [0, 32, 64, 96, 128, 160, 192, 224, 256, 288, 320, 352, 384, 416, 448]
+            : (layerBits === 2
+              ? [0, 32, 48, 56, 64, 80, 96, 112, 128, 160, 192, 224, 256, 320, 384]
+              : [0, 32, 40, 48, 56, 64, 80, 96, 112, 128, 160, 192, 224, 256, 320]);
+        } else {
+          brTbl = layerBits === 3
+            ? [0, 32, 48, 56, 64, 80, 96, 112, 128, 144, 160, 176, 192, 224, 256]
+            : [0, 8, 16, 24, 32, 40, 48, 56, 64, 80, 96, 112, 128, 144, 160];
+        }
+        const bitrate = brTbl[brIdx] * 1000;
+        let frameLen, samples;
+        if (layerBits === 3) {
+          frameLen = (Math.floor((12 * bitrate) / sampleRate) + padding) * 4;
+          samples = 384;
+        } else if (layerBits === 2) {
+          frameLen = Math.floor((144 * bitrate) / sampleRate) + padding;
+          samples = 1152;
+        } else {
+          frameLen = Math.floor(((verId === 3 ? 144 : 72) * bitrate) / sampleRate) + padding;
+          samples = verId === 3 ? 1152 : 576;
+        }
+        if (frameLen < 16 || frameLen > 4096) return null;
+        return { verId, layerBits, sampleRate, bitrate, channels, frameLen, samples };
+      }
+
+      async function findMp3StreamStart(blob) {
+        let pos = 0;
+        if (blob.size >= 10) {
+          const head = new Uint8Array(await blob.slice(0, 10).arrayBuffer());
+          if (head[0] === 0x49 && head[1] === 0x44 && head[2] === 0x33) { // 'ID3'
+            const flags = head[5];
+            const tagSize = ((head[6] & 0x7f) << 21) | ((head[7] & 0x7f) << 14) | ((head[8] & 0x7f) << 7) | (head[9] & 0x7f);
+            pos = 10 + tagSize + ((flags & 0x10) ? 10 : 0);
+          }
+        }
+        const probeEnd = Math.min(blob.size, pos + 262144);
+        if (probeEnd <= pos + 8) return null;
+        const buf = new Uint8Array(await blob.slice(pos, probeEnd).arrayBuffer());
+        for (let i = 0; i + 8 < buf.length; i++) {
+          const h1 = parseMp3FrameHeader(buf, i);
+          if (!h1) continue;
+          if (i + h1.frameLen + 4 <= buf.length) {
+            const h2 = parseMp3FrameHeader(buf, i + h1.frameLen);
+            if (h2 && h2.verId === h1.verId && h2.layerBits === h1.layerBits && h2.sampleRate === h1.sampleRate) {
+              return { startOffset: pos + i, header: h1 };
+            }
+          }
+        }
+        return null;
+      }
+
+      async function buildMp3StreamPyramidAsync(blob, durationHint, onProgress, onPartialPyramid, isCancelled) {
+        const info = await findMp3StreamStart(blob);
+        if (!info) return null;
+        if (isCancelled && isCancelled()) return null;
+
+        const { startOffset, header } = info;
+        const sr = header.sampleRate;
+        const ch = header.channels;
+        const estFrames = Math.max(sr, Math.round((durationHint > 0 ? durationHint : (blob.size * 8 / Math.max(32000, header.bitrate))) * sr));
+        const acc = createStreamPyramidAccumulator(sr, estFrames);
+
+        // Try WebCodecs AudioDecoder ('mp3') first; fall back automatically to chunked decodeAudioData
+        let wcRunner = null;
+        if (header.layerBits === 1) {
+          wcRunner = await createWebCodecsDecoderRunner(
+            { codec: 'mp3', sampleRate: sr, numberOfChannels: ch },
+            (audioData) => acc.pushAudioData(audioData)
+          );
+        }
+
+        const chunkBytes = 2 * 1024 * 1024;
+        const startPerf = performance.now();
+        let lastPartialPerf = startPerf;
+        let filePos = startOffset;
+        let carry = new Uint8Array(0);
+        let fedSamples = 0;
+
+        // Helper for chunked decodeAudioData fallback (frame-aligned ~1.5MB slices)
+        const runChunkedFallback = async (resumeOffset) => {
+          initAudioGraph();
+          const fbAcc = resumeOffset === startOffset ? acc : createStreamPyramidAccumulator(sr, estFrames);
+          let fPos = resumeOffset;
+          let rem = new Uint8Array(0);
+          const batchTargetBytes = 1536 * 1024;
+          let batchParts = [];
+          let batchLen = 0;
+
+          const flushBatch = async () => {
+            if (batchLen < 32) { batchParts = []; batchLen = 0; return; }
+            const combined = new Uint8Array(batchLen);
+            let off = 0;
+            for (let i = 0; i < batchParts.length; i++) {
+              combined.set(batchParts[i], off);
+              off += batchParts[i].length;
+            }
+            batchParts = [];
+            batchLen = 0;
+            try {
+              const decoded = await audioCtx.decodeAudioData(combined.buffer);
+              fbAcc.pushAudioBuffer(decoded);
+            } catch (e) {
+              console.warn('MP3 chunk decode skipped:', e);
+            }
+          };
+
+          while (fPos < blob.size) {
+            if (isCancelled && isCancelled()) return null;
+            const end = Math.min(blob.size, fPos + chunkBytes);
+            const slice = new Uint8Array(await blob.slice(fPos, end).arrayBuffer());
+            fPos = end;
+            if (isCancelled && isCancelled()) return null;
+
+            let data;
+            if (rem.length > 0) {
+              data = new Uint8Array(rem.length + slice.length);
+              data.set(rem, 0);
+              data.set(slice, rem.length);
+            } else {
+              data = slice;
+            }
+
+            let off = 0;
+            while (off + 4 <= data.length) {
+              // Stop at ID3v1 'TAG' footer near end of file
+              if (fPos >= blob.size && off + 128 === data.length && data[off] === 0x54 && data[off + 1] === 0x41 && data[off + 2] === 0x47) {
+                off = data.length;
+                break;
+              }
+              const h = parseMp3FrameHeader(data, off);
+              if (!h || h.verId !== header.verId || h.layerBits !== header.layerBits || h.sampleRate !== sr) {
+                off++;
+                continue;
+              }
+              if (off + h.frameLen > data.length) break;
+              const frameSlice = data.slice(off, off + h.frameLen);
+              batchParts.push(frameSlice);
+              batchLen += frameSlice.length;
+              off += h.frameLen;
+
+              if (batchLen >= batchTargetBytes) {
+                await flushBatch();
+                if (isCancelled && isCancelled()) return null;
+              }
+            }
+            rem = off < data.length ? data.slice(off) : new Uint8Array(0);
+
+            const now = performance.now();
+            const frac = Math.min(0.98, (fPos - startOffset) / Math.max(1, blob.size - startOffset));
+            const elapsed = Math.max(0.02, (now - startPerf) / 1000);
+            const eta = frac > 0.02 ? elapsed * (1 - frac) / frac : null;
+            if (onProgress) onProgress(frac * 0.96, eta);
+            if (onPartialPyramid && now - lastPartialPerf >= 260 && fbAcc.totalSamples > 0) {
+              lastPartialPerf = now;
+              onPartialPyramid(fbAcc.snapshot(false));
+            }
+            await new Promise(r => setTimeout(r, 0));
+          }
+
+          await flushBatch();
+          if (isCancelled && isCancelled()) return null;
+          if (fbAcc.totalSamples <= 0) return null;
+          if (onProgress) onProgress(1.0, 0);
+          return fbAcc.snapshot(true);
+        };
+
+        if (!wcRunner) {
+          return await runChunkedFallback(startOffset);
+        }
+
+        try {
+          while (filePos < blob.size) {
+            if (isCancelled && isCancelled()) {
+              wcRunner.abort();
+              return null;
+            }
+            const end = Math.min(blob.size, filePos + chunkBytes);
+            const slice = new Uint8Array(await blob.slice(filePos, end).arrayBuffer());
+            filePos = end;
+            if (isCancelled && isCancelled()) {
+              wcRunner.abort();
+              return null;
+            }
+
+            let data;
+            if (carry.length > 0) {
+              data = new Uint8Array(carry.length + slice.length);
+              data.set(carry, 0);
+              data.set(slice, carry.length);
+            } else {
+              data = slice;
+            }
+
+            let off = 0;
+            let frameCounter = 0;
+            while (off + 4 <= data.length) {
+              if (filePos >= blob.size && off + 128 === data.length && data[off] === 0x54 && data[off + 1] === 0x41 && data[off + 2] === 0x47) {
+                off = data.length;
+                break;
+              }
+              const h = parseMp3FrameHeader(data, off);
+              if (!h || h.verId !== header.verId || h.layerBits !== header.layerBits || h.sampleRate !== sr) {
+                off++;
+                continue;
+              }
+              if (off + h.frameLen > data.length) break;
+
+              const frameBytes = data.subarray(off, off + h.frameLen);
+              const tsUs = (fedSamples / sr) * 1e6;
+              const durUs = (h.samples / sr) * 1e6;
+              await wcRunner.decodeChunk(frameBytes, tsUs, durUs);
+              fedSamples += h.samples;
+              off += h.frameLen;
+              frameCounter++;
+
+              if ((frameCounter & 127) === 0) {
+                if (isCancelled && isCancelled()) {
+                  wcRunner.abort();
+                  return null;
+                }
+                const now = performance.now();
+                if (onPartialPyramid && now - lastPartialPerf >= 260 && acc.totalSamples > 0) {
+                  lastPartialPerf = now;
+                  onPartialPyramid(acc.snapshot(false));
+                }
+              }
+            }
+            carry = off < data.length ? data.slice(off) : new Uint8Array(0);
+
+            const now = performance.now();
+            const frac = Math.min(0.98, (filePos - startOffset) / Math.max(1, blob.size - startOffset));
+            const elapsed = Math.max(0.02, (now - startPerf) / 1000);
+            const eta = frac > 0.02 ? elapsed * (1 - frac) / frac : null;
+            if (onProgress) onProgress(frac * 0.96, eta);
+            if (onPartialPyramid && now - lastPartialPerf >= 260 && acc.totalSamples > 0) {
+              lastPartialPerf = now;
+              onPartialPyramid(acc.snapshot(false));
+            }
+            await new Promise(r => setTimeout(r, 0));
+          }
+
+          await wcRunner.flushAndClose();
+          if (isCancelled && isCancelled()) return null;
+          if (acc.totalSamples <= 0) {
+            return await runChunkedFallback(startOffset);
+          }
+          if (onProgress) onProgress(1.0, 0);
+          return acc.snapshot(true);
+        } catch (wcErr) {
+          console.warn('WebCodecs MP3 stream failed, switching to chunked decodeAudioData:', wcErr);
+          wcRunner.abort();
+          if (isCancelled && isCancelled()) return null;
+          return await runChunkedFallback(startOffset);
+        }
+      }
+
+      // ---------- 2. ISO BMFF (M4A / MP4: AAC / Opus / FLAC / MP3) Zero-OOM Streaming Decoder ----------
+      function readMp4BoxHeaderFromView(dv, u8, pos, end) {
+        if (pos + 8 > end) return null;
+        let size = dv.getUint32(pos, false);
+        const type = String.fromCharCode(u8[pos + 4], u8[pos + 5], u8[pos + 6], u8[pos + 7]);
+        let hdrLen = 8;
+        if (size === 1) {
+          if (pos + 16 > end) return null;
+          const hi = dv.getUint32(pos + 8, false);
+          const lo = dv.getUint32(pos + 12, false);
+          size = hi * 4294967296 + lo;
+          hdrLen = 16;
+        } else if (size === 0) {
+          size = end - pos;
+        }
+        if (size < hdrLen || pos + size > end) return null;
+        return { type, start: pos, dataStart: pos + hdrLen, end: pos + size, size };
+      }
+
+      function parseEsdsBox(u8, start, end) {
+        let p = start + 4; // skip fullbox version/flags
+        const readDescLen = () => {
+          let len = 0;
+          for (let i = 0; i < 4 && p < end; i++) {
+            const b = u8[p++];
+            len = (len << 7) | (b & 0x7f);
+            if ((b & 0x80) === 0) break;
+          }
+          return len;
+        };
+        let objTypeId = 0x40;
+        let asc = null;
+        while (p + 2 <= end) {
+          const tag = u8[p++];
+          const len = readDescLen();
+          const bodyEnd = Math.min(end, p + len);
+          if (tag === 0x03) { // ES_DescrTag
+            p += 2; // ES_ID
+            if (p < bodyEnd) {
+              const fl = u8[p++];
+              if (fl & 0x80) p += 2;
+              if (fl & 0x40 && p < bodyEnd) p += 1 + u8[p];
+              if (fl & 0x20) p += 2;
+            }
+          } else if (tag === 0x04) { // DecoderConfigDescrTag
+            if (p < bodyEnd) objTypeId = u8[p];
+            p += 13;
+          } else if (tag === 0x05) { // DecSpecificInfoTag
+            asc = u8.slice(p, bodyEnd);
+            p = bodyEnd;
+          } else {
+            p = bodyEnd;
+          }
+        }
+        return { objTypeId, asc };
+      }
+
+      function parseMp4MoovAudioTrack(moovAb) {
+        const u8 = new Uint8Array(moovAb);
+        const dv = new DataView(moovAb);
+        const rootEnd = u8.length;
+
+        const findChildBoxes = (s, e, wantType = null) => {
+          const out = [];
+          let p = s;
+          while (p + 8 <= e) {
+            const b = readMp4BoxHeaderFromView(dv, u8, p, e);
+            if (!b) break;
+            if (!wantType || b.type === wantType) out.push(b);
+            p = b.end;
+          }
+          return out;
+        };
+
+        const traks = findChildBoxes(0, rootEnd, 'trak');
+        for (const trak of traks) {
+          const mdia = findChildBoxes(trak.dataStart, trak.end, 'mdia')[0];
+          if (!mdia) continue;
+          const hdlr = findChildBoxes(mdia.dataStart, mdia.end, 'hdlr')[0];
+          if (!hdlr || hdlr.dataStart + 12 > hdlr.end) continue;
+          const hType = String.fromCharCode(
+            u8[hdlr.dataStart + 8], u8[hdlr.dataStart + 9],
+            u8[hdlr.dataStart + 10], u8[hdlr.dataStart + 11]
+          );
+          if (hType !== 'soun') continue;
+
+          const mdhd = findChildBoxes(mdia.dataStart, mdia.end, 'mdhd')[0];
+          let timescale = 48000;
+          let mdDuration = 0;
+          if (mdhd && mdhd.dataStart + 20 <= mdhd.end) {
+            const ver = u8[mdhd.dataStart];
+            if (ver === 1 && mdhd.dataStart + 32 <= mdhd.end) {
+              timescale = dv.getUint32(mdhd.dataStart + 20, false) || 48000;
+              mdDuration = dv.getUint32(mdhd.dataStart + 24, false) * 4294967296 + dv.getUint32(mdhd.dataStart + 28, false);
+            } else {
+              timescale = dv.getUint32(mdhd.dataStart + 12, false) || 48000;
+              mdDuration = dv.getUint32(mdhd.dataStart + 16, false);
+            }
+          }
+
+          const minf = findChildBoxes(mdia.dataStart, mdia.end, 'minf')[0];
+          if (!minf) continue;
+          const stbl = findChildBoxes(minf.dataStart, minf.end, 'stbl')[0];
+          if (!stbl) continue;
+
+          const stsd = findChildBoxes(stbl.dataStart, stbl.end, 'stsd')[0];
+          const stts = findChildBoxes(stbl.dataStart, stbl.end, 'stts')[0];
+          const stsc = findChildBoxes(stbl.dataStart, stbl.end, 'stsc')[0];
+          const stsz = findChildBoxes(stbl.dataStart, stbl.end, 'stsz')[0];
+          const stco = findChildBoxes(stbl.dataStart, stbl.end, 'stco')[0];
+          const co64 = findChildBoxes(stbl.dataStart, stbl.end, 'co64')[0];
+          if (!stsd || !stsc || !stsz || (!stco && !co64)) continue;
+
+          // Parse stsd first entry
+          const entry = readMp4BoxHeaderFromView(dv, u8, stsd.dataStart + 8, stsd.end);
+          if (!entry || entry.dataStart + 28 > entry.end) continue;
+          const entryVer = dv.getUint16(entry.dataStart + 8, false);
+          let channels = dv.getUint16(entry.dataStart + 16, false) || 2;
+          let sampleRate = (dv.getUint32(entry.dataStart + 24, false) >>> 16) || timescale;
+          let subStart = entry.dataStart + 28;
+          if (entryVer === 1) subStart += 16;
+          else if (entryVer === 2) subStart += 36;
+
+          let codec = '';
+          let description = null;
+          let isAac = false;
+
+          if (entry.type === 'mp4a') {
+            const esdsBox = findChildBoxes(subStart, entry.end, 'esds')[0];
+            let objTypeId = 0x40;
+            if (esdsBox) {
+              const parsed = parseEsdsBox(u8, esdsBox.dataStart, esdsBox.end);
+              objTypeId = parsed.objTypeId;
+              description = parsed.asc;
+            }
+            if (objTypeId === 0x69 || objTypeId === 0x6b) {
+              codec = 'mp3';
+            } else {
+              isAac = true;
+              let aot = 2;
+              if (description && description.length >= 2) {
+                aot = (description[0] >> 3) & 0x1f;
+                const srIdx = ((description[0] & 0x07) << 1) | ((description[1] >> 7) & 1);
+                const srTbl = [96000, 88200, 64000, 48000, 44100, 32000, 24000, 22050, 16000, 12000, 11025, 8000, 7350];
+                if (srIdx < srTbl.length) sampleRate = srTbl[srIdx];
+                const chCfg = (description[1] >> 3) & 0x0f;
+                if (chCfg >= 1 && chCfg <= 2) channels = chCfg;
+              }
+              codec = `mp4a.40.${aot || 2}`;
+            }
+          } else if (entry.type === 'Opus') {
+            codec = 'opus';
+            sampleRate = 48000;
+            const dops = findChildBoxes(subStart, entry.end, 'dOps')[0];
+            if (dops && dops.dataStart + 11 <= dops.end) {
+              channels = u8[dops.dataStart + 1] || channels;
+            }
+          } else if (entry.type === 'fLaC') {
+            codec = 'flac';
+            const dfla = findChildBoxes(subStart, entry.end, 'dfLa')[0];
+            if (dfla && dfla.dataStart + 4 < dfla.end) {
+              const body = u8.subarray(dfla.dataStart + 4, dfla.end);
+              description = new Uint8Array(4 + body.length);
+              description[0] = 0x66; description[1] = 0x4c; description[2] = 0x61; description[3] = 0x43;
+              description.set(body, 4);
+            }
+          } else if (entry.type === '.mp3') {
+            codec = 'mp3';
+          } else {
+            continue;
+          }
+
+          // Parse stsz
+          const uniformSize = dv.getUint32(stsz.dataStart + 4, false);
+          const sampleCount = dv.getUint32(stsz.dataStart + 8, false);
+          if (sampleCount <= 0) continue;
+          let sampleSizes = null;
+          if (uniformSize === 0) {
+            sampleSizes = new Uint32Array(sampleCount);
+            const szOff = stsz.dataStart + 12;
+            for (let i = 0; i < sampleCount; i++) {
+              sampleSizes[i] = dv.getUint32(szOff + i * 4, false);
+            }
+          }
+
+          // Parse stco / co64
+          const chunkOffsets = [];
+          if (co64) {
+            const cnt = dv.getUint32(co64.dataStart + 4, false);
+            const cOff = co64.dataStart + 8;
+            for (let i = 0; i < cnt; i++) {
+              const hi = dv.getUint32(cOff + i * 8, false);
+              const lo = dv.getUint32(cOff + i * 8 + 4, false);
+              chunkOffsets.push(hi * 4294967296 + lo);
+            }
+          } else {
+            const cnt = dv.getUint32(stco.dataStart + 4, false);
+            const cOff = stco.dataStart + 8;
+            for (let i = 0; i < cnt; i++) {
+              chunkOffsets.push(dv.getUint32(cOff + i * 4, false));
+            }
+          }
+
+          // Parse stsc
+          const stscCount = dv.getUint32(stsc.dataStart + 4, false);
+          const stscEntries = [];
+          const scOff = stsc.dataStart + 8;
+          for (let i = 0; i < stscCount; i++) {
+            stscEntries.push({
+              firstChunk: dv.getUint32(scOff + i * 12, false),
+              samplesPerChunk: dv.getUint32(scOff + i * 12 + 4, false)
+            });
+          }
+
+          // Parse stts
+          const sttsEntries = [];
+          if (stts && stts.dataStart + 8 <= stts.end) {
+            const cnt = dv.getUint32(stts.dataStart + 4, false);
+            const tOff = stts.dataStart + 8;
+            for (let i = 0; i < cnt; i++) {
+              sttsEntries.push({
+                count: dv.getUint32(tOff + i * 8, false),
+                delta: dv.getUint32(tOff + i * 8 + 4, false)
+              });
+            }
+          }
+
+          return {
+            codec,
+            isAac,
+            description,
+            channels: Math.min(2, Math.max(1, channels)),
+            sampleRate,
+            timescale,
+            durationSec: mdDuration > 0 ? mdDuration / timescale : 0,
+            sampleCount,
+            uniformSize,
+            sampleSizes,
+            chunkOffsets,
+            stscEntries,
+            sttsEntries
+          };
+        }
+        return null;
+      }
+
+      async function buildMp4StreamPyramidAsync(blob, durationHint, onProgress, onPartialPyramid, isCancelled) {
+        // Locate moov box via top-level 16-byte header hops (never loads mdat into RAM)
+        let pos = 0;
+        let moovRange = null;
+        let guard = 0;
+        while (pos + 8 <= blob.size && guard < 128) {
+          guard++;
+          const hdrAb = await blob.slice(pos, Math.min(blob.size, pos + 16)).arrayBuffer();
+          if (hdrAb.byteLength < 8) break;
+          const dv = new DataView(hdrAb);
+          const u8 = new Uint8Array(hdrAb);
+          let size = dv.getUint32(0, false);
+          const type = String.fromCharCode(u8[4], u8[5], u8[6], u8[7]);
+          let hdrLen = 8;
+          if (size === 1 && hdrAb.byteLength >= 16) {
+            size = dv.getUint32(8, false) * 4294967296 + dv.getUint32(12, false);
+            hdrLen = 16;
+          } else if (size === 0) {
+            size = blob.size - pos;
+          }
+          if (size < hdrLen) break;
+          if (type === 'moov') {
+            moovRange = { start: pos + hdrLen, end: Math.min(blob.size, pos + size) };
+            break;
+          }
+          pos += size;
+        }
+        if (!moovRange || (moovRange.end - moovRange.start) > 48 * 1024 * 1024) return null;
+        if (isCancelled && isCancelled()) return null;
+
+        const moovAb = await blob.slice(moovRange.start, moovRange.end).arrayBuffer();
+        const track = parseMp4MoovAudioTrack(moovAb);
+        if (!track) return null;
+
+        const sr = track.sampleRate;
+        const durSec = track.durationSec > 0 ? track.durationSec : (durationHint > 0 ? durationHint : 60);
+        const estFrames = Math.max(sr, Math.round(durSec * sr));
+        const acc = createStreamPyramidAccumulator(sr, estFrames);
+
+        // Expand chunk map into compact per-chunk descriptors: { offset, firstSample, sampleCount, totalBytes }
+        const chunks = [];
+        const numChunks = track.chunkOffsets.length;
+        let sampleIdx = 0;
+        let scIdx = 0;
+        for (let c = 0; c < numChunks && sampleIdx < track.sampleCount; c++) {
+          const chunkNum1 = c + 1;
+          while (scIdx + 1 < track.stscEntries.length && track.stscEntries[scIdx + 1].firstChunk <= chunkNum1) {
+            scIdx++;
+          }
+          const spc = track.stscEntries[scIdx] ? track.stscEntries[scIdx].samplesPerChunk : 1;
+          const cnt = Math.min(spc, track.sampleCount - sampleIdx);
+          let bytes = 0;
+          if (track.uniformSize > 0) {
+            bytes = cnt * track.uniformSize;
+          } else {
+            for (let k = 0; k < cnt; k++) bytes += track.sampleSizes[sampleIdx + k];
+          }
+          chunks.push({ offset: track.chunkOffsets[c], firstSample: sampleIdx, count: cnt, bytes });
+          sampleIdx += cnt;
+        }
+        if (chunks.length === 0) return null;
+
+        const decCfg = {
+          codec: track.codec,
+          sampleRate: sr,
+          numberOfChannels: track.channels
+        };
+        if (track.description && track.description.length > 0) {
+          decCfg.description = track.description;
+        }
+        let wcRunner = await createWebCodecsDecoderRunner(decCfg, (ad) => acc.pushAudioData(ad));
+
+        // Build per-sample default duration helper from stts
+        let sttsCursor = 0;
+        let sttsUsedInEntry = 0;
+        const nextSampleDelta = () => {
+          while (sttsCursor < track.sttsEntries.length && sttsUsedInEntry >= track.sttsEntries[sttsCursor].count) {
+            sttsCursor++;
+            sttsUsedInEntry = 0;
+          }
+          if (sttsCursor < track.sttsEntries.length) {
+            sttsUsedInEntry++;
+            return track.sttsEntries[sttsCursor].delta || 1024;
+          }
+          return 1024;
+        };
+
+        const startPerf = performance.now();
+        let lastPartialPerf = startPerf;
+
+        // Fallback: chunked mini-M4A decodeAudioData for AAC when WebCodecs isn't available
+        const runAacMiniM4aFallback = async () => {
+          if (!track.isAac) return null;
+          initAudioGraph();
+          const fbAcc = createStreamPyramidAccumulator(sr, estFrames);
+          let pendingFrames = [];
+          let pendingBytes = 0;
+
+          const flushMiniM4a = async () => {
+            if (pendingFrames.length === 0) return;
+            const miniBlob = muxAacToM4a(pendingFrames, sr, track.channels, 192000, track.description);
+            pendingFrames = [];
+            pendingBytes = 0;
+            try {
+              const ab = await miniBlob.arrayBuffer();
+              const decoded = await audioCtx.decodeAudioData(ab);
+              fbAcc.pushAudioBuffer(decoded);
+            } catch (e) {
+              console.warn('Mini-M4A chunk decode skipped:', e);
+            }
+          };
+
+          let cIdx = 0;
+          while (cIdx < chunks.length) {
+            if (isCancelled && isCancelled()) return null;
+            const readStart = chunks[cIdx].offset;
+            let readEnd = readStart + chunks[cIdx].bytes;
+            let endIdx = cIdx + 1;
+            while (endIdx < chunks.length) {
+              const nc = chunks[endIdx];
+              if (nc.offset < readStart || (nc.offset + nc.bytes - readStart) > 2 * 1024 * 1024) break;
+              if (nc.offset > readEnd + 262144) break;
+              readEnd = Math.max(readEnd, nc.offset + nc.bytes);
+              endIdx++;
+            }
+            const buf = new Uint8Array(await blob.slice(readStart, readEnd).arrayBuffer());
+            for (let k = cIdx; k < endIdx; k++) {
+              const chObj = chunks[k];
+              let relOff = chObj.offset - readStart;
+              for (let s = 0; s < chObj.count; s++) {
+                const sIdx = chObj.firstSample + s;
+                const sz = track.uniformSize > 0 ? track.uniformSize : track.sampleSizes[sIdx];
+                if (relOff + sz <= buf.length && sz > 0) {
+                  pendingFrames.push({ data: buf.slice(relOff, relOff + sz) });
+                  pendingBytes += sz;
+                }
+                relOff += sz;
+                if (pendingFrames.length >= 1600 || pendingBytes >= 1024 * 1024) {
+                  await flushMiniM4a();
+                  if (isCancelled && isCancelled()) return null;
+                }
+              }
+            }
+            cIdx = endIdx;
+            const now = performance.now();
+            const frac = cIdx / chunks.length;
+            const elapsed = Math.max(0.02, (now - startPerf) / 1000);
+            const eta = frac > 0.02 ? elapsed * (1 - frac) / frac : null;
+            if (onProgress) onProgress(frac * 0.96, eta);
+            if (onPartialPyramid && now - lastPartialPerf >= 260 && fbAcc.totalSamples > 0) {
+              lastPartialPerf = now;
+              onPartialPyramid(fbAcc.snapshot(false));
+            }
+            await new Promise(r => setTimeout(r, 0));
+          }
+          await flushMiniM4a();
+          if (isCancelled && isCancelled()) return null;
+          if (fbAcc.totalSamples <= 0) return null;
+          if (onProgress) onProgress(1.0, 0);
+          return fbAcc.snapshot(true);
+        };
+
+        if (!wcRunner) {
+          return await runAacMiniM4aFallback();
+        }
+
+        try {
+          let curTimeTicks = 0;
+          let cIdx = 0;
+          while (cIdx < chunks.length) {
+            if (isCancelled && isCancelled()) {
+              wcRunner.abort();
+              return null;
+            }
+            const readStart = chunks[cIdx].offset;
+            let readEnd = readStart + chunks[cIdx].bytes;
+            let endIdx = cIdx + 1;
+            while (endIdx < chunks.length) {
+              const nc = chunks[endIdx];
+              if (nc.offset < readStart || (nc.offset + nc.bytes - readStart) > 2 * 1024 * 1024) break;
+              if (nc.offset > readEnd + 262144) break;
+              readEnd = Math.max(readEnd, nc.offset + nc.bytes);
+              endIdx++;
+            }
+
+            const buf = new Uint8Array(await blob.slice(readStart, readEnd).arrayBuffer());
+            if (isCancelled && isCancelled()) {
+              wcRunner.abort();
+              return null;
+            }
+
+            let sampleCounter = 0;
+            for (let k = cIdx; k < endIdx; k++) {
+              const chObj = chunks[k];
+              let relOff = chObj.offset - readStart;
+              for (let s = 0; s < chObj.count; s++) {
+                const sIdx = chObj.firstSample + s;
+                const sz = track.uniformSize > 0 ? track.uniformSize : track.sampleSizes[sIdx];
+                const delta = nextSampleDelta();
+                if (relOff + sz <= buf.length && sz > 0) {
+                  const tsUs = (curTimeTicks / track.timescale) * 1e6;
+                  const durUs = (delta / track.timescale) * 1e6;
+                  await wcRunner.decodeChunk(buf.subarray(relOff, relOff + sz), tsUs, durUs);
+                }
+                curTimeTicks += delta;
+                relOff += sz;
+                sampleCounter++;
+                if ((sampleCounter & 127) === 0) {
+                  if (isCancelled && isCancelled()) {
+                    wcRunner.abort();
+                    return null;
+                  }
+                  const now = performance.now();
+                  if (onPartialPyramid && now - lastPartialPerf >= 260 && acc.totalSamples > 0) {
+                    lastPartialPerf = now;
+                    onPartialPyramid(acc.snapshot(false));
+                  }
+                }
+              }
+            }
+
+            cIdx = endIdx;
+            const now = performance.now();
+            const frac = cIdx / chunks.length;
+            const elapsed = Math.max(0.02, (now - startPerf) / 1000);
+            const eta = frac > 0.02 ? elapsed * (1 - frac) / frac : null;
+            if (onProgress) onProgress(frac * 0.96, eta);
+            if (onPartialPyramid && now - lastPartialPerf >= 260 && acc.totalSamples > 0) {
+              lastPartialPerf = now;
+              onPartialPyramid(acc.snapshot(false));
+            }
+            await new Promise(r => setTimeout(r, 0));
+          }
+
+          await wcRunner.flushAndClose();
+          if (isCancelled && isCancelled()) return null;
+          if (acc.totalSamples <= 0) return await runAacMiniM4aFallback();
+          if (onProgress) onProgress(1.0, 0);
+          return acc.snapshot(true);
+        } catch (err) {
+          console.warn('WebCodecs MP4 stream failed, trying fallback:', err);
+          wcRunner.abort();
+          if (isCancelled && isCancelled()) return null;
+          return await runAacMiniM4aFallback();
+        }
+      }
+
+      // ---------- 3. OGG (Opus / Vorbis) Zero-OOM Streaming Decoder ----------
+      function buildVorbisXiphDescription(p0, p1, p2) {
+        const xiph = (len) => {
+          const out = [];
+          let r = len;
+          while (r >= 255) { out.push(255); r -= 255; }
+          out.push(r);
+          return out;
+        };
+        const l0 = xiph(p0.length);
+        const l1 = xiph(p1.length);
+        const desc = new Uint8Array(1 + l0.length + l1.length + p0.length + p1.length + p2.length);
+        let o = 0;
+        desc[o++] = 2;
+        for (let i = 0; i < l0.length; i++) desc[o++] = l0[i];
+        for (let i = 0; i < l1.length; i++) desc[o++] = l1[i];
+        desc.set(p0, o); o += p0.length;
+        desc.set(p1, o); o += p1.length;
+        desc.set(p2, o);
+        return desc;
+      }
+
+      async function buildOggStreamPyramidAsync(blob, durationHint, onProgress, onPartialPyramid, isCancelled) {
+        const chunkBytes = 2 * 1024 * 1024;
+        const startPerf = performance.now();
+        let lastPartialPerf = startPerf;
+        let filePos = 0;
+        let carry = new Uint8Array(0);
+
+        let codecKind = null; // 'opus' | 'vorbis'
+        let sampleRate = 48000;
+        let channels = 2;
+        let headerPackets = [];
+        let acc = null;
+        let wcRunner = null;
+        let pktParts = [];
+        let pktLen = 0;
+        let pktIdx = 0;
+        let prevGranule = 0;
+
+        const finishPacket = async (pkt, pageGranule) => {
+          if (!codecKind) {
+            if (pkt.length >= 19 && pkt[0] === 0x4f && pkt[1] === 0x70 && pkt[2] === 0x75 && pkt[3] === 0x73 && pkt[4] === 0x48) {
+              codecKind = 'opus';
+              channels = Math.min(2, Math.max(1, pkt[9] || 2));
+              sampleRate = 48000;
+              headerPackets.push(pkt);
+              return true;
+            }
+            if (pkt.length >= 28 && pkt[0] === 0x01 && pkt[1] === 0x76 && pkt[2] === 0x6f && pkt[3] === 0x72 && pkt[4] === 0x62 && pkt[5] === 0x69 && pkt[6] === 0x73) {
+              const pdv = new DataView(pkt.buffer, pkt.byteOffset, pkt.byteLength);
+              codecKind = 'vorbis';
+              channels = Math.min(2, Math.max(1, pkt[11] || 2));
+              sampleRate = pdv.getUint32(12, true) || 44100;
+              headerPackets.push(pkt);
+              return true;
+            }
+            return false;
+          }
+
+          if (codecKind === 'opus' && headerPackets.length < 2) {
+            headerPackets.push(pkt);
+            const estFrames = Math.max(sampleRate, Math.round((durationHint > 0 ? durationHint : 60) * sampleRate));
+            acc = createStreamPyramidAccumulator(sampleRate, estFrames);
+            wcRunner = await createWebCodecsDecoderRunner(
+              { codec: 'opus', sampleRate: 48000, numberOfChannels: channels, description: headerPackets[0] },
+              (ad) => acc.pushAudioData(ad)
+            );
+            if (!wcRunner) {
+              // Retry without description (some browsers prefer omitting OpusHead)
+              wcRunner = await createWebCodecsDecoderRunner(
+                { codec: 'opus', sampleRate: 48000, numberOfChannels: channels },
+                (ad) => acc.pushAudioData(ad)
+              );
+            }
+            return Boolean(wcRunner);
+          }
+
+          if (codecKind === 'vorbis' && headerPackets.length < 3) {
+            headerPackets.push(pkt);
+            if (headerPackets.length === 3) {
+              const estFrames = Math.max(sampleRate, Math.round((durationHint > 0 ? durationHint : 60) * sampleRate));
+              acc = createStreamPyramidAccumulator(sampleRate, estFrames);
+              const desc = buildVorbisXiphDescription(headerPackets[0], headerPackets[1], headerPackets[2]);
+              wcRunner = await createWebCodecsDecoderRunner(
+                { codec: 'vorbis', sampleRate, numberOfChannels: channels, description: desc },
+                (ad) => acc.pushAudioData(ad)
+              );
+              return Boolean(wcRunner);
+            }
+            return true;
+          }
+
+          if (!wcRunner) return false;
+          const tsUs = prevGranule > 0 ? (prevGranule / sampleRate) * 1e6 : pktIdx * 20000;
+          await wcRunner.decodeChunk(pkt, tsUs, 0);
+          pktIdx++;
+          if (pageGranule > prevGranule) prevGranule = pageGranule;
+          return true;
+        };
+
+        try {
+          while (filePos < blob.size) {
+            if (isCancelled && isCancelled()) {
+              if (wcRunner) wcRunner.abort();
+              return null;
+            }
+            const end = Math.min(blob.size, filePos + chunkBytes);
+            const slice = new Uint8Array(await blob.slice(filePos, end).arrayBuffer());
+            filePos = end;
+            if (isCancelled && isCancelled()) {
+              if (wcRunner) wcRunner.abort();
+              return null;
+            }
+
+            let data;
+            if (carry.length > 0) {
+              data = new Uint8Array(carry.length + slice.length);
+              data.set(carry, 0);
+              data.set(slice, carry.length);
+            } else {
+              data = slice;
+            }
+
+            let off = 0;
+            while (off + 27 <= data.length) {
+              if (data[off] !== 0x4f || data[off + 1] !== 0x67 || data[off + 2] !== 0x67 || data[off + 3] !== 0x53) {
+                off++;
+                continue;
+              }
+              const segCount = data[off + 26];
+              if (off + 27 + segCount > data.length) break;
+              let payloadBytes = 0;
+              for (let s = 0; s < segCount; s++) payloadBytes += data[off + 27 + s];
+              const pageLen = 27 + segCount + payloadBytes;
+              if (off + pageLen > data.length) break;
+
+              const pdv = new DataView(data.buffer, data.byteOffset + off, 27);
+              const gLo = pdv.getUint32(6, true);
+              const gHi = pdv.getUint32(10, true);
+              const granule = (gHi === 0xffffffff && gLo === 0xffffffff) ? 0 : (gHi * 4294967296 + gLo);
+
+              let pOff = off + 27 + segCount;
+              for (let s = 0; s < segCount; s++) {
+                const segL = data[off + 27 + s];
+                if (segL > 0) {
+                  pktParts.push(data.slice(pOff, pOff + segL));
+                  pktLen += segL;
+                  pOff += segL;
+                }
+                if (segL < 255) {
+                  let fullPkt;
+                  if (pktParts.length === 1) {
+                    fullPkt = pktParts[0];
+                  } else {
+                    fullPkt = new Uint8Array(pktLen);
+                    let po = 0;
+                    for (let j = 0; j < pktParts.length; j++) {
+                      fullPkt.set(pktParts[j], po);
+                      po += pktParts[j].length;
+                    }
+                  }
+                  pktParts = [];
+                  pktLen = 0;
+                  if (fullPkt.length > 0) {
+                    const ok = await finishPacket(fullPkt, granule);
+                    if (!ok) {
+                      if (wcRunner) wcRunner.abort();
+                      return null;
+                    }
+                  }
+                }
+              }
+
+              off += pageLen;
+              const now = performance.now();
+              if (onPartialPyramid && acc && acc.totalSamples > 0 && now - lastPartialPerf >= 260) {
+                lastPartialPerf = now;
+                onPartialPyramid(acc.snapshot(false));
+              }
+            }
+            carry = off < data.length ? data.slice(off) : new Uint8Array(0);
+
+            const now = performance.now();
+            const frac = Math.min(0.98, filePos / Math.max(1, blob.size));
+            const elapsed = Math.max(0.02, (now - startPerf) / 1000);
+            const eta = frac > 0.02 ? elapsed * (1 - frac) / frac : null;
+            if (onProgress) onProgress(frac * 0.96, eta);
+            if (onPartialPyramid && acc && acc.totalSamples > 0 && now - lastPartialPerf >= 260) {
+              lastPartialPerf = now;
+              onPartialPyramid(acc.snapshot(false));
+            }
+            await new Promise(r => setTimeout(r, 0));
+          }
+
+          if (!wcRunner || !acc) return null;
+          await wcRunner.flushAndClose();
+          if (isCancelled && isCancelled()) return null;
+          if (acc.totalSamples <= 0) return null;
+          if (onProgress) onProgress(1.0, 0);
+          return acc.snapshot(true);
+        } catch (err) {
+          console.warn('OGG stream decode failed:', err);
+          if (wcRunner) wcRunner.abort();
+          return null;
+        }
+      }
+
+      // ---------- 4. Native FLAC Zero-OOM Streaming Decoder (Header CRC-8 Frame Sync) ----------
+      const FLAC_CRC8_TABLE = (() => {
+        const tbl = new Uint8Array(256);
+        for (let i = 0; i < 256; i++) {
+          let c = i;
+          for (let b = 0; b < 8; b++) c = (c & 0x80) ? (((c << 1) ^ 0x07) & 0xff) : ((c << 1) & 0xff);
+          tbl[i] = c;
+        }
+        return tbl;
+      })();
+
+      function isValidFlacFrameHeader(u8, off, expectedSr, expectedCh) {
+        if (off + 8 > u8.length) return false;
+        if (u8[off] !== 0xff || (u8[off + 1] & 0xfe) !== 0xf8) return false;
+        const bsCode = (u8[off + 2] >> 4) & 0x0f;
+        const srCode = u8[off + 2] & 0x0f;
+        const chCode = (u8[off + 3] >> 4) & 0x0f;
+        const ssCode = (u8[off + 3] >> 1) & 0x07;
+        const resBit = u8[off + 3] & 1;
+        if (bsCode === 0 || srCode === 15 || chCode > 10 || ssCode === 3 || ssCode === 7 || resBit !== 0) return false;
+
+        // Channel count sanity check
+        const frameCh = chCode <= 7 ? (chCode + 1) : 2;
+        if (expectedCh > 0 && frameCh !== expectedCh) return false;
+
+        // Decode UTF-8 coded frame/sample number starting at off + 4
+        let p = off + 4;
+        const first = u8[p++];
+        let extra = 0;
+        if ((first & 0x80) === 0) extra = 0;
+        else if ((first & 0xe0) === 0xc0) extra = 1;
+        else if ((first & 0xf0) === 0xe0) extra = 2;
+        else if ((first & 0xf8) === 0xf0) extra = 3;
+        else if ((first & 0xfc) === 0xf8) extra = 4;
+        else if ((first & 0xfe) === 0xfc) extra = 5;
+        else if (first === 0xfe) extra = 6;
+        else return false;
+        if (p + extra + 1 > u8.length) return false;
+        for (let k = 0; k < extra; k++) {
+          if ((u8[p++] & 0xc0) !== 0x80) return false;
+        }
+
+        if (bsCode === 6) p += 1;
+        else if (bsCode === 7) p += 2;
+        if (srCode === 12) p += 1;
+        else if (srCode === 13 || srCode === 14) p += 2;
+        if (p >= u8.length) return false;
+
+        // Exact FLAC header CRC-8 verification
+        let crc = 0;
+        for (let i = off; i < p; i++) crc = FLAC_CRC8_TABLE[crc ^ u8[i]];
+        return crc === u8[p];
+      }
+
+      async function buildFlacStreamPyramidAsync(blob, durationHint, onProgress, onPartialPyramid, isCancelled) {
+        if (blob.size < 42) return null;
+        // Parse metadata blocks to extract STREAMINFO & find exact first frame offset
+        let pos = 4;
+        let sampleRate = 48000;
+        let channels = 2;
+        let totalSamplesMeta = 0;
+        let streamInfoBody = null;
+        let guard = 0;
+
+        while (pos + 4 <= blob.size && guard < 64) {
+          guard++;
+          const bh = new Uint8Array(await blob.slice(pos, pos + 4).arrayBuffer());
+          const isLast = (bh[0] & 0x80) !== 0;
+          const bType = bh[0] & 0x7f;
+          const bLen = (bh[1] << 16) | (bh[2] << 8) | bh[3];
+          pos += 4;
+          if (bType === 0 && bLen >= 34 && pos + 34 <= blob.size) {
+            streamInfoBody = new Uint8Array(await blob.slice(pos, pos + 34).arrayBuffer());
+            sampleRate = (streamInfoBody[10] << 12) | (streamInfoBody[11] << 4) | (streamInfoBody[12] >> 4);
+            channels = ((streamInfoBody[12] >> 1) & 0x07) + 1;
+            totalSamplesMeta = ((streamInfoBody[13] & 0x0f) * 4294967296) +
+              ((streamInfoBody[14] << 24) >>> 0) + (streamInfoBody[15] << 16) + (streamInfoBody[16] << 8) + streamInfoBody[17];
+          }
+          pos += bLen;
+          if (isLast) break;
+        }
+        if (!streamInfoBody || sampleRate < 1000) return null;
+        const audioStartOffset = pos;
+
+        // Build minimal standalone 42-byte fLaC + STREAMINFO header (with totalSamples=0 for chunked decodeAudioData fallback)
+        const minFlacHdr = new Uint8Array(42);
+        minFlacHdr[0] = 0x66; minFlacHdr[1] = 0x4c; minFlacHdr[2] = 0x61; minFlacHdr[3] = 0x43; // 'fLaC'
+        minFlacHdr[4] = 0x80; // last metadata block, type 0 (STREAMINFO)
+        minFlacHdr[5] = 0; minFlacHdr[6] = 0; minFlacHdr[7] = 34;
+        minFlacHdr.set(streamInfoBody, 8);
+
+        const minFlacHdrUnknownLen = minFlacHdr.slice(0);
+        minFlacHdrUnknownLen[8 + 13] &= 0xf0;
+        minFlacHdrUnknownLen[8 + 14] = 0;
+        minFlacHdrUnknownLen[8 + 15] = 0;
+        minFlacHdrUnknownLen[8 + 16] = 0;
+        minFlacHdrUnknownLen[8 + 17] = 0;
+
+        const estFrames = totalSamplesMeta > 0 ? totalSamplesMeta : Math.round((durationHint > 0 ? durationHint : 60) * sampleRate);
+        const acc = createStreamPyramidAccumulator(sampleRate, estFrames);
+        const wcRunner = await createWebCodecsDecoderRunner(
+          { codec: 'flac', sampleRate, numberOfChannels: Math.min(2, channels), description: minFlacHdr },
+          (ad) => acc.pushAudioData(ad)
+        );
+
+        const chunkBytes = 2 * 1024 * 1024;
+        const startPerf = performance.now();
+        let lastPartialPerf = startPerf;
+        let filePos = audioStartOffset;
+        let carry = new Uint8Array(0);
+        let frameIndex = 0;
+        let batchParts = [];
+        let batchLen = 0;
+
+        const flushFlacFallbackBatch = async () => {
+          if (batchLen <= 0) return;
+          initAudioGraph();
+          const combined = new Uint8Array(42 + batchLen);
+          combined.set(minFlacHdrUnknownLen, 0);
+          let off = 42;
+          for (let i = 0; i < batchParts.length; i++) {
+            combined.set(batchParts[i], off);
+            off += batchParts[i].length;
+          }
+          batchParts = [];
+          batchLen = 0;
+          try {
+            const decoded = await audioCtx.decodeAudioData(combined.buffer);
+            acc.pushAudioBuffer(decoded);
+          } catch (e) {
+            console.warn('FLAC chunk decode skipped:', e);
+          }
+        };
+
+        try {
+          while (filePos < blob.size) {
+            if (isCancelled && isCancelled()) {
+              if (wcRunner) wcRunner.abort();
+              return null;
+            }
+            const end = Math.min(blob.size, filePos + chunkBytes);
+            const slice = new Uint8Array(await blob.slice(filePos, end).arrayBuffer());
+            filePos = end;
+            if (isCancelled && isCancelled()) {
+              if (wcRunner) wcRunner.abort();
+              return null;
+            }
+
+            let data;
+            if (carry.length > 0) {
+              data = new Uint8Array(carry.length + slice.length);
+              data.set(carry, 0);
+              data.set(slice, carry.length);
+            } else {
+              data = slice;
+            }
+
+            const isEof = filePos >= blob.size;
+            const frameOffsets = [];
+            for (let i = 0; i + 8 < data.length; i++) {
+              if (data[i] === 0xff && (data[i + 1] & 0xfe) === 0xf8 && isValidFlacFrameHeader(data, i, sampleRate, channels)) {
+                frameOffsets.push(i);
+                i += 12; // minimum FLAC frame size > 12 bytes
+              }
+            }
+
+            if (frameOffsets.length === 0) {
+              carry = data;
+              continue;
+            }
+
+            const lastCompleteCount = isEof ? frameOffsets.length : Math.max(0, frameOffsets.length - 1);
+            for (let k = 0; k < lastCompleteCount; k++) {
+              const sOff = frameOffsets[k];
+              const eOff = (k + 1 < frameOffsets.length) ? frameOffsets[k + 1] : data.length;
+              const fBytes = data.subarray(sOff, eOff);
+              if (wcRunner) {
+                await wcRunner.decodeChunk(fBytes, frameIndex * 40000, 0);
+                frameIndex++;
+              } else {
+                batchParts.push(fBytes.slice(0));
+                batchLen += fBytes.length;
+                if (batchLen >= 1536 * 1024) {
+                  await flushFlacFallbackBatch();
+                  if (isCancelled && isCancelled()) return null;
+                }
+              }
+            }
+
+            carry = isEof ? new Uint8Array(0) : data.slice(frameOffsets[frameOffsets.length - 1]);
+
+            const now = performance.now();
+            const frac = Math.min(0.98, (filePos - audioStartOffset) / Math.max(1, blob.size - audioStartOffset));
+            const elapsed = Math.max(0.02, (now - startPerf) / 1000);
+            const eta = frac > 0.02 ? elapsed * (1 - frac) / frac : null;
+            if (onProgress) onProgress(frac * 0.96, eta);
+            if (onPartialPyramid && acc.totalSamples > 0 && now - lastPartialPerf >= 260) {
+              lastPartialPerf = now;
+              onPartialPyramid(acc.snapshot(false));
+            }
+            await new Promise(r => setTimeout(r, 0));
+          }
+
+          if (wcRunner) {
+            await wcRunner.flushAndClose();
+          } else {
+            await flushFlacFallbackBatch();
+          }
+          if (isCancelled && isCancelled()) return null;
+          if (acc.totalSamples <= 0) return null;
+          if (onProgress) onProgress(1.0, 0);
+          return acc.snapshot(true);
+        } catch (err) {
+          console.warn('FLAC stream decode failed:', err);
+          if (wcRunner) wcRunner.abort();
+          return null;
+        }
+      }
+
+      // ---------- 5. Raw ADTS AAC (.aac) Zero-OOM Streaming Decoder ----------
+      function parseAdtsFrameHeader(u8, off) {
+        if (off + 7 > u8.length) return null;
+        if (u8[off] !== 0xff || (u8[off + 1] & 0xf6) !== 0xf0) return null;
+        const noCrc = (u8[off + 1] & 1) === 1;
+        const hdrLen = noCrc ? 7 : 9;
+        const profile = ((u8[off + 2] >> 6) & 3) + 1;
+        const srIdx = (u8[off + 2] >> 2) & 0x0f;
+        const ch = ((u8[off + 2] & 1) << 2) | ((u8[off + 3] >> 6) & 3);
+        const frameLen = ((u8[off + 3] & 3) << 11) | (u8[off + 4] << 3) | ((u8[off + 5] >> 5) & 7);
+        const srTbl = [96000, 88200, 64000, 48000, 44100, 32000, 24000, 22050, 16000, 12000, 11025, 8000, 7350];
+        if (srIdx >= srTbl.length || frameLen <= hdrLen || ch < 1 || ch > 2) return null;
+        return { hdrLen, frameLen, profile, sampleRate: srTbl[srIdx], channels: ch };
+      }
+
+      async function buildAdtsStreamPyramidAsync(blob, durationHint, onProgress, onPartialPyramid, isCancelled) {
+        const probe = new Uint8Array(await blob.slice(0, Math.min(blob.size, 65536)).arrayBuffer());
+        let firstOff = -1;
+        let firstHdr = null;
+        for (let i = 0; i + 14 < probe.length; i++) {
+          const h1 = parseAdtsFrameHeader(probe, i);
+          if (h1 && i + h1.frameLen + 7 <= probe.length) {
+            const h2 = parseAdtsFrameHeader(probe, i + h1.frameLen);
+            if (h2 && h2.sampleRate === h1.sampleRate && h2.channels === h1.channels) {
+              firstOff = i;
+              firstHdr = h1;
+              break;
+            }
+          }
+        }
+        if (firstOff < 0 || !firstHdr) return null;
+
+        const sr = firstHdr.sampleRate;
+        const ch = firstHdr.channels;
+        const asc = makeAacAudioSpecificConfig(sr, ch);
+        const estFrames = Math.max(sr, Math.round((durationHint > 0 ? durationHint : 60) * sr));
+        const acc = createStreamPyramidAccumulator(sr, estFrames);
+        const wcRunner = await createWebCodecsDecoderRunner(
+          { codec: `mp4a.40.${firstHdr.profile || 2}`, sampleRate: sr, numberOfChannels: ch, description: asc },
+          (ad) => acc.pushAudioData(ad)
+        );
+
+        const chunkBytes = 2 * 1024 * 1024;
+        const startPerf = performance.now();
+        let lastPartialPerf = startPerf;
+        let filePos = firstOff;
+        let carry = new Uint8Array(0);
+        let fedSamples = 0;
+        let pendingFrames = [];
+
+        const flushAacFallback = async () => {
+          if (pendingFrames.length === 0) return;
+          initAudioGraph();
+          const miniBlob = muxAacToM4a(pendingFrames, sr, ch, 192000, asc);
+          pendingFrames = [];
+          try {
+            const ab = await miniBlob.arrayBuffer();
+            const decoded = await audioCtx.decodeAudioData(ab);
+            acc.pushAudioBuffer(decoded);
+          } catch (_) {}
+        };
+
+        try {
+          while (filePos < blob.size) {
+            if (isCancelled && isCancelled()) {
+              if (wcRunner) wcRunner.abort();
+              return null;
+            }
+            const end = Math.min(blob.size, filePos + chunkBytes);
+            const slice = new Uint8Array(await blob.slice(filePos, end).arrayBuffer());
+            filePos = end;
+            let data = carry.length > 0 ? (() => { const d = new Uint8Array(carry.length + slice.length); d.set(carry, 0); d.set(slice, carry.length); return d; })() : slice;
+
+            let off = 0;
+            while (off + 7 <= data.length) {
+              const h = parseAdtsFrameHeader(data, off);
+              if (!h || h.sampleRate !== sr) { off++; continue; }
+              if (off + h.frameLen > data.length) break;
+              const rawPayload = data.subarray(off + h.hdrLen, off + h.frameLen);
+              if (wcRunner) {
+                await wcRunner.decodeChunk(rawPayload, (fedSamples / sr) * 1e6, (1024 / sr) * 1e6);
+                fedSamples += 1024;
+              } else {
+                pendingFrames.push({ data: rawPayload.slice(0) });
+                if (pendingFrames.length >= 1600) {
+                  await flushAacFallback();
+                  if (isCancelled && isCancelled()) return null;
+                }
+              }
+              off += h.frameLen;
+            }
+            carry = off < data.length ? data.slice(off) : new Uint8Array(0);
+
+            const now = performance.now();
+            const frac = Math.min(0.98, filePos / Math.max(1, blob.size));
+            const elapsed = Math.max(0.02, (now - startPerf) / 1000);
+            const eta = frac > 0.02 ? elapsed * (1 - frac) / frac : null;
+            if (onProgress) onProgress(frac * 0.96, eta);
+            if (onPartialPyramid && acc.totalSamples > 0 && now - lastPartialPerf >= 260) {
+              lastPartialPerf = now;
+              onPartialPyramid(acc.snapshot(false));
+            }
+            await new Promise(r => setTimeout(r, 0));
+          }
+
+          if (wcRunner) await wcRunner.flushAndClose();
+          else await flushAacFallback();
+          if (isCancelled && isCancelled()) return null;
+          if (acc.totalSamples <= 0) return null;
+          if (onProgress) onProgress(1.0, 0);
+          return acc.snapshot(true);
+        } catch (err) {
+          console.warn('ADTS stream decode failed:', err);
+          if (wcRunner) wcRunner.abort();
+          return null;
+        }
+      }
+
+      // ---------- 6. Unified Compressed Format Dispatcher ----------
+      async function buildCompressedStreamPyramidAsync(blob, fileName, durationHint, onProgress, onPartialPyramid, isCancelled) {
+        if (!blob || blob.size < 32) return null;
+        const head = new Uint8Array(await blob.slice(0, Math.min(blob.size, 32)).arrayBuffer());
+        if (isCancelled && isCancelled()) return null;
+
+        const lowerName = String(fileName || '').toLowerCase();
+        const fcc0 = head.length >= 4 ? String.fromCharCode(head[0], head[1], head[2], head[3]) : '';
+        const fcc4 = head.length >= 8 ? String.fromCharCode(head[4], head[5], head[6], head[7]) : '';
+
+        // 1. ISO BMFF (M4A / MP4)
+        if (fcc4 === 'ftyp' || lowerName.endsWith('.m4a') || lowerName.endsWith('.mp4')) {
+          const pyr = await buildMp4StreamPyramidAsync(blob, durationHint, onProgress, onPartialPyramid, isCancelled);
+          if (pyr) return pyr;
+        }
+
+        // 2. OGG (Opus / Vorbis)
+        if (fcc0 === 'OggS' || lowerName.endsWith('.ogg') || lowerName.endsWith('.opus') || lowerName.endsWith('.oga')) {
+          const pyr = await buildOggStreamPyramidAsync(blob, durationHint, onProgress, onPartialPyramid, isCancelled);
+          if (pyr) return pyr;
+        }
+
+        // 3. Native FLAC
+        if (fcc0 === 'fLaC' || lowerName.endsWith('.flac')) {
+          const pyr = await buildFlacStreamPyramidAsync(blob, durationHint, onProgress, onPartialPyramid, isCancelled);
+          if (pyr) return pyr;
+        }
+
+        // 4. MP3 (ID3 tag or MPEG sync)
+        if (
+          (head[0] === 0x49 && head[1] === 0x44 && head[2] === 0x33) ||
+          (head[0] === 0xff && (head[1] & 0xe0) === 0xe0) ||
+          lowerName.endsWith('.mp3')
+        ) {
+          const pyr = await buildMp3StreamPyramidAsync(blob, durationHint, onProgress, onPartialPyramid, isCancelled);
+          if (pyr) return pyr;
+        }
+
+        // 5. Raw ADTS AAC
+        if ((head[0] === 0xff && (head[1] & 0xf6) === 0xf0) || lowerName.endsWith('.aac')) {
+          const pyr = await buildAdtsStreamPyramidAsync(blob, durationHint, onProgress, onPartialPyramid, isCancelled);
+          if (pyr) return pyr;
+        }
+
+        return null;
+      }
+
       function queryPyramid(pyramid, t0, t1) {
         if (!pyramid || pyramid.totalSamples === 0) return { min: 0, max: 0 };
         const sr = pyramid.sampleRate;
@@ -7065,15 +8742,44 @@
             return { restoredFromMem };
           }
 
-          if (!wavMeta && blob.size > 250 * 1024 * 1024) {
-            state.isFallbackLargeFile = true;
-            setEngine('native');
-            hideWaveProgress(0);
-            showToast('超大容量の圧縮音声のためOS標準再生で動作します');
+          // Long or large compressed audio (MP3 / M4A / OGG / FLAC / AAC > 28 min or > 60MB):
+          // Proactively use Zero-OOM Streaming Waveform Analysis so 1h+ recordings never hit browser RAM limits!
+          if (!wavMeta && (resolvedDuration > 28 * 60 || blob.size > 60 * 1024 * 1024)) {
+            (async () => {
+              state.isAnalyzingWave = true;
+              state.isFallbackLargeFile = true;
+              setEngine('native');
+              showWaveProgress(1, '省メモリ波形解析中', null);
+
+              const pyr = await buildCompressedStreamPyramidAsync(
+                blob,
+                origName,
+                resolvedDuration,
+                (frac, etaSec) => {
+                  if (!isCancelled()) showWaveProgress(frac * 100, '省メモリ波形解析中', etaSec);
+                },
+                (partialPyr) => {
+                  if (isCancelled()) return;
+                  state.waveformPyramid = partialPyr;
+                  computeAutoGainsFromPyramid(partialPyr, { updateBoost: false });
+                  updateWaveGainUI();
+                  renderAllCanvases();
+                },
+                isCancelled
+              );
+              if (isCancelled()) return;
+              if (pyr) {
+                finalizeStreamedWavPyramid(pyr, myToken);
+              } else {
+                state.isAnalyzingWave = false;
+                hideWaveProgress(0);
+                showToast('この形式の省メモリ波形解析に非対応のためOS標準再生で動作します');
+              }
+            })();
             return { restoredFromMem };
           }
 
-          // Standard files (<= 90MB WAV or <= 250MB MP3/M4A/etc.): Full PCM decode with fallback to WAV streaming if OOM
+          // Standard files (<= 90MB WAV or <= 28 min & <= 60MB compressed): Full PCM decode with Zero-OOM streaming fallback
           (async () => {
             state.isAnalyzingWave = true;
             const totalMB = Math.max(0.1, blob.size / (1024 * 1024));
@@ -7155,9 +8861,33 @@
                 return;
               }
 
-              state.isAnalyzingWave = false;
+              // Seamlessly fall back to Zero-OOM Streaming Compressed Waveform Analysis (MP3 / M4A / OGG / FLAC / AAC)
               state.isFallbackLargeFile = true;
               setEngine('native');
+              showWaveProgress(4, '省メモリ波形解析へ切替中', null);
+              const streamPyr = await buildCompressedStreamPyramidAsync(
+                blob,
+                origName,
+                resolvedDuration,
+                (frac, etaSec) => {
+                  if (!isCancelled()) showWaveProgress(frac * 100, '省メモリ波形解析中', etaSec);
+                },
+                (partialPyr) => {
+                  if (isCancelled()) return;
+                  state.waveformPyramid = partialPyr;
+                  computeAutoGainsFromPyramid(partialPyr, { updateBoost: false });
+                  updateWaveGainUI();
+                  renderAllCanvases();
+                },
+                isCancelled
+              );
+              if (isCancelled()) return;
+              if (streamPyr) {
+                finalizeStreamedWavPyramid(streamPyr, myToken);
+                return;
+              }
+
+              state.isAnalyzingWave = false;
               hideWaveProgress(0);
               showToast('メモリ上限または非対応形式のためOS標準再生で動作します');
               return;
@@ -13269,11 +14999,22 @@
       document.addEventListener('webkitfullscreenchange', onFullscreenStateChanged);
 
       // ==================== GITHUB / PWA SOFTWARE UPDATE CHECK & APPLY ====================
-      const APP_VERSION = 'v31';
+      const APP_VERSION = 'v32';
 
       // Ordered newest-first; each release appends a new object at the top.
       // Users who skip multiple versions automatically see ALL unseen versions between lastSeen and current.
       const APP_RELEASE_NOTES = [
+        {
+          version: 'v32',
+          verNum: 32,
+          date: '2026/11/23',
+          title: '長時間のMP3・M4A・OGG・FLAC等も省メモリ波形解析に対応',
+          items: [
+            '1時間超の長時間MP3・M4A(AAC)・OGG(Opus/Vorbis)・FLAC・AACファイルでもメモリ上限で止まらず、分割ストリーミングで波形を描画できるようにしました',
+            '解析の進捗に合わせて波形がリアルタイムに順次表示され、拍手除外の「波形:自動」「音量:自動」もそのまま機能します',
+            '通常の短いファイルでも端末のメモリ不足で一括デコードに失敗した場合は、自動で省メモリ波形解析へ切り替わります'
+          ]
+        },
         {
           version: 'v31',
           verNum: 31,
