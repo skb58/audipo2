@@ -8,7 +8,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="Audipo2">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="app-version" content="v53">
+  <meta name="app-version" content="v54">
   <link rel="manifest" href="./manifest.json">
   <title>Audipo風 練習プレイヤー＆レコーダー</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='bg' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%231b2030'/%3E%3Cstop offset='100%25' stop-color='%230d0f15'/%3E%3C/linearGradient%3E%3ClinearGradient id='wv' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0%25' stop-color='%2360c5ff'/%3E%3Cstop offset='100%25' stop-color='%232563eb'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='url(%23bg)'/%3E%3Crect x='1' y='1' width='62' height='62' rx='15' fill='none' stroke='%233b82f6' stroke-opacity='0.3' stroke-width='2'/%3E%3Cg fill='url(%23wv)'%3E%3Crect x='10' y='28' width='4.5' height='12' rx='2.25' opacity='0.6'/%3E%3Crect x='18' y='22' width='4.5' height='24' rx='2.25' opacity='0.85'/%3E%3Crect x='26' y='15' width='4.5' height='36' rx='2.25'/%3E%3Crect x='34' y='21' width='4.5' height='25' rx='2.25' opacity='0.9'/%3E%3Crect x='42' y='26' width='4.5' height='16' rx='2.25' opacity='0.75'/%3E%3Crect x='50' y='30' width='4.5' height='9' rx='2.25' opacity='0.5'/%3E%3C/g%3E%3Cpath d='M36.25 10.5c0-1.4 1.1-2.5 2.5-2.5h5.5c1.4 0 2.5 1.1 2.5 2.5v2.4c0 .8-.3 1.5-.9 2.1l-3.2 3.1c-.6.6-1.6.6-2.2 0l-3.2-3.1c-.6-.6-.9-1.3-.9-2.1v-2.4z' fill='%23facc15'/%3E%3C/svg%3E">
@@ -2264,6 +2264,16 @@
 
 
 
+    .zoom-badges-left {
+      position: absolute;
+      top: 4px;
+      left: 6px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      z-index: 4;
+    }
+
     .zoom-badges-right {
       position: absolute;
       top: 4px;
@@ -2271,6 +2281,7 @@
       display: flex;
       align-items: center;
       gap: 5px;
+      z-index: 4;
     }
 
     .zoom-pill {
@@ -2285,6 +2296,9 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
+      gap: 4px;
+      white-space: nowrap;
+      transition: background-color 0.12s ease, border-color 0.12s ease, color 0.12s ease, transform 0.08s ease;
     }
 
     .zoom-pill:active {
@@ -2299,6 +2313,18 @@
     .zoom-pill-span {
       border-color: rgba(66, 165, 245, 0.55);
       color: #93c5fd;
+    }
+
+    .zoom-pill-lead {
+      border-color: var(--border-strong);
+      color: #a1a1aa;
+    }
+
+    .zoom-pill-lead.active {
+      background: rgba(245, 158, 11, 0.24);
+      border-color: rgba(250, 204, 21, 0.78);
+      color: #fef08a;
+      box-shadow: 0 0 8px rgba(245, 158, 11, 0.22);
     }
 
     .zoom-close-btn {
@@ -2317,8 +2343,9 @@
     .zoom-collapsed-bar {
       display: flex;
       align-items: center;
-      justify-content: flex-end;
-      padding: 4px 10px;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 4px 8px;
       background: #151518;
       border-top: 1px solid var(--border-subtle);
       border-bottom: 1px solid var(--border-subtle);
@@ -5542,6 +5569,9 @@
     <!-- Lower Pane: Closeable Zoomed Detail Waveform -->
     <section id="zoomPane" class="zoom-pane">
       <canvas id="zoomCanvas"></canvas>
+      <div class="zoom-badges-left">
+        <button id="btnSkipLeadQuick" type="button" class="zoom-pill zoom-pill-lead mono" title="ファイル先頭の無音区間を自動スキップ ON/OFF">先頭無音:OFF</button>
+      </div>
       <div class="zoom-badges-right">
         <button id="btnWaveGainQuick" type="button" class="zoom-pill zoom-pill-gain mono" title="波形縦倍率を切替 (自動/1x/2x/4x/8x)">波形:自動</button>
         <button id="btnZoomSpanReset" type="button" class="zoom-pill zoom-pill-span mono" title="タップで8.0sにリセット">8.0s</button>
@@ -5551,6 +5581,7 @@
 
     <!-- Re-open Zoom Bar (when lower pane is collapsed) -->
     <div id="zoomCollapsedBar" class="zoom-collapsed-bar hidden">
+      <button id="btnSkipLeadCollapsed" type="button" class="zoom-pill zoom-pill-lead mono" title="ファイル先頭の無音区間を自動スキップ ON/OFF">先頭無音:OFF</button>
       <button id="btnOpenZoom" type="button" class="zoom-reopen-btn">＋ 拡大波形を表示</button>
     </div>
   </main>
@@ -5850,6 +5881,33 @@
           </div>
         </div>
 
+        <!-- Leading Silence Auto-Skip -->
+        <div class="modal-section">
+          <div class="sec-head" style="margin-bottom:4px;">
+            <span class="sec-title-group">
+              <span class="sec-title">ファイル先頭の無音スキップ</span>
+              <button type="button" class="setting-help-btn" data-help-key="skipLeadingSilence" aria-label="ファイル先頭の無音スキップの説明">?</button>
+            </span>
+            <span id="modalSkipLeadVal" class="sec-value mono" style="color:#a1a1aa;">OFF</span>
+          </div>
+          <div class="toggle-row" style="margin-top:4px;padding-top:6px;">
+            <div>
+              <div class="sec-title" style="font-size:11.5px;">先頭の無音区間を自動スキップ</div>
+              <div id="skipLeadStatusText" class="engine-desc">OFF（ファイルの 0:00 からそのまま再生）</div>
+            </div>
+            <button id="btnToggleSkipLeadModal" type="button" class="toggle-pill">OFF</button>
+          </div>
+          <div class="sec-head" style="margin-top:10px;margin-bottom:6px;">
+            <span class="sec-title" style="font-size:11.5px;">無音判定の感度</span>
+            <span id="modalLeadSensVal" class="sec-value" style="font-size:11px;color:#fcd34d;">標準</span>
+          </div>
+          <div class="opt-grid-3">
+            <button type="button" data-lead-sens="gentle" class="opt-pill lead-sens-opt">繊細 (弱音保護)</button>
+            <button type="button" data-lead-sens="normal" class="opt-pill lead-sens-opt active-amber">標準 (おすすめ)</button>
+            <button type="button" data-lead-sens="strong" class="opt-pill lead-sens-opt">強め (環境音)</button>
+          </div>
+        </div>
+
         <!-- Slow-down Vocoder Tone & High-Freq Smoothing -->
         <div class="modal-section">
           <div class="sec-head">
@@ -6025,7 +6083,7 @@
         <div class="modal-section" style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
           <div>
             <div class="sec-title">バージョン情報</div>
-            <div id="settingsVersionLabel" class="engine-desc mono">現在: v53</div>
+            <div id="settingsVersionLabel" class="engine-desc mono">現在: v54</div>
           </div>
           <button id="btnShowReleaseHistory" type="button" class="step-btn" style="color:#93c5fd;border-color:rgba(66,165,245,0.45);">更新履歴を見る</button>
         </div>
@@ -6182,7 +6240,7 @@
           </div>
           <div>
             <h3 id="whatsNewTitle" class="whats-new-title">アップデートのお知らせ</h3>
-            <p id="whatsNewSub" class="whats-new-sub mono">v53 に更新されました</p>
+            <p id="whatsNewSub" class="whats-new-sub mono">v54 に更新されました</p>
           </div>
         </div>
         <button id="btnCloseWhatsNewX" type="button" class="modal-close" aria-label="閉じる">✕</button>
@@ -6761,6 +6819,12 @@
       const recMidGainWarn = document.getElementById('recMidGainWarn');
       const selectMicDevice = document.getElementById('selectMicDevice');
 
+      const btnSkipLeadQuick = document.getElementById('btnSkipLeadQuick');
+      const btnSkipLeadCollapsed = document.getElementById('btnSkipLeadCollapsed');
+      const btnToggleSkipLeadModal = document.getElementById('btnToggleSkipLeadModal');
+      const modalSkipLeadVal = document.getElementById('modalSkipLeadVal');
+      const skipLeadStatusText = document.getElementById('skipLeadStatusText');
+      const modalLeadSensVal = document.getElementById('modalLeadSensVal');
       const btnWaveGainQuick = document.getElementById('btnWaveGainQuick');
       const btnZoomSpanReset = document.getElementById('btnZoomSpanReset');
       const btnPlaylistIndex = document.getElementById('btnPlaylistIndex');
@@ -6898,6 +6962,9 @@
         // Track order mode & independent A-B section repeat toggle
         orderMode: 'stop', // 'loop1' | 'loopAll' | 'stop' | 'shuffle'
         sectionRepeat: false,
+        skipLeadingSilence: false,
+        leadingSilenceSensitivity: 'normal', // 'gentle' | 'normal' | 'strong'
+        leadingSilenceEnd: 0,
 
         // Markers: Yellow Confirmed Pins (objects) & startSectionEnabled (0:00 -> 1st yellow) & Green Temporary Pin (max 1)
         markers: [],
@@ -7482,6 +7549,8 @@
             vocoderTone: state.vocoderTone,
             lpfLevel: state.lpfLevel,
             orderMode: state.orderMode,
+            skipLeadingSilence: Boolean(state.skipLeadingSilence),
+            leadingSilenceSensitivity: state.leadingSilenceSensitivity,
             waveGainMode: state.waveGainMode,
             waveSymmetry: state.waveSymmetry,
             boostMode: state.boostMode,
@@ -7538,6 +7607,10 @@
             document.getElementById('btnOrderLoopAll').classList.toggle('active', p.orderMode === 'loopAll');
             document.getElementById('btnOrderStopEnd').classList.toggle('active', p.orderMode === 'stop');
             document.getElementById('btnOrderShuffle').classList.toggle('active', p.orderMode === 'shuffle');
+          }
+          if (typeof p.skipLeadingSilence === 'boolean') state.skipLeadingSilence = p.skipLeadingSilence;
+          if (['gentle', 'normal', 'strong'].includes(p.leadingSilenceSensitivity)) {
+            state.leadingSilenceSensitivity = p.leadingSilenceSensitivity;
           }
           if (p.waveGainMode !== undefined) state.waveGainMode = p.waveGainMode;
           if (typeof p.waveSymmetry === 'boolean') state.waveSymmetry = p.waveSymmetry;
@@ -7816,12 +7889,298 @@
         return secs[secs.length - 1];
       }
 
-      // Finds where playback should jump if `t` lands inside a skipped section (`sectionEnabled === false`)
+      const LEAD_SENS_LABELS = {
+        gentle: '繊細 (弱音保護)',
+        normal: '標準 (おすすめ)',
+        strong: '強め (環境音)'
+      };
+
+      function getEffectiveTrackStartTime() {
+        if (!state.hasAudio || !state.skipLeadingSilence) return 0;
+        const lead = Number(state.leadingSilenceEnd) || 0;
+        if (lead >= 0.25 && lead < state.duration - 0.35) {
+          return lead;
+        }
+        return 0;
+      }
+
+      // Fast leading-silence onset detector (works on both decoded AudioBuffer and streamed waveformPyramid)
+      function detectLeadingSilenceEnd() {
+        const dur = Number(state.duration) || 0;
+        if (!state.hasAudio || dur < 0.8) return 0;
+
+        const dt = 0.05; // 50ms resolution
+        const sens = state.leadingSilenceSensitivity || 'normal';
+        const minConsec = sens === 'gentle' ? 2 : (sens === 'strong' ? 4 : 3);
+        const preRollSec = sens === 'gentle' ? 0.20 : (sens === 'strong' ? 0.12 : 0.15);
+
+        // Scan up to first 60% of track (capped at 10 min) for onset, while sampling full track for dynamic range reference
+        const scanDur = Math.min(dur, Math.max(20, Math.min(600, dur * 0.75)));
+        const scanFrames = Math.floor(scanDur / dt);
+        if (scanFrames < minConsec + 2) return 0;
+
+        const scanDb = new Float32Array(scanFrames);
+        const refDbList = [];
+
+        if (state.audioBuffer) {
+          const buf = state.audioBuffer;
+          const sr = buf.sampleRate;
+          const ch0 = buf.getChannelData(0);
+          const ch1 = buf.numberOfChannels > 1 ? buf.getChannelData(1) : null;
+          const totalS = buf.length;
+          const stride = Math.max(1, Math.floor(sr / 4000));
+
+          for (let f = 0; f < scanFrames; f++) {
+            const s0 = Math.floor(f * dt * sr);
+            const s1 = Math.min(totalS, Math.floor((f + 1) * dt * sr));
+            let sumSq = 0;
+            let cnt = 0;
+            for (let i = s0; i < s1; i += stride) {
+              const v0 = ch0[i];
+              sumSq += v0 * v0;
+              cnt++;
+              if (ch1) {
+                const v1 = ch1[i];
+                sumSq += v1 * v1;
+                cnt++;
+              }
+            }
+            const rms = cnt > 0 ? Math.sqrt(sumSq / cnt) : 0;
+            scanDb[f] = 20.0 * Math.log10(Math.max(1e-6, rms));
+          }
+
+          // Sample ~320 evenly-spaced frames across whole track for robust activeDb / floorDb
+          const totalFramesAll = Math.max(1, Math.floor(dur / dt));
+          const refStep = Math.max(1, Math.floor(totalFramesAll / 320));
+          for (let f = 0; f < totalFramesAll; f += refStep) {
+            if (f < scanFrames) {
+              refDbList.push(scanDb[f]);
+            } else {
+              const s0 = Math.floor(f * dt * sr);
+              const s1 = Math.min(totalS, Math.floor((f + 1) * dt * sr));
+              let sumSq = 0;
+              let cnt = 0;
+              for (let i = s0; i < s1; i += stride) {
+                const v0 = ch0[i];
+                sumSq += v0 * v0;
+                cnt++;
+                if (ch1) {
+                  const v1 = ch1[i];
+                  sumSq += v1 * v1;
+                  cnt++;
+                }
+              }
+              const rms = cnt > 0 ? Math.sqrt(sumSq / cnt) : 0;
+              refDbList.push(20.0 * Math.log10(Math.max(1e-6, rms)));
+            }
+          }
+        } else if (state.waveformPyramid && state.waveformPyramid.levels && state.waveformPyramid.levels.length > 0) {
+          const pyr = state.waveformPyramid;
+          const sr = Math.max(1000, Number(pyr.sampleRate) || 48000);
+          const targetBin = Math.max(16, sr * 0.025);
+          let lvl = pyr.levels[0];
+          for (let i = 0; i < pyr.levels.length; i++) {
+            if (pyr.levels[i].binSize <= targetBin * 2) lvl = pyr.levels[i];
+          }
+          const binDur = lvl.binSize / sr;
+          const bLen = lvl.min.length;
+          const useSym = Boolean(state.waveSymmetry);
+
+          const frameAmpFromPyr = (frameIdx) => {
+            const b0 = Math.max(0, Math.min(bLen - 1, Math.floor((frameIdx * dt) / binDur)));
+            const b1 = Math.max(b0, Math.min(bLen - 1, Math.ceil(((frameIdx + 1) * dt) / binDur)));
+            let sumSq = 0;
+            let cnt = 0;
+            for (let b = b0; b <= b1; b++) {
+              const lo = lvl.min[b];
+              const hi = lvl.max[b];
+              const amp = useSym ? Math.max(0, 0.5 * (hi - lo)) : Math.max(Math.abs(lo), Math.abs(hi));
+              sumSq += amp * amp;
+              cnt++;
+            }
+            // Convert peak-envelope bin RMS roughly toward audio RMS (-3dB)
+            return cnt > 0 ? Math.sqrt(sumSq / cnt) * 0.707 : 0;
+          };
+
+          for (let f = 0; f < scanFrames; f++) {
+            scanDb[f] = 20.0 * Math.log10(Math.max(1e-6, frameAmpFromPyr(f)));
+          }
+          const totalFramesAll = Math.max(1, Math.floor(dur / dt));
+          const refStep = Math.max(1, Math.floor(totalFramesAll / 320));
+          for (let f = 0; f < totalFramesAll; f += refStep) {
+            refDbList.push(f < scanFrames ? scanDb[f] : 20.0 * Math.log10(Math.max(1e-6, frameAmpFromPyr(f))));
+          }
+        } else {
+          return 0;
+        }
+
+        if (refDbList.length < 4) return 0;
+        refDbList.sort((a, b) => a - b);
+        const rLen = refDbList.length;
+        const activeDb = refDbList[Math.min(rLen - 1, Math.floor(rLen * 0.90))];
+        const rawFloorDb = refDbList[Math.min(rLen - 1, Math.floor(rLen * 0.05))];
+        if (activeDb < -62) return 0; // Entire file is effectively silent
+
+        const floorDb = Math.max(activeDb - 65.0, Math.min(rawFloorDb, activeDb - 12.0));
+        const dynRange = Math.max(0, activeDb - floorDb);
+        if (dynRange < 4.5) return 0;
+
+        let threshDb;
+        if (sens === 'gentle') {
+          threshDb = Math.max(-54.0, Math.min(activeDb - 26.0, floorDb + Math.max(4.5, dynRange * 0.14)));
+        } else if (sens === 'strong') {
+          threshDb = Math.max(-36.0, Math.min(activeDb - 13.0, floorDb + Math.max(9.0, dynRange * 0.30)));
+        } else {
+          threshDb = Math.max(-44.0, Math.min(activeDb - 19.0, floorDb + Math.max(6.5, dynRange * 0.21)));
+        }
+
+        let consec = 0;
+        let onsetFrame = -1;
+        for (let f = 0; f < scanFrames; f++) {
+          if (scanDb[f] >= threshDb) {
+            consec++;
+            if (consec >= minConsec) {
+              onsetFrame = f - minConsec + 1;
+              break;
+            }
+          } else {
+            consec = 0;
+          }
+        }
+
+        if (onsetFrame <= 0) return 0;
+        const onsetSec = Math.max(0, onsetFrame * dt - preRollSec);
+        if (onsetSec < 0.25 || onsetSec >= dur - 0.5) return 0;
+        return Math.round(onsetSec * 100) / 100;
+      }
+
+      function updateSkipLeadingSilenceUI() {
+        const on = Boolean(state.skipLeadingSilence);
+        const lead = Number(state.leadingSilenceEnd) || 0;
+        const hasLead = state.hasAudio && lead >= 0.25;
+        const quickText = on
+          ? (hasLead ? `先頭スキップ ${formatTime(lead)}` : '先頭無音:ON')
+          : '先頭無音:OFF';
+
+        if (btnSkipLeadQuick) {
+          btnSkipLeadQuick.textContent = quickText;
+          btnSkipLeadQuick.classList.toggle('active', on);
+          btnSkipLeadQuick.title = on
+            ? (hasLead ? `先頭無音スキップON（${formatTime(lead, true)}まで自動スキップ・タップでOFF）` : '先頭無音スキップON（この曲の先頭に無音は検出されませんでした・タップでOFF）')
+            : 'ファイル先頭の無音区間を自動スキップ ON/OFF';
+        }
+        if (btnSkipLeadCollapsed) {
+          btnSkipLeadCollapsed.textContent = quickText;
+          btnSkipLeadCollapsed.classList.toggle('active', on);
+        }
+        if (btnToggleSkipLeadModal) {
+          btnToggleSkipLeadModal.textContent = on ? 'ON' : 'OFF';
+          btnToggleSkipLeadModal.classList.toggle('on', on);
+        }
+        if (modalSkipLeadVal) {
+          if (!on) {
+            modalSkipLeadVal.textContent = 'OFF';
+            modalSkipLeadVal.style.color = '#a1a1aa';
+          } else if (hasLead) {
+            modalSkipLeadVal.textContent = `ON (${formatTime(lead, true)})`;
+            modalSkipLeadVal.style.color = '#fcd34d';
+          } else if (state.hasAudio) {
+            modalSkipLeadVal.textContent = 'ON (先頭無音なし)';
+            modalSkipLeadVal.style.color = '#86efac';
+          } else {
+            modalSkipLeadVal.textContent = 'ON';
+            modalSkipLeadVal.style.color = '#86efac';
+          }
+        }
+        if (skipLeadStatusText) {
+          if (!on) {
+            skipLeadStatusText.textContent = 'OFF（ファイルの 0:00 からそのまま再生）';
+          } else if (hasLead) {
+            skipLeadStatusText.textContent = `ON（先頭 ${formatTime(lead, true)} までの無音を自動スキップ）`;
+          } else if (state.hasAudio) {
+            skipLeadStatusText.textContent = 'ON（現在のファイルは先頭に無音区間なし）';
+          } else {
+            skipLeadStatusText.textContent = 'ON（ファイル読込・再生開始時に先頭無音を自動スキップ）';
+          }
+        }
+        if (modalLeadSensVal) {
+          modalLeadSensVal.textContent = LEAD_SENS_LABELS[state.leadingSilenceSensitivity] || '標準';
+        }
+        document.querySelectorAll('.lead-sens-opt').forEach(btn => {
+          btn.classList.toggle('active-amber', btn.dataset.leadSens === state.leadingSilenceSensitivity);
+        });
+      }
+
+      function recomputeLeadingSilence(opts = {}) {
+        const { applyJump = false } = opts;
+        state.leadingSilenceEnd = detectLeadingSilenceEnd();
+        updateSkipLeadingSilenceUI();
+
+        if (applyJump && state.skipLeadingSilence && state.leadingSilenceEnd >= 0.25 && !isWaveScrubbing()) {
+          const liveT = getLivePlayheadTime();
+          if (liveT < state.leadingSilenceEnd - 0.05) {
+            seekTo(state.leadingSilenceEnd, { setGreenPin: false });
+          }
+        }
+        renderAllCanvases();
+      }
+
+      function setSkipLeadingSilence(enabled, announce = true) {
+        state.skipLeadingSilence = Boolean(enabled);
+        if (state.hasAudio && (state.audioBuffer || state.waveformPyramid)) {
+          state.leadingSilenceEnd = detectLeadingSilenceEnd();
+        }
+        updateSkipLeadingSilenceUI();
+        saveAppPrefs();
+
+        if (state.skipLeadingSilence && state.hasAudio && state.leadingSilenceEnd >= 0.25) {
+          const liveT = getLivePlayheadTime();
+          if (liveT < state.leadingSilenceEnd - 0.05 && !isWaveScrubbing()) {
+            seekTo(state.leadingSilenceEnd, { setGreenPin: false });
+          }
+          if (announce) {
+            showToast(`先頭無音スキップ: ON（${formatTime(state.leadingSilenceEnd, true)} までスキップ）`);
+          }
+        } else if (announce) {
+          if (state.skipLeadingSilence) {
+            showToast(state.hasAudio ? '先頭無音スキップ: ON（この曲の先頭に無音なし）' : '先頭無音スキップ: ON');
+          } else {
+            showToast('先頭無音スキップ: OFF');
+          }
+        }
+        renderAllCanvases();
+      }
+
+      function setLeadingSilenceSensitivity(sens) {
+        if (!['gentle', 'normal', 'strong'].includes(sens)) return;
+        state.leadingSilenceSensitivity = sens;
+        saveAppPrefs();
+        if (state.hasAudio && (state.audioBuffer || state.waveformPyramid)) {
+          recomputeLeadingSilence({ applyJump: state.skipLeadingSilence && state.currentTime < 0.25 });
+        } else {
+          updateSkipLeadingSilenceUI();
+        }
+        const leadNote = (state.hasAudio && state.leadingSilenceEnd >= 0.25)
+          ? `（先頭 ${formatTime(state.leadingSilenceEnd, true)}）`
+          : '';
+        showToast(`無音判定感度: ${LEAD_SENS_LABELS[sens]}${leadNote}`);
+      }
+
+      // Finds where playback should jump if `t` lands inside a skipped section (`sectionEnabled === false`) or leading silence
       function resolveSkipTarget(t) {
+        let cur = t;
+        let jumped = false;
+
+        const leadStart = getEffectiveTrackStartTime();
+        if (leadStart >= 0.25 && cur < leadStart - 0.03) {
+          cur = leadStart;
+          jumped = true;
+        }
+
         const secs = getAllSections();
         for (let i = 0; i < secs.length; i++) {
           const s = secs[i];
-          if (!s.sectionEnabled && t >= s.start - 0.02 && t < s.end - 0.03) {
+          if (!s.sectionEnabled && cur >= s.start - 0.02 && cur < s.end - 0.03) {
             // Advance past any consecutive skipped sections as well
             let target = s.end;
             for (let j = i + 1; j < secs.length; j++) {
@@ -7831,7 +8190,7 @@
             return target;
           }
         }
-        return null;
+        return jumped ? cur : null;
       }
 
       // ==================== WEB AUDIO GRAPH & 3 PLAYBACK ENGINES ====================
@@ -8202,6 +8561,10 @@
         // Precompute skipped sample intervals
         const allSecs = getAllSections();
         const skipRanges = [];
+        const leadStart = getEffectiveTrackStartTime();
+        if (leadStart >= 0.25) {
+          skipRanges.push([0, Math.min(totalSamples, Math.floor(leadStart * bufSr))]);
+        }
         for (let i = 0; i < allSecs.length; i++) {
           if (!allSecs[i].sectionEnabled) {
             skipRanges.push([
@@ -10964,6 +11327,7 @@
           state.audioBuffer = null;
           state.wavMeta = null;
           state.waveformPyramid = null;
+          state.leadingSilenceEnd = 0;
           state.isFallbackLargeFile = false;
           state.isAnalyzingWave = false;
           state.undoCutSnapshot = null;
@@ -11156,6 +11520,7 @@
 
           updateVocoderUI();
           updateWaveGainUI();
+          updateSkipLeadingSilenceUI();
           applyMasterBoost();
           updateHeaderSubInfo();
           updateTimeUI();
@@ -11521,9 +11886,11 @@
         }
         saveCurrentFileMemory(true);
         computeAutoGainsFromPyramid(pyramid);
+        recomputeLeadingSilence({ applyJump: !state.restoredFromMemory });
         btnCutYellowSection.disabled = !state.wavMeta;
         updateVocoderUI();
         updateWaveGainUI();
+        updateSkipLeadingSilenceUI();
         applyMasterBoost();
         updateTimeUI();
         updatePinButtonsUI();
@@ -11586,6 +11953,7 @@
           }
         }
 
+        recomputeLeadingSilence({ applyJump: !state.restoredFromMemory });
         btnCutYellowSection.disabled = false;
         updateVocoderUI();
         updateWaveGainUI();
@@ -14856,6 +15224,10 @@
             segEnd = bounds[i + 1];
           }
         }
+        const leadStart = getEffectiveTrackStartTime();
+        if (segStart <= 0.02 && leadStart >= 0.25 && leadStart < segEnd - 0.25) {
+          segStart = leadStart;
+        }
         if (state.tempMarker !== null && state.tempMarker > segStart + 0.05 && state.tempMarker < segEnd - 0.2 && t >= state.tempMarker - 0.05) {
           segStart = state.tempMarker;
         }
@@ -15499,7 +15871,7 @@
         initAudioGraph();
 
         if (state.currentTime >= state.duration - 0.05) {
-          seekTo(0, { setGreenPin: false });
+          seekTo(getEffectiveTrackStartTime(), { setGreenPin: false });
         }
 
         // If starting inside a skipped section, jump past it immediately
@@ -15648,7 +16020,7 @@
           return;
         }
         if (state.orderMode === 'loop1') {
-          seekTo(0, { setGreenPin: false });
+          seekTo(getEffectiveTrackStartTime(), { setGreenPin: false });
           startPlayback();
         } else if (state.orderMode === 'shuffle' && state.playlist.length > 1) {
           let next = state.currentTrackIndex;
@@ -15660,7 +16032,7 @@
           if (state.playlist.length > 1) {
             switchTrack(state.currentTrackIndex + 1, true);
           } else {
-            seekTo(0, { setGreenPin: false });
+            seekTo(getEffectiveTrackStartTime(), { setGreenPin: false });
             startPlayback();
           }
         } else {
@@ -15726,6 +16098,18 @@
           // Row track background
           ctx.fillStyle = '#1c1c21';
           ctx.fillRect(waveX, barTop, waveW, barH);
+
+          // Leading silence auto-skip shading
+          if (state.hasAudio && state.skipLeadingSilence && state.leadingSilenceEnd >= 0.25) {
+            const ovS = Math.max(rStart, 0);
+            const ovE = Math.min(rEnd, state.leadingSilenceEnd);
+            if (ovE > ovS) {
+              const sx = waveX + ((ovS - rStart) / rowDur) * waveW;
+              const sw = ((ovE - ovS) / rowDur) * waveW;
+              ctx.fillStyle = 'rgba(245, 158, 11, 0.16)';
+              ctx.fillRect(sx, barTop, sw, barH);
+            }
+          }
 
           // Skipped section shading (sectionEnabled === false)
           if (state.hasAudio) {
@@ -16119,6 +16503,33 @@
         const winStart = displayTime - halfWin;
         const winEnd = displayTime + halfWin;
         const pxPerSec = W / state.zoomWindowSeconds;
+
+        // Leading silence auto-skip highlight on zoom pane
+        if (state.hasAudio && state.skipLeadingSilence && state.leadingSilenceEnd >= 0.25) {
+          const sX = Math.max(0, (0 - winStart) * pxPerSec);
+          const eX = Math.min(W, (state.leadingSilenceEnd - winStart) * pxPerSec);
+          if (eX > sX) {
+            ctx.fillStyle = 'rgba(245, 158, 11, 0.15)';
+            ctx.fillRect(sX, 0, eX - sX, H);
+            ctx.fillStyle = 'rgba(253, 224, 71, 0.78)';
+            ctx.font = '700 10px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace';
+            ctx.textAlign = 'left';
+            ctx.textBaseline = 'bottom';
+            ctx.fillText('先頭SKIP', sX + 4, H - 4);
+          }
+          const boundX = (state.leadingSilenceEnd - winStart) * pxPerSec;
+          if (boundX >= 0 && boundX <= W) {
+            ctx.save();
+            ctx.strokeStyle = 'rgba(250, 204, 21, 0.75)';
+            ctx.lineWidth = 1.4;
+            ctx.setLineDash([3, 3]);
+            ctx.beginPath();
+            ctx.moveTo(boundX, 0);
+            ctx.lineTo(boundX, H);
+            ctx.stroke();
+            ctx.restore();
+          }
+        }
 
         // Skipped sections highlight on zoom pane
         if (state.hasAudio) {
@@ -21690,11 +22101,22 @@
       document.addEventListener('webkitfullscreenchange', onFullscreenStateChanged);
 
       // ==================== GITHUB / PWA SOFTWARE UPDATE CHECK & APPLY ====================
-      const APP_VERSION = 'v53';
+      const APP_VERSION = 'v54';
 
       // Ordered newest-first; each release appends a new object at the top.
       // Users who skip multiple versions automatically see ALL unseen versions between lastSeen and current.
       const APP_RELEASE_NOTES = [
+        {
+          version: 'v54',
+          verNum: 54,
+          date: '2026/11/25',
+          title: 'ファイル先頭の無音区間を自動スキップ（メイン画面＆設定画面対応）',
+          items: [
+            '設定画面に「ファイル先頭の無音スキップ」ON/OFFと無音判定の感度（繊細・標準・強め）を追加しました',
+            'メイン画面の拡大波形左上（および折りたたみバー左側）にもワンタップ切替ボタンを配置し、検出された先頭無音秒数の確認とON/OFFがすぐ行えます',
+            'ONのときは新規ファイル読込・先頭からの再生・リピート・頭出し時に音の立ち上がり直前へ自動スキップし、波形上でもスキップ区間をハイライト表示します'
+          ]
+        },
         {
           version: 'v53',
           verNum: 53,
@@ -22218,6 +22640,32 @@
 
       // ==================== SETTING HELP (?) CONTENT & MODAL ====================
       const SETTING_HELP_TOPICS = {
+        skipLeadingSilence: {
+          title: 'ファイル先頭の無音スキップ',
+          sub: '録音開始直後の無音や待ち時間を自動で飛ばして再生',
+          summary: 'ONにすると、ファイル先頭の無音区間を自動検出し、音が鳴り始める約0.15秒手前から再生します。拡大波形の左上にあるボタンからもワンタップでON/OFFを切り替えられます。',
+          tablesBefore: [
+            {
+              title: '無音判定の感度（3段階）',
+              headers: ['感度', 'おすすめの用途と動作'],
+              rows: [
+                ['繊細 (弱音保護)', 'ピアニッシモ(pp)の静かな入りや息づかいを絶対に切りたくないときに。純粋な無音付近のみスキップします。'],
+                ['標準 (おすすめ)', '普段の練習録音や演奏ファイル全般向け。小さなクリック音は無視し、自然な立ち上がり直前に移動します。'],
+                ['強め (環境音)', 'ホール録音や室内ノイズが少しある音源で、演奏がはっきり始まるまで飛ばしたいときに便利です。']
+              ]
+            }
+          ],
+          sections: [
+            {
+              title: 'スキップが働くタイミング',
+              bullets: [
+                ['新規にファイルを開いたとき', '波形解析が完了すると、自動で音の始まり付近へ頭出しされます（前回途中の位置を復元したときは上書きしません）。'],
+                ['再生開始・リピート・頭出し', '0:00 から再生するときや、1曲リピート・区間リピート（第1区間）・頭出しボタン（|<）で先頭に戻るときも自動で無音をスキップします。'],
+                ['先頭の無音を聴きたいとき', 'メイン画面の拡大波形左上にある「先頭スキップ」ボタンを1回タップしてOFFにするだけで、いつでも 0:00 から聴けます。']
+              ]
+            }
+          ]
+        },
         exportFormat: {
           title: '保存形式と音質ランキング',
           sub: 'WAV / M4A / OGG の音質が良い順番と選び方',
@@ -23160,8 +23608,17 @@
           return;
         }
 
-        // Otherwise: return to 0:00, or if already at 0:00 and playlist has multiple tracks, go to previous track
-        if (state.currentTime > 0.05 || state.playlist.length <= 1) {
+        // Otherwise: return to musical start (leading silence end if ON) or 0:00, or go to previous track
+        const leadStart = getEffectiveTrackStartTime();
+        if (leadStart >= 0.25) {
+          if (state.currentTime > leadStart + 0.35) {
+            seekTo(leadStart, { setGreenPin: false });
+          } else if (state.playlist.length > 1) {
+            switchTrack(state.currentTrackIndex - 1, state.isPlaying);
+          } else {
+            seekTo(state.currentTime > 0.05 ? leadStart : 0, { setGreenPin: false });
+          }
+        } else if (state.currentTime > 0.05 || state.playlist.length <= 1) {
           seekTo(0, { setGreenPin: false });
         } else {
           switchTrack(state.currentTrackIndex - 1, state.isPlaying);
@@ -23251,6 +23708,27 @@
           saveAppPrefs();
           renderAllCanvases();
         });
+      });
+
+      if (btnSkipLeadQuick) {
+        btnSkipLeadQuick.addEventListener('click', (e) => {
+          e.stopPropagation();
+          setSkipLeadingSilence(!state.skipLeadingSilence, true);
+        });
+      }
+      if (btnSkipLeadCollapsed) {
+        btnSkipLeadCollapsed.addEventListener('click', (e) => {
+          e.stopPropagation();
+          setSkipLeadingSilence(!state.skipLeadingSilence, true);
+        });
+      }
+      if (btnToggleSkipLeadModal) {
+        btnToggleSkipLeadModal.addEventListener('click', () => {
+          setSkipLeadingSilence(!state.skipLeadingSilence, true);
+        });
+      }
+      document.querySelectorAll('.lead-sens-opt').forEach(btn => {
+        btn.addEventListener('click', () => setLeadingSilenceSensitivity(btn.dataset.leadSens));
       });
 
       document.getElementById('btnToggleWaveSymmetry').addEventListener('click', () => {
