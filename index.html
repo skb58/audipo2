@@ -8,7 +8,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="Audipo2">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="app-version" content="v51">
+  <meta name="app-version" content="v52">
   <link rel="manifest" href="./manifest.json">
   <title>Audipo風 練習プレイヤー＆レコーダー</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='bg' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%231b2030'/%3E%3Cstop offset='100%25' stop-color='%230d0f15'/%3E%3C/linearGradient%3E%3ClinearGradient id='wv' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0%25' stop-color='%2360c5ff'/%3E%3Cstop offset='100%25' stop-color='%232563eb'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='url(%23bg)'/%3E%3Crect x='1' y='1' width='62' height='62' rx='15' fill='none' stroke='%233b82f6' stroke-opacity='0.3' stroke-width='2'/%3E%3Cg fill='url(%23wv)'%3E%3Crect x='10' y='28' width='4.5' height='12' rx='2.25' opacity='0.6'/%3E%3Crect x='18' y='22' width='4.5' height='24' rx='2.25' opacity='0.85'/%3E%3Crect x='26' y='15' width='4.5' height='36' rx='2.25'/%3E%3Crect x='34' y='21' width='4.5' height='25' rx='2.25' opacity='0.9'/%3E%3Crect x='42' y='26' width='4.5' height='16' rx='2.25' opacity='0.75'/%3E%3Crect x='50' y='30' width='4.5' height='9' rx='2.25' opacity='0.5'/%3E%3C/g%3E%3Cpath d='M36.25 10.5c0-1.4 1.1-2.5 2.5-2.5h5.5c1.4 0 2.5 1.1 2.5 2.5v2.4c0 .8-.3 1.5-.9 2.1l-3.2 3.1c-.6.6-1.6.6-2.2 0l-3.2-3.1c-.6-.6-.9-1.3-.9-2.1v-2.4z' fill='%23facc15'/%3E%3C/svg%3E">
@@ -4597,10 +4597,10 @@
     .fav-track-item {
       width: 100%;
       display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 8px;
-      padding: 10px 11px;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 3px;
+      padding: 8px 11px;
       border-radius: 10px;
       background: #141419;
       border: 1px solid var(--border-subtle);
@@ -4630,17 +4630,44 @@
     }
 
     .fav-track-name {
+      width: 100%;
       font-size: 12.5px;
       font-weight: 700;
       color: #ffffff;
+      line-height: 1.3;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
     }
 
     .fav-track-meta {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      flex-wrap: nowrap;
+      gap: 6px;
       font-size: 10.5px;
+      line-height: 1.25;
       color: var(--text-sub);
+      padding-left: 16px;
+      min-height: 14px;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+
+    .fav-track-dur {
+      color: #7dd3fc;
+      font-weight: 700;
+    }
+
+    .fav-track-dur.pending {
+      color: var(--text-dim);
+      font-weight: 600;
+    }
+
+    .fav-track-sep {
+      color: #52525b;
     }
 
     .fav-track-select-btn {
@@ -5832,7 +5859,7 @@
         <div class="modal-section" style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
           <div>
             <div class="sec-title">バージョン情報</div>
-            <div id="settingsVersionLabel" class="engine-desc mono">現在: v51</div>
+            <div id="settingsVersionLabel" class="engine-desc mono">現在: v52</div>
           </div>
           <button id="btnShowReleaseHistory" type="button" class="step-btn" style="color:#93c5fd;border-color:rgba(66,165,245,0.45);">更新履歴を見る</button>
         </div>
@@ -5989,7 +6016,7 @@
           </div>
           <div>
             <h3 id="whatsNewTitle" class="whats-new-title">アップデートのお知らせ</h3>
-            <p id="whatsNewSub" class="whats-new-sub mono">v51 に更新されました</p>
+            <p id="whatsNewSub" class="whats-new-sub mono">v52 に更新されました</p>
           </div>
         </div>
         <button id="btnCloseWhatsNewX" type="button" class="modal-close" aria-label="閉じる">✕</button>
@@ -6900,6 +6927,8 @@
       const LS_GEMINI_API_KEY = 'audipo2_gemini_api_key_v1';
       const LS_TRANSCRIPTS_KEY = 'audipo2_transcripts_v1';
       const LS_FAV_FOLDERS_KEY = 'audipo2_fav_folders_v1';
+      const LS_TRACK_META_CACHE_KEY = 'audipo2_track_meta_cache_v1';
+      const MAX_TRACK_META_CACHE = 1000;
       const IDB_NAME = 'audipo2_session_db_v1';
       const IDB_STORE = 'session_store';
       const MAX_REMEMBERED_FILES = 1000;
@@ -7172,6 +7201,10 @@
           state.currentMemoryKey = key;
           map[key] = snapshot;
           writeAllFileMemories(map);
+          if (effectiveDur > 0 && state.rawBlob) {
+            const lm = (typeof state.rawBlob.lastModified === 'number' && state.rawBlob.lastModified > 0) ? state.rawBlob.lastModified : 0;
+            upsertTrackMetaCache(origName, size, lm, effectiveDur);
+          }
           saveTranscriptForFile(size, effectiveDur, state.transcriptSegments);
           updateShareButtonState();
 
@@ -19823,9 +19856,109 @@
       const btnFavSortName = document.getElementById('btnFavSortName');
       const btnFavSortDate = document.getElementById('btnFavSortDate');
 
-      let activeBrowsedFolder = null; // { rootItem, stack: [{ name, handle }], dirs: [{ name, handle }], fileEntries: [{ name, handle, isAudio, lastModified }] }
+      let activeBrowsedFolder = null; // { rootItem, stack: [{ name, handle }], dirs: [{ name, handle }], fileEntries: [{ name, handle, isAudio, size, lastModified, duration, verified, _metaEl }] }
       let favSortField = 'name'; // 'name' | 'date'
       let favSortDir = 'asc';    // 'asc' | 'desc'
+      let favMetaScanToken = 0;
+
+      // ---------- Track Metadata Cache (LRU up to 1,000 files: name + size + lastModified -> duration) ----------
+      let trackMetaCacheMem = null;
+      let trackMetaSaveTimer = null;
+
+      function makeTrackMetaKey(name, size, lastModified) {
+        return `${String(name || '')}::${Math.max(0, Math.round(Number(size) || 0))}::${Math.max(0, Math.round(Number(lastModified) || 0))}`;
+      }
+
+      function readTrackMetaCache() {
+        if (trackMetaCacheMem) return trackMetaCacheMem;
+        try {
+          const raw = localStorage.getItem(LS_TRACK_META_CACHE_KEY);
+          if (!raw) {
+            trackMetaCacheMem = {};
+            return trackMetaCacheMem;
+          }
+          const parsed = JSON.parse(raw);
+          trackMetaCacheMem = (parsed && typeof parsed === 'object') ? parsed : {};
+          return trackMetaCacheMem;
+        } catch (_) {
+          trackMetaCacheMem = {};
+          return trackMetaCacheMem;
+        }
+      }
+
+      function flushTrackMetaCacheNow() {
+        clearTimeout(trackMetaSaveTimer);
+        trackMetaSaveTimer = null;
+        if (!trackMetaCacheMem) return;
+        let entries = Object.entries(trackMetaCacheMem)
+          .sort((a, b) => (b[1]?.u || 0) - (a[1]?.u || 0));
+        if (entries.length > MAX_TRACK_META_CACHE) {
+          entries = entries.slice(0, MAX_TRACK_META_CACHE);
+          trackMetaCacheMem = Object.fromEntries(entries);
+        }
+        while (entries.length > 0) {
+          try {
+            localStorage.setItem(LS_TRACK_META_CACHE_KEY, JSON.stringify(Object.fromEntries(entries)));
+            return;
+          } catch (_) {
+            if (entries.length <= 1) return;
+            const drop = Math.max(1, Math.ceil(entries.length * 0.15));
+            entries = entries.slice(0, entries.length - drop);
+            trackMetaCacheMem = Object.fromEntries(entries);
+          }
+        }
+      }
+
+      function scheduleTrackMetaCacheFlush() {
+        clearTimeout(trackMetaSaveTimer);
+        trackMetaSaveTimer = setTimeout(flushTrackMetaCacheNow, 450);
+      }
+
+      function upsertTrackMetaCache(name, size, lastModified, duration) {
+        const cleanName = String(name || '').trim();
+        const sz = Math.max(0, Math.round(Number(size) || 0));
+        const lm = Math.max(0, Math.round(Number(lastModified) || 0));
+        const dur = (typeof duration === 'number' && isFinite(duration) && duration > 0)
+          ? Math.round(duration * 10) / 10
+          : 0;
+        if (!cleanName || sz <= 0) return;
+        const cache = readTrackMetaCache();
+        const key = makeTrackMetaKey(cleanName, sz, lm);
+        const prev = cache[key];
+        cache[key] = {
+          n: cleanName,
+          s: sz,
+          m: lm,
+          d: dur > 0 ? dur : (prev && prev.d > 0 ? prev.d : 0),
+          u: Date.now()
+        };
+        scheduleTrackMetaCacheFlush();
+      }
+
+      function buildNamePreviewCacheMap() {
+        const cache = readTrackMetaCache();
+        const byName = new Map();
+        for (const k in cache) {
+          const rec = cache[k];
+          if (!rec || !rec.n) continue;
+          const prev = byName.get(rec.n);
+          if (!prev || (rec.u || 0) > (prev.u || 0)) {
+            byName.set(rec.n, rec);
+          }
+        }
+        return byName;
+      }
+
+      function lookupExactTrackMetaCache(name, size, lastModified) {
+        const cache = readTrackMetaCache();
+        const key = makeTrackMetaKey(name, size, lastModified);
+        const rec = cache[key];
+        if (rec) {
+          rec.u = Date.now();
+          return rec;
+        }
+        return null;
+      }
 
       function formatShortDate(ms) {
         if (!ms || !isFinite(ms)) return '';
@@ -19834,6 +19967,32 @@
         const m = String(d.getMonth() + 1).padStart(2, '0');
         const day = String(d.getDate()).padStart(2, '0');
         return `${y}/${m}/${day}`;
+      }
+
+      function buildFavTrackMetaHTML(fe) {
+        const parts = [];
+        if (fe.isAudio) {
+          if (typeof fe.duration === 'number' && isFinite(fe.duration) && fe.duration > 0) {
+            parts.push(`<span class="fav-track-dur">${formatTime(fe.duration)}</span>`);
+          } else {
+            parts.push(`<span class="fav-track-dur pending">--:--</span>`);
+          }
+        } else {
+          parts.push(`<span style="color:#fde68a;font-weight:700;">ピン情報</span>`);
+        }
+        if (typeof fe.size === 'number' && fe.size > 0) {
+          parts.push(`<span>${escapeHtml(formatBytesApprox(fe.size))}</span>`);
+        }
+        if (typeof fe.lastModified === 'number' && fe.lastModified > 0) {
+          parts.push(`<span>${formatShortDate(fe.lastModified)}</span>`);
+        }
+        return parts.join('<span class="fav-track-sep">•</span>');
+      }
+
+      function updateTrackRowMetaDOM(fe) {
+        if (fe && fe._metaEl) {
+          fe._metaEl.innerHTML = buildFavTrackMetaHTML(fe);
+        }
       }
 
       function updateFavSortButtonsUI() {
@@ -19878,13 +20037,112 @@
       async function ensureFileEntriesMetadata(fileEntries) {
         for (let i = 0; i < fileEntries.length; i++) {
           const fe = fileEntries[i];
-          if (typeof fe.lastModified === 'number' && fe.lastModified > 0) continue;
+          if (fe.verified) continue;
           try {
             const f = await fe.handle.getFile();
+            fe.size = Number(f.size) || 0;
             fe.lastModified = Number(f.lastModified) || 0;
+            fe.verified = true;
+            const exact = lookupExactTrackMetaCache(fe.name, fe.size, fe.lastModified);
+            if (exact && exact.d > 0) {
+              fe.duration = exact.d;
+            } else if (fe.isAudio) {
+              const pinMem = lookupFileMemory(fe.size, null);
+              if (pinMem && typeof pinMem.duration === 'number' && pinMem.duration > 0) {
+                fe.duration = pinMem.duration;
+                upsertTrackMetaCache(fe.name, fe.size, fe.lastModified, fe.duration);
+              } else if (fe.previewCached) {
+                // File size/date changed from cached preview -> clear stale duration so phase 2 re-probes
+                fe.duration = 0;
+              }
+            }
+            fe.previewCached = false;
           } catch (_) {
-            fe.lastModified = 0;
+            fe.lastModified = fe.lastModified || 0;
           }
+        }
+      }
+
+      async function probeAudioFileDurationFast(file) {
+        if (!file) return 0;
+        // Fast path: WAV header parsing (reads only first ~64 bytes)
+        if (/\.wav$/i.test(file.name || '') || file.type === 'audio/wav' || file.type === 'audio/x-wav') {
+          try {
+            const meta = await parseWavHeader(file);
+            if (meta && meta.duration > 0) return meta.duration;
+          } catch (_) {}
+        }
+        // Lightweight browser metadata probe (releases ObjectURL immediately)
+        const url = URL.createObjectURL(file);
+        try {
+          return await probeDuration(url);
+        } finally {
+          URL.revokeObjectURL(url);
+        }
+      }
+
+      async function enrichFolderFileEntriesBg(fileEntries, myScanToken) {
+        if (!Array.isArray(fileEntries) || fileEntries.length === 0) return;
+        const isCancelled = () => myScanToken !== favMetaScanToken;
+
+        // Phase 1: Lightweight stat (size + lastModified + exact cache / pin memory check)
+        for (let i = 0; i < fileEntries.length; i++) {
+          if (isCancelled()) return;
+          const fe = fileEntries[i];
+          if (fe.verified) continue;
+          try {
+            const f = await fe.handle.getFile();
+            if (isCancelled()) return;
+            fe.size = Number(f.size) || 0;
+            fe.lastModified = Number(f.lastModified) || 0;
+            fe.verified = true;
+
+            const exact = lookupExactTrackMetaCache(fe.name, fe.size, fe.lastModified);
+            if (exact && exact.d > 0) {
+              fe.duration = exact.d;
+            } else if (fe.isAudio) {
+              const pinMem = lookupFileMemory(fe.size, null);
+              if (pinMem && typeof pinMem.duration === 'number' && pinMem.duration > 0) {
+                fe.duration = pinMem.duration;
+                upsertTrackMetaCache(fe.name, fe.size, fe.lastModified, fe.duration);
+              } else if (fe.previewCached) {
+                fe.duration = 0;
+              }
+            } else {
+              upsertTrackMetaCache(fe.name, fe.size, fe.lastModified, 0);
+            }
+            fe.previewCached = false;
+            updateTrackRowMetaDOM(fe);
+          } catch (_) {}
+
+          if ((i & 3) === 3) {
+            await new Promise(r => setTimeout(r, 0));
+          }
+        }
+
+        // Phase 2: Background duration probing for uncached audio tracks (1 by 1, non-blocking)
+        for (let i = 0; i < fileEntries.length; i++) {
+          if (isCancelled()) return;
+          const fe = fileEntries[i];
+          if (!fe.isAudio || (typeof fe.duration === 'number' && fe.duration > 0)) continue;
+          try {
+            const f = await fe.handle.getFile();
+            if (isCancelled()) return;
+            fe.size = Number(f.size) || fe.size || 0;
+            fe.lastModified = Number(f.lastModified) || fe.lastModified || 0;
+            const dur = await probeAudioFileDurationFast(f);
+            if (isCancelled()) return;
+            if (dur > 0) {
+              fe.duration = dur;
+              upsertTrackMetaCache(fe.name, fe.size, fe.lastModified, dur);
+              updateTrackRowMetaDOM(fe);
+            }
+          } catch (_) {}
+          await new Promise(r => setTimeout(r, 0));
+        }
+
+        if (!isCancelled()) {
+          flushTrackMetaCacheNow();
         }
       }
 
@@ -19905,6 +20163,7 @@
       }
 
       function showFavFoldersMainView() {
+        favMetaScanToken++;
         activeBrowsedFolder = null;
         if (favFolderBrowserView) favFolderBrowserView.classList.add('hidden');
         if (favFoldersMainView) favFoldersMainView.classList.remove('hidden');
@@ -19913,6 +20172,7 @@
 
       async function openSingleFileFromFolder(fileEntry) {
         if (!fileEntry || !fileEntry.handle) return;
+        favMetaScanToken++;
         try {
           const f = await fileEntry.handle.getFile();
           closeFavoriteFoldersModal();
@@ -19925,6 +20185,7 @@
 
       async function openAllFilesFromBrowsedFolder() {
         if (!activeBrowsedFolder || !Array.isArray(activeBrowsedFolder.fileEntries) || activeBrowsedFolder.fileEntries.length === 0) return;
+        favMetaScanToken++;
         const entries = getSortedFileEntries(activeBrowsedFolder.fileEntries);
         closeFavoriteFoldersModal();
         try {
@@ -19944,6 +20205,8 @@
         const dirHandle = curEntry ? curEntry.handle : null;
         if (!dirHandle || typeof dirHandle.entries !== 'function') return;
 
+        favMetaScanToken++;
+        const namePreviewMap = buildNamePreviewCacheMap();
         const dirs = [];
         const fileEntries = [];
         for await (const [, entry] of dirHandle.entries()) {
@@ -19954,7 +20217,18 @@
             const fname = entry.name || '';
             const isAud = isAudioFileName(fname);
             if (isAud || isPinFileName(fname)) {
-              fileEntries.push({ name: fname, handle: entry, isAudio: isAud, lastModified: 0 });
+              const cached = namePreviewMap.get(fname);
+              fileEntries.push({
+                name: fname,
+                handle: entry,
+                isAudio: isAud,
+                size: cached ? (Number(cached.s) || 0) : 0,
+                lastModified: cached ? (Number(cached.m) || 0) : 0,
+                duration: cached ? (Number(cached.d) || 0) : 0,
+                previewCached: Boolean(cached),
+                verified: false,
+                _metaEl: null
+              });
             }
           }
         }
@@ -20017,14 +20291,27 @@
           rowBtn.type = 'button';
           rowBtn.className = 'fav-track-item' + (fe.isAudio ? '' : ' is-pin-file');
           const badge = fe.isAudio ? '♪' : '📌';
-          const dateStr = (favSortField === 'date' && fe.lastModified > 0) ? formatShortDate(fe.lastModified) : '';
-          const metaHtml = dateStr ? `<span class="fav-track-meta mono" style="flex-shrink:0;">${dateStr}</span>` : '';
-          rowBtn.innerHTML = `<span class="fav-track-name" style="flex:1;min-width:0;">${badge} ${escapeHtml(fe.name)}</span>${metaHtml}`;
+
+          const nameSpan = document.createElement('span');
+          nameSpan.className = 'fav-track-name';
+          nameSpan.textContent = `${badge} ${fe.name}`;
+
+          const metaSpan = document.createElement('span');
+          metaSpan.className = 'fav-track-meta mono';
+          metaSpan.innerHTML = buildFavTrackMetaHTML(fe);
+          fe._metaEl = metaSpan;
+
+          rowBtn.appendChild(nameSpan);
+          rowBtn.appendChild(metaSpan);
           rowBtn.addEventListener('click', () => openSingleFileFromFolder(fe));
           frag.appendChild(rowBtn);
         });
 
         favBrowserFileListWrap.appendChild(frag);
+
+        // Start/restart non-blocking background metadata & duration enrichment in current displayed order
+        const scanTok = ++favMetaScanToken;
+        enrichFolderFileEntriesBg(sortedFiles, scanTok);
       }
 
       async function openFavoriteFolderItem(folderItem) {
@@ -20532,11 +20819,22 @@
       document.addEventListener('webkitfullscreenchange', onFullscreenStateChanged);
 
       // ==================== GITHUB / PWA SOFTWARE UPDATE CHECK & APPLY ====================
-      const APP_VERSION = 'v51';
+      const APP_VERSION = 'v52';
 
       // Ordered newest-first; each release appends a new object at the top.
       // Users who skip multiple versions automatically see ALL unseen versions between lastSeen and current.
       const APP_RELEASE_NOTES = [
+        {
+          version: 'v52',
+          verNum: 52,
+          date: '2026/11/24',
+          title: 'フォルダ一覧で曲の長さ・サイズ・更新日を2段表示＆自動キャッシュ（上限1,000件）',
+          items: [
+            'フォルダ内のファイル一覧を「1段目：ファイル名（横幅いっぱい）／2段目：曲の長さ・ファイルサイズ・更新日」の見やすい2段レイアウトにしました',
+            'フォルダを開いた瞬間にリストを即表示し、未取得の曲の長さ・サイズ・更新日は裏で順番に取得して表示を埋める非同期方式にしました',
+            '一度取得した曲の長さ・サイズ・更新日は最大1,000件まで端末内キャッシュ（古い順に自動整理）し、次回からは開いた瞬間に即表示されます'
+          ]
+        },
         {
           version: 'v51',
           verNum: 51,
