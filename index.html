@@ -8,7 +8,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="Audipo2">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="app-version" content="v52">
+  <meta name="app-version" content="v53">
   <link rel="manifest" href="./manifest.json">
   <title>Audipo風 練習プレイヤー＆レコーダー</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='bg' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%231b2030'/%3E%3Cstop offset='100%25' stop-color='%230d0f15'/%3E%3C/linearGradient%3E%3ClinearGradient id='wv' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0%25' stop-color='%2360c5ff'/%3E%3Cstop offset='100%25' stop-color='%232563eb'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='url(%23bg)'/%3E%3Crect x='1' y='1' width='62' height='62' rx='15' fill='none' stroke='%233b82f6' stroke-opacity='0.3' stroke-width='2'/%3E%3Cg fill='url(%23wv)'%3E%3Crect x='10' y='28' width='4.5' height='12' rx='2.25' opacity='0.6'/%3E%3Crect x='18' y='22' width='4.5' height='24' rx='2.25' opacity='0.85'/%3E%3Crect x='26' y='15' width='4.5' height='36' rx='2.25'/%3E%3Crect x='34' y='21' width='4.5' height='25' rx='2.25' opacity='0.9'/%3E%3Crect x='42' y='26' width='4.5' height='16' rx='2.25' opacity='0.75'/%3E%3Crect x='50' y='30' width='4.5' height='9' rx='2.25' opacity='0.5'/%3E%3C/g%3E%3Cpath d='M36.25 10.5c0-1.4 1.1-2.5 2.5-2.5h5.5c1.4 0 2.5 1.1 2.5 2.5v2.4c0 .8-.3 1.5-.9 2.1l-3.2 3.1c-.6.6-1.6.6-2.2 0l-3.2-3.1c-.6-.6-.9-1.3-.9-2.1v-2.4z' fill='%23facc15'/%3E%3C/svg%3E">
@@ -4597,25 +4597,54 @@
     .fav-track-item {
       width: 100%;
       display: flex;
-      flex-direction: column;
-      align-items: stretch;
-      gap: 3px;
-      padding: 8px 11px;
+      align-items: center;
+      gap: 4px;
+      padding: 0;
       border-radius: 10px;
       background: #141419;
       border: 1px solid var(--border-subtle);
       text-align: left;
-      transition: border-color 0.12s ease, background-color 0.12s ease, transform 0.08s ease;
-    }
-
-    .fav-track-item:active {
-      transform: scale(0.985);
-      border-color: rgba(96, 165, 250, 0.72);
-      background: #1a1b24;
+      overflow: hidden;
+      transition: border-color 0.12s ease, background-color 0.12s ease;
     }
 
     .fav-track-item.is-pin-file {
       border-color: rgba(250, 204, 21, 0.32);
+    }
+
+    .fav-track-open-btn {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 3px;
+      padding: 8px 6px 8px 11px;
+      text-align: left;
+      background: transparent;
+      transition: background-color 0.1s ease;
+    }
+
+    .fav-track-open-btn:active {
+      background: #1b1d28;
+    }
+
+    .fav-track-more-btn {
+      width: 34px;
+      align-self: stretch;
+      flex-shrink: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: #a1a1aa;
+      border-left: 1px solid rgba(255, 255, 255, 0.06);
+      background: rgba(255, 255, 255, 0.02);
+      transition: background-color 0.1s ease, color 0.1s ease;
+    }
+
+    .fav-track-more-btn:active {
+      background: rgba(96, 165, 250, 0.22);
+      color: #ffffff;
     }
 
     .fav-track-main {
@@ -4701,12 +4730,149 @@
     .fav-crumb-path {
       flex: 1;
       min-width: 0;
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      overflow-x: auto;
+      white-space: nowrap;
+      scrollbar-width: none;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .fav-crumb-path::-webkit-scrollbar {
+      display: none;
+    }
+
+    .fav-crumb-seg {
+      height: 24px;
+      padding: 0 7px;
+      border-radius: 6px;
       font-size: 11.5px;
       font-weight: 700;
       color: #93c5fd;
+      background: rgba(66, 165, 245, 0.12);
+      border: 1px solid rgba(96, 165, 250, 0.28);
+      display: inline-flex;
+      align-items: center;
+      flex-shrink: 0;
+      transition: background-color 0.1s ease, transform 0.08s ease;
+    }
+
+    .fav-crumb-seg:active {
+      transform: scale(0.95);
+      background: rgba(66, 165, 245, 0.28);
+    }
+
+    .fav-crumb-seg.is-current {
+      color: #ffffff;
+      background: rgba(250, 204, 21, 0.16);
+      border-color: rgba(250, 204, 21, 0.42);
+      pointer-events: none;
+    }
+
+    .fav-crumb-sep {
+      color: #71717a;
+      font-size: 11px;
+      font-weight: 800;
+      padding: 0 1px;
+      flex-shrink: 0;
+    }
+
+    /* ==================== FILE ACTION (RENAME / MOVE) MODAL ==================== */
+    .fav-act-card {
+      width: 100%;
+      max-width: 420px;
+      max-height: 86dvh;
+      background: #1c1c22;
+      border: 1px solid rgba(96, 165, 250, 0.52);
+      border-radius: 18px;
+      padding: 16px 16px 14px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.88), 0 0 24px rgba(66, 165, 245, 0.16);
+    }
+
+    .fav-act-target-box {
+      padding: 8px 10px;
+      border-radius: 10px;
+      background: #131318;
+      border: 1px solid var(--border-subtle);
+      margin-bottom: 10px;
+      flex-shrink: 0;
+    }
+
+    .fav-act-target-name {
+      font-size: 13px;
+      font-weight: 800;
+      color: #ffffff;
+      word-break: break-all;
+      line-height: 1.35;
+    }
+
+    .fav-act-target-path {
+      font-size: 10.5px;
+      color: var(--text-sub);
+      margin-top: 2px;
       white-space: nowrap;
-      overflow-x: auto;
+      overflow: hidden;
       text-overflow: ellipsis;
+    }
+
+    .fav-move-roots {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      overflow-x: auto;
+      padding-bottom: 2px;
+      scrollbar-width: none;
+    }
+
+    .fav-move-roots::-webkit-scrollbar {
+      display: none;
+    }
+
+    .fav-move-root-chip {
+      height: 27px;
+      padding: 0 9px;
+      border-radius: 8px;
+      background: #23232c;
+      border: 1px solid var(--border-strong);
+      color: #d4d4d8;
+      font-size: 11px;
+      font-weight: 700;
+      white-space: nowrap;
+      flex-shrink: 0;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .fav-move-root-chip.active {
+      background: rgba(250, 204, 21, 0.18);
+      border-color: rgba(250, 204, 21, 0.65);
+      color: #fef08a;
+    }
+
+    .fav-move-root-chip:active {
+      transform: scale(0.95);
+    }
+
+    .fav-move-dir-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      min-height: 80px;
+    }
+
+    .fav-move-note {
+      font-size: 11px;
+      line-height: 1.45;
+      color: #a1a1aa;
+      padding: 6px 9px;
+      border-radius: 9px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border-subtle);
     }
 
     .fav-dir-item {
@@ -5859,7 +6025,7 @@
         <div class="modal-section" style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
           <div>
             <div class="sec-title">バージョン情報</div>
-            <div id="settingsVersionLabel" class="engine-desc mono">現在: v52</div>
+            <div id="settingsVersionLabel" class="engine-desc mono">現在: v53</div>
           </div>
           <button id="btnShowReleaseHistory" type="button" class="step-btn" style="color:#93c5fd;border-color:rgba(66,165,245,0.45);">更新履歴を見る</button>
         </div>
@@ -6016,7 +6182,7 @@
           </div>
           <div>
             <h3 id="whatsNewTitle" class="whats-new-title">アップデートのお知らせ</h3>
-            <p id="whatsNewSub" class="whats-new-sub mono">v52 に更新されました</p>
+            <p id="whatsNewSub" class="whats-new-sub mono">v53 に更新されました</p>
           </div>
         </div>
         <button id="btnCloseWhatsNewX" type="button" class="modal-close" aria-label="閉じる">✕</button>
@@ -6411,6 +6577,87 @@
           </button>
           <button id="btnCloseFavFoldersOk" type="button" class="whats-new-ok-btn">閉じる</button>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== 15. FILE RENAME & MOVE MODAL ==================== -->
+  <div id="favFileActionModal" class="modal-backdrop hidden" style="z-index:84;">
+    <div class="fav-act-card" role="dialog" aria-modal="true" aria-labelledby="favFileActionTitle">
+      <div class="whats-new-head" style="margin-bottom:10px;">
+        <div class="whats-new-title-wrap">
+          <div class="whats-new-icon" aria-hidden="true">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 20h9"/>
+              <path d="M16.5 3.5a2.12 2.12 0 1 1 3 3L7 19l-4 1 1-4Z"/>
+            </svg>
+          </div>
+          <div>
+            <h3 id="favFileActionTitle" class="whats-new-title">ファイルの操作</h3>
+            <p class="whats-new-sub">リネーム・別フォルダへ移動</p>
+          </div>
+        </div>
+        <button id="btnCloseFavFileActionX" type="button" class="modal-close" aria-label="閉じる">✕</button>
+      </div>
+
+      <div class="fav-act-target-box">
+        <div id="favActTargetName" class="fav-act-target-name">ファイル名</div>
+        <div id="favActTargetPath" class="fav-act-target-path mono">/</div>
+      </div>
+
+      <div class="share-mode-tabs" role="tablist" aria-label="ファイル操作の切替">
+        <button id="tabFavActRename" type="button" class="share-mode-tab active" role="tab" aria-selected="true">名前を変更</button>
+        <button id="tabFavActMove" type="button" class="share-mode-tab" role="tab" aria-selected="false">別フォルダへ移動</button>
+      </div>
+
+      <!-- Rename Panel -->
+      <div id="favActRenamePanel" class="modal-body" style="gap:10px;">
+        <div class="modal-section">
+          <div class="sec-head" style="margin-bottom:6px;">
+            <span class="sec-title">新しいファイル名</span>
+            <span id="favActRenameHint" class="engine-desc">拡張子は自動で維持されます</span>
+          </div>
+          <div class="save-name-row">
+            <input type="text" id="favActRenameInput" class="text-input" placeholder="新しいファイル名を入力" autocomplete="off">
+            <span id="favActRenameExtBadge" class="save-ext-badge mono">.m4a</span>
+          </div>
+        </div>
+        <div class="fav-move-note">
+          ファイル名を変更しても、この曲に付けた黄色ピンや再生位置の記憶はそのまま引き継がれます。
+        </div>
+      </div>
+
+      <!-- Move Panel -->
+      <div id="favActMovePanel" class="modal-body hidden" style="gap:8px;">
+        <div>
+          <div class="fav-section-label" style="margin:0 0 5px;">
+            <span>移動先の基準フォルダ</span>
+          </div>
+          <div id="favMoveRootsWrap" class="fav-move-roots"></div>
+        </div>
+
+        <div class="fav-crumb-bar">
+          <button id="btnFavMoveDirUp" type="button" class="fav-icon-btn" style="height:24px;padding:0 7px;font-size:10.5px;">↑ 上へ</button>
+          <div id="favMoveCrumbPath" class="fav-crumb-path mono"></div>
+          <button id="btnFavMoveNewDir" type="button" class="fav-icon-btn" style="height:24px;padding:0 7px;font-size:10.5px;color:#86efac;">＋新規</button>
+        </div>
+
+        <div id="favMoveNewDirBox" class="fav-add-row hidden">
+          <input type="text" id="favMoveNewDirInput" class="text-input" style="height:34px;font-size:12.5px;" placeholder="新しいフォルダ名を入力" autocomplete="off">
+          <button id="btnFavMoveNewDirCreate" type="button" class="fav-add-btn" style="height:34px;">作成</button>
+          <button id="btnFavMoveNewDirCancel" type="button" class="fav-icon-btn" style="height:34px;">✕</button>
+        </div>
+
+        <div class="fav-section-label" style="margin:0;">
+          <span>移動先フォルダを選択</span>
+          <span id="favMoveDestLabel" class="mono" style="color:#93c5fd;">/</span>
+        </div>
+        <div id="favMoveDirListWrap" class="fav-move-dir-list"></div>
+      </div>
+
+      <div class="modal-footer-row" style="margin-top:12px;">
+        <button id="btnCancelFavFileAction" type="button" class="danger-btn-safe" style="height:41px;border-radius:11px;">キャンセル</button>
+        <button id="btnExecFavFileAction" type="button" class="whats-new-ok-btn" style="height:41px;">この名前に変更する</button>
       </div>
     </div>
   </div>
@@ -20255,9 +20502,10 @@
         if (favBrowserFolderSub) {
           favBrowserFolderSub.textContent = `音声 ${audioCount}曲 / フォルダ ${sortedDirs.length}件`;
         }
-        if (favCrumbPath) {
-          favCrumbPath.textContent = '/' + stack.map(s => s.name).join(' / ');
-        }
+        renderClickableBreadcrumbs(favCrumbPath, stack, async (targetIdx) => {
+          const nextStack = stack.slice(0, targetIdx + 1);
+          await loadDirectoryContents(folderItem, nextStack);
+        });
         if (btnFavDirUp) {
           btnFavDirUp.disabled = stack.length <= 1;
           btnFavDirUp.style.opacity = stack.length <= 1 ? '0.35' : '1';
@@ -20287,10 +20535,13 @@
         });
 
         sortedFiles.forEach((fe) => {
-          const rowBtn = document.createElement('button');
-          rowBtn.type = 'button';
-          rowBtn.className = 'fav-track-item' + (fe.isAudio ? '' : ' is-pin-file');
+          const rowWrap = document.createElement('div');
+          rowWrap.className = 'fav-track-item' + (fe.isAudio ? '' : ' is-pin-file');
           const badge = fe.isAudio ? '♪' : '📌';
+
+          const openBtn = document.createElement('button');
+          openBtn.type = 'button';
+          openBtn.className = 'fav-track-open-btn';
 
           const nameSpan = document.createElement('span');
           nameSpan.className = 'fav-track-name';
@@ -20301,10 +20552,24 @@
           metaSpan.innerHTML = buildFavTrackMetaHTML(fe);
           fe._metaEl = metaSpan;
 
-          rowBtn.appendChild(nameSpan);
-          rowBtn.appendChild(metaSpan);
-          rowBtn.addEventListener('click', () => openSingleFileFromFolder(fe));
-          frag.appendChild(rowBtn);
+          openBtn.appendChild(nameSpan);
+          openBtn.appendChild(metaSpan);
+          openBtn.addEventListener('click', () => openSingleFileFromFolder(fe));
+
+          const moreBtn = document.createElement('button');
+          moreBtn.type = 'button';
+          moreBtn.className = 'fav-track-more-btn';
+          moreBtn.title = 'ファイル名の変更・別フォルダへ移動';
+          moreBtn.setAttribute('aria-label', `${fe.name} の操作メニュー`);
+          moreBtn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg>`;
+          moreBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            openFavFileActionModal(fe);
+          });
+
+          rowWrap.appendChild(openBtn);
+          rowWrap.appendChild(moreBtn);
+          frag.appendChild(rowWrap);
         });
 
         favBrowserFileListWrap.appendChild(frag);
@@ -20312,6 +20577,606 @@
         // Start/restart non-blocking background metadata & duration enrichment in current displayed order
         const scanTok = ++favMetaScanToken;
         enrichFolderFileEntriesBg(sortedFiles, scanTok);
+      }
+
+      function renderClickableBreadcrumbs(containerEl, stack, onJump) {
+        if (!containerEl) return;
+        containerEl.innerHTML = '';
+        if (!Array.isArray(stack) || stack.length === 0) return;
+        const frag = document.createDocumentFragment();
+        stack.forEach((seg, idx) => {
+          if (idx > 0) {
+            const sep = document.createElement('span');
+            sep.className = 'fav-crumb-sep';
+            sep.textContent = '›';
+            frag.appendChild(sep);
+          }
+          const isLast = idx === stack.length - 1;
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'fav-crumb-seg' + (isLast ? ' is-current' : '');
+          btn.textContent = seg.name || 'フォルダ';
+          if (!isLast && typeof onJump === 'function') {
+            btn.title = `${seg.name} へ移動`;
+            btn.addEventListener('click', () => onJump(idx));
+          }
+          frag.appendChild(btn);
+        });
+        containerEl.appendChild(frag);
+        requestAnimationFrame(() => {
+          containerEl.scrollLeft = containerEl.scrollWidth;
+        });
+      }
+
+      // ==================== FILE RENAME & MOVE (IN-APP FILE MANAGER) ====================
+      const favFileActionModal = document.getElementById('favFileActionModal');
+      const favActTargetName = document.getElementById('favActTargetName');
+      const favActTargetPath = document.getElementById('favActTargetPath');
+      const tabFavActRename = document.getElementById('tabFavActRename');
+      const tabFavActMove = document.getElementById('tabFavActMove');
+      const favActRenamePanel = document.getElementById('favActRenamePanel');
+      const favActMovePanel = document.getElementById('favActMovePanel');
+      const favActRenameInput = document.getElementById('favActRenameInput');
+      const favActRenameExtBadge = document.getElementById('favActRenameExtBadge');
+      const favActRenameHint = document.getElementById('favActRenameHint');
+      const favMoveRootsWrap = document.getElementById('favMoveRootsWrap');
+      const btnFavMoveDirUp = document.getElementById('btnFavMoveDirUp');
+      const favMoveCrumbPath = document.getElementById('favMoveCrumbPath');
+      const btnFavMoveNewDir = document.getElementById('btnFavMoveNewDir');
+      const favMoveDestLabel = document.getElementById('favMoveDestLabel');
+      const favMoveDirListWrap = document.getElementById('favMoveDirListWrap');
+      const btnCloseFavFileActionX = document.getElementById('btnCloseFavFileActionX');
+      const btnCancelFavFileAction = document.getElementById('btnCancelFavFileAction');
+      const btnExecFavFileAction = document.getElementById('btnExecFavFileAction');
+
+      let favFileActionState = null;
+      // { fileEntry, srcDirHandle, srcRootHandle, srcStack, mode: 'rename'|'move', ext, baseName, moveRootId, moveStack, moveDirs, isSameAsSrc, busy }
+
+      function splitFileNameAndExt(filename) {
+        const str = String(filename || '');
+        const dotIdx = str.lastIndexOf('.');
+        if (dotIdx > 0 && dotIdx < str.length - 1 && (str.length - dotIdx) <= 8) {
+          return { base: str.slice(0, dotIdx), ext: str.slice(dotIdx) };
+        }
+        return { base: str, ext: '' };
+      }
+
+      function validateSafeFileName(name) {
+        const trimmed = String(name || '').trim();
+        if (!trimmed) return 'ファイル名を入力してください';
+        if (trimmed === '.' || trimmed === '..') return 'この名前は使用できません';
+        if (/[\\/:*?"<>|\x00-\x1f]/.test(trimmed)) return 'ファイル名に使えない記号（/ \ : * ? " < > |）が含まれています';
+        return '';
+      }
+
+      async function ensureDirWritePermission(dirHandle, rootHandle = null) {
+        const targets = [];
+        if (rootHandle) targets.push(rootHandle);
+        if (dirHandle && dirHandle !== rootHandle) targets.push(dirHandle);
+        for (let i = 0; i < targets.length; i++) {
+          const h = targets[i];
+          if (!h || typeof h.queryPermission !== 'function') continue;
+          try {
+            let perm = await h.queryPermission({ mode: 'readwrite' });
+            if (perm !== 'granted' && typeof h.requestPermission === 'function') {
+              perm = await h.requestPermission({ mode: 'readwrite' });
+            }
+            if (perm === 'granted') return true;
+          } catch (err) {
+            console.warn('readwrite permission check failed:', err);
+          }
+        }
+        return false;
+      }
+
+      async function checkFileExistsInDir(dirHandle, fileName) {
+        if (!dirHandle || typeof dirHandle.getFileHandle !== 'function') return false;
+        try {
+          await dirHandle.getFileHandle(fileName, { create: false });
+          return true;
+        } catch (err) {
+          if (err && err.name === 'NotFoundError') return false;
+          return false;
+        }
+      }
+
+      async function copyFileToDirectory(fileHandle, destDirHandle, destName) {
+        const file = await fileHandle.getFile();
+        const newHandle = await destDirHandle.getFileHandle(destName, { create: true });
+        if (typeof newHandle.createWritable !== 'function') {
+          throw new Error('NO_WRITABLE');
+        }
+        const writable = await newHandle.createWritable();
+        if (typeof file.stream === 'function' && typeof writable.getWriter === 'function') {
+          await file.stream().pipeTo(writable);
+        } else {
+          await writable.write(file);
+          await writable.close();
+        }
+        return newHandle;
+      }
+
+      function syncAppStateAfterFileRename(oldName, newName, fileSize) {
+        if (!oldName || !newName || oldName === newName) return;
+        if (state.hasAudio && state.currentFileOrigName === oldName && (!fileSize || !state.currentFileSize || Math.abs(state.currentFileSize - fileSize) <= 64)) {
+          const wasDefaultTitle = trackTitleEl && trackTitleEl.textContent.trim() === oldName;
+          state.currentFileOrigName = newName;
+          if (wasDefaultTitle) {
+            trackTitleEl.textContent = newName;
+            const nameInput = document.getElementById('inputTrackName');
+            if (nameInput) nameInput.value = newName;
+          }
+          saveCurrentFileMemory(true);
+        }
+        if (Array.isArray(state.playlist)) {
+          let changed = false;
+          state.playlist.forEach((item) => {
+            if (!item) return;
+            const orig = item.origName || item.name;
+            const sz = item.blob ? item.blob.size : 0;
+            if (orig === oldName && (!fileSize || !sz || Math.abs(sz - fileSize) <= 64)) {
+              if (item.name === oldName) item.name = newName;
+              item.origName = newName;
+              changed = true;
+            }
+          });
+          if (changed) renderPlaylistModal();
+        }
+      }
+
+      function closeFavFileActionModal() {
+        if (favFileActionState && favFileActionState.busy) return;
+        if (typeof hideFavMoveNewDirBox === 'function') hideFavMoveNewDirBox();
+        favFileActionState = null;
+        if (favFileActionModal) favFileActionModal.classList.add('hidden');
+      }
+
+      function updateFavFileActionButtons() {
+        if (!favFileActionState || !btnExecFavFileAction) return;
+        const st = favFileActionState;
+        if (st.busy) {
+          btnExecFavFileAction.disabled = true;
+          btnExecFavFileAction.textContent = st.mode === 'rename' ? '名前を変更中...' : 'ファイルを移動中...';
+          return;
+        }
+        if (st.mode === 'rename') {
+          btnExecFavFileAction.disabled = false;
+          btnExecFavFileAction.textContent = 'この名前に変更する';
+        } else {
+          btnExecFavFileAction.disabled = Boolean(st.isSameAsSrc);
+          btnExecFavFileAction.textContent = st.isSameAsSrc ? '現在のフォルダと同じです' : 'ここへ移動する';
+        }
+      }
+
+      function setFavFileActionMode(mode) {
+        if (!favFileActionState) return;
+        favFileActionState.mode = mode === 'move' ? 'move' : 'rename';
+        const isMove = favFileActionState.mode === 'move';
+        if (tabFavActRename) {
+          tabFavActRename.classList.toggle('active', !isMove);
+          tabFavActRename.setAttribute('aria-selected', String(!isMove));
+        }
+        if (tabFavActMove) {
+          tabFavActMove.classList.toggle('active', isMove);
+          tabFavActMove.setAttribute('aria-selected', String(isMove));
+        }
+        if (favActRenamePanel) favActRenamePanel.classList.toggle('hidden', isMove);
+        if (favActMovePanel) favActMovePanel.classList.toggle('hidden', !isMove);
+        updateFavFileActionButtons();
+        if (isMove) {
+          loadFavMoveDirContents(favFileActionState.moveStack);
+        } else if (favActRenameInput) {
+          setTimeout(() => {
+            try { favActRenameInput.focus(); favActRenameInput.select(); } catch (_) {}
+          }, 40);
+        }
+      }
+
+      async function renderFavMoveRootsBar() {
+        if (!favMoveRootsWrap || !favFileActionState) return;
+        const st = favFileActionState;
+        favMoveRootsWrap.innerHTML = '';
+        const frag = document.createDocumentFragment();
+        const store = readFavoriteFolders();
+
+        for (let i = 0; i < store.favorites.length; i++) {
+          const item = store.favorites[i];
+          const h = await loadFavFolderHandleFromIDB(item.id);
+          if (!h) continue;
+          const chip = document.createElement('button');
+          chip.type = 'button';
+          chip.className = 'fav-move-root-chip' + (st.moveRootId === item.id ? ' active' : '');
+          chip.textContent = `★ ${item.name}`;
+          chip.addEventListener('click', async () => {
+            if (!favFileActionState || favFileActionState.busy) return;
+            try {
+              let perm = await h.queryPermission({ mode: 'read' });
+              if (perm !== 'granted') perm = await h.requestPermission({ mode: 'read' });
+              if (perm !== 'granted') {
+                showToast('フォルダへのアクセス権限が必要です');
+                return;
+              }
+              favFileActionState.moveRootId = item.id;
+              favFileActionState.moveRootHandle = h;
+              await loadFavMoveDirContents([{ name: item.name, handle: h }]);
+              await renderFavMoveRootsBar();
+            } catch (_) {
+              showToast('このフォルダを開けませんでした');
+            }
+          });
+          frag.appendChild(chip);
+        }
+
+        if (typeof window.showDirectoryPicker === 'function') {
+          const pickChip = document.createElement('button');
+          pickChip.type = 'button';
+          pickChip.className = 'fav-move-root-chip';
+          pickChip.style.color = '#93c5fd';
+          pickChip.textContent = '＋ 別のフォルダを選ぶ';
+          pickChip.addEventListener('click', async () => {
+            if (!favFileActionState || favFileActionState.busy) return;
+            try {
+              let picked = null;
+              try {
+                picked = await window.showDirectoryPicker({ mode: 'readwrite' });
+              } catch (e) {
+                if (e && e.name === 'AbortError') return;
+                picked = await window.showDirectoryPicker({ mode: 'read' });
+              }
+              if (!picked) return;
+              favFileActionState.moveRootId = '__picked__';
+              favFileActionState.moveRootHandle = picked;
+              await loadFavMoveDirContents([{ name: picked.name || '選択フォルダ', handle: picked }]);
+              await renderFavMoveRootsBar();
+            } catch (_) {}
+          });
+          frag.appendChild(pickChip);
+        }
+
+        favMoveRootsWrap.appendChild(frag);
+      }
+
+      async function loadFavMoveDirContents(stack) {
+        if (!favFileActionState || !Array.isArray(stack) || stack.length === 0) return;
+        const cur = stack[stack.length - 1];
+        const dirHandle = cur ? cur.handle : null;
+        if (!dirHandle || typeof dirHandle.entries !== 'function') return;
+
+        const dirs = [];
+        try {
+          for await (const [, entry] of dirHandle.entries()) {
+            if (entry && entry.kind === 'directory') {
+              dirs.push({ name: entry.name || 'フォルダ', handle: entry });
+            }
+          }
+        } catch (err) {
+          console.warn('Move dest entries read error:', err);
+          showToast('移動先フォルダの中身を読み取れませんでした');
+          return;
+        }
+        dirs.sort((a, b) => a.name.localeCompare(b.name, 'ja', { numeric: true }));
+
+        let same = false;
+        try {
+          if (typeof dirHandle.isSameEntry === 'function' && favFileActionState.srcDirHandle) {
+            same = await dirHandle.isSameEntry(favFileActionState.srcDirHandle);
+          }
+        } catch (_) {}
+
+        favFileActionState.moveStack = stack;
+        favFileActionState.moveDirs = dirs;
+        favFileActionState.isSameAsSrc = same;
+
+        renderClickableBreadcrumbs(favMoveCrumbPath, stack, async (targetIdx) => {
+          await loadFavMoveDirContents(stack.slice(0, targetIdx + 1));
+        });
+        if (btnFavMoveDirUp) {
+          btnFavMoveDirUp.disabled = stack.length <= 1;
+          btnFavMoveDirUp.style.opacity = stack.length <= 1 ? '0.35' : '1';
+        }
+        if (favMoveDestLabel) {
+          favMoveDestLabel.textContent = cur.name || '/';
+        }
+
+        if (favMoveDirListWrap) {
+          favMoveDirListWrap.innerHTML = '';
+          if (dirs.length === 0) {
+            favMoveDirListWrap.innerHTML = '<div class="fav-empty-hint" style="padding:10px;">この階層にサブフォルダはありません。<br>「ここへ移動する」または上のパスから移動先を選べます。</div>';
+          } else {
+            const frag = document.createDocumentFragment();
+            dirs.forEach((d) => {
+              const dBtn = document.createElement('button');
+              dBtn.type = 'button';
+              dBtn.className = 'fav-dir-item';
+              dBtn.innerHTML = `<span class="fav-dir-name">📁 <span>${escapeHtml(d.name)}</span></span><span class="mono" style="font-size:11px;color:#fde68a;">開く ›</span>`;
+              dBtn.addEventListener('click', async () => {
+                await loadFavMoveDirContents([...stack, { name: d.name, handle: d.handle }]);
+              });
+              frag.appendChild(dBtn);
+            });
+            favMoveDirListWrap.appendChild(frag);
+          }
+        }
+
+        updateFavFileActionButtons();
+      }
+
+      async function openFavFileActionModal(fileEntry) {
+        if (!fileEntry || !fileEntry.handle || !activeBrowsedFolder) return;
+        const srcStack = activeBrowsedFolder.stack;
+        if (!Array.isArray(srcStack) || srcStack.length === 0) return;
+        const srcDirHandle = srcStack[srcStack.length - 1].handle;
+        const srcRootHandle = srcStack[0].handle;
+        const { base, ext } = splitFileNameAndExt(fileEntry.name);
+
+        favFileActionState = {
+          fileEntry,
+          srcDirHandle,
+          srcRootHandle,
+          srcStack: [...srcStack],
+          mode: 'rename',
+          ext,
+          baseName: base,
+          moveRootId: activeBrowsedFolder.rootItem ? activeBrowsedFolder.rootItem.id : '',
+          moveRootHandle: srcRootHandle,
+          moveStack: [...srcStack],
+          moveDirs: [],
+          isSameAsSrc: true,
+          busy: false
+        };
+
+        if (favActTargetName) favActTargetName.textContent = fileEntry.name;
+        if (favActTargetPath) favActTargetPath.textContent = '/' + srcStack.map(s => s.name).join(' / ');
+        if (favActRenameInput) favActRenameInput.value = base;
+        if (favActRenameExtBadge) {
+          favActRenameExtBadge.textContent = ext || 'なし';
+          favActRenameExtBadge.classList.toggle('hidden', !ext);
+        }
+        if (favActRenameHint) {
+          favActRenameHint.textContent = ext ? '拡張子は自動で維持されます' : '拡張子なしのファイルです';
+        }
+
+        if (favFileActionModal) favFileActionModal.classList.remove('hidden');
+        setFavFileActionMode('rename');
+        renderFavMoveRootsBar();
+      }
+
+      async function executeFavFileRename() {
+        const st = favFileActionState;
+        if (!st || st.busy) return;
+        let rawBase = favActRenameInput ? favActRenameInput.value.trim() : '';
+        if (st.ext && rawBase.toLowerCase().endsWith(st.ext.toLowerCase())) {
+          rawBase = rawBase.slice(0, -st.ext.length).trim();
+        }
+        const newName = st.ext ? `${rawBase}${st.ext}` : rawBase;
+        const valErr = validateSafeFileName(rawBase);
+        if (valErr) {
+          showToast(valErr);
+          return;
+        }
+        const oldName = st.fileEntry.name;
+        if (newName === oldName) {
+          showToast('ファイル名が変更されていません');
+          return;
+        }
+
+        st.busy = true;
+        updateFavFileActionButtons();
+        try {
+          const granted = await ensureDirWritePermission(st.srcDirHandle, st.srcRootHandle);
+          if (!granted) {
+            showToast('書き込み権限が許可されませんでした');
+            return;
+          }
+
+          const isCaseOnlyChange = oldName.toLowerCase() === newName.toLowerCase();
+          if (!isCaseOnlyChange && await checkFileExistsInDir(st.srcDirHandle, newName)) {
+            showToast(`同じ名前のファイルがすでにあります: ${newName}`);
+            return;
+          }
+
+          const fh = st.fileEntry.handle;
+          let renamed = false;
+          if (typeof fh.move === 'function') {
+            try {
+              await fh.move(newName);
+              renamed = true;
+            } catch (mvErr) {
+              console.warn('FileHandle.move(newName) fallback to copy+remove:', mvErr);
+            }
+          }
+          if (!renamed) {
+            if (isCaseOnlyChange) {
+              const tmpName = `.__tmp_${Date.now()}_${newName}`;
+              const tmpHandle = await copyFileToDirectory(fh, st.srcDirHandle, tmpName);
+              await st.srcDirHandle.removeEntry(oldName);
+              await copyFileToDirectory(tmpHandle, st.srcDirHandle, newName);
+              await st.srcDirHandle.removeEntry(tmpName);
+            } else {
+              await copyFileToDirectory(fh, st.srcDirHandle, newName);
+              await st.srcDirHandle.removeEntry(oldName);
+            }
+          }
+
+          // Preserve duration cache & update active track / playlist metadata
+          if (st.fileEntry.size > 0) {
+            upsertTrackMetaCache(newName, st.fileEntry.size, Date.now(), st.fileEntry.duration || 0);
+            flushTrackMetaCacheNow();
+          }
+          syncAppStateAfterFileRename(oldName, newName, st.fileEntry.size);
+
+          st.busy = false;
+          closeFavFileActionModal();
+          if (activeBrowsedFolder) {
+            await loadDirectoryContents(activeBrowsedFolder.rootItem, activeBrowsedFolder.stack);
+          }
+          showToast(`ファイル名を変更しました: ${newName}`);
+        } catch (err) {
+          console.error('File rename error:', err);
+          if (err && err.message === 'NO_WRITABLE') {
+            showToast('このブラウザではファイルの書き換えに対応していません');
+          } else {
+            showToast('ファイル名の変更に失敗しました（端末・フォルダの権限を確認してください）');
+          }
+        } finally {
+          if (favFileActionState) {
+            favFileActionState.busy = false;
+            updateFavFileActionButtons();
+          }
+        }
+      }
+
+      async function executeFavFileMove() {
+        const st = favFileActionState;
+        if (!st || st.busy || st.isSameAsSrc) return;
+        const destEntry = st.moveStack[st.moveStack.length - 1];
+        const destDirHandle = destEntry ? destEntry.handle : null;
+        if (!destDirHandle) return;
+
+        st.busy = true;
+        updateFavFileActionButtons();
+        try {
+          const srcOk = await ensureDirWritePermission(st.srcDirHandle, st.srcRootHandle);
+          const dstOk = await ensureDirWritePermission(destDirHandle, st.moveRootHandle);
+          if (!srcOk || !dstOk) {
+            showToast('移動元または移動先フォルダの書き込み権限が必要です');
+            return;
+          }
+
+          const fileName = st.fileEntry.name;
+          if (await checkFileExistsInDir(destDirHandle, fileName)) {
+            showToast(`移動先に同じ名前のファイルがすでにあります: ${fileName}`);
+            return;
+          }
+
+          const fh = st.fileEntry.handle;
+          let moved = false;
+          if (typeof fh.move === 'function') {
+            try {
+              await fh.move(destDirHandle, fileName);
+              moved = true;
+            } catch (mvErr) {
+              console.warn('FileHandle.move(destDir, name) fallback to copy+remove:', mvErr);
+            }
+          }
+          if (!moved) {
+            await copyFileToDirectory(fh, destDirHandle, fileName);
+            await st.srcDirHandle.removeEntry(fileName);
+          }
+
+          const destName = destEntry.name || '移動先';
+          st.busy = false;
+          closeFavFileActionModal();
+          if (activeBrowsedFolder) {
+            await loadDirectoryContents(activeBrowsedFolder.rootItem, activeBrowsedFolder.stack);
+          }
+          showToast(`「${destName}」へ移動しました: ${fileName}`);
+        } catch (err) {
+          console.error('File move error:', err);
+          if (err && err.message === 'NO_WRITABLE') {
+            showToast('このブラウザではファイルの移動に対応していません');
+          } else {
+            showToast('ファイルの移動に失敗しました（端末・フォルダの権限を確認してください）');
+          }
+        } finally {
+          if (favFileActionState) {
+            favFileActionState.busy = false;
+            updateFavFileActionButtons();
+          }
+        }
+      }
+
+      if (tabFavActRename) tabFavActRename.addEventListener('click', () => setFavFileActionMode('rename'));
+      if (tabFavActMove) tabFavActMove.addEventListener('click', () => setFavFileActionMode('move'));
+      if (btnCloseFavFileActionX) btnCloseFavFileActionX.addEventListener('click', closeFavFileActionModal);
+      if (btnCancelFavFileAction) btnCancelFavFileAction.addEventListener('click', closeFavFileActionModal);
+      if (favFileActionModal) {
+        favFileActionModal.addEventListener('click', (e) => {
+          if (e.target === favFileActionModal) closeFavFileActionModal();
+        });
+      }
+      if (favActRenameInput) {
+        favActRenameInput.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            executeFavFileRename();
+          }
+        });
+      }
+      if (btnFavMoveDirUp) {
+        btnFavMoveDirUp.addEventListener('click', async () => {
+          if (!favFileActionState || favFileActionState.busy || favFileActionState.moveStack.length <= 1) return;
+          await loadFavMoveDirContents(favFileActionState.moveStack.slice(0, -1));
+        });
+      }
+      const favMoveNewDirBox = document.getElementById('favMoveNewDirBox');
+      const favMoveNewDirInput = document.getElementById('favMoveNewDirInput');
+      const btnFavMoveNewDirCreate = document.getElementById('btnFavMoveNewDirCreate');
+      const btnFavMoveNewDirCancel = document.getElementById('btnFavMoveNewDirCancel');
+
+      function hideFavMoveNewDirBox() {
+        if (favMoveNewDirBox) favMoveNewDirBox.classList.add('hidden');
+        if (favMoveNewDirInput) favMoveNewDirInput.value = '';
+      }
+
+      async function createSubDirInMoveDest() {
+        if (!favFileActionState || favFileActionState.busy) return;
+        const cur = favFileActionState.moveStack[favFileActionState.moveStack.length - 1];
+        const curDir = cur ? cur.handle : null;
+        if (!curDir || typeof curDir.getDirectoryHandle !== 'function') return;
+        const folderName = favMoveNewDirInput ? favMoveNewDirInput.value : '';
+        const err = validateSafeFileName(folderName);
+        if (err) {
+          showToast(err);
+          return;
+        }
+        try {
+          const ok = await ensureDirWritePermission(curDir, favFileActionState.moveRootHandle);
+          if (!ok) {
+            showToast('フォルダ作成の書き込み権限が必要です');
+            return;
+          }
+          const cleanFolder = folderName.trim();
+          const newSub = await curDir.getDirectoryHandle(cleanFolder, { create: true });
+          hideFavMoveNewDirBox();
+          await loadFavMoveDirContents([...favFileActionState.moveStack, { name: cleanFolder, handle: newSub }]);
+          showToast(`フォルダを作成しました: ${cleanFolder}`);
+        } catch (e) {
+          console.warn('Create subfolder failed:', e);
+          showToast('フォルダの作成に失敗しました');
+        }
+      }
+
+      if (btnFavMoveNewDir) {
+        btnFavMoveNewDir.addEventListener('click', () => {
+          if (!favFileActionState || favFileActionState.busy || !favMoveNewDirBox) return;
+          const willShow = favMoveNewDirBox.classList.contains('hidden');
+          favMoveNewDirBox.classList.toggle('hidden', !willShow);
+          if (willShow && favMoveNewDirInput) {
+            favMoveNewDirInput.value = '';
+            setTimeout(() => { try { favMoveNewDirInput.focus(); } catch (_) {} }, 30);
+          }
+        });
+      }
+      if (btnFavMoveNewDirCancel) btnFavMoveNewDirCancel.addEventListener('click', hideFavMoveNewDirBox);
+      if (btnFavMoveNewDirCreate) btnFavMoveNewDirCreate.addEventListener('click', createSubDirInMoveDest);
+      if (favMoveNewDirInput) {
+        favMoveNewDirInput.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            createSubDirInMoveDest();
+          }
+        });
+      }
+      if (btnExecFavFileAction) {
+        btnExecFavFileAction.addEventListener('click', () => {
+          if (!favFileActionState) return;
+          if (favFileActionState.mode === 'move') {
+            executeFavFileMove();
+          } else {
+            executeFavFileRename();
+          }
+        });
       }
 
       async function openFavoriteFolderItem(folderItem) {
@@ -20564,7 +21429,13 @@
           return;
         }
         try {
-          const dirHandle = await window.showDirectoryPicker({ mode: 'read' });
+          let dirHandle = null;
+          try {
+            dirHandle = await window.showDirectoryPicker({ mode: 'readwrite' });
+          } catch (rwErr) {
+            if (rwErr && rwErr.name === 'AbortError') return;
+            dirHandle = await window.showDirectoryPicker({ mode: 'read' });
+          }
           if (!dirHandle) return;
           await registerFavoriteDirectoryHandle(dirHandle, dirHandle.name);
         } catch (_) {
@@ -20819,11 +21690,22 @@
       document.addEventListener('webkitfullscreenchange', onFullscreenStateChanged);
 
       // ==================== GITHUB / PWA SOFTWARE UPDATE CHECK & APPLY ====================
-      const APP_VERSION = 'v52';
+      const APP_VERSION = 'v53';
 
       // Ordered newest-first; each release appends a new object at the top.
       // Users who skip multiple versions automatically see ALL unseen versions between lastSeen and current.
       const APP_RELEASE_NOTES = [
+        {
+          version: 'v53',
+          verNum: 53,
+          date: '2026/11/25',
+          title: 'フォルダパスのパンくずジャンプ＆ファイルのリネーム・移動に対応',
+          items: [
+            'フォルダブラウザー上部のパス表示をパンくずリスト化し、各フォルダ名をタップして好きな階層へ直接ジャンプできるようにしました',
+            '各ファイルの右端に操作メニュー（⋮）を追加し、アプリ内からファイル名の変更（リネーム・拡張子自動維持）ができるようになりました（ピン記憶もそのまま引き継がれます）',
+            '同じく操作メニュー（⋮）から、別フォルダへのファイル移動（お気に入りフォルダ間の移動や新規サブフォルダ作成にも対応）ができるようになりました'
+          ]
+        },
         {
           version: 'v52',
           verNum: 52,
@@ -22589,7 +23471,9 @@
 
       window.addEventListener('popstate', () => {
         // 1. Close topmost open modal if any
-        if (favFoldersModal && !favFoldersModal.classList.contains('hidden')) {
+        if (favFileActionModal && !favFileActionModal.classList.contains('hidden')) {
+          closeFavFileActionModal();
+        } else if (favFoldersModal && !favFoldersModal.classList.contains('hidden')) {
           if (favFolderBrowserView && !favFolderBrowserView.classList.contains('hidden')) {
             showFavFoldersMainView();
           } else {
