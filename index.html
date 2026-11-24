@@ -8,7 +8,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="Audipo2">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="app-version" content="v50">
+  <meta name="app-version" content="v51">
   <link rel="manifest" href="./manifest.json">
   <title>Audipo風 練習プレイヤー＆レコーダー</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='bg' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%231b2030'/%3E%3Cstop offset='100%25' stop-color='%230d0f15'/%3E%3C/linearGradient%3E%3ClinearGradient id='wv' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0%25' stop-color='%2360c5ff'/%3E%3Cstop offset='100%25' stop-color='%232563eb'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='url(%23bg)'/%3E%3Crect x='1' y='1' width='62' height='62' rx='15' fill='none' stroke='%233b82f6' stroke-opacity='0.3' stroke-width='2'/%3E%3Cg fill='url(%23wv)'%3E%3Crect x='10' y='28' width='4.5' height='12' rx='2.25' opacity='0.6'/%3E%3Crect x='18' y='22' width='4.5' height='24' rx='2.25' opacity='0.85'/%3E%3Crect x='26' y='15' width='4.5' height='36' rx='2.25'/%3E%3Crect x='34' y='21' width='4.5' height='25' rx='2.25' opacity='0.9'/%3E%3Crect x='42' y='26' width='4.5' height='16' rx='2.25' opacity='0.75'/%3E%3Crect x='50' y='30' width='4.5' height='9' rx='2.25' opacity='0.5'/%3E%3C/g%3E%3Cpath d='M36.25 10.5c0-1.4 1.1-2.5 2.5-2.5h5.5c1.4 0 2.5 1.1 2.5 2.5v2.4c0 .8-.3 1.5-.9 2.1l-3.2 3.1c-.6.6-1.6.6-2.2 0l-3.2-3.1c-.6-.6-.9-1.3-.9-2.1v-2.4z' fill='%23facc15'/%3E%3C/svg%3E">
@@ -4719,6 +4719,82 @@
       gap: 6px;
     }
 
+    .fav-sort-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+      margin: 2px 0 4px;
+    }
+
+    .fav-sort-group {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      flex-shrink: 0;
+    }
+
+    .fav-sort-btn {
+      height: 25px;
+      padding: 0 8px;
+      border-radius: 7px;
+      background: #23232c;
+      border: 1px solid var(--border-strong);
+      color: #a1a1aa;
+      font-size: 10.5px;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      white-space: nowrap;
+      transition: background-color 0.12s ease, border-color 0.12s ease, color 0.12s ease;
+    }
+
+    .fav-sort-btn.active {
+      background: rgba(66, 165, 245, 0.2);
+      border-color: var(--accent-blue);
+      color: #bae6fd;
+    }
+
+    .fav-sort-btn:active {
+      transform: scale(0.95);
+    }
+
+    .fav-footer-stack {
+      margin-top: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      flex-shrink: 0;
+    }
+
+    .fav-footer-bottom-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 7px;
+    }
+
+    .fav-footer-back-btn {
+      height: 42px;
+      padding: 0 10px;
+      border-radius: 11px;
+      background: #262632;
+      border: 1px solid var(--border-strong);
+      color: #f4f4f6;
+      font-size: 12.5px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      white-space: nowrap;
+      transition: transform 0.08s ease;
+    }
+
+    .fav-footer-back-btn:active {
+      transform: scale(0.97);
+    }
+
     /* Toast Notification (never uses alert/confirm) */
     .toast-banner {
       position: fixed;
@@ -5756,7 +5832,7 @@
         <div class="modal-section" style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
           <div>
             <div class="sec-title">バージョン情報</div>
-            <div id="settingsVersionLabel" class="engine-desc mono">現在: v50</div>
+            <div id="settingsVersionLabel" class="engine-desc mono">現在: v51</div>
           </div>
           <button id="btnShowReleaseHistory" type="button" class="step-btn" style="color:#93c5fd;border-color:rgba(66,165,245,0.45);">更新履歴を見る</button>
         </div>
@@ -5913,7 +5989,7 @@
           </div>
           <div>
             <h3 id="whatsNewTitle" class="whats-new-title">アップデートのお知らせ</h3>
-            <p id="whatsNewSub" class="whats-new-sub mono">v50 に更新されました</p>
+            <p id="whatsNewSub" class="whats-new-sub mono">v51 に更新されました</p>
           </div>
         </div>
         <button id="btnCloseWhatsNewX" type="button" class="modal-close" aria-label="閉じる">✕</button>
@@ -6285,23 +6361,29 @@
           <div id="favCrumbPath" class="fav-crumb-path mono">/</div>
         </div>
 
-        <button id="btnFavLoadAllTracks" type="button" class="fav-primary-picker-btn" style="min-height:38px;font-size:12.5px;">
-          <span>このフォルダの全曲をリストに読み込む</span>
-        </button>
-
-        <div class="fav-section-label" style="margin-bottom:0;">
-          <span>フォルダ移動・1曲を選んで開く</span>
-          <span id="favBrowserCountBadge" class="mono" style="color:#a1a1aa;">0件</span>
+        <div class="fav-sort-bar">
+          <span class="fav-section-label" style="margin:0;">
+            <span>一覧</span>
+            <span id="favBrowserCountBadge" class="mono" style="color:#a1a1aa;margin-left:5px;">0件</span>
+          </span>
+          <div class="fav-sort-group" role="group" aria-label="並び順">
+            <button id="btnFavSortName" type="button" class="fav-sort-btn active">ファイル名 ↑</button>
+            <button id="btnFavSortDate" type="button" class="fav-sort-btn">更新日 ↓</button>
+          </div>
         </div>
         <div id="favBrowserFileListWrap" class="fav-list"></div>
-
-        <button id="btnFavBackToFoldersBottom" type="button" class="fav-browser-back-footer-btn">
-          <span>← フォルダ一覧に戻る</span>
-        </button>
       </div>
 
-      <div class="whats-new-footer">
-        <button id="btnCloseFavFoldersOk" type="button" class="whats-new-ok-btn">閉じる</button>
+      <div class="fav-footer-stack">
+        <button id="btnFavLoadAllTracks" type="button" class="fav-primary-picker-btn hidden" style="min-height:40px;font-size:12.5px;">
+          <span>このフォルダの全曲をリストに読み込む</span>
+        </button>
+        <div id="favFooterBottomRow" style="display:grid;grid-template-columns:1fr;gap:7px;">
+          <button id="btnFavBackToFoldersBottom" type="button" class="fav-footer-back-btn hidden">
+            <span>← フォルダ一覧に戻る</span>
+          </button>
+          <button id="btnCloseFavFoldersOk" type="button" class="whats-new-ok-btn">閉じる</button>
+        </div>
       </div>
     </div>
   </div>
@@ -19732,12 +19814,87 @@
       const favBrowserCountBadge = document.getElementById('favBrowserCountBadge');
       const favBrowserFileListWrap = document.getElementById('favBrowserFileListWrap');
       const btnFavBackToFolders = document.getElementById('btnFavBackToFolders');
+      const btnFavBackToFoldersBottom = document.getElementById('btnFavBackToFoldersBottom');
+      const favFooterBottomRow = document.getElementById('favFooterBottomRow');
       const btnFavBookmarkCurDir = document.getElementById('btnFavBookmarkCurDir');
       const btnFavDirUp = document.getElementById('btnFavDirUp');
       const favCrumbPath = document.getElementById('favCrumbPath');
       const btnFavLoadAllTracks = document.getElementById('btnFavLoadAllTracks');
+      const btnFavSortName = document.getElementById('btnFavSortName');
+      const btnFavSortDate = document.getElementById('btnFavSortDate');
 
-      let activeBrowsedFolder = null; // { rootItem, stack: [{ name, handle }], dirs: [{ name, handle }], fileEntries: [{ name, handle, isAudio }] }
+      let activeBrowsedFolder = null; // { rootItem, stack: [{ name, handle }], dirs: [{ name, handle }], fileEntries: [{ name, handle, isAudio, lastModified }] }
+      let favSortField = 'name'; // 'name' | 'date'
+      let favSortDir = 'asc';    // 'asc' | 'desc'
+
+      function formatShortDate(ms) {
+        if (!ms || !isFinite(ms)) return '';
+        const d = new Date(ms);
+        const y = d.getFullYear();
+        const m = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        return `${y}/${m}/${day}`;
+      }
+
+      function updateFavSortButtonsUI() {
+        if (btnFavSortName) {
+          const isName = favSortField === 'name';
+          btnFavSortName.classList.toggle('active', isName);
+          btnFavSortName.textContent = isName
+            ? (favSortDir === 'asc' ? 'ファイル名 ↑' : 'ファイル名 ↓')
+            : 'ファイル名';
+        }
+        if (btnFavSortDate) {
+          const isDate = favSortField === 'date';
+          btnFavSortDate.classList.toggle('active', isDate);
+          btnFavSortDate.textContent = isDate
+            ? (favSortDir === 'desc' ? '更新日 ↓' : '更新日 ↑')
+            : '更新日';
+        }
+      }
+
+      function getSortedDirs(dirs) {
+        const list = [...dirs];
+        const mul = (favSortField === 'name' && favSortDir === 'desc') ? -1 : 1;
+        list.sort((a, b) => mul * a.name.localeCompare(b.name, 'ja', { numeric: true }));
+        return list;
+      }
+
+      function getSortedFileEntries(fileEntries) {
+        const list = [...fileEntries];
+        const mul = favSortDir === 'asc' ? 1 : -1;
+        if (favSortField === 'date') {
+          list.sort((a, b) => {
+            const diff = (a.lastModified || 0) - (b.lastModified || 0);
+            if (diff !== 0) return mul * diff;
+            return a.name.localeCompare(b.name, 'ja', { numeric: true });
+          });
+        } else {
+          list.sort((a, b) => mul * a.name.localeCompare(b.name, 'ja', { numeric: true }));
+        }
+        return list;
+      }
+
+      async function ensureFileEntriesMetadata(fileEntries) {
+        for (let i = 0; i < fileEntries.length; i++) {
+          const fe = fileEntries[i];
+          if (typeof fe.lastModified === 'number' && fe.lastModified > 0) continue;
+          try {
+            const f = await fe.handle.getFile();
+            fe.lastModified = Number(f.lastModified) || 0;
+          } catch (_) {
+            fe.lastModified = 0;
+          }
+        }
+      }
+
+      function setFavFooterBrowserMode(isBrowser) {
+        if (btnFavLoadAllTracks) btnFavLoadAllTracks.classList.toggle('hidden', !isBrowser);
+        if (btnFavBackToFoldersBottom) btnFavBackToFoldersBottom.classList.toggle('hidden', !isBrowser);
+        if (favFooterBottomRow) {
+          favFooterBottomRow.style.gridTemplateColumns = isBrowser ? '1fr 1fr' : '1fr';
+        }
+      }
 
       function isAudioFileName(name) {
         return /\.(m4a|mp3|wav|aac|flac|ogg|opus|wma|aif|aiff|caf|3gp|mp4|webm)$/i.test(String(name || ''));
@@ -19751,6 +19908,7 @@
         activeBrowsedFolder = null;
         if (favFolderBrowserView) favFolderBrowserView.classList.add('hidden');
         if (favFoldersMainView) favFoldersMainView.classList.remove('hidden');
+        setFavFooterBrowserMode(false);
       }
 
       async function openSingleFileFromFolder(fileEntry) {
@@ -19767,7 +19925,7 @@
 
       async function openAllFilesFromBrowsedFolder() {
         if (!activeBrowsedFolder || !Array.isArray(activeBrowsedFolder.fileEntries) || activeBrowsedFolder.fileEntries.length === 0) return;
-        const entries = activeBrowsedFolder.fileEntries;
+        const entries = getSortedFileEntries(activeBrowsedFolder.fileEntries);
         closeFavoriteFoldersModal();
         try {
           const files = [];
@@ -19796,12 +19954,13 @@
             const fname = entry.name || '';
             const isAud = isAudioFileName(fname);
             if (isAud || isPinFileName(fname)) {
-              fileEntries.push({ name: fname, handle: entry, isAudio: isAud });
+              fileEntries.push({ name: fname, handle: entry, isAudio: isAud, lastModified: 0 });
             }
           }
         }
-        dirs.sort((a, b) => a.name.localeCompare(b.name, 'ja'));
-        fileEntries.sort((a, b) => a.name.localeCompare(b.name, 'ja'));
+        if (favSortField === 'date') {
+          await ensureFileEntriesMetadata(fileEntries);
+        }
         renderFolderBrowserView(folderItem, stack, dirs, fileEntries);
       }
 
@@ -19810,12 +19969,17 @@
         activeBrowsedFolder = { rootItem: folderItem, stack, dirs, fileEntries };
         if (favFoldersMainView) favFoldersMainView.classList.add('hidden');
         favFolderBrowserView.classList.remove('hidden');
+        setFavFooterBrowserMode(true);
+        updateFavSortButtonsUI();
+
+        const sortedDirs = getSortedDirs(dirs);
+        const sortedFiles = getSortedFileEntries(fileEntries);
 
         const curEntry = stack[stack.length - 1];
-        const audioCount = fileEntries.filter(fe => fe.isAudio).length;
+        const audioCount = sortedFiles.filter(fe => fe.isAudio).length;
         if (favBrowserFolderName) favBrowserFolderName.textContent = `★ ${curEntry ? curEntry.name : folderItem.name}`;
         if (favBrowserFolderSub) {
-          favBrowserFolderSub.textContent = `音声 ${audioCount}曲 / フォルダ ${dirs.length}件`;
+          favBrowserFolderSub.textContent = `音声 ${audioCount}曲 / フォルダ ${sortedDirs.length}件`;
         }
         if (favCrumbPath) {
           favCrumbPath.textContent = '/' + stack.map(s => s.name).join(' / ');
@@ -19825,19 +19989,19 @@
           btnFavDirUp.style.opacity = stack.length <= 1 ? '0.35' : '1';
         }
         if (favBrowserCountBadge) {
-          favBrowserCountBadge.textContent = `${dirs.length + fileEntries.length}件`;
+          favBrowserCountBadge.textContent = `${sortedDirs.length + sortedFiles.length}件`;
         }
         if (btnFavLoadAllTracks) {
-          btnFavLoadAllTracks.disabled = fileEntries.length === 0;
-          btnFavLoadAllTracks.textContent = fileEntries.length > 1
-            ? `このフォルダの全 ${fileEntries.length} 件をリストに読み込む`
-            : (fileEntries.length === 1 ? 'この1曲をリストに読み込む' : 'この階層に音声ファイルはありません');
+          btnFavLoadAllTracks.disabled = sortedFiles.length === 0;
+          btnFavLoadAllTracks.textContent = sortedFiles.length > 1
+            ? `このフォルダの全 ${sortedFiles.length} 件をリストに読み込む`
+            : (sortedFiles.length === 1 ? 'この1曲をリストに読み込む' : 'この階層に音声ファイルはありません');
         }
 
         favBrowserFileListWrap.innerHTML = '';
         const frag = document.createDocumentFragment();
 
-        dirs.forEach((d) => {
+        sortedDirs.forEach((d) => {
           const dBtn = document.createElement('button');
           dBtn.type = 'button';
           dBtn.className = 'fav-dir-item';
@@ -19848,12 +20012,14 @@
           frag.appendChild(dBtn);
         });
 
-        fileEntries.forEach((fe) => {
+        sortedFiles.forEach((fe) => {
           const rowBtn = document.createElement('button');
           rowBtn.type = 'button';
           rowBtn.className = 'fav-track-item' + (fe.isAudio ? '' : ' is-pin-file');
           const badge = fe.isAudio ? '♪' : '📌';
-          rowBtn.innerHTML = `<span class="fav-track-name" style="flex:1;min-width:0;">${badge} ${escapeHtml(fe.name)}</span>`;
+          const dateStr = (favSortField === 'date' && fe.lastModified > 0) ? formatShortDate(fe.lastModified) : '';
+          const metaHtml = dateStr ? `<span class="fav-track-meta mono" style="flex-shrink:0;">${dateStr}</span>` : '';
+          rowBtn.innerHTML = `<span class="fav-track-name" style="flex:1;min-width:0;">${badge} ${escapeHtml(fe.name)}</span>${metaHtml}`;
           rowBtn.addEventListener('click', () => openSingleFileFromFolder(fe));
           frag.appendChild(rowBtn);
         });
@@ -20054,8 +20220,34 @@
 
       document.getElementById('btnFavStandardPick').addEventListener('click', () => triggerStandardFilePicker());
       if (btnFavBackToFolders) btnFavBackToFolders.addEventListener('click', showFavFoldersMainView);
-      const btnFavBackToFoldersBottom = document.getElementById('btnFavBackToFoldersBottom');
       if (btnFavBackToFoldersBottom) btnFavBackToFoldersBottom.addEventListener('click', showFavFoldersMainView);
+      if (btnFavSortName) {
+        btnFavSortName.addEventListener('click', () => {
+          if (favSortField === 'name') {
+            favSortDir = favSortDir === 'asc' ? 'desc' : 'asc';
+          } else {
+            favSortField = 'name';
+            favSortDir = 'asc';
+          }
+          if (activeBrowsedFolder) {
+            renderFolderBrowserView(activeBrowsedFolder.rootItem, activeBrowsedFolder.stack, activeBrowsedFolder.dirs, activeBrowsedFolder.fileEntries);
+          }
+        });
+      }
+      if (btnFavSortDate) {
+        btnFavSortDate.addEventListener('click', async () => {
+          if (favSortField === 'date') {
+            favSortDir = favSortDir === 'desc' ? 'asc' : 'desc';
+          } else {
+            favSortField = 'date';
+            favSortDir = 'desc';
+          }
+          if (activeBrowsedFolder) {
+            await ensureFileEntriesMetadata(activeBrowsedFolder.fileEntries);
+            renderFolderBrowserView(activeBrowsedFolder.rootItem, activeBrowsedFolder.stack, activeBrowsedFolder.dirs, activeBrowsedFolder.fileEntries);
+          }
+        });
+      }
       if (btnFavDirUp) {
         btnFavDirUp.addEventListener('click', async () => {
           if (!activeBrowsedFolder || !Array.isArray(activeBrowsedFolder.stack) || activeBrowsedFolder.stack.length <= 1) return;
@@ -20340,11 +20532,21 @@
       document.addEventListener('webkitfullscreenchange', onFullscreenStateChanged);
 
       // ==================== GITHUB / PWA SOFTWARE UPDATE CHECK & APPLY ====================
-      const APP_VERSION = 'v50';
+      const APP_VERSION = 'v51';
 
       // Ordered newest-first; each release appends a new object at the top.
       // Users who skip multiple versions automatically see ALL unseen versions between lastSeen and current.
       const APP_RELEASE_NOTES = [
+        {
+          version: 'v51',
+          verNum: 51,
+          date: '2026/11/24',
+          title: 'フォルダ内ファイルの並び替え（ファイル名・更新日の昇順／降順）と下部ボタン配置を改善',
+          items: [
+            'フォルダ内のファイル一覧で「ファイル名 ↑/↓」「更新日 ↓/↑」の昇順・降順ソートをワンタップで切り替えられるようにしました（全曲一括読込もその並び順で読み込まれます）',
+            '「このフォルダの全〜件をリストに読み込む」と「← フォルダ一覧に戻る」を画面下部の「閉じる」ボタンと並べて固定表示し、一覧のスクロール領域を広げました'
+          ]
+        },
         {
           version: 'v50',
           verNum: 50,
