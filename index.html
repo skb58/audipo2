@@ -8,7 +8,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="Audipo2">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="app-version" content="v57">
+  <meta name="app-version" content="v58">
   <link rel="manifest" href="./manifest.json">
   <title>Audipo風 練習プレイヤー＆レコーダー</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='bg' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%231b2030'/%3E%3Cstop offset='100%25' stop-color='%230d0f15'/%3E%3C/linearGradient%3E%3ClinearGradient id='wv' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0%25' stop-color='%2360c5ff'/%3E%3Cstop offset='100%25' stop-color='%232563eb'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='url(%23bg)'/%3E%3Crect x='1' y='1' width='62' height='62' rx='15' fill='none' stroke='%233b82f6' stroke-opacity='0.3' stroke-width='2'/%3E%3Cg fill='url(%23wv)'%3E%3Crect x='10' y='28' width='4.5' height='12' rx='2.25' opacity='0.6'/%3E%3Crect x='18' y='22' width='4.5' height='24' rx='2.25' opacity='0.85'/%3E%3Crect x='26' y='15' width='4.5' height='36' rx='2.25'/%3E%3Crect x='34' y='21' width='4.5' height='25' rx='2.25' opacity='0.9'/%3E%3Crect x='42' y='26' width='4.5' height='16' rx='2.25' opacity='0.75'/%3E%3Crect x='50' y='30' width='4.5' height='9' rx='2.25' opacity='0.5'/%3E%3C/g%3E%3Cpath d='M36.25 10.5c0-1.4 1.1-2.5 2.5-2.5h5.5c1.4 0 2.5 1.1 2.5 2.5v2.4c0 .8-.3 1.5-.9 2.1l-3.2 3.1c-.6.6-1.6.6-2.2 0l-3.2-3.1c-.6-.6-.9-1.3-.9-2.1v-2.4z' fill='%23facc15'/%3E%3C/svg%3E">
@@ -3752,66 +3752,69 @@
       flex-shrink: 0;
     }
 
-    .save-dest-chips {
+    .save-dest-row {
       display: flex;
-      flex-wrap: wrap;
+      align-items: center;
       gap: 6px;
     }
 
-    .save-dest-chip {
-      max-width: 100%;
-      min-height: 31px;
-      padding: 4px 10px;
+    .save-dest-box {
+      flex: 1;
+      min-width: 0;
+      height: 38px;
+      padding: 0 10px;
       border-radius: 9px;
-      background: #1d1d24;
+      background: #111114;
       border: 1px solid var(--border-strong);
       color: #d4d4d8;
-      font-size: 11.5px;
-      font-weight: 700;
-      display: inline-flex;
+      display: flex;
       align-items: center;
-      gap: 5px;
+      gap: 7px;
+      transition: border-color 0.14s ease, color 0.14s ease, background-color 0.14s ease;
+    }
+
+    .save-dest-box.is-custom {
+      background: rgba(34, 197, 94, 0.08);
+      border-color: rgba(34, 197, 94, 0.55);
+      color: #86efac;
+    }
+
+    .save-dest-text {
+      flex: 1;
+      min-width: 0;
+      font-size: 13px;
+      font-weight: 700;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-      transition: transform 0.08s ease, background-color 0.12s ease, border-color 0.12s ease, color 0.12s ease;
     }
 
-    .save-dest-chip:active {
+    .save-dest-change-btn {
+      height: 38px;
+      padding: 0 12px;
+      border-radius: 9px;
+      background: rgba(66, 165, 245, 0.16);
+      border: 1px solid rgba(96, 165, 250, 0.62);
+      color: #bae6fd;
+      font-size: 12.5px;
+      font-weight: 800;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      white-space: nowrap;
+      flex-shrink: 0;
+      transition: transform 0.08s ease, background-color 0.12s ease;
+    }
+
+    .save-dest-change-btn:active {
       transform: scale(0.95);
+      background: rgba(66, 165, 245, 0.28);
     }
 
-    .save-dest-chip:disabled {
+    .save-dest-change-btn:disabled {
       opacity: 0.4;
       pointer-events: none;
-    }
-
-    .save-dest-chip.active-blue {
-      background: rgba(66, 165, 245, 0.22);
-      border-color: var(--accent-blue);
-      color: #e0f2fe;
-      box-shadow: 0 0 10px rgba(66, 165, 245, 0.22);
-    }
-
-    .save-dest-chip.active-amber {
-      background: rgba(250, 204, 21, 0.2);
-      border-color: rgba(250, 204, 21, 0.8);
-      color: #fef08a;
-      box-shadow: 0 0 10px rgba(250, 204, 21, 0.22);
-    }
-
-    .save-dest-chip.active-green {
-      background: rgba(34, 197, 94, 0.2);
-      border-color: var(--accent-green);
-      color: #dcfce7;
-      box-shadow: 0 0 10px rgba(34, 197, 94, 0.22);
-    }
-
-    .save-dest-chip.pick-btn {
-      background: rgba(66, 165, 245, 0.12);
-      border-style: dashed;
-      border-color: rgba(96, 165, 250, 0.6);
-      color: #93c5fd;
     }
 
     .save-fmt-grid {
@@ -6145,7 +6148,7 @@
         <div class="modal-section" style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
           <div>
             <div class="sec-title">バージョン情報</div>
-            <div id="settingsVersionLabel" class="engine-desc mono">現在: v57</div>
+            <div id="settingsVersionLabel" class="engine-desc mono">現在: v58</div>
           </div>
           <button id="btnShowReleaseHistory" type="button" class="step-btn" style="color:#93c5fd;border-color:rgba(66,165,245,0.45);">更新履歴を見る</button>
         </div>
@@ -6302,7 +6305,7 @@
           </div>
           <div>
             <h3 id="whatsNewTitle" class="whats-new-title">アップデートのお知らせ</h3>
-            <p id="whatsNewSub" class="whats-new-sub mono">v57 に更新されました</p>
+            <p id="whatsNewSub" class="whats-new-sub mono">v58 に更新されました</p>
           </div>
         </div>
         <button id="btnCloseWhatsNewX" type="button" class="modal-close" aria-label="閉じる">✕</button>
@@ -6408,14 +6411,26 @@
           </div>
         </div>
 
-        <!-- Save Destination Selector (Save Mode Only) -->
+        <!-- Save Destination (Save Mode Only) -->
         <div id="saveDestSection" class="modal-section">
           <div class="sec-head" style="margin-bottom:6px;">
-            <span class="sec-title">保存場所</span>
-            <span id="saveDestValueLabel" class="sec-value" style="max-width:65%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">標準（ダウンロード）</span>
+            <span class="sec-title">保存先</span>
+            <button id="btnSaveDestReset" type="button" class="step-btn hidden" style="padding:2px 8px;font-size:10px;">標準に戻す</button>
           </div>
-          <div id="saveDestChipRow" class="save-dest-chips"></div>
-          <div id="saveDestHint" class="engine-desc" style="margin-top:6px;">前回選んだ保存場所を記憶します。</div>
+          <div class="save-dest-row">
+            <div id="saveDestPathBox" class="save-dest-box">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;">
+                <path d="M4 20h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2Z"/>
+              </svg>
+              <span id="saveDestPathText" class="save-dest-text">標準（ダウンロード）</span>
+            </div>
+            <button id="btnSaveDestChange" type="button" class="save-dest-change-btn" title="保存先フォルダを選択して変更">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4 20h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2Z"/>
+              </svg>
+              <span>変更</span>
+            </button>
+          </div>
         </div>
 
         <!-- Format Selector -->
@@ -12769,9 +12784,10 @@
       const saveFileNameInput = document.getElementById('saveFileNameInput');
       const saveFileExtBadge = document.getElementById('saveFileExtBadge');
       const saveDestSection = document.getElementById('saveDestSection');
-      const saveDestValueLabel = document.getElementById('saveDestValueLabel');
-      const saveDestChipRow = document.getElementById('saveDestChipRow');
-      const saveDestHint = document.getElementById('saveDestHint');
+      const saveDestPathBox = document.getElementById('saveDestPathBox');
+      const saveDestPathText = document.getElementById('saveDestPathText');
+      const btnSaveDestChange = document.getElementById('btnSaveDestChange');
+      const btnSaveDestReset = document.getElementById('btnSaveDestReset');
       const saveFormatGrid = document.getElementById('saveFormatGrid');
       const saveFormatLabel = document.getElementById('saveFormatLabel');
       const saveFormatHint = document.getElementById('saveFormatHint');
@@ -13752,50 +13768,27 @@
       }
 
       async function selectSaveDestination(mode, favItem = null, customHandle = null) {
-        if (mode === 'fav' && favItem) {
+        if (mode === 'custom' && customHandle) {
+          const cleanName = String(customHandle.name || '選択フォルダ').trim() || '選択フォルダ';
+          await saveCustomSaveDestHandleToIDB(customHandle, cleanName);
+          state.saveDestMode = 'custom';
+          state.saveDestFavId = '';
+          state.saveDestName = cleanName;
+          saveExportState.resolvedDirHandle = customHandle;
+          saveExportState.resolvedDirName = cleanName;
+        } else if (mode === 'fav' && favItem) {
           const h = await loadFavFolderHandleFromIDB(favItem.id);
           if (!h || typeof h.getFileHandle !== 'function') {
-            showToast('このフォルダは直接保存に対応していません（再登録してください）');
+            showToast('このフォルダは直接保存に対応していません');
             return;
           }
-          state.saveDestMode = 'fav';
-          state.saveDestFavId = favItem.id;
-          state.saveDestName = favItem.name || h.name || 'お気に入りフォルダ';
+          const cleanName = favItem.name || h.name || '選択フォルダ';
+          await saveCustomSaveDestHandleToIDB(h, cleanName);
+          state.saveDestMode = 'custom';
+          state.saveDestFavId = '';
+          state.saveDestName = cleanName;
           saveExportState.resolvedDirHandle = h;
-          saveExportState.resolvedDirName = state.saveDestName;
-        } else if (mode === 'custom' && customHandle) {
-          const cleanName = String(customHandle.name || '選択フォルダ').trim() || '選択フォルダ';
-          // If this picked folder is already registered in favorites, link to that favorite chip directly
-          let matchedFav = null;
-          if (typeof readFavoriteFolders === 'function' && typeof customHandle.isSameEntry === 'function') {
-            const favs = readFavoriteFolders().favorites;
-            for (let i = 0; i < favs.length; i++) {
-              const fh = await loadFavFolderHandleFromIDB(favs[i].id);
-              if (fh) {
-                try {
-                  if (await fh.isSameEntry(customHandle)) {
-                    matchedFav = favs[i];
-                    break;
-                  }
-                } catch (_) {}
-              }
-            }
-          }
-          if (matchedFav) {
-            state.saveDestMode = 'fav';
-            state.saveDestFavId = matchedFav.id;
-            state.saveDestName = matchedFav.name || cleanName;
-            saveExportState.resolvedDirHandle = customHandle;
-            saveExportState.resolvedDirName = state.saveDestName;
-            await saveFavFolderHandleToIDB(matchedFav.id, customHandle);
-          } else {
-            await saveCustomSaveDestHandleToIDB(customHandle, cleanName);
-            state.saveDestMode = 'custom';
-            state.saveDestFavId = '';
-            state.saveDestName = cleanName;
-            saveExportState.resolvedDirHandle = customHandle;
-            saveExportState.resolvedDirName = cleanName;
-          }
+          saveExportState.resolvedDirName = cleanName;
         } else {
           state.saveDestMode = 'download';
           state.saveDestFavId = '';
@@ -13810,13 +13803,24 @@
       async function pickCustomSaveDestinationFolder() {
         if (saveExportState.isExporting) return;
         if (typeof window.showDirectoryPicker !== 'function') {
-          showToast('このブラウザはフォルダ指定保存に非対応のため「標準（ダウンロード）」をご利用ください');
+          showToast('このブラウザはフォルダ変更に非対応のため「標準（ダウンロード）」へ保存されます');
           return;
         }
         try {
+          const curHandle = saveExportState.resolvedDirHandle || saveExportState.customDirHandle || null;
           let dirHandle = null;
           try {
-            dirHandle = await window.showDirectoryPicker({ mode: 'readwrite' });
+            if (curHandle) {
+              try {
+                dirHandle = await window.showDirectoryPicker({ mode: 'readwrite', startIn: curHandle });
+              } catch (startErr) {
+                if (startErr && startErr.name === 'AbortError') return;
+                if (startErr && (startErr.name === 'SecurityError' || startErr.name === 'NotAllowedError')) throw startErr;
+                dirHandle = await window.showDirectoryPicker({ mode: 'readwrite' });
+              }
+            } else {
+              dirHandle = await window.showDirectoryPicker({ mode: 'readwrite' });
+            }
           } catch (rwErr) {
             if (rwErr && rwErr.name === 'AbortError') return;
             if (rwErr && (rwErr.name === 'SecurityError' || rwErr.name === 'NotAllowedError')) {
@@ -13827,7 +13831,7 @@
           }
           if (!dirHandle) return;
           await selectSaveDestination('custom', null, dirHandle);
-          showToast(`保存場所を設定しました: ${state.saveDestName}`);
+          showToast(`保存先を変更しました: ${state.saveDestName}`);
         } catch (err) {
           if (err && err.name === 'AbortError') return;
           if (err && (err.name === 'SecurityError' || err.name === 'NotAllowedError')) {
@@ -13839,96 +13843,25 @@
       }
 
       function renderSaveDestSelectorUI() {
-        if (!saveDestSection || !saveDestChipRow || !saveDestValueLabel) return;
+        if (!saveDestSection || !saveDestPathText || !saveDestPathBox) return;
         const isShare = saveExportState.mode === 'share';
         saveDestSection.classList.toggle('hidden', isShare);
         if (isShare) return;
 
-        const supportsDirPicker = typeof window.showDirectoryPicker === 'function';
-        const mode = state.saveDestMode || 'download';
-        const favs = typeof readFavoriteFolders === 'function'
-          ? readFavoriteFolders().favorites.filter(f => f && f.hasDirHandle !== false)
-          : [];
+        const isCustom = state.saveDestMode !== 'download' && Boolean(saveExportState.resolvedDirHandle || state.saveDestName);
+        const label = isCustom
+          ? (saveExportState.resolvedDirName || state.saveDestName || saveExportState.customDirName || '選択フォルダ')
+          : '標準（ダウンロード）';
 
-        if (mode === 'fav' && state.saveDestName) {
-          saveDestValueLabel.textContent = `★ ${state.saveDestName}`;
-          saveDestValueLabel.style.color = '#fde047';
-        } else if (mode === 'custom' && (state.saveDestName || saveExportState.customDirName)) {
-          saveDestValueLabel.textContent = `📁 ${state.saveDestName || saveExportState.customDirName}`;
-          saveDestValueLabel.style.color = '#86efac';
-        } else {
-          saveDestValueLabel.textContent = '標準（ダウンロード）';
-          saveDestValueLabel.style.color = '#93c5fd';
+        saveDestPathText.textContent = label;
+        saveDestPathBox.classList.toggle('is-custom', isCustom);
+
+        if (btnSaveDestReset) {
+          btnSaveDestReset.classList.toggle('hidden', !isCustom);
+          btnSaveDestReset.disabled = saveExportState.isExporting;
         }
-
-        saveDestChipRow.innerHTML = '';
-        const frag = document.createDocumentFragment();
-
-        // 1. Default Download chip
-        const dlBtn = document.createElement('button');
-        dlBtn.type = 'button';
-        dlBtn.className = 'save-dest-chip' + (mode === 'download' ? ' active-blue' : '');
-        dlBtn.disabled = saveExportState.isExporting;
-        dlBtn.textContent = '標準（ダウンロード）';
-        dlBtn.addEventListener('click', () => {
-          if (saveExportState.isExporting) return;
-          selectSaveDestination('download');
-        });
-        frag.appendChild(dlBtn);
-
-        // 2. Favorite folders chips
-        favs.forEach((f) => {
-          const btn = document.createElement('button');
-          btn.type = 'button';
-          const isAct = mode === 'fav' && state.saveDestFavId === f.id;
-          btn.className = 'save-dest-chip' + (isAct ? ' active-amber' : '');
-          btn.disabled = saveExportState.isExporting;
-          btn.textContent = `★ ${f.name}`;
-          btn.title = `お気に入りフォルダ「${f.name}」へ直接保存`;
-          btn.addEventListener('click', () => {
-            if (saveExportState.isExporting) return;
-            selectSaveDestination('fav', f);
-          });
-          frag.appendChild(btn);
-        });
-
-        // 3. Remembered Custom folder chip (if one was previously picked and isn't already in favs)
-        if (saveExportState.customDirHandle) {
-          const customLabel = saveExportState.customDirName || saveExportState.customDirHandle.name || '指定フォルダ';
-          const cBtn = document.createElement('button');
-          cBtn.type = 'button';
-          cBtn.className = 'save-dest-chip' + (mode === 'custom' ? ' active-green' : '');
-          cBtn.disabled = saveExportState.isExporting;
-          cBtn.textContent = `📁 ${customLabel}`;
-          cBtn.title = `指定フォルダ「${customLabel}」へ直接保存`;
-          cBtn.addEventListener('click', () => {
-            if (saveExportState.isExporting) return;
-            selectSaveDestination('custom', null, saveExportState.customDirHandle);
-          });
-          frag.appendChild(cBtn);
-        }
-
-        // 4. Pick another folder button
-        if (supportsDirPicker) {
-          const pickBtn = document.createElement('button');
-          pickBtn.type = 'button';
-          pickBtn.className = 'save-dest-chip pick-btn';
-          pickBtn.disabled = saveExportState.isExporting;
-          pickBtn.textContent = '＋ フォルダを選ぶ';
-          pickBtn.addEventListener('click', pickCustomSaveDestinationFolder);
-          frag.appendChild(pickBtn);
-        }
-
-        saveDestChipRow.appendChild(frag);
-
-        if (saveDestHint) {
-          if (!supportsDirPicker && favs.length === 0 && !saveExportState.customDirHandle) {
-            saveDestHint.textContent = 'このブラウザはフォルダ指定保存に非対応のため、標準（ダウンロード）へ保存します。';
-          } else if (mode === 'download') {
-            saveDestHint.textContent = 'ブラウザのダウンロード先へ保存します。お気に入りや任意のフォルダを選ぶと次回起動時も記憶します。';
-          } else {
-            saveDestHint.textContent = 'このフォルダへ直接保存します（次回起動時も記憶）。アプリ再起動後の初回のみ書き込み許可ダイアログが出ます。';
-          }
+        if (btnSaveDestChange) {
+          btnSaveDestChange.disabled = saveExportState.isExporting;
         }
       }
 
@@ -14285,6 +14218,8 @@
         btnSaveExportRun.disabled = true;
         btnSaveExportRun.textContent = isShare ? '共有用ファイル作成中...' : '書き出し中...';
         saveFileNameInput.disabled = true;
+        if (btnSaveDestChange) btnSaveDestChange.disabled = true;
+        if (btnSaveDestReset) btnSaveDestReset.disabled = true;
         saveProgressBox.classList.remove('hidden');
         saveProgressLabel.textContent = isShare ? '共有用データを準備中...' : '書き出し準備中...';
         saveProgressPct.textContent = '0%';
@@ -14431,6 +14366,8 @@
             btnSaveExportRun.classList.remove('share-ready');
           }
           saveFileNameInput.disabled = false;
+          if (btnSaveDestChange) btnSaveDestChange.disabled = false;
+          if (btnSaveDestReset) btnSaveDestReset.disabled = false;
           saveProgressBox.classList.add('hidden');
         }
       }
@@ -14453,6 +14390,17 @@
         clearPreparedShareFile();
         saveFileNameInput.focus();
       });
+
+      if (btnSaveDestChange) {
+        btnSaveDestChange.addEventListener('click', pickCustomSaveDestinationFolder);
+      }
+      if (btnSaveDestReset) {
+        btnSaveDestReset.addEventListener('click', async () => {
+          if (saveExportState.isExporting) return;
+          await selectSaveDestination('download');
+          showToast('保存先を「標準（ダウンロード）」に戻しました');
+        });
+      }
 
       saveFileNameInput.addEventListener('input', () => {
         if (saveExportState.preparedShareFile) {
@@ -22648,11 +22596,21 @@
       document.addEventListener('webkitfullscreenchange', onFullscreenStateChanged);
 
       // ==================== GITHUB / PWA SOFTWARE UPDATE CHECK & APPLY ====================
-      const APP_VERSION = 'v57';
+      const APP_VERSION = 'v58';
 
       // Ordered newest-first; each release appends a new object at the top.
       // Users who skip multiple versions automatically see ALL unseen versions between lastSeen and current.
       const APP_RELEASE_NOTES = [
+        {
+          version: 'v58',
+          verNum: 58,
+          date: '2026/11/25',
+          title: '保存先UIを「現在の保存先＋変更ボタン」のシンプルな1行表示に整理',
+          items: [
+            '「保存」画面の保存先欄を、現在の保存先（初期値：標準（ダウンロード））と「変更」ボタンのみのすっきりした1行レイアウトに整理しました',
+            '「変更」ボタンから選んだフォルダはそのまま次回起動時も記憶され、必要に応じて右上の「標準に戻す」からいつでも元に戻せます'
+          ]
+        },
         {
           version: 'v57',
           verNum: 57,
