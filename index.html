@@ -8,7 +8,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="Audipo2">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="app-version" content="v54">
+  <meta name="app-version" content="v55">
   <link rel="manifest" href="./manifest.json">
   <title>Audipo風 練習プレイヤー＆レコーダー</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='bg' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%231b2030'/%3E%3Cstop offset='100%25' stop-color='%230d0f15'/%3E%3C/linearGradient%3E%3ClinearGradient id='wv' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0%25' stop-color='%2360c5ff'/%3E%3Cstop offset='100%25' stop-color='%232563eb'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='url(%23bg)'/%3E%3Crect x='1' y='1' width='62' height='62' rx='15' fill='none' stroke='%233b82f6' stroke-opacity='0.3' stroke-width='2'/%3E%3Cg fill='url(%23wv)'%3E%3Crect x='10' y='28' width='4.5' height='12' rx='2.25' opacity='0.6'/%3E%3Crect x='18' y='22' width='4.5' height='24' rx='2.25' opacity='0.85'/%3E%3Crect x='26' y='15' width='4.5' height='36' rx='2.25'/%3E%3Crect x='34' y='21' width='4.5' height='25' rx='2.25' opacity='0.9'/%3E%3Crect x='42' y='26' width='4.5' height='16' rx='2.25' opacity='0.75'/%3E%3Crect x='50' y='30' width='4.5' height='9' rx='2.25' opacity='0.5'/%3E%3C/g%3E%3Cpath d='M36.25 10.5c0-1.4 1.1-2.5 2.5-2.5h5.5c1.4 0 2.5 1.1 2.5 2.5v2.4c0 .8-.3 1.5-.9 2.1l-3.2 3.1c-.6.6-1.6.6-2.2 0l-3.2-3.1c-.6-.6-.9-1.3-.9-2.1v-2.4z' fill='%23facc15'/%3E%3C/svg%3E">
@@ -6083,7 +6083,7 @@
         <div class="modal-section" style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
           <div>
             <div class="sec-title">バージョン情報</div>
-            <div id="settingsVersionLabel" class="engine-desc mono">現在: v54</div>
+            <div id="settingsVersionLabel" class="engine-desc mono">現在: v55</div>
           </div>
           <button id="btnShowReleaseHistory" type="button" class="step-btn" style="color:#93c5fd;border-color:rgba(66,165,245,0.45);">更新履歴を見る</button>
         </div>
@@ -6240,7 +6240,7 @@
           </div>
           <div>
             <h3 id="whatsNewTitle" class="whats-new-title">アップデートのお知らせ</h3>
-            <p id="whatsNewSub" class="whats-new-sub mono">v54 に更新されました</p>
+            <p id="whatsNewSub" class="whats-new-sub mono">v55 に更新されました</p>
           </div>
         </div>
         <button id="btnCloseWhatsNewX" type="button" class="modal-close" aria-label="閉じる">✕</button>
@@ -7904,17 +7904,17 @@
         return 0;
       }
 
-      // Fast leading-silence onset detector (works on both decoded AudioBuffer and streamed waveformPyramid)
+      // Fast leading-silence onset detector (strictly track-relative AC-RMS + AC-Peak; works even on very quiet raw 24-bit recordings)
       function detectLeadingSilenceEnd() {
         const dur = Number(state.duration) || 0;
         if (!state.hasAudio || dur < 0.8) return 0;
 
-        const dt = 0.05; // 50ms resolution
+        const dt = 0.04; // 40ms resolution
         const sens = state.leadingSilenceSensitivity || 'normal';
         const minConsec = sens === 'gentle' ? 2 : (sens === 'strong' ? 4 : 3);
-        const preRollSec = sens === 'gentle' ? 0.20 : (sens === 'strong' ? 0.12 : 0.15);
+        const preRollSec = sens === 'gentle' ? 0.20 : (sens === 'strong' ? 0.10 : 0.15);
 
-        // Scan up to first 60% of track (capped at 10 min) for onset, while sampling full track for dynamic range reference
+        // Scan up to first 75% of track (capped at 10 min) for onset, while sampling full track for dynamic range reference
         const scanDur = Math.min(dur, Math.max(20, Math.min(600, dur * 0.75)));
         const scanFrames = Math.floor(scanDur / dt);
         if (scanFrames < minConsec + 2) return 0;
@@ -7930,54 +7930,53 @@
           const totalS = buf.length;
           const stride = Math.max(1, Math.floor(sr / 4000));
 
-          for (let f = 0; f < scanFrames; f++) {
-            const s0 = Math.floor(f * dt * sr);
-            const s1 = Math.min(totalS, Math.floor((f + 1) * dt * sr));
-            let sumSq = 0;
-            let cnt = 0;
+          const evalBufFrameDb = (frameIdx) => {
+            const s0 = Math.floor(frameIdx * dt * sr);
+            const s1 = Math.min(totalS, Math.floor((frameIdx + 1) * dt * sr));
+            let sum0 = 0, sum1 = 0, nSamples = 0;
             for (let i = s0; i < s1; i += stride) {
-              const v0 = ch0[i];
-              sumSq += v0 * v0;
-              cnt++;
+              sum0 += ch0[i];
+              if (ch1) sum1 += ch1[i];
+              nSamples++;
+            }
+            if (nSamples <= 0) return -120.0;
+            const m0 = sum0 / nSamples;
+            const m1 = ch1 ? (sum1 / nSamples) : 0;
+
+            let sumSq = 0;
+            let peak = 0;
+            for (let i = s0; i < s1; i += stride) {
+              const d0 = ch0[i] - m0;
+              sumSq += d0 * d0;
+              const a0 = Math.abs(d0);
+              if (a0 > peak) peak = a0;
               if (ch1) {
-                const v1 = ch1[i];
-                sumSq += v1 * v1;
-                cnt++;
+                const d1 = ch1[i] - m1;
+                sumSq += d1 * d1;
+                const a1 = Math.abs(d1);
+                if (a1 > peak) peak = a1;
               }
             }
-            const rms = cnt > 0 ? Math.sqrt(sumSq / cnt) : 0;
-            scanDb[f] = 20.0 * Math.log10(Math.max(1e-6, rms));
+            const rms = Math.sqrt(sumSq / (ch1 ? nSamples * 2 : nSamples));
+            // Combine AC-RMS and AC-Peak so sharp audible/visible attacks are never missed
+            const eff = Math.max(rms, peak * 0.55);
+            return 20.0 * Math.log10(Math.max(1e-6, eff));
+          };
+
+          for (let f = 0; f < scanFrames; f++) {
+            scanDb[f] = evalBufFrameDb(f);
           }
 
           // Sample ~320 evenly-spaced frames across whole track for robust activeDb / floorDb
           const totalFramesAll = Math.max(1, Math.floor(dur / dt));
           const refStep = Math.max(1, Math.floor(totalFramesAll / 320));
           for (let f = 0; f < totalFramesAll; f += refStep) {
-            if (f < scanFrames) {
-              refDbList.push(scanDb[f]);
-            } else {
-              const s0 = Math.floor(f * dt * sr);
-              const s1 = Math.min(totalS, Math.floor((f + 1) * dt * sr));
-              let sumSq = 0;
-              let cnt = 0;
-              for (let i = s0; i < s1; i += stride) {
-                const v0 = ch0[i];
-                sumSq += v0 * v0;
-                cnt++;
-                if (ch1) {
-                  const v1 = ch1[i];
-                  sumSq += v1 * v1;
-                  cnt++;
-                }
-              }
-              const rms = cnt > 0 ? Math.sqrt(sumSq / cnt) : 0;
-              refDbList.push(20.0 * Math.log10(Math.max(1e-6, rms)));
-            }
+            refDbList.push(f < scanFrames ? scanDb[f] : evalBufFrameDb(f));
           }
         } else if (state.waveformPyramid && state.waveformPyramid.levels && state.waveformPyramid.levels.length > 0) {
           const pyr = state.waveformPyramid;
           const sr = Math.max(1000, Number(pyr.sampleRate) || 48000);
-          const targetBin = Math.max(16, sr * 0.025);
+          const targetBin = Math.max(16, sr * 0.020);
           let lvl = pyr.levels[0];
           for (let i = 0; i < pyr.levels.length; i++) {
             if (pyr.levels[i].binSize <= targetBin * 2) lvl = pyr.levels[i];
@@ -7986,29 +7985,32 @@
           const bLen = lvl.min.length;
           const useSym = Boolean(state.waveSymmetry);
 
-          const frameAmpFromPyr = (frameIdx) => {
+          const evalPyrFrameDb = (frameIdx) => {
             const b0 = Math.max(0, Math.min(bLen - 1, Math.floor((frameIdx * dt) / binDur)));
             const b1 = Math.max(b0, Math.min(bLen - 1, Math.ceil(((frameIdx + 1) * dt) / binDur)));
             let sumSq = 0;
+            let peak = 0;
             let cnt = 0;
             for (let b = b0; b <= b1; b++) {
               const lo = lvl.min[b];
               const hi = lvl.max[b];
               const amp = useSym ? Math.max(0, 0.5 * (hi - lo)) : Math.max(Math.abs(lo), Math.abs(hi));
               sumSq += amp * amp;
+              if (amp > peak) peak = amp;
               cnt++;
             }
-            // Convert peak-envelope bin RMS roughly toward audio RMS (-3dB)
-            return cnt > 0 ? Math.sqrt(sumSq / cnt) * 0.707 : 0;
+            const rmsApprox = cnt > 0 ? Math.sqrt(sumSq / cnt) * 0.707 : 0;
+            const eff = Math.max(rmsApprox, peak * 0.55);
+            return 20.0 * Math.log10(Math.max(1e-6, eff));
           };
 
           for (let f = 0; f < scanFrames; f++) {
-            scanDb[f] = 20.0 * Math.log10(Math.max(1e-6, frameAmpFromPyr(f)));
+            scanDb[f] = evalPyrFrameDb(f);
           }
           const totalFramesAll = Math.max(1, Math.floor(dur / dt));
           const refStep = Math.max(1, Math.floor(totalFramesAll / 320));
           for (let f = 0; f < totalFramesAll; f += refStep) {
-            refDbList.push(f < scanFrames ? scanDb[f] : 20.0 * Math.log10(Math.max(1e-6, frameAmpFromPyr(f))));
+            refDbList.push(f < scanFrames ? scanDb[f] : evalPyrFrameDb(f));
           }
         } else {
           return 0;
@@ -8018,26 +8020,43 @@
         refDbList.sort((a, b) => a - b);
         const rLen = refDbList.length;
         const activeDb = refDbList[Math.min(rLen - 1, Math.floor(rLen * 0.90))];
-        const rawFloorDb = refDbList[Math.min(rLen - 1, Math.floor(rLen * 0.05))];
-        if (activeDb < -62) return 0; // Entire file is effectively silent
+        const p05Db = refDbList[Math.min(rLen - 1, Math.floor(rLen * 0.05))];
+        if (activeDb < -80.0) return 0; // Entire file is effectively digital silence
 
-        const floorDb = Math.max(activeDb - 65.0, Math.min(rawFloorDb, activeDb - 12.0));
+        // Also inspect the first 2 seconds so brief leading silence on long tracks is properly anchored
+        const leadCheckN = Math.max(1, Math.min(scanFrames, Math.floor(2.0 / dt)));
+        const leadSample = Array.from(scanDb.subarray(0, leadCheckN)).sort((a, b) => a - b);
+        const leadQuietDb = leadSample[Math.min(leadCheckN - 1, Math.floor(leadCheckN * 0.25))];
+
+        const rawFloorDb = Math.min(p05Db, leadQuietDb);
+        const floorDb = Math.max(activeDb - 65.0, Math.min(rawFloorDb, activeDb - 6.0));
         const dynRange = Math.max(0, activeDb - floorDb);
-        if (dynRange < 4.5) return 0;
+        if (dynRange < 6.0) return 0;
 
+        // Purely track-relative threshold (never clamped up to a high absolute dBFS like -44dB!)
         let threshDb;
         if (sens === 'gentle') {
-          threshDb = Math.max(-54.0, Math.min(activeDb - 26.0, floorDb + Math.max(4.5, dynRange * 0.14)));
+          const off = Math.max(4.5, Math.min(10.0, dynRange * 0.16));
+          threshDb = Math.min(activeDb - 4.0, floorDb + off);
         } else if (sens === 'strong') {
-          threshDb = Math.max(-36.0, Math.min(activeDb - 13.0, floorDb + Math.max(9.0, dynRange * 0.30)));
+          const off = Math.max(9.5, Math.min(20.0, dynRange * 0.36));
+          threshDb = Math.min(activeDb - 2.5, floorDb + off);
         } else {
-          threshDb = Math.max(-44.0, Math.min(activeDb - 19.0, floorDb + Math.max(6.5, dynRange * 0.21)));
+          const off = Math.max(6.5, Math.min(15.0, dynRange * 0.25));
+          threshDb = Math.min(activeDb - 3.5, floorDb + off);
         }
+        threshDb = Math.max(-84.0, threshDb);
+
+        // Strong-burst safety override: any clearly loud/visible burst (>= activeDb - 9dB) triggers onset immediately
+        const strongThreshDb = Math.max(threshDb + 4.0, activeDb - 9.0);
+        const strongMinConsec = sens === 'gentle' ? 1 : 2;
 
         let consec = 0;
+        let strongConsec = 0;
         let onsetFrame = -1;
         for (let f = 0; f < scanFrames; f++) {
-          if (scanDb[f] >= threshDb) {
+          const v = scanDb[f];
+          if (v >= threshDb) {
             consec++;
             if (consec >= minConsec) {
               onsetFrame = f - minConsec + 1;
@@ -8045,6 +8064,15 @@
             }
           } else {
             consec = 0;
+          }
+          if (v >= strongThreshDb) {
+            strongConsec++;
+            if (strongConsec >= strongMinConsec) {
+              onsetFrame = f - strongMinConsec + 1;
+              break;
+            }
+          } else {
+            strongConsec = 0;
           }
         }
 
@@ -22101,11 +22129,21 @@
       document.addEventListener('webkitfullscreenchange', onFullscreenStateChanged);
 
       // ==================== GITHUB / PWA SOFTWARE UPDATE CHECK & APPLY ====================
-      const APP_VERSION = 'v54';
+      const APP_VERSION = 'v55';
 
       // Ordered newest-first; each release appends a new object at the top.
       // Users who skip multiple versions automatically see ALL unseen versions between lastSeen and current.
       const APP_RELEASE_NOTES = [
+        {
+          version: 'v55',
+          verNum: 55,
+          date: '2026/11/25',
+          title: '小さい音量の録音でも大きな波形を無音扱いしないよう先頭無音判定を修正',
+          items: [
+            '生録音（1xゲイン等）で音量が小さめのファイルにおいて、絶対音量の下限(-44dBFS)により明らかな波形まで無音と誤判定されていた不具合を修正しました',
+            'ファイル自身のノイズ床と演奏音量の相対差（AC-RMS＋ピーク併用）のみで判定するように改め、16倍ズームや自動ブーストがかかる静かな録音でも最初の大きな波形の手前で正確に止まるようにしました'
+          ]
+        },
         {
           version: 'v54',
           verNum: 54,
