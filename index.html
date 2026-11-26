@@ -8,7 +8,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="Audipo2">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="app-version" content="v59">
+  <meta name="app-version" content="v60">
   <link rel="manifest" href="./manifest.json">
   <title>Audipo風 練習プレイヤー＆レコーダー</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='bg' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%231b2030'/%3E%3Cstop offset='100%25' stop-color='%230d0f15'/%3E%3C/linearGradient%3E%3ClinearGradient id='wv' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0%25' stop-color='%2360c5ff'/%3E%3Cstop offset='100%25' stop-color='%232563eb'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='url(%23bg)'/%3E%3Crect x='1' y='1' width='62' height='62' rx='15' fill='none' stroke='%233b82f6' stroke-opacity='0.3' stroke-width='2'/%3E%3Cg fill='url(%23wv)'%3E%3Crect x='10' y='28' width='4.5' height='12' rx='2.25' opacity='0.6'/%3E%3Crect x='18' y='22' width='4.5' height='24' rx='2.25' opacity='0.85'/%3E%3Crect x='26' y='15' width='4.5' height='36' rx='2.25'/%3E%3Crect x='34' y='21' width='4.5' height='25' rx='2.25' opacity='0.9'/%3E%3Crect x='42' y='26' width='4.5' height='16' rx='2.25' opacity='0.75'/%3E%3Crect x='50' y='30' width='4.5' height='9' rx='2.25' opacity='0.5'/%3E%3C/g%3E%3Cpath d='M36.25 10.5c0-1.4 1.1-2.5 2.5-2.5h5.5c1.4 0 2.5 1.1 2.5 2.5v2.4c0 .8-.3 1.5-.9 2.1l-3.2 3.1c-.6.6-1.6.6-2.2 0l-3.2-3.1c-.6-.6-.9-1.3-.9-2.1v-2.4z' fill='%23facc15'/%3E%3C/svg%3E">
@@ -5153,8 +5153,8 @@
     }
 
     .theme-preview-minimal {
-      background: #f5f5f7;
-      border-color: rgba(0, 0, 0, 0.08);
+      background: #eceae4;
+      border-color: rgba(45, 44, 41, 0.1);
     }
 
     .tp-bar {
@@ -5179,11 +5179,11 @@
     }
 
     .theme-preview-minimal .tp-bar span:first-child {
-      background: #18181b;
+      background: #3a3834;
     }
 
     .theme-preview-minimal .tp-bar span:last-child {
-      background: #18181b;
+      background: #3a3834;
     }
 
     .tp-wave {
@@ -5197,8 +5197,8 @@
     }
 
     .theme-preview-minimal .tp-wave {
-      background: #ffffff;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.07);
+      background: #f6f4ef;
+      box-shadow: 0 1px 2px rgba(45, 44, 41, 0.06);
     }
 
     .tp-wave i {
@@ -5213,11 +5213,11 @@
     }
 
     .theme-preview-minimal .tp-wave i {
-      background: #18181b;
+      background: #69829c;
     }
 
     .theme-preview-minimal .tp-wave i.dim {
-      background: #c8c8d0;
+      background: #d1cdc4;
     }
 
     .tp-pads {
@@ -5237,12 +5237,12 @@
     }
 
     .theme-preview-minimal .tp-pads span {
-      background: #ffffff;
-      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+      background: #f6f4ef;
+      box-shadow: 0 1px 2px rgba(45, 44, 41, 0.07);
     }
 
     .theme-preview-minimal .tp-pads span.act {
-      background: #18181b;
+      background: #2d2c29;
       border-radius: 999px;
     }
 
@@ -5259,114 +5259,288 @@
       line-height: 1.3;
     }
 
+    /* ==================== AUDIO JOIN / CONCATENATE MODAL ==================== */
+    .sec-act-btn.join-btn {
+      background: rgba(66, 165, 245, 0.14);
+      border-color: rgba(96, 165, 250, 0.48);
+      color: #93c5fd;
+    }
+
+    .join-modal-card {
+      width: 100%;
+      max-width: 430px;
+      max-height: 88dvh;
+      background: #1c1c22;
+      border: 1px solid rgba(96, 165, 250, 0.48);
+      border-radius: 18px;
+      padding: 16px 16px 14px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.85), 0 0 24px rgba(66, 165, 245, 0.14);
+    }
+
+    .join-mode-banner {
+      padding: 9px 11px;
+      border-radius: 11px;
+      background: rgba(34, 197, 94, 0.11);
+      border: 1px solid rgba(34, 197, 94, 0.4);
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .join-mode-banner.mode-pcm {
+      background: rgba(66, 165, 245, 0.11);
+      border-color: rgba(96, 165, 250, 0.42);
+    }
+
+    .join-mode-title {
+      font-size: 12px;
+      font-weight: 800;
+      color: #86efac;
+      line-height: 1.3;
+    }
+
+    .join-mode-banner.mode-pcm .join-mode-title {
+      color: #93c5fd;
+    }
+
+    .join-mode-desc {
+      font-size: 10.5px;
+      line-height: 1.45;
+      color: #d4d4d8;
+    }
+
+    .join-clip-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .join-clip-item {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      padding: 8px 9px;
+      border-radius: 11px;
+      background: #141419;
+      border: 1px solid var(--border-subtle);
+    }
+
+    .join-clip-num {
+      width: 22px;
+      height: 22px;
+      border-radius: 999px;
+      background: rgba(66, 165, 245, 0.2);
+      color: #93c5fd;
+      font-size: 11px;
+      font-weight: 800;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .join-clip-main {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .join-clip-name {
+      font-size: 12.5px;
+      font-weight: 700;
+      color: #ffffff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .join-clip-meta {
+      font-size: 10.5px;
+      color: var(--text-sub);
+      margin-top: 2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .join-clip-ctrls {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      flex-shrink: 0;
+    }
+
+    .join-mini-btn {
+      width: 26px;
+      height: 26px;
+      border-radius: 7px;
+      background: #24242e;
+      border: 1px solid var(--border-strong);
+      color: #e4e4e7;
+      font-size: 12px;
+      font-weight: 800;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .join-mini-btn:active {
+      transform: scale(0.92);
+    }
+
+    .join-mini-btn:disabled {
+      opacity: 0.3;
+      pointer-events: none;
+    }
+
+    .join-mini-btn.del {
+      background: rgba(239, 68, 68, 0.16);
+      border-color: rgba(239, 68, 68, 0.45);
+      color: #fca5a5;
+    }
+
+    .join-add-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 6px;
+    }
+
+    .join-playlist-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      margin-top: 4px;
+    }
+
+    .join-pl-chip {
+      max-width: 100%;
+      height: 28px;
+      padding: 0 9px;
+      border-radius: 8px;
+      background: #202029;
+      border: 1px solid var(--border-strong);
+      color: #d4d4d8;
+      font-size: 11px;
+      font-weight: 700;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .join-pl-chip:active {
+      transform: scale(0.95);
+    }
+
     /* ============================================================================
-       MINIMAL WHITE THEME (body.theme-minimal)
-       Clean Japanese Minimalist Off-White Canvas + Pure White Elevated Cards
-       + Crisp Matte Charcoal Ink Accents (Zero Functional Changes)
+       SOFT MINIMAL OFF-WHITE THEME (body.theme-minimal)
+       Gentle Warm Paper / Alabaster Off-White (#ECEAE4) + Warm Cream Cards (#F6F4EF)
+       + Soft Charcoal Ink (#2D2C29) + Muted Slate-Blue Waveform (#69829C)
        ============================================================================ */
     html.theme-minimal,
     body.theme-minimal {
-      --bg-base: #f5f5f7;
-      --bg-surface: #ffffff;
-      --bg-panel: #ffffff;
-      --bg-btn: #ffffff;
-      --bg-btn-active: #ececf0;
-      --border-subtle: rgba(0, 0, 0, 0.065);
-      --border-strong: rgba(0, 0, 0, 0.12);
-      --text-main: #17171a;
-      --text-sub: #71717a;
-      --text-dim: #a1a1aa;
-      --accent-blue: #18181b;
-      --accent-blue-bg: rgba(24, 24, 27, 0.08);
-      --accent-yellow: #d97706;
-      --accent-yellow-bg: rgba(217, 119, 6, 0.12);
-      --accent-green: #16a34a;
-      --accent-green-bg: rgba(22, 163, 74, 0.12);
-      --accent-red: #dc2626;
-      --accent-red-bg: rgba(220, 38, 38, 0.1);
-      --accent-amber: #d97706;
-      --accent-amber-bg: rgba(217, 119, 6, 0.11);
-      background-color: #f5f5f7;
-      color: #17171a;
+      --bg-base: #eceae4;
+      --bg-surface: #f4f2ed;
+      --bg-panel: #f6f4ef;
+      --bg-btn: #f6f4ef;
+      --bg-btn-active: #e3e0d8;
+      --border-subtle: rgba(45, 44, 41, 0.08);
+      --border-strong: rgba(45, 44, 41, 0.15);
+      --text-main: #2d2c29;
+      --text-sub: #6f6c66;
+      --text-dim: #9c9890;
+      --accent-blue: #2d2c29;
+      --accent-blue-bg: rgba(45, 44, 41, 0.08);
+      --accent-yellow: #c47d24;
+      --accent-yellow-bg: rgba(196, 125, 36, 0.12);
+      --accent-green: #3c8c5c;
+      --accent-green-bg: rgba(60, 140, 92, 0.12);
+      --accent-red: #c44343;
+      --accent-red-bg: rgba(196, 67, 67, 0.10);
+      --accent-amber: #c47d24;
+      --accent-amber-bg: rgba(196, 125, 36, 0.11);
+      background-color: #eceae4;
+      color: #2d2c29;
     }
 
     /* 1. Top Header */
     body.theme-minimal .app-header {
-      background-color: #f5f5f7;
-      border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+      background-color: #eceae4;
+      border-bottom: 1px solid rgba(45, 44, 41, 0.075);
       padding-top: calc(8px + env(safe-area-inset-top));
       padding-bottom: 8px;
     }
 
     body.theme-minimal .track-title {
-      color: #141416;
+      color: #252421;
       font-weight: 800;
       letter-spacing: -0.01em;
     }
 
     body.theme-minimal .track-subtitle {
-      color: #71717a;
+      color: #6f6c66;
     }
 
     body.theme-minimal .hdr-btn {
       border-radius: 999px;
-      background: #ffffff;
-      border: 1px solid rgba(0, 0, 0, 0.07);
-      color: #18181b;
-      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.045);
+      background: #f6f4ef;
+      border: 1px solid rgba(45, 44, 41, 0.09);
+      color: #2d2c29;
+      box-shadow: 0 1px 3px rgba(45, 44, 41, 0.05);
       font-weight: 700;
     }
 
     body.theme-minimal .hdr-btn-rec {
-      background: #ffffff;
-      border-color: rgba(220, 38, 38, 0.24);
-      color: #dc2626;
+      background: #f6f4ef;
+      border-color: rgba(196, 67, 67, 0.28);
+      color: #b83b3b;
     }
 
     body.theme-minimal .hdr-btn-rec.recording {
-      background: #dc2626;
-      border-color: #dc2626;
-      color: #ffffff;
-      box-shadow: 0 2px 10px rgba(220, 38, 38, 0.28);
+      background: #c44343;
+      border-color: #c44343;
+      color: #faf9f6;
+      box-shadow: 0 2px 10px rgba(196, 67, 67, 0.25);
     }
 
     body.theme-minimal .hdr-btn-open {
-      background: #18181b;
-      border-color: #18181b;
-      color: #ffffff;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+      background: #2d2c29;
+      border-color: #2d2c29;
+      color: #f6f4ef;
+      box-shadow: 0 2px 7px rgba(45, 44, 41, 0.13);
     }
 
     body.theme-minimal .hdr-btn-save {
-      background: #ffffff;
-      border-color: rgba(0, 0, 0, 0.08);
-      color: #18181b;
+      background: #f6f4ef;
+      border-color: rgba(45, 44, 41, 0.1);
+      color: #2d2c29;
     }
 
     body.theme-minimal .hdr-save-icon {
-      stroke: #18181b;
+      stroke: #2d2c29;
     }
 
     body.theme-minimal .hdr-btn-share {
-      background: #ffffff;
-      border-color: rgba(0, 0, 0, 0.08);
-      color: #18181b;
+      background: #f6f4ef;
+      border-color: rgba(45, 44, 41, 0.1);
+      color: #2d2c29;
     }
 
     /* 2. Workspace, Page Dots & Progress */
     body.theme-minimal .waveform-workspace,
     body.theme-minimal .upper-page-wave {
-      background-color: #f5f5f7;
+      background-color: #eceae4;
     }
 
     body.theme-minimal .upper-page-dots {
-      background: rgba(255, 255, 255, 0.88);
-      border: 1px solid rgba(0, 0, 0, 0.07);
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+      background: rgba(246, 244, 239, 0.9);
+      border: 1px solid rgba(45, 44, 41, 0.08);
+      box-shadow: 0 2px 8px rgba(45, 44, 41, 0.06);
     }
 
     body.theme-minimal .upper-dot {
-      background: rgba(24, 24, 27, 0.2);
+      background: rgba(45, 44, 41, 0.22);
     }
 
     body.theme-minimal .upper-dot.active,
@@ -5374,175 +5548,181 @@
     body.theme-minimal .upper-dot.active-kbd,
     body.theme-minimal .upper-dot.active-pins,
     body.theme-minimal .upper-dot.active-transcript {
-      background: #18181b;
+      background: #556c85;
       box-shadow: none;
     }
 
     body.theme-minimal .wave-progress-track {
-      background: rgba(24, 24, 27, 0.1);
+      background: rgba(85, 108, 133, 0.14);
     }
 
     body.theme-minimal .wave-progress-fill {
-      background: #18181b;
+      background: #69829c;
     }
 
     body.theme-minimal .wave-progress-pill {
-      background: rgba(255, 255, 255, 0.94);
-      border-color: rgba(0, 0, 0, 0.09);
-      color: #18181b;
-      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+      background: rgba(246, 244, 239, 0.95);
+      border-color: rgba(45, 44, 41, 0.1);
+      color: #2d2c29;
+      box-shadow: 0 4px 14px rgba(45, 44, 41, 0.08);
     }
 
     body.theme-minimal .wave-progress-dot {
-      background: #18181b;
+      background: #69829c;
     }
 
     /* 3. Zoom Pane & Pills */
     body.theme-minimal .zoom-pane {
-      background-color: #ffffff;
-      border-top: 1px solid rgba(0, 0, 0, 0.06);
-      border-bottom: 1px solid rgba(0, 0, 0, 0.06);
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+      background-color: #f6f4ef;
+      border-top: 1px solid rgba(45, 44, 41, 0.07);
+      border-bottom: 1px solid rgba(45, 44, 41, 0.07);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5);
     }
 
     body.theme-minimal .zoom-pill {
       border-radius: 999px;
-      background: rgba(255, 255, 255, 0.92);
-      border: 1px solid rgba(0, 0, 0, 0.1);
-      color: #3f3f46;
-      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+      background: rgba(246, 244, 239, 0.92);
+      border: 1px solid rgba(45, 44, 41, 0.11);
+      color: #4a4843;
+      box-shadow: 0 1px 3px rgba(45, 44, 41, 0.05);
     }
 
     body.theme-minimal .zoom-pill-gain,
     body.theme-minimal .zoom-pill-span {
-      border-color: rgba(0, 0, 0, 0.1);
-      color: #18181b;
+      border-color: rgba(45, 44, 41, 0.11);
+      color: #2d2c29;
     }
 
     body.theme-minimal .zoom-pill-lead {
-      color: #71717a;
+      color: #6f6c66;
     }
 
     body.theme-minimal .zoom-pill-lead.active {
-      background: #18181b;
-      border-color: #18181b;
-      color: #ffffff;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.14);
+      background: #2d2c29;
+      border-color: #2d2c29;
+      color: #f6f4ef;
+      box-shadow: 0 2px 6px rgba(45, 44, 41, 0.14);
     }
 
     body.theme-minimal .zoom-close-btn {
-      background: rgba(255, 255, 255, 0.92);
-      border-color: rgba(0, 0, 0, 0.1);
-      color: #52525b;
-      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+      background: rgba(246, 244, 239, 0.92);
+      border-color: rgba(45, 44, 41, 0.11);
+      color: #5c5953;
+      box-shadow: 0 1px 3px rgba(45, 44, 41, 0.05);
     }
 
     body.theme-minimal .zoom-collapsed-bar {
-      background: #ffffff;
-      border-top: 1px solid rgba(0, 0, 0, 0.06);
-      border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+      background: #f4f2ed;
+      border-top: 1px solid rgba(45, 44, 41, 0.07);
+      border-bottom: 1px solid rgba(45, 44, 41, 0.07);
     }
 
     body.theme-minimal .zoom-reopen-btn {
       border-radius: 999px;
-      background: #f0f0f3;
-      color: #18181b;
+      background: #e6e3db;
+      color: #2d2c29;
     }
 
     /* 4. Status Bar & Section Action Bar */
     body.theme-minimal .status-bar {
-      background: #ffffff;
-      border-bottom: 1px solid rgba(0, 0, 0, 0.055);
+      background: #f4f2ed;
+      border-bottom: 1px solid rgba(45, 44, 41, 0.065);
       padding: 6px 10px;
     }
 
     body.theme-minimal .track-idx-btn {
       border-radius: 999px;
-      background: #f2f2f5;
+      background: #e7e4dc;
       border-color: transparent;
-      color: #18181b;
+      color: #2d2c29;
     }
 
     body.theme-minimal .time-readout {
-      color: #141416;
+      color: #252421;
       font-weight: 800;
     }
 
     body.theme-minimal .time-readout .slash {
-      color: #c4c4cc;
+      color: #bcb7ad;
     }
 
     body.theme-minimal .time-readout .total {
-      color: #71717a;
+      color: #6f6c66;
       font-weight: 600;
     }
 
     body.theme-minimal .status-pill {
       border-radius: 999px;
-      background: #f2f2f5;
-      border-color: rgba(0, 0, 0, 0.07);
-      color: #18181b;
+      background: #e7e4dc;
+      border-color: rgba(45, 44, 41, 0.07);
+      color: #2d2c29;
     }
 
     body.theme-minimal .pill-engine.low-mem {
-      background: #ededf0;
-      color: #71717a;
+      background: #e3e0d8;
+      color: #6f6c66;
     }
 
     body.theme-minimal .order-btn {
       border-radius: 9px;
-      background: #f4f4f6;
+      background: #eae7df;
       border-color: transparent;
-      color: #9ca3af;
+      color: #969188;
     }
 
     body.theme-minimal .order-btn.active {
-      background: #18181b;
-      border-color: #18181b;
-      color: #ffffff;
+      background: #2d2c29;
+      border-color: #2d2c29;
+      color: #f6f4ef;
     }
 
     body.theme-minimal .section-action-bar {
-      background: #fafafc;
-      border-bottom: 1px solid rgba(0, 0, 0, 0.055);
-      padding: 5px 10px;
+      background: #f0eee8;
+      border-bottom: 1px solid rgba(45, 44, 41, 0.065);
+      padding: 5px 8px;
     }
 
     body.theme-minimal .sec-info-chip {
-      color: #52525b;
+      color: #5c5953;
     }
 
     body.theme-minimal .sec-info-chip strong {
-      color: #141416;
+      color: #252421;
     }
 
     body.theme-minimal .sec-info-chip span[style] {
-      color: #b45309 !important;
+      color: #a6691c !important;
     }
 
     body.theme-minimal .sec-act-btn {
       border-radius: 999px;
-      background: #ffffff;
-      border: 1px solid rgba(0, 0, 0, 0.09);
-      color: #18181b;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+      background: #f6f4ef;
+      border: 1px solid rgba(45, 44, 41, 0.1);
+      color: #2d2c29;
+      box-shadow: 0 1px 2px rgba(45, 44, 41, 0.04);
     }
 
     body.theme-minimal .sec-act-btn.skip-active {
-      background: #18181b;
-      border-color: #18181b;
-      color: #ffffff;
+      background: #2d2c29;
+      border-color: #2d2c29;
+      color: #f6f4ef;
     }
 
     body.theme-minimal .sec-act-btn.cut-btn {
-      background: #ffffff;
-      border-color: rgba(220, 38, 38, 0.25);
-      color: #dc2626;
+      background: #f6f4ef;
+      border-color: rgba(196, 67, 67, 0.28);
+      color: #b83b3b;
     }
 
-    /* 5. Bottom 3x7 Control Grid (Floating White Minimal Cards + Matte Charcoal Primary) */
+    body.theme-minimal .sec-act-btn.join-btn {
+      background: #f6f4ef;
+      border-color: rgba(85, 108, 133, 0.34);
+      color: #465d75;
+    }
+
+    /* 5. Bottom 3x7 Control Grid (Warm Off-White Soft Cards + Matte Charcoal Primary) */
     body.theme-minimal .control-footer {
-      background: #f5f5f7;
+      background: #eceae4;
       padding: 7px 7px calc(10px + env(safe-area-inset-bottom, 0px));
     }
 
@@ -5552,141 +5732,141 @@
     }
 
     body.theme-minimal .pad-btn {
-      background: #ffffff;
-      border: 1px solid rgba(0, 0, 0, 0.055);
+      background: #f6f4ef;
+      border: 1px solid rgba(45, 44, 41, 0.065);
       border-radius: 13px;
-      color: #18181b;
-      box-shadow: 0 1.5px 4px rgba(0, 0, 0, 0.045);
+      color: #2d2c29;
+      box-shadow: 0 1.5px 3.5px rgba(45, 44, 41, 0.05);
     }
 
     body.theme-minimal .pad-btn:active {
-      background: #ededf1;
+      background: #e4e1d9;
     }
 
     body.theme-minimal .pad-btn .settings-slider-dot {
-      fill: #ffffff;
+      fill: #f6f4ef;
     }
 
     body.theme-minimal .pad-btn-play {
-      background: #18181b;
-      border-color: #18181b;
+      background: #2d2c29;
+      border-color: #2d2c29;
       border-radius: 15px;
-      color: #ffffff;
-      box-shadow: 0 3px 10px rgba(24, 24, 27, 0.22);
+      color: #f6f4ef;
+      box-shadow: 0 3px 9px rgba(45, 44, 41, 0.2);
     }
 
     body.theme-minimal .pad-btn-play #iconPlay {
-      fill: #ffffff;
+      fill: #f6f4ef;
     }
 
     body.theme-minimal .pad-btn-play.playing {
-      background: #ffffff;
-      border: 2px solid #18181b;
-      color: #18181b;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      background: #f6f4ef;
+      border: 2px solid #2d2c29;
+      color: #2d2c29;
+      box-shadow: 0 2px 7px rgba(45, 44, 41, 0.08);
     }
 
     body.theme-minimal .pad-btn-play.playing #iconPause {
-      fill: #18181b;
+      fill: #2d2c29;
     }
 
     body.theme-minimal .pad-btn.active-blue,
     body.theme-minimal .pad-btn.active-star {
-      background: #18181b;
-      border-color: #18181b;
-      color: #ffffff;
-      box-shadow: 0 2px 8px rgba(24, 24, 27, 0.18);
+      background: #2d2c29;
+      border-color: #2d2c29;
+      color: #f6f4ef;
+      box-shadow: 0 2px 7px rgba(45, 44, 41, 0.16);
     }
 
     body.theme-minimal .pad-btn.active-star .pad-sub,
     body.theme-minimal .pad-btn.active-blue .pad-sub,
     body.theme-minimal .pad-btn.active-blue .pad-sub-xs {
-      color: #ffffff;
+      color: #f6f4ef;
     }
 
     body.theme-minimal .speed-preset-btn.active-star .speed-dot {
-      background: #ffffff;
+      background: #f6f4ef;
       box-shadow: none;
     }
 
     body.theme-minimal .pad-btn.active-green {
-      background: #18181b;
-      border-color: #18181b;
-      color: #ffffff;
-      box-shadow: 0 2px 8px rgba(24, 24, 27, 0.18);
+      background: #2d2c29;
+      border-color: #2d2c29;
+      color: #f6f4ef;
+      box-shadow: 0 2px 7px rgba(45, 44, 41, 0.16);
     }
 
     body.theme-minimal .pad-btn.active-green .pad-sub-xs {
-      color: #ffffff;
+      color: #f6f4ef;
     }
 
     body.theme-minimal .pad-btn.active-yellow-glow {
-      background: #fffbeb;
-      border-color: #d97706;
-      box-shadow: 0 0 0 2px rgba(217, 119, 6, 0.18);
+      background: #f8f1e2;
+      border-color: #c47d24;
+      box-shadow: 0 0 0 2px rgba(196, 125, 36, 0.18);
     }
 
     body.theme-minimal .pad-btn.active-green-glow {
-      background: #f0fdf4;
-      border-color: #16a34a;
-      box-shadow: 0 0 0 2px rgba(22, 163, 74, 0.18);
+      background: #eaf4ec;
+      border-color: #3c8c5c;
+      box-shadow: 0 0 0 2px rgba(60, 140, 92, 0.18);
     }
 
     body.theme-minimal .pad-btn.active-red-glow {
-      background: #fef2f2;
-      border-color: #dc2626;
-      box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.15);
+      background: #f8ebeb;
+      border-color: #c44343;
+      box-shadow: 0 0 0 2px rgba(196, 67, 67, 0.15);
     }
 
     body.theme-minimal .pad-sub {
-      color: #18181b;
+      color: #2d2c29;
     }
 
     body.theme-minimal .pad-sub-xs {
-      color: #71717a;
+      color: #6f6c66;
     }
 
     body.theme-minimal .speed-val-text {
-      color: #141416;
+      color: #252421;
       font-weight: 800;
     }
 
     body.theme-minimal .pitch-val-text {
-      color: #71717a;
+      color: #6f6c66;
     }
 
     body.theme-minimal .pitch-val-text.shifted {
-      color: #16a34a;
+      color: #3c8c5c;
     }
 
     /* 6. Startup Overlay & Recording Overlay */
     body.theme-minimal .startup-overlay {
-      background: rgba(245, 245, 247, 0.96);
+      background: rgba(236, 234, 228, 0.96);
     }
 
     body.theme-minimal .startup-card {
-      background: #ffffff;
-      border: 1px solid rgba(0, 0, 0, 0.06);
+      background: #f6f4ef;
+      border: 1px solid rgba(45, 44, 41, 0.08);
       border-radius: 22px;
-      box-shadow: 0 12px 36px rgba(0, 0, 0, 0.08);
+      box-shadow: 0 12px 34px rgba(45, 44, 41, 0.09);
     }
 
     body.theme-minimal .startup-icon {
-      background: #f4f4f6;
-      border-color: rgba(0, 0, 0, 0.07);
-      color: #18181b;
+      background: #ece9e1;
+      border-color: rgba(45, 44, 41, 0.08);
+      color: #2d2c29;
     }
 
     body.theme-minimal .startup-icon rect {
-      fill: #18181b !important;
+      fill: #5d7691 !important;
     }
 
     body.theme-minimal .startup-title {
-      color: #141416;
+      color: #252421;
     }
 
     body.theme-minimal .startup-desc {
-      color: #71717a;
+      color: #6f6c66;
     }
 
     body.theme-minimal .start-btn {
@@ -5695,533 +5875,528 @@
 
     body.theme-minimal .start-btn-local,
     body.theme-minimal label.btn-like.start-btn-local {
-      background: #18181b;
-      color: #ffffff;
+      background: #2d2c29;
+      color: #f6f4ef;
     }
 
     body.theme-minimal .start-btn-demo {
-      background: #f2f2f5;
-      border-color: rgba(0, 0, 0, 0.07);
-      color: #18181b;
+      background: #eae7df;
+      border-color: rgba(45, 44, 41, 0.08);
+      color: #2d2c29;
     }
 
     body.theme-minimal .start-btn-demo svg {
-      stroke: #18181b !important;
+      stroke: #2d2c29 !important;
     }
 
     body.theme-minimal .startup-last-hint {
-      background: #f5f5f7;
-      border-color: rgba(0, 0, 0, 0.08);
-      color: #3f3f46;
+      background: #edeae2;
+      border-color: rgba(45, 44, 41, 0.09);
+      color: #4a4843;
     }
 
     body.theme-minimal .rec-overlay {
-      background: rgba(255, 255, 255, 0.97);
-      border: 1.5px solid rgba(220, 38, 38, 0.35);
+      background: rgba(246, 244, 239, 0.97);
+      border: 1.5px solid rgba(196, 67, 67, 0.35);
       border-radius: 18px;
-      box-shadow: 0 14px 36px rgba(0, 0, 0, 0.12);
+      box-shadow: 0 14px 36px rgba(45, 44, 41, 0.13);
     }
 
     body.theme-minimal .rec-label-group {
-      color: #dc2626;
+      color: #b83b3b;
     }
 
     body.theme-minimal .rec-timer {
-      color: #141416;
+      color: #252421;
     }
 
     body.theme-minimal .rec-meter-wrap {
-      background: #ededf0;
-      border-color: rgba(0, 0, 0, 0.06);
+      background: #e5e2da;
+      border-color: rgba(45, 44, 41, 0.07);
     }
 
     body.theme-minimal #recLiveWaveCanvas {
-      background: #f5f5f7;
-      border-color: rgba(0, 0, 0, 0.08);
+      background: #eceae4;
+      border-color: rgba(45, 44, 41, 0.09);
     }
 
     body.theme-minimal .rec-gain-hint {
-      background: #f7f7f9;
-      border-color: rgba(0, 0, 0, 0.08);
+      background: #efede7;
+      border-color: rgba(45, 44, 41, 0.09);
     }
 
     body.theme-minimal .rec-gain-hint.low-level {
-      background: #fffbeb;
-      border-color: #d97706;
+      background: #f8f1e2;
+      border-color: #c47d24;
     }
 
     body.theme-minimal .rec-gain-hint-text {
-      color: #52525b;
+      color: #5c5953;
     }
 
     body.theme-minimal .rec-gain-hint.low-level .rec-gain-hint-text {
-      color: #92400e;
+      color: #8c5614;
     }
 
     body.theme-minimal .rec-stereo-note {
-      color: #18181b;
+      color: #2d2c29;
     }
 
     body.theme-minimal .rec-gain-jump-btn {
-      background: #18181b;
-      border-color: #18181b;
-      color: #ffffff;
+      background: #2d2c29;
+      border-color: #2d2c29;
+      color: #f6f4ef;
     }
 
     body.theme-minimal .rec-add-marker-btn {
-      background: #f2f2f5;
-      border-color: rgba(0, 0, 0, 0.12);
-      color: #18181b;
+      background: #eae7df;
+      border-color: rgba(45, 44, 41, 0.12);
+      color: #2d2c29;
     }
 
     body.theme-minimal .rec-badge-count {
-      background: #18181b;
-      color: #ffffff;
+      background: #2d2c29;
+      color: #f6f4ef;
     }
 
     /* 7. Upper Pages: Metronome, Tuner, Keyboard, Pins, Transcript */
     body.theme-minimal .upper-page-metro {
-      background: #f5f5f7;
+      background: #eceae4;
     }
 
     body.theme-minimal .tuner-card,
     body.theme-minimal .metro-hero-card {
-      background: #ffffff;
-      border: 1px solid rgba(0, 0, 0, 0.06);
+      background: #f6f4ef;
+      border: 1px solid rgba(45, 44, 41, 0.07);
       border-radius: 18px;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+      box-shadow: 0 2px 8px rgba(45, 44, 41, 0.045);
     }
 
     body.theme-minimal .tuner-card.tuner-in-tune {
-      background: #f0fdf4;
-      border-color: #16a34a;
-      box-shadow: 0 2px 12px rgba(22, 163, 74, 0.14);
+      background: #eaf4ec;
+      border-color: #3c8c5c;
+      box-shadow: 0 2px 12px rgba(60, 140, 92, 0.14);
     }
 
     body.theme-minimal .tuner-power-btn {
-      background: #f2f2f5;
-      border-color: rgba(0, 0, 0, 0.08);
-      color: #3f3f46;
+      background: #eae7df;
+      border-color: rgba(45, 44, 41, 0.09);
+      color: #4a4843;
       border-radius: 999px;
     }
 
     body.theme-minimal .tuner-power-btn.on {
-      background: #18181b;
-      border-color: #18181b;
-      color: #ffffff;
+      background: #2d2c29;
+      border-color: #2d2c29;
+      color: #f6f4ef;
     }
 
     body.theme-minimal .tuner-note-text {
-      color: #141416;
+      color: #252421;
     }
 
     body.theme-minimal .tuner-note-text.in-tune {
-      color: #16a34a;
+      color: #3c8c5c;
     }
 
     body.theme-minimal .tuner-a4-ctrl {
-      background: #f2f2f5;
-      border-color: rgba(0, 0, 0, 0.06);
+      background: #eae7df;
+      border-color: rgba(45, 44, 41, 0.07);
     }
 
     body.theme-minimal .tuner-a4-btn {
-      background: #ffffff;
-      color: #18181b;
+      background: #f6f4ef;
+      color: #2d2c29;
     }
 
     body.theme-minimal .tuner-a4-val {
-      color: #18181b;
+      color: #2d2c29;
     }
 
     body.theme-minimal .tuner-bar {
-      background: #e5e5ea;
+      background: #dfdcd4;
     }
 
     body.theme-minimal .tuner-bar.center-bar {
-      background: #c7c7cf;
+      background: #c2beb4;
     }
 
     body.theme-minimal .metro-pendulum-col {
-      background: #f6f6f8;
-      border-color: rgba(0, 0, 0, 0.05);
+      background: #efede7;
+      border-color: rgba(45, 44, 41, 0.06);
       border-radius: 13px;
     }
 
     body.theme-minimal .metro-pendulum-arc path {
-      stroke: rgba(0, 0, 0, 0.15);
+      stroke: rgba(45, 44, 41, 0.16);
     }
 
     body.theme-minimal .metro-pendulum-arc line {
-      stroke: rgba(0, 0, 0, 0.35);
+      stroke: rgba(45, 44, 41, 0.35);
     }
 
     body.theme-minimal .metro-pendulum-arm {
-      background: linear-gradient(180deg, #18181b 0%, #3f3f46 100%);
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.18);
+      background: linear-gradient(180deg, #3c3a36 0%, #5e5a53 100%);
+      box-shadow: 0 2px 6px rgba(45, 44, 41, 0.16);
     }
 
     body.theme-minimal .metro-pendulum-weight {
-      background: #18181b;
-      border-color: #ffffff;
+      background: #2d2c29;
+      border-color: #f6f4ef;
     }
 
     body.theme-minimal .metro-pendulum-pivot {
-      background: #ffffff;
-      border-color: #18181b;
+      background: #f6f4ef;
+      border-color: #2d2c29;
     }
 
     body.theme-minimal .metro-tempo-marking {
-      color: #52525b;
+      color: #5c5953;
     }
 
     body.theme-minimal .metro-led-strip {
-      background: #f2f2f5;
-      border-color: rgba(0, 0, 0, 0.06);
+      background: #eae7df;
+      border-color: rgba(45, 44, 41, 0.07);
     }
 
     body.theme-minimal .metro-led {
-      background: #e2e2e8;
+      background: #dad6cd;
       border-color: transparent;
     }
 
     body.theme-minimal .metro-led.lit-accent {
-      background: #18181b;
-      border-color: #18181b;
-      box-shadow: 0 0 0 3px rgba(24, 24, 27, 0.16);
+      background: #2d2c29;
+      border-color: #2d2c29;
+      box-shadow: 0 0 0 3px rgba(45, 44, 41, 0.16);
     }
 
     body.theme-minimal .metro-led.lit-beat {
-      background: #71717a;
-      border-color: #71717a;
+      background: #69829c;
+      border-color: #69829c;
       box-shadow: none;
     }
 
     body.theme-minimal .metro-bpm-input-wrap {
-      background: #f5f5f7;
-      border-color: rgba(0, 0, 0, 0.08);
+      background: #efede7;
+      border-color: rgba(45, 44, 41, 0.09);
     }
 
     body.theme-minimal .metro-bpm-input {
-      color: #141416;
+      color: #252421;
     }
 
     body.theme-minimal .metro-step-btn {
-      background: #f2f2f5;
-      border-color: rgba(0, 0, 0, 0.07);
-      color: #18181b;
+      background: #eae7df;
+      border-color: rgba(45, 44, 41, 0.08);
+      color: #2d2c29;
     }
 
     body.theme-minimal .metro-main-btn {
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+      box-shadow: 0 2px 8px rgba(45, 44, 41, 0.06);
     }
 
     body.theme-minimal .metro-start-btn {
-      background: #18181b;
-      border-color: #18181b;
-      color: #ffffff;
+      background: #2d2c29;
+      border-color: #2d2c29;
+      color: #f6f4ef;
     }
 
     body.theme-minimal .metro-start-btn.running {
-      background: #ffffff;
-      border: 2px solid #18181b;
-      color: #18181b;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+      background: #f6f4ef;
+      border: 2px solid #2d2c29;
+      color: #2d2c29;
+      box-shadow: 0 2px 8px rgba(45, 44, 41, 0.08);
     }
 
     body.theme-minimal .metro-tap-btn {
-      background: #ffffff;
-      border-color: rgba(0, 0, 0, 0.12);
-      color: #18181b;
+      background: #f6f4ef;
+      border-color: rgba(45, 44, 41, 0.13);
+      color: #2d2c29;
     }
 
     body.theme-minimal .metro-tap-btn.tap-flash {
-      background: #18181b;
-      border-color: #18181b;
-      color: #ffffff;
+      background: #2d2c29;
+      border-color: #2d2c29;
+      color: #f6f4ef;
     }
 
     body.theme-minimal .metro-chip {
-      background: #ffffff;
-      border-color: rgba(0, 0, 0, 0.07);
-      color: #52525b;
-      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+      background: #f6f4ef;
+      border-color: rgba(45, 44, 41, 0.08);
+      color: #5c5953;
+      box-shadow: 0 1px 2px rgba(45, 44, 41, 0.03);
     }
 
     body.theme-minimal .metro-chip.active-blue,
     body.theme-minimal .metro-chip.active-yellow {
-      background: #18181b;
-      border-color: #18181b;
-      color: #ffffff;
+      background: #2d2c29;
+      border-color: #2d2c29;
+      color: #f6f4ef;
     }
 
     body.theme-minimal #metroSoundName,
     body.theme-minimal #metroBeatLabel,
     body.theme-minimal #metroVolVal {
-      color: #18181b !important;
+      color: #2d2c29 !important;
     }
 
     /* Keyboard Page */
     body.theme-minimal .upper-page-kbd {
-      background: #f5f5f7;
+      background: #eceae4;
     }
 
     body.theme-minimal .kbd-toolbar {
-      background: #ffffff;
-      border-color: rgba(0, 0, 0, 0.07);
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+      background: #f6f4ef;
+      border-color: rgba(45, 44, 41, 0.08);
+      box-shadow: 0 2px 8px rgba(45, 44, 41, 0.045);
     }
 
     body.theme-minimal .kbd-nav-btn,
     body.theme-minimal .kbd-toggle-btn {
-      background: #f2f2f5;
-      border-color: rgba(0, 0, 0, 0.08);
-      color: #18181b;
+      background: #eae7df;
+      border-color: rgba(45, 44, 41, 0.09);
+      color: #2d2c29;
     }
 
     body.theme-minimal .kbd-readout {
-      background: #f5f5f7;
-      border-color: rgba(0, 0, 0, 0.07);
-      color: #18181b;
+      background: #efede7;
+      border-color: rgba(45, 44, 41, 0.08);
+      color: #2d2c29;
     }
 
     body.theme-minimal .kbd-inst-group,
     body.theme-minimal .kbd-stepper {
-      background: #f2f2f5;
-      border-color: rgba(0, 0, 0, 0.06);
+      background: #eae7df;
+      border-color: rgba(45, 44, 41, 0.07);
     }
 
     body.theme-minimal .kbd-inst-btn.active {
-      background: #18181b;
-      color: #ffffff;
+      background: #2d2c29;
+      color: #f6f4ef;
       box-shadow: none;
     }
 
     body.theme-minimal .kbd-step-btn {
-      background: #ffffff;
-      color: #18181b;
+      background: #f6f4ef;
+      color: #2d2c29;
     }
 
     body.theme-minimal .kbd-step-val {
-      color: #18181b;
+      color: #2d2c29;
     }
 
     body.theme-minimal .kbd-stepper-oct {
-      background: #ececf0;
-      border-color: rgba(0, 0, 0, 0.14);
+      background: #e4e1d8;
+      border-color: rgba(45, 44, 41, 0.14);
       box-shadow: none;
     }
 
     body.theme-minimal .kbd-stepper-oct .kbd-step-btn {
-      background: #ffffff;
-      color: #18181b;
+      background: #f6f4ef;
+      color: #2d2c29;
     }
 
     body.theme-minimal .kbd-stepper-oct .kbd-step-val {
-      color: #141416;
+      color: #252421;
     }
 
     body.theme-minimal .kbd-toggle-btn-hold {
-      background: #f2f2f5;
-      border-color: rgba(0, 0, 0, 0.12);
-      color: #18181b;
+      background: #eae7df;
+      border-color: rgba(45, 44, 41, 0.13);
+      color: #2d2c29;
       box-shadow: none;
     }
 
     body.theme-minimal .kbd-toggle-btn.active-hold {
-      background: #18181b;
-      border-color: #18181b;
-      color: #ffffff;
+      background: #2d2c29;
+      border-color: #2d2c29;
+      color: #f6f4ef;
       box-shadow: none;
     }
 
-    body.theme-minimal .kbd-to-landscape-hero {
-      background: #18181b;
-      border-color: #18181b;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.14);
-    }
-
+    body.theme-minimal .kbd-to-landscape-hero,
     body.theme-minimal .kbd-to-portrait-btn {
-      background: #18181b;
-      border-color: #18181b;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.16);
+      background: #2d2c29;
+      border-color: #2d2c29;
+      box-shadow: 0 4px 12px rgba(45, 44, 41, 0.15);
     }
 
     body.theme-minimal .kbd-stage {
-      border-color: rgba(0, 0, 0, 0.12);
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+      border-color: rgba(45, 44, 41, 0.13);
+      box-shadow: 0 2px 10px rgba(45, 44, 41, 0.08);
     }
 
     /* Pin List Page & Transcript Page */
     body.theme-minimal .upper-page-pins,
     body.theme-minimal .upper-page-transcript {
-      background: #f5f5f7;
+      background: #eceae4;
     }
 
     body.theme-minimal .upper-pin-footer,
     body.theme-minimal .tr-footer,
     body.theme-minimal .tr-topbar {
-      background: #ffffff;
-      border-color: rgba(0, 0, 0, 0.07);
+      background: #f4f2ed;
+      border-color: rgba(45, 44, 41, 0.08);
     }
 
     body.theme-minimal .pin-foot-btn {
       border-radius: 999px;
-      background: #f2f2f5;
-      border-color: rgba(0, 0, 0, 0.08);
-      color: #18181b;
+      background: #eae7df;
+      border-color: rgba(45, 44, 41, 0.09);
+      color: #2d2c29;
     }
 
     body.theme-minimal .pin-foot-btn-cur {
-      background: #18181b;
-      border-color: #18181b;
-      color: #ffffff;
+      background: #2d2c29;
+      border-color: #2d2c29;
+      color: #f6f4ef;
     }
 
     body.theme-minimal .pin-foot-btn-clear {
-      background: #fef2f2;
-      border-color: rgba(220, 38, 38, 0.25);
-      color: #dc2626;
+      background: #f6ebeb;
+      border-color: rgba(196, 67, 67, 0.25);
+      color: #b83b3b;
     }
 
     body.theme-minimal .tr-engine-tabs {
-      background: #f2f2f5;
-      border-color: rgba(0, 0, 0, 0.06);
+      background: #e7e4dc;
+      border-color: rgba(45, 44, 41, 0.07);
     }
 
     body.theme-minimal .tr-engine-btn {
-      color: #71717a;
+      color: #6f6c66;
     }
 
     body.theme-minimal .tr-engine-btn.active-whisper,
     body.theme-minimal .tr-engine-btn.active-gemini {
-      background: #18181b;
-      color: #ffffff;
+      background: #2d2c29;
+      color: #f6f4ef;
       box-shadow: none;
     }
 
     body.theme-minimal .tr-gear-btn {
-      background: #f2f2f5;
-      border-color: rgba(0, 0, 0, 0.08);
-      color: #18181b;
+      background: #eae7df;
+      border-color: rgba(45, 44, 41, 0.09);
+      color: #2d2c29;
     }
 
     body.theme-minimal .tr-gear-btn.open {
-      background: #18181b;
-      border-color: #18181b;
-      color: #ffffff;
+      background: #2d2c29;
+      border-color: #2d2c29;
+      color: #f6f4ef;
     }
 
     body.theme-minimal .tr-settings-drawer {
-      background: #ffffff;
-      border-color: rgba(0, 0, 0, 0.08);
+      background: #f6f4ef;
+      border-color: rgba(45, 44, 41, 0.09);
     }
 
     body.theme-minimal .tr-set-label {
-      color: #18181b;
+      color: #2d2c29;
     }
 
     body.theme-minimal .tr-mini-pill {
-      background: #f2f2f5;
-      border-color: rgba(0, 0, 0, 0.07);
-      color: #52525b;
+      background: #eae7df;
+      border-color: rgba(45, 44, 41, 0.08);
+      color: #5c5953;
     }
 
     body.theme-minimal .tr-mini-pill.active {
-      background: #18181b;
-      border-color: #18181b;
-      color: #ffffff;
+      background: #2d2c29;
+      border-color: #2d2c29;
+      color: #f6f4ef;
     }
 
     body.theme-minimal .tr-key-input {
-      background: #f5f5f7;
-      border-color: rgba(0, 0, 0, 0.12);
-      color: #18181b;
+      background: #eceae4;
+      border-color: rgba(45, 44, 41, 0.13);
+      color: #2d2c29;
     }
 
     body.theme-minimal .tr-progress-box {
-      background: #ffffff;
-      border-color: rgba(0, 0, 0, 0.08);
+      background: #f6f4ef;
+      border-color: rgba(45, 44, 41, 0.09);
     }
 
     body.theme-minimal .tr-progress-head {
-      color: #18181b;
+      color: #2d2c29;
     }
 
     body.theme-minimal .tr-progress-track {
-      background: #e5e5ea;
+      background: #dfdcd4;
     }
 
     body.theme-minimal .tr-progress-fill {
-      background: #18181b;
+      background: #69829c;
     }
 
     body.theme-minimal .tr-empty-box {
-      background: #ffffff;
-      border-color: rgba(0, 0, 0, 0.12);
-      color: #71717a;
+      background: #f6f4ef;
+      border-color: rgba(45, 44, 41, 0.14);
+      color: #6f6c66;
     }
 
     body.theme-minimal .tr-empty-box strong {
-      color: #141416;
+      color: #252421;
     }
 
     body.theme-minimal .tr-item {
-      background: #ffffff;
-      border: 1px solid rgba(0, 0, 0, 0.06);
+      background: #f6f4ef;
+      border: 1px solid rgba(45, 44, 41, 0.07);
       border-radius: 14px;
-      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+      box-shadow: 0 1px 3px rgba(45, 44, 41, 0.045);
     }
 
     body.theme-minimal .tr-item:active {
-      background: #f2f2f5;
+      background: #eae7df;
     }
 
     body.theme-minimal .tr-item.active-utterance {
-      background: #ffffff;
-      border-color: #18181b;
-      box-shadow: inset 3.5px 0 0 #18181b, 0 2px 10px rgba(0, 0, 0, 0.06);
+      background: #f6f4ef;
+      border-color: #556c85;
+      box-shadow: inset 3.5px 0 0 #556c85, 0 2px 8px rgba(45, 44, 41, 0.06);
     }
 
     body.theme-minimal .tr-idx-badge {
-      background: #f2f2f5;
-      color: #18181b;
+      background: #eae7df;
+      color: #2d2c29;
     }
 
     body.theme-minimal .tr-time-range {
-      color: #52525b;
+      color: #556c85;
     }
 
     body.theme-minimal .tr-now-badge {
-      background: #18181b;
-      color: #ffffff;
+      background: #556c85;
+      color: #f6f4ef;
     }
 
     body.theme-minimal .tr-pin-add-btn {
-      background: #f2f2f5;
-      border-color: rgba(0, 0, 0, 0.1);
-      color: #18181b;
+      background: #eae7df;
+      border-color: rgba(45, 44, 41, 0.11);
+      color: #2d2c29;
     }
 
     body.theme-minimal .tr-text {
-      color: #17171a;
+      color: #2d2c29;
     }
 
     body.theme-minimal .tr-run-btn {
-      background: #18181b;
-      border-color: #18181b;
-      color: #ffffff;
+      background: #2d2c29;
+      border-color: #2d2c29;
+      color: #f6f4ef;
       border-radius: 999px;
     }
 
     body.theme-minimal .tr-run-btn.running {
-      background: #dc2626;
-      border-color: #dc2626;
-      color: #ffffff;
+      background: #c44343;
+      border-color: #c44343;
+      color: #faf9f6;
     }
 
-    /* 8. Modals, Settings, Cards & Controls */
+    /* 8. Modals, Settings, Cards, Join Modal & Controls */
     body.theme-minimal .modal-backdrop {
-      background: rgba(24, 24, 27, 0.34);
+      background: rgba(35, 34, 30, 0.34);
       backdrop-filter: blur(4px);
       -webkit-backdrop-filter: blur(4px);
     }
@@ -6230,21 +6405,22 @@
     body.theme-minimal .whats-new-card,
     body.theme-minimal .help-modal-card,
     body.theme-minimal .save-modal-card,
+    body.theme-minimal .join-modal-card,
     body.theme-minimal .fav-modal-card,
     body.theme-minimal .fav-act-card,
     body.theme-minimal .pin-conflict-card,
     body.theme-minimal .mark-edit-card,
     body.theme-minimal .danger-confirm-card {
-      background: #f5f5f7;
-      border: 1px solid rgba(0, 0, 0, 0.08);
+      background: #eceae4;
+      border: 1px solid rgba(45, 44, 41, 0.1);
       border-radius: 22px;
-      color: #17171a;
-      box-shadow: 0 20px 56px rgba(0, 0, 0, 0.18);
+      color: #2d2c29;
+      box-shadow: 0 20px 56px rgba(35, 34, 30, 0.2);
     }
 
     body.theme-minimal .danger-confirm-card.step-final {
-      background: #fff5f5;
-      border-color: #dc2626;
+      background: #f8efef;
+      border-color: #c44343;
     }
 
     body.theme-minimal .modal-title,
@@ -6261,8 +6437,9 @@
     body.theme-minimal .fav-act-target-name,
     body.theme-minimal .pin-conflict-fname,
     body.theme-minimal .pin-compare-count,
-    body.theme-minimal .mark-time-readout {
-      color: #141416;
+    body.theme-minimal .mark-time-readout,
+    body.theme-minimal .join-clip-name {
+      color: #252421;
     }
 
     body.theme-minimal .whats-new-sub,
@@ -6274,41 +6451,43 @@
     body.theme-minimal .fav-track-meta,
     body.theme-minimal .fav-act-target-path,
     body.theme-minimal .pin-conflict-fmeta,
-    body.theme-minimal .save-preview-spec {
-      color: #71717a;
+    body.theme-minimal .save-preview-spec,
+    body.theme-minimal .join-clip-meta,
+    body.theme-minimal .join-mode-desc {
+      color: #6f6c66;
     }
 
     body.theme-minimal .whats-new-icon {
-      background: #ffffff !important;
-      border: 1px solid rgba(0, 0, 0, 0.08) !important;
-      color: #18181b !important;
-      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+      background: #f6f4ef !important;
+      border: 1px solid rgba(45, 44, 41, 0.09) !important;
+      color: #2d2c29 !important;
+      box-shadow: 0 1px 3px rgba(45, 44, 41, 0.05);
     }
 
     body.theme-minimal .modal-close {
-      background: #ffffff;
-      color: #52525b;
-      border: 1px solid rgba(0, 0, 0, 0.08);
+      background: #f6f4ef;
+      color: #5c5953;
+      border: 1px solid rgba(45, 44, 41, 0.09);
     }
 
     body.theme-minimal .tab-bar,
     body.theme-minimal .share-mode-tabs {
-      background: #e9e9ee;
+      background: #e1ded6;
       border-color: transparent;
       border-radius: 12px;
     }
 
     body.theme-minimal .tab-btn,
     body.theme-minimal .share-mode-tab {
-      color: #71717a;
+      color: #6f6c66;
     }
 
     body.theme-minimal .tab-btn.active,
     body.theme-minimal .share-mode-tab.active,
     body.theme-minimal .share-mode-tab.active-pin {
-      background: #ffffff;
-      color: #141416;
-      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+      background: #f6f4ef;
+      color: #252421;
+      box-shadow: 0 1px 4px rgba(45, 44, 41, 0.08);
     }
 
     body.theme-minimal .modal-section,
@@ -6321,102 +6500,143 @@
     body.theme-minimal .fav-act-target-box,
     body.theme-minimal .pin-conflict-file-box,
     body.theme-minimal .pin-compare-col,
-    body.theme-minimal .mark-time-box {
-      background: #ffffff;
-      border: 1px solid rgba(0, 0, 0, 0.055);
+    body.theme-minimal .mark-time-box,
+    body.theme-minimal .join-clip-item {
+      background: #f6f4ef;
+      border: 1px solid rgba(45, 44, 41, 0.07);
       border-radius: 16px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.035);
+      box-shadow: 0 1.5px 6px rgba(45, 44, 41, 0.04);
+    }
+
+    body.theme-minimal .join-clip-item {
+      border-radius: 13px;
+    }
+
+    body.theme-minimal .join-mode-banner {
+      background: #eaf4ec;
+      border-color: rgba(60, 140, 92, 0.35);
+    }
+
+    body.theme-minimal .join-mode-banner.mode-pcm {
+      background: #ebf0f5;
+      border-color: rgba(85, 108, 133, 0.34);
+    }
+
+    body.theme-minimal .join-mode-title {
+      color: #2d6f48;
+    }
+
+    body.theme-minimal .join-mode-banner.mode-pcm .join-mode-title {
+      color: #465d75;
+    }
+
+    body.theme-minimal .join-clip-num {
+      background: #e7e4dc;
+      color: #2d2c29;
+    }
+
+    body.theme-minimal .join-mini-btn,
+    body.theme-minimal .join-pl-chip {
+      background: #eae7df;
+      border-color: rgba(45, 44, 41, 0.1);
+      color: #2d2c29;
+    }
+
+    body.theme-minimal .join-mini-btn.del {
+      background: #f6ebeb;
+      border-color: rgba(196, 67, 67, 0.28);
+      color: #b83b3b;
     }
 
     body.theme-minimal .whats-new-ver-card.is-latest {
-      border-color: rgba(24, 24, 27, 0.25);
-      background: #ffffff;
+      border-color: rgba(45, 44, 41, 0.24);
+      background: #f6f4ef;
     }
 
     body.theme-minimal .whats-new-ver-badge {
-      background: #f2f2f5;
+      background: #eae7df;
       border-color: transparent;
-      color: #52525b;
+      color: #5c5953;
     }
 
     body.theme-minimal .whats-new-ver-card.is-latest .whats-new-ver-badge {
-      background: #18181b;
-      border-color: #18181b;
-      color: #ffffff;
+      background: #2d2c29;
+      border-color: #2d2c29;
+      color: #f6f4ef;
     }
 
     body.theme-minimal .whats-new-ver-card.is-latest .whats-new-ver-date,
     body.theme-minimal .whats-new-ver-date {
-      color: #71717a;
+      color: #6f6c66;
     }
 
     body.theme-minimal .whats-new-bullets,
     body.theme-minimal .help-sec-list,
     body.theme-minimal .pin-compare-list {
-      color: #3f3f46;
+      color: #4a4843;
     }
 
     body.theme-minimal .whats-new-bullets li::marker,
     body.theme-minimal .help-sec-list li::marker {
-      color: #18181b;
+      color: #2d2c29;
     }
 
     body.theme-minimal .help-sec-list strong {
-      color: #141416;
+      color: #252421;
     }
 
     body.theme-minimal .help-summary-box {
-      background: #ffffff;
-      border-color: rgba(0, 0, 0, 0.08);
-      color: #18181b;
+      background: #f6f4ef;
+      border-color: rgba(45, 44, 41, 0.09);
+      color: #2d2c29;
     }
 
     body.theme-minimal .help-table th {
-      color: #141416;
-      background: #f5f5f7;
+      color: #252421;
+      background: #eceae4;
     }
 
     body.theme-minimal .help-table td:first-child,
     body.theme-minimal .help-table.cols-3 td:first-child,
     body.theme-minimal .help-table.cols-3 td:nth-child(2) {
-      color: #141416;
+      color: #252421;
     }
 
     body.theme-minimal .help-table td:last-child,
     body.theme-minimal .help-table.cols-3 td:last-child {
-      color: #52525b;
+      color: #5c5953;
     }
 
     body.theme-minimal .sec-value {
-      color: #18181b !important;
+      color: #2d2c29 !important;
       font-weight: 800;
     }
 
     body.theme-minimal .setting-help-btn {
-      background: #f2f2f5;
-      border-color: rgba(0, 0, 0, 0.12);
-      color: #52525b;
+      background: #eae7df;
+      border-color: rgba(45, 44, 41, 0.13);
+      color: #5c5953;
     }
 
     body.theme-minimal .theme-card {
-      background: #f7f7f9;
-      border-color: rgba(0, 0, 0, 0.08);
+      background: #efede7;
+      border-color: rgba(45, 44, 41, 0.09);
     }
 
     body.theme-minimal .theme-card.active {
-      background: #ffffff;
-      border-color: #18181b;
-      box-shadow: 0 0 0 1.5px #18181b, 0 4px 12px rgba(0, 0, 0, 0.06);
+      background: #f6f4ef;
+      border-color: #2d2c29;
+      box-shadow: 0 0 0 1.5px #2d2c29, 0 4px 12px rgba(45, 44, 41, 0.06);
     }
 
     body.theme-minimal input[type="range"] {
-      background: #e4e4e8;
+      background: #dcd8cf;
     }
 
     body.theme-minimal input[type="range"]::-webkit-slider-thumb {
-      background: #18181b;
-      border: 2px solid #ffffff;
-      box-shadow: 0 1px 5px rgba(0, 0, 0, 0.28);
+      background: #2d2c29;
+      border: 2px solid #f6f4ef;
+      box-shadow: 0 1px 5px rgba(45, 44, 41, 0.25);
     }
 
     body.theme-minimal .step-btn,
@@ -6434,9 +6654,9 @@
     body.theme-minimal .mark-action-block,
     body.theme-minimal .mini-act-btn,
     body.theme-minimal .marker-row-pencil {
-      background: #f4f4f6;
-      border-color: rgba(0, 0, 0, 0.08);
-      color: #27272a;
+      background: #eceae4;
+      border-color: rgba(45, 44, 41, 0.09);
+      color: #2d2c29;
     }
 
     body.theme-minimal .step-btn[style*="color:#42a5f5"],
@@ -6444,16 +6664,16 @@
     body.theme-minimal .step-btn[style*="color:#93c5fd"],
     body.theme-minimal .step-btn[style*="color:#fef08a"],
     body.theme-minimal .step-btn[style*="color:#bae6fd"] {
-      background: #f2f2f5 !important;
-      border-color: rgba(0, 0, 0, 0.12) !important;
-      color: #18181b !important;
+      background: #eae7df !important;
+      border-color: rgba(45, 44, 41, 0.13) !important;
+      color: #2d2c29 !important;
     }
 
     body.theme-minimal .step-btn[style*="color:#fca5a5"],
     body.theme-minimal .mark-action-block[style*="color:#fca5a5"] {
-      color: #dc2626 !important;
-      border-color: rgba(220, 38, 38, 0.28) !important;
-      background: #fef2f2 !important;
+      color: #b83b3b !important;
+      border-color: rgba(196, 67, 67, 0.28) !important;
+      background: #f6ebeb !important;
     }
 
     body.theme-minimal .opt-pill.active-blue,
@@ -6466,10 +6686,10 @@
     body.theme-minimal .pin-scope-btn.active,
     body.theme-minimal .fav-sort-btn.active,
     body.theme-minimal .fav-move-root-chip.active {
-      background: #18181b;
-      border-color: #18181b;
-      color: #ffffff;
-      box-shadow: 0 2px 8px rgba(24, 24, 27, 0.16);
+      background: #2d2c29;
+      border-color: #2d2c29;
+      color: #f6f4ef;
+      box-shadow: 0 2px 7px rgba(45, 44, 41, 0.15);
     }
 
     body.theme-minimal .engine-card.active .engine-name,
@@ -6477,194 +6697,211 @@
     body.theme-minimal .save-fmt-btn.active .save-fmt-sub,
     body.theme-minimal .save-qual-btn.active .save-qual-sub,
     body.theme-minimal .pin-scope-btn.active .pin-scope-sub {
-      color: #e4e4e7;
+      color: #dfdcd4;
     }
 
     body.theme-minimal .save-qual-rank {
-      background: #e9e9ee;
+      background: #e1ded6;
       border-color: transparent;
-      color: #3f3f46;
+      color: #4a4843;
     }
 
     body.theme-minimal .save-qual-btn.active .save-qual-rank {
-      background: rgba(255, 255, 255, 0.18);
-      border-color: rgba(255, 255, 255, 0.25);
-      color: #ffffff;
+      background: rgba(246, 244, 239, 0.18);
+      border-color: rgba(246, 244, 239, 0.28);
+      color: #f6f4ef;
     }
 
     body.theme-minimal .save-rank-guide,
     body.theme-minimal .save-share-notice,
     body.theme-minimal .fav-move-note,
     body.theme-minimal .rec-mid-gain-warn {
-      background: #f5f5f7 !important;
-      border-color: rgba(0, 0, 0, 0.08) !important;
-      color: #3f3f46 !important;
+      background: #efede7 !important;
+      border-color: rgba(45, 44, 41, 0.09) !important;
+      color: #4a4843 !important;
     }
 
     body.theme-minimal .save-preview-size {
-      color: #141416;
+      color: #252421;
     }
 
     body.theme-minimal .save-ext-badge {
-      background: #f2f2f5;
-      border-color: rgba(0, 0, 0, 0.1);
-      color: #18181b;
+      background: #eae7df;
+      border-color: rgba(45, 44, 41, 0.11);
+      color: #2d2c29;
     }
 
     body.theme-minimal .save-dest-box {
-      background: #f5f5f7;
-      border-color: rgba(0, 0, 0, 0.1);
-      color: #18181b;
+      background: #efede7;
+      border-color: rgba(45, 44, 41, 0.11);
+      color: #2d2c29;
     }
 
     body.theme-minimal .save-dest-box.is-custom {
-      background: #ffffff;
-      border-color: #18181b;
-      color: #141416;
+      background: #f6f4ef;
+      border-color: #2d2c29;
+      color: #252421;
     }
 
     body.theme-minimal .save-dest-change-btn {
-      background: #18181b;
-      border-color: #18181b;
-      color: #ffffff;
+      background: #2d2c29;
+      border-color: #2d2c29;
+      color: #f6f4ef;
+    }
+
+    body.theme-minimal .save-progress-box {
+      background: #f6f4ef;
+      border-color: rgba(85, 108, 133, 0.35);
+    }
+
+    body.theme-minimal .save-progress-head {
+      color: #2d2c29;
+    }
+
+    body.theme-minimal .save-progress-track {
+      background: #dfdcd4;
+    }
+
+    body.theme-minimal .save-progress-bar {
+      background: #69829c;
     }
 
     body.theme-minimal .toggle-pill {
       border-radius: 999px;
-      background: #e9e9ee;
+      background: #e1ded6;
       border-color: transparent;
-      color: #71717a;
+      color: #6f6c66;
     }
 
     body.theme-minimal .toggle-pill.on {
-      background: #18181b;
-      border-color: #18181b;
-      color: #ffffff;
+      background: #2d2c29;
+      border-color: #2d2c29;
+      color: #f6f4ef;
     }
 
     body.theme-minimal .text-input,
     body.theme-minimal .pin-text-area {
-      background: #f5f5f7;
-      border-color: rgba(0, 0, 0, 0.11);
-      color: #141416;
+      background: #efede7;
+      border-color: rgba(45, 44, 41, 0.12);
+      color: #252421;
     }
 
     body.theme-minimal .text-input:focus,
     body.theme-minimal .pin-text-area:focus {
-      border-color: #18181b;
-      background: #ffffff;
+      border-color: #2d2c29;
+      background: #f8f6f2;
     }
 
     body.theme-minimal .mark-name-input {
-      color: #141416;
-      border-bottom-color: #18181b;
+      color: #252421;
+      border-bottom-color: #2d2c29;
     }
 
     body.theme-minimal .mark-switch-row {
-      color: #17171a;
+      color: #2d2c29;
     }
 
     body.theme-minimal .audipo-switch {
-      background: #d4d4dc;
+      background: #cfc9be;
     }
 
     body.theme-minimal .audipo-switch::after {
-      background: #ffffff;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+      background: #f6f4ef;
+      box-shadow: 0 1px 3px rgba(45, 44, 41, 0.2);
     }
 
     body.theme-minimal .audipo-switch.on {
-      background: #18181b;
+      background: #2d2c29;
     }
 
     body.theme-minimal .audipo-switch.on::after {
-      background: #ffffff;
+      background: #f6f4ef;
     }
 
     body.theme-minimal .mark-dialog-btn {
-      color: #18181b;
+      color: #2d2c29;
     }
 
     body.theme-minimal .list-item,
     body.theme-minimal .fav-folder-row,
     body.theme-minimal .fav-track-item,
     body.theme-minimal .fav-dir-item {
-      background: #ffffff;
-      border: 1px solid rgba(0, 0, 0, 0.06);
+      background: #f6f4ef;
+      border: 1px solid rgba(45, 44, 41, 0.07);
       border-radius: 14px;
-      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+      box-shadow: 0 1px 3.5px rgba(45, 44, 41, 0.045);
     }
 
     body.theme-minimal .list-item.current,
     body.theme-minimal .list-item.active-section {
-      background: #ffffff;
-      border-color: #18181b;
-      box-shadow: inset 3.5px 0 0 #18181b, 0 2px 10px rgba(0, 0, 0, 0.06);
+      background: #f6f4ef;
+      border-color: #556c85;
+      box-shadow: inset 3.5px 0 0 #556c85, 0 2px 8px rgba(45, 44, 41, 0.06);
     }
 
     body.theme-minimal .active-section-badge {
-      background: #18181b;
-      color: #ffffff;
+      background: #556c85;
+      color: #f6f4ef;
     }
 
     body.theme-minimal .list-item-title span[style*="color:#ffffff"] {
-      color: #141416 !important;
+      color: #252421 !important;
     }
 
     body.theme-minimal .list-item-title span[style*="color:#fcd34d"],
     body.theme-minimal .fav-track-meta span[style*="color:#fde68a"] {
-      color: #b45309 !important;
+      color: #a6691c !important;
     }
 
     body.theme-minimal .fav-section-label,
     body.theme-minimal .fav-browser-title,
     body.theme-minimal .fav-dir-name {
-      color: #141416;
+      color: #252421;
     }
 
     body.theme-minimal .fav-section-label span[style*="color:#93c5fd"],
     body.theme-minimal .fav-track-dur,
     body.theme-minimal .fav-crumb-seg,
     body.theme-minimal #favMoveDestLabel {
-      color: #18181b !important;
+      color: #465d75 !important;
     }
 
     body.theme-minimal .fav-crumb-seg {
-      background: #f2f2f5;
-      border-color: rgba(0, 0, 0, 0.08);
+      background: #eae7df;
+      border-color: rgba(45, 44, 41, 0.09);
     }
 
     body.theme-minimal .fav-crumb-seg.is-current {
-      background: #18181b;
-      border-color: #18181b;
-      color: #ffffff !important;
+      background: #2d2c29;
+      border-color: #2d2c29;
+      color: #f6f4ef !important;
     }
 
     body.theme-minimal .fav-dir-item span[style*="color:#fde68a"],
     body.theme-minimal #btnFavBookmarkCurDir,
     body.theme-minimal #btnFavMoveNewDir {
-      color: #18181b !important;
+      color: #2d2c29 !important;
     }
 
     body.theme-minimal .fav-track-open-btn:active {
-      background: #f2f2f5;
+      background: #eae7df;
     }
 
     body.theme-minimal .fav-track-more-btn {
-      border-left-color: rgba(0, 0, 0, 0.06);
-      color: #71717a;
+      border-left-color: rgba(45, 44, 41, 0.07);
+      color: #6f6c66;
     }
 
     body.theme-minimal .fav-empty-hint {
-      background: #ffffff;
-      border-color: rgba(0, 0, 0, 0.12);
+      background: #f6f4ef;
+      border-color: rgba(45, 44, 41, 0.13);
     }
 
     body.theme-minimal .fav-pick-big-btn {
-      background: #ffffff;
-      border-color: rgba(0, 0, 0, 0.18);
-      color: #18181b;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+      background: #f6f4ef;
+      border-color: rgba(45, 44, 41, 0.18);
+      color: #2d2c29;
+      box-shadow: 0 2px 6px rgba(45, 44, 41, 0.045);
     }
 
     body.theme-minimal .fav-primary-picker-btn,
@@ -6672,83 +6909,83 @@
     body.theme-minimal .whats-new-ok-btn,
     body.theme-minimal .app-share-primary-btn,
     body.theme-minimal .pin-act-merge {
-      background: #18181b;
-      border-color: #18181b;
-      color: #ffffff;
+      background: #2d2c29;
+      border-color: #2d2c29;
+      color: #f6f4ef;
       border-radius: 13px;
-      box-shadow: 0 3px 10px rgba(24, 24, 27, 0.16);
+      box-shadow: 0 3px 9px rgba(45, 44, 41, 0.16);
     }
 
     body.theme-minimal .whats-new-ok-btn.share-ready {
-      background: #16a34a;
-      border-color: #16a34a;
-      color: #ffffff;
+      background: #3c8c5c;
+      border-color: #3c8c5c;
+      color: #f6f4ef;
     }
 
     body.theme-minimal .modal-update-btn,
     body.theme-minimal .danger-btn-safe,
     body.theme-minimal .fav-footer-back-btn,
     body.theme-minimal .pin-act-skip {
-      background: #ffffff;
-      border-color: rgba(0, 0, 0, 0.12);
-      color: #18181b;
+      background: #f6f4ef;
+      border-color: rgba(45, 44, 41, 0.13);
+      color: #2d2c29;
     }
 
     body.theme-minimal .pin-act-overwrite {
-      background: #fffbeb;
-      border-color: #d97706;
-      color: #92400e;
+      background: #f8f1e2;
+      border-color: #c47d24;
+      color: #8c5614;
     }
 
     body.theme-minimal .app-share-url-box {
-      background: #f5f5f7;
-      border-color: rgba(0, 0, 0, 0.08);
-      color: #18181b;
+      background: #efede7;
+      border-color: rgba(45, 44, 41, 0.09);
+      color: #2d2c29;
     }
 
     body.theme-minimal .app-share-btn-line {
-      background: #f0fdf4;
-      border-color: rgba(22, 163, 74, 0.35);
-      color: #15803d;
+      background: #eaf4ec;
+      border-color: rgba(60, 140, 92, 0.35);
+      color: #2d6f48;
     }
 
     body.theme-minimal .app-share-btn-mail {
-      background: #f5f5f7;
-      border-color: rgba(0, 0, 0, 0.1);
-      color: #18181b;
+      background: #efede7;
+      border-color: rgba(45, 44, 41, 0.11);
+      color: #2d2c29;
     }
 
     body.theme-minimal .danger-stats-box {
-      background: #fef2f2;
-      border-color: rgba(220, 38, 38, 0.25);
-      color: #991b1b;
+      background: #f6ebeb;
+      border-color: rgba(196, 67, 67, 0.25);
+      color: #992e2e;
     }
 
     body.theme-minimal #clearPinMemoryTitle,
     body.theme-minimal #clearPinsConfirmTitle,
     body.theme-minimal #cutConfirmModal .mark-edit-title {
-      color: #dc2626 !important;
+      color: #b83b3b !important;
     }
 
     body.theme-minimal #clearPinMemoryDesc,
     body.theme-minimal #clearPinsConfirmDesc,
     body.theme-minimal #cutConfirmModal p {
-      color: #3f3f46 !important;
+      color: #4a4843 !important;
     }
 
     body.theme-minimal #cutConfirmRangeText {
-      color: #141416 !important;
+      color: #252421 !important;
     }
 
     body.theme-minimal .pin-sub-btn svg {
-      stroke: #18181b !important;
+      stroke: #2d2c29 !important;
     }
 
     body.theme-minimal .toast-banner {
-      background: #18181b;
-      border-color: #18181b;
-      color: #ffffff;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+      background: #2d2c29;
+      border-color: #2d2c29;
+      color: #f6f4ef;
+      box-shadow: 0 8px 24px rgba(35, 34, 30, 0.2);
     }
   </style>
 </head>
@@ -6760,6 +6997,7 @@
   <!-- Plain multi-file input with NO restrictive accept filter so Android opens native storage/SD picker -->
   <input type="file" id="fileInput" accept="audio/*,.m4a,.mp3,.wav,.aac,.flac,.ogg,.opus,.wma,.aif,.aiff,.caf,.txt,.json" multiple class="sr-only">
   <input type="file" id="pinImportInput" accept=".txt,.json,text/plain,application/json" multiple class="sr-only">
+  <input type="file" id="joinFileInput" accept="audio/*,.m4a,.mp3,.wav,.aac,.flac,.ogg,.opus,.wma,.aif,.aiff,.caf" multiple class="sr-only">
 
   <!-- ==================== 1. TOP HEADER BAR ==================== -->
   <header class="app-header">
@@ -7358,6 +7596,13 @@
         </svg>
         <span>区間削除</span>
       </button>
+      <button id="btnJoinAudioBar" type="button" class="sec-act-btn join-btn" title="別の音声ファイルを劣化なしでつなぎ合わせる">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M10 13a5 5 0 0 0 7.54.54l2-2a5 5 0 0 0-7.07-7.07l-1.15 1.15"/>
+          <path d="M14 11a5 5 0 0 0-7.54-.54l-2 2a5 5 0 0 0 7.07 7.07l1.15-1.15"/>
+        </svg>
+        <span>結合</span>
+      </button>
     </div>
   </section>
 
@@ -7583,7 +7828,7 @@
                 <div class="tp-pads"><span></span><span class="act"></span><span></span></div>
               </div>
               <div class="theme-card-name">ミニマル（白）</div>
-              <div class="theme-card-desc">白カード＆黒インクの静かな雰囲気</div>
+              <div class="theme-card-desc">やわらかなオフホワイト＆くすみ波形</div>
             </button>
           </div>
         </div>
@@ -7823,7 +8068,7 @@
         <div class="modal-section" style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
           <div>
             <div class="sec-title">バージョン情報</div>
-            <div id="settingsVersionLabel" class="engine-desc mono">現在: v59</div>
+            <div id="settingsVersionLabel" class="engine-desc mono">現在: v60</div>
           </div>
           <button id="btnShowReleaseHistory" type="button" class="step-btn" style="color:#93c5fd;border-color:rgba(66,165,245,0.45);">更新履歴を見る</button>
         </div>
@@ -7870,6 +8115,13 @@
         <label for="fileInput" class="start-btn start-btn-demo btn-like" style="min-height:38px;font-size:12px;">
           ＋ ローカル音声ファイルを追加
         </label>
+        <button id="btnJoinAudioFromPlaylist" type="button" class="start-btn start-btn-local" style="min-height:38px;font-size:12px;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M10 13a5 5 0 0 0 7.54.54l2-2a5 5 0 0 0-7.07-7.07l-1.15 1.15"/>
+            <path d="M14 11a5 5 0 0 0-7.54-.54l-2 2a5 5 0 0 0 7.07 7.07l1.15-1.15"/>
+          </svg>
+          <span>音声ファイルを無劣化で結合する</span>
+        </button>
       </div>
 
       <div class="modal-footer-row">
@@ -7980,7 +8232,7 @@
           </div>
           <div>
             <h3 id="whatsNewTitle" class="whats-new-title">アップデートのお知らせ</h3>
-            <p id="whatsNewSub" class="whats-new-sub mono">v59 に更新されました</p>
+            <p id="whatsNewSub" class="whats-new-sub mono">v60 に更新されました</p>
           </div>
         </div>
         <button id="btnCloseWhatsNewX" type="button" class="modal-close" aria-label="閉じる">✕</button>
@@ -8482,6 +8734,105 @@
     </div>
   </div>
 
+  <!-- ==================== 16. LOSSLESS AUDIO JOIN / CONCATENATE MODAL ==================== -->
+  <div id="joinAudioModal" class="modal-backdrop hidden" style="z-index:83;">
+    <div class="join-modal-card" role="dialog" aria-modal="true" aria-labelledby="joinAudioTitle">
+      <div class="whats-new-head" style="margin-bottom:10px;">
+        <div class="whats-new-title-wrap">
+          <div class="whats-new-icon" aria-hidden="true">
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M10 13a5 5 0 0 0 7.54.54l2-2a5 5 0 0 0-7.07-7.07l-1.15 1.15"/>
+              <path d="M14 11a5 5 0 0 0-7.54-.54l-2 2a5 5 0 0 0 7.07 7.07l1.15-1.15"/>
+            </svg>
+          </div>
+          <div>
+            <h3 id="joinAudioTitle" class="whats-new-title">音声ファイルを無劣化で結合</h3>
+            <p class="whats-new-sub">複数ファイルを順番につなぎ合わせます</p>
+          </div>
+        </div>
+        <button id="btnCloseJoinAudioX" type="button" class="modal-close" aria-label="閉じる">✕</button>
+      </div>
+
+      <div class="modal-body" style="gap:10px;">
+        <!-- Live Lossless Mode Banner -->
+        <div id="joinModeBanner" class="join-mode-banner">
+          <div id="joinModeTitle" class="join-mode-title">劣化なしで結合できます</div>
+          <div id="joinModeDesc" class="join-mode-desc">2つ以上のファイルを選ぶと、同形式WAVはバイナリ直結（再変換ゼロ）、異形式混在時は最高サンプルレート維持・24bit無圧縮WAVで劣化なく結合します。</div>
+        </div>
+
+        <!-- Ordered Clip List -->
+        <div class="modal-section">
+          <div class="sec-head" style="margin-bottom:7px;">
+            <span class="sec-title">結合する順番</span>
+            <span id="joinTotalMeta" class="sec-value mono">0件 • 0:00</span>
+          </div>
+          <div id="joinClipList" class="join-clip-list"></div>
+
+          <div class="join-add-row" style="margin-top:8px;">
+            <button id="btnJoinAddFiles" type="button" class="fav-primary-picker-btn" style="min-height:38px;font-size:12.5px;">
+              <span>＋ 音声ファイルを追加</span>
+            </button>
+            <button id="btnJoinClearList" type="button" class="step-btn" style="height:38px;padding:0 11px;color:#fca5a5;border-color:rgba(239,68,68,0.45);">クリア</button>
+          </div>
+
+          <div id="joinPlaylistQuickWrap" class="hidden" style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border-subtle);">
+            <div class="engine-desc" style="margin-bottom:4px;">読込済みの曲一覧からワンタップ追加:</div>
+            <div id="joinPlaylistChips" class="join-playlist-chips"></div>
+          </div>
+        </div>
+
+        <!-- Splice Options -->
+        <div class="modal-section">
+          <div class="sec-head" style="margin-bottom:6px;">
+            <span class="sec-title">つなぎ目の無音間隔</span>
+            <span id="joinGapLabel" class="sec-value mono">0秒（直結）</span>
+          </div>
+          <div class="opt-grid-4">
+            <button type="button" data-join-gap="0" class="opt-pill join-gap-opt active-blue">0秒 (直結)</button>
+            <button type="button" data-join-gap="0.5" class="opt-pill join-gap-opt mono">0.5秒</button>
+            <button type="button" data-join-gap="1" class="opt-pill join-gap-opt mono">1.0秒</button>
+            <button type="button" data-join-gap="2" class="opt-pill join-gap-opt mono">2.0秒</button>
+          </div>
+
+          <div class="toggle-row">
+            <div>
+              <div class="sec-title" style="font-size:11.5px;">つなぎ目に黄色ピンを自動追加</div>
+              <div class="engine-desc">結合位置にファイル名つきの黄色ピンを打ち、元のピンも自動引き継ぎします</div>
+            </div>
+            <button id="btnToggleJoinPins" type="button" class="toggle-pill on">ON</button>
+          </div>
+        </div>
+
+        <!-- Joined Output Title -->
+        <div class="modal-section">
+          <div class="sec-head" style="margin-bottom:6px;">
+            <span class="sec-title">結合後のファイル名</span>
+          </div>
+          <div class="save-name-row">
+            <input type="text" id="joinOutputNameInput" class="text-input" placeholder="結合後のファイル名" autocomplete="off">
+            <span class="save-ext-badge mono">.wav</span>
+          </div>
+        </div>
+
+        <!-- Progress bar while joining -->
+        <div id="joinProgressBox" class="save-progress-box hidden">
+          <div class="save-progress-head">
+            <span id="joinProgressLabel">結合処理中...</span>
+            <span id="joinProgressPct" class="mono">0%</span>
+          </div>
+          <div class="save-progress-track">
+            <div id="joinProgressBar" class="save-progress-bar"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer-row" style="margin-top:12px;">
+        <button id="btnCancelJoinAudio" type="button" class="danger-btn-safe" style="height:41px;border-radius:11px;">キャンセル</button>
+        <button id="btnExecJoinAudio" type="button" class="whats-new-ok-btn" style="height:41px;" disabled>劣化なしで結合する</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Toast Banner -->
   <div id="toastBanner" class="toast-banner"></div>
 
@@ -8498,7 +8849,7 @@
             document.documentElement.classList.add('theme-minimal');
             document.body.classList.add('theme-minimal');
             const tcMeta = document.querySelector('meta[name="theme-color"]');
-            if (tcMeta) tcMeta.setAttribute('content', '#f5f5f7');
+            if (tcMeta) tcMeta.setAttribute('content', '#eceae4');
           }
         }
       } catch (_) {}
@@ -9422,8 +9773,8 @@
             const rp = state.reverbPresets[state.reverbIndex];
             reverbLabel.textContent = rp.name;
             const active = state.reverbIndex > 0;
-            reverbLabel.style.color = active ? (isMinimalTheme() ? '#18181b' : '#42a5f5') : '';
-            reverbIcon.style.color = active ? (isMinimalTheme() ? '#18181b' : '#42a5f5') : '';
+            reverbLabel.style.color = active ? (isMinimalTheme() ? '#465d75' : '#42a5f5') : '';
+            reverbIcon.style.color = active ? (isMinimalTheme() ? '#465d75' : '#42a5f5') : '';
           }
           if (typeof p.zoomVisible === 'boolean') {
             state.zoomVisible = p.zoomVisible;
@@ -10662,8 +11013,8 @@
         const p = state.reverbPresets[state.reverbIndex];
         reverbLabel.textContent = p.name;
         const active = state.reverbIndex > 0;
-        reverbLabel.style.color = active ? (isMinimalTheme() ? '#18181b' : '#42a5f5') : '';
-        reverbIcon.style.color = active ? (isMinimalTheme() ? '#18181b' : '#42a5f5') : '';
+        reverbLabel.style.color = active ? (isMinimalTheme() ? '#465d75' : '#42a5f5') : '';
+        reverbIcon.style.color = active ? (isMinimalTheme() ? '#465d75' : '#42a5f5') : '';
 
         if (audioCtx && audioGraphReady) {
           if (p.wet <= 0.001) {
@@ -10851,7 +11202,7 @@
         document.documentElement.classList.toggle('theme-minimal', isMin);
         document.body.classList.toggle('theme-minimal', isMin);
         const tcMeta = document.querySelector('meta[name="theme-color"]');
-        if (tcMeta) tcMeta.setAttribute('content', isMin ? '#f5f5f7' : '#111113');
+        if (tcMeta) tcMeta.setAttribute('content', isMin ? '#eceae4' : '#111113');
 
         const valEl = document.getElementById('modalThemeVal');
         if (valEl) {
@@ -10863,8 +11214,8 @@
 
         // Re-sync dynamic inline colors (e.g. reverb active tint) & redraw canvases
         const revActive = state.reverbIndex > 0;
-        if (reverbLabel) reverbLabel.style.color = revActive ? (isMin ? '#18181b' : '#42a5f5') : '';
-        if (reverbIcon) reverbIcon.style.color = revActive ? (isMin ? '#18181b' : '#42a5f5') : '';
+        if (reverbLabel) reverbLabel.style.color = revActive ? (isMin ? '#465d75' : '#42a5f5') : '';
+        if (reverbIcon) reverbIcon.style.color = revActive ? (isMin ? '#465d75' : '#42a5f5') : '';
         if (typeof renderAllCanvases === 'function') renderAllCanvases();
 
         if (persist) {
@@ -10892,11 +11243,7 @@
           valEl.textContent = isLowMem ? `${meta.short}（この曲は省メモリ中）` : meta.short;
         }
 
-        document.querySelectorAll('.theme-card').forEach(card => {
-        card.addEventListener('click', () => applyUiTheme(card.dataset.uiTheme, true));
-      });
-
-      document.querySelectorAll('.vocoder-tone-card').forEach(card => {
+        document.querySelectorAll('.vocoder-tone-card').forEach(card => {
           const key = card.dataset.vocoderTone;
           const active = key === tone;
           card.classList.toggle('active', active);
@@ -16704,7 +17051,7 @@
             ctx.save();
             ctx.scale(dpr, dpr);
             const isMinRec = isMinimalTheme();
-            ctx.fillStyle = isMinRec ? '#f5f5f7' : '#120c0d';
+            ctx.fillStyle = isMinRec ? '#eceae4' : '#120c0d';
             ctx.fillRect(0, 0, rect.width, rect.height);
             ctx.strokeStyle = isMinRec ? 'rgba(0,0,0,0.08)' : 'rgba(255,255,255,0.12)';
             ctx.beginPath();
@@ -16712,7 +17059,7 @@
             ctx.lineTo(rect.width, rect.height / 2);
             ctx.stroke();
 
-            ctx.strokeStyle = isMinRec ? '#dc2626' : '#f87171';
+            ctx.strokeStyle = isMinRec ? '#c44343' : '#f87171';
             ctx.lineWidth = 1.6;
             ctx.beginPath();
             for (let i = 0; i < bufLen; i++) {
@@ -17798,6 +18145,670 @@
         showToast(`区間を削除しました (-${formatTime(cutDuration)})`);
       }
 
+      // ==================== LOSSLESS AUDIO CONCATENATION (JOIN / MERGE) ====================
+      const joinAudioModal = document.getElementById('joinAudioModal');
+      const joinFileInput = document.getElementById('joinFileInput');
+      const joinModeBanner = document.getElementById('joinModeBanner');
+      const joinModeTitle = document.getElementById('joinModeTitle');
+      const joinModeDesc = document.getElementById('joinModeDesc');
+      const joinTotalMeta = document.getElementById('joinTotalMeta');
+      const joinClipList = document.getElementById('joinClipList');
+      const btnJoinAddFiles = document.getElementById('btnJoinAddFiles');
+      const btnJoinClearList = document.getElementById('btnJoinClearList');
+      const joinPlaylistQuickWrap = document.getElementById('joinPlaylistQuickWrap');
+      const joinPlaylistChips = document.getElementById('joinPlaylistChips');
+      const joinGapLabel = document.getElementById('joinGapLabel');
+      const btnToggleJoinPins = document.getElementById('btnToggleJoinPins');
+      const joinOutputNameInput = document.getElementById('joinOutputNameInput');
+      const joinProgressBox = document.getElementById('joinProgressBox');
+      const joinProgressLabel = document.getElementById('joinProgressLabel');
+      const joinProgressPct = document.getElementById('joinProgressPct');
+      const joinProgressBar = document.getElementById('joinProgressBar');
+      const btnCloseJoinAudioX = document.getElementById('btnCloseJoinAudioX');
+      const btnCancelJoinAudio = document.getElementById('btnCancelJoinAudio');
+      const btnExecJoinAudio = document.getElementById('btnExecJoinAudio');
+      const btnJoinAudioBar = document.getElementById('btnJoinAudioBar');
+      const btnJoinAudioFromPlaylist = document.getElementById('btnJoinAudioFromPlaylist');
+
+      let nextJoinItemUid = 1;
+      const joinAudioState = {
+        items: [], // { uid, name, blob, wavMeta, duration, markers, startSectionEnabled, isCurrentTrack }
+        gapSec: 0,
+        addBoundaryPins: true,
+        isJoining: false,
+        userEditedName: false
+      };
+
+      function probeAudioBlobDurationQuick(blob) {
+        return new Promise((resolve) => {
+          if (!blob) return resolve(0);
+          let url = '';
+          const tmp = document.createElement('audio');
+          tmp.preload = 'metadata';
+          let settled = false;
+          const done = (val) => {
+            if (settled) return;
+            settled = true;
+            try { tmp.removeAttribute('src'); tmp.load(); } catch (_) {}
+            if (url) { try { URL.revokeObjectURL(url); } catch (_) {} }
+            resolve(isFinite(val) && val > 0 ? val : 0);
+          };
+          const timer = setTimeout(() => done(0), 2500);
+          tmp.onloadedmetadata = () => {
+            clearTimeout(timer);
+            done(tmp.duration);
+          };
+          tmp.onerror = () => {
+            clearTimeout(timer);
+            done(0);
+          };
+          try {
+            url = URL.createObjectURL(blob);
+            tmp.src = url;
+          } catch (_) {
+            clearTimeout(timer);
+            done(0);
+          }
+        });
+      }
+
+      function canBinaryJoinWavItems(items) {
+        if (!Array.isArray(items) || items.length < 2) return false;
+        const first = items[0] && items[0].wavMeta;
+        if (!first) return false;
+        if (first.audioFormat !== 1 && first.audioFormat !== 3) return false;
+        for (let i = 1; i < items.length; i++) {
+          const m = items[i] && items[i].wavMeta;
+          if (!m) return false;
+          if (
+            m.audioFormat !== first.audioFormat ||
+            m.numChannels !== first.numChannels ||
+            m.sampleRate !== first.sampleRate ||
+            m.bitsPerSample !== first.bitsPerSample ||
+            m.blockAlign !== first.blockAlign
+          ) {
+            return false;
+          }
+        }
+        return true;
+      }
+
+      function buildDefaultJoinedName(items) {
+        if (!items || items.length === 0) return 'merged_audio';
+        const stripExt = (s) => String(s || '').replace(/\.[^/.]+$/, '').trim() || 'audio';
+        const a = stripExt(items[0].name).slice(0, 20);
+        if (items.length === 1) return `${a}_結合`;
+        const b = stripExt(items[1].name).slice(0, 20);
+        if (items.length === 2) return `${a} + ${b}`;
+        return `${a} + 他${items.length - 1}曲`;
+      }
+
+      function setJoinProgress(pct, label) {
+        if (!joinProgressBox) return;
+        const clamped = Math.max(0, Math.min(100, Math.round(pct)));
+        joinProgressBox.classList.remove('hidden');
+        if (joinProgressLabel) joinProgressLabel.textContent = label || '結合処理中...';
+        if (joinProgressPct) joinProgressPct.textContent = `${clamped}%`;
+        if (joinProgressBar) joinProgressBar.style.width = `${clamped}%`;
+      }
+
+      async function buildJoinItemFromBlob(blob, displayName, opts = {}) {
+        const cleanName = String(displayName || blob.name || 'audio').trim() || 'audio';
+        const wavMeta = await parseWavHeader(blob);
+        let dur = Number(opts.duration) || 0;
+        if (wavMeta && wavMeta.duration > 0) {
+          dur = wavMeta.duration;
+        } else if (dur <= 0) {
+          dur = await probeAudioBlobDurationQuick(blob);
+        }
+        let markers = Array.isArray(opts.markers) ? cloneMarkerList(opts.markers) : null;
+        if (!markers) {
+          const mem = lookupFileMemory(blob.size, dur > 0 ? dur : null);
+          markers = mem && Array.isArray(mem.markers) ? cloneMarkerList(mem.markers) : [];
+        }
+        return {
+          uid: `ji_${nextJoinItemUid++}`,
+          name: cleanName,
+          blob,
+          wavMeta,
+          duration: dur,
+          markers,
+          startSectionEnabled: opts.startSectionEnabled !== false,
+          isCurrentTrack: Boolean(opts.isCurrentTrack)
+        };
+      }
+
+      function renderJoinAudioModalUI() {
+        const items = joinAudioState.items;
+        const gapSec = joinAudioState.gapSec;
+        const totalAudioDur = items.reduce((s, it) => s + (Number(it.duration) || 0), 0);
+        const totalGapDur = items.length > 1 ? gapSec * (items.length - 1) : 0;
+        const estTotalDur = totalAudioDur + totalGapDur;
+
+        if (joinTotalMeta) {
+          joinTotalMeta.textContent = `${items.length}件 • 約 ${formatTime(estTotalDur)}`;
+        }
+
+        if (!joinAudioState.userEditedName && joinOutputNameInput) {
+          joinOutputNameInput.value = buildDefaultJoinedName(items);
+        }
+
+        const isBinaryWav = canBinaryJoinWavItems(items);
+        if (joinModeBanner && joinModeTitle && joinModeDesc) {
+          if (items.length < 2) {
+            joinModeBanner.classList.remove('mode-pcm');
+            joinModeTitle.textContent = '2つ以上のファイルを追加してください';
+            joinModeDesc.textContent = '同仕様のWAV同士は再変換ゼロの完全バイナリ直結、異形式混在時は最高サンプルレート維持・24bit無圧縮WAVで劣化なく結合します。';
+          } else if (isBinaryWav) {
+            const m = items[0].wavMeta;
+            const chStr = m.numChannels === 1 ? 'モノラル' : `${m.numChannels}ch`;
+            joinModeBanner.classList.remove('mode-pcm');
+            joinModeTitle.textContent = '★ 完全無劣化（バイナリ直結・再変換ゼロ）';
+            joinModeDesc.textContent = `全ファイルが同一WAV仕様（${m.bitsPerSample}bit / ${(m.sampleRate / 1000).toFixed(1).replace(/\.0$/, '')}kHz / ${chStr}）のため、音データを1ビットも変換せず直接つなぎます。`;
+          } else {
+            joinModeBanner.classList.add('mode-pcm');
+            joinModeTitle.textContent = '★ 劣化なし（最高レート維持・24bit無圧縮WAV）';
+            joinModeDesc.textContent = '異なる形式やサンプルレートが混在しているため、最も高いサンプルレートを維持したまま24bit無圧縮PCMで結合します（再圧縮による劣化ゼロ）。';
+          }
+        }
+
+        if (joinGapLabel) {
+          joinGapLabel.textContent = gapSec <= 0 ? '0秒（直結）' : `${gapSec}秒`;
+        }
+        document.querySelectorAll('.join-gap-opt').forEach((btn) => {
+          const v = parseFloat(btn.dataset.joinGap || '0');
+          btn.classList.toggle('active-blue', Math.abs(v - gapSec) < 0.01);
+          btn.disabled = joinAudioState.isJoining;
+        });
+
+        if (btnToggleJoinPins) {
+          btnToggleJoinPins.textContent = joinAudioState.addBoundaryPins ? 'ON' : 'OFF';
+          btnToggleJoinPins.classList.toggle('on', joinAudioState.addBoundaryPins);
+          btnToggleJoinPins.disabled = joinAudioState.isJoining;
+        }
+
+        if (joinClipList) {
+          joinClipList.innerHTML = '';
+          if (items.length === 0) {
+            joinClipList.innerHTML = '<div class="fav-empty-hint">下の「＋ 音声ファイルを追加」から、つなぎ合わせたいファイルを2つ以上選んでください。</div>';
+          } else {
+            const frag = document.createDocumentFragment();
+            items.forEach((it, idx) => {
+              const row = document.createElement('div');
+              row.className = 'join-clip-item';
+
+              const num = document.createElement('span');
+              num.className = 'join-clip-num mono';
+              num.textContent = String(idx + 1);
+
+              const main = document.createElement('div');
+              main.className = 'join-clip-main';
+
+              const nameEl = document.createElement('div');
+              nameEl.className = 'join-clip-name';
+              nameEl.textContent = it.name;
+
+              const metaParts = [];
+              if (it.duration > 0) metaParts.push(formatTime(it.duration, true));
+              if (it.wavMeta) {
+                metaParts.push(`WAV ${it.wavMeta.bitsPerSample}bit ${(it.wavMeta.sampleRate / 1000).toFixed(1).replace(/\.0$/, '')}kHz`);
+              } else {
+                const extM = String(it.name || '').match(/\.([a-zA-Z0-9]{2,5})$/);
+                metaParts.push(extM ? extM[1].toUpperCase() : '音声');
+              }
+              if (it.markers && it.markers.length > 0) {
+                metaParts.push(`ピン${it.markers.length}`);
+              }
+              const metaEl = document.createElement('div');
+              metaEl.className = 'join-clip-meta mono';
+              metaEl.textContent = metaParts.join(' • ');
+
+              main.appendChild(nameEl);
+              main.appendChild(metaEl);
+
+              const ctrls = document.createElement('div');
+              ctrls.className = 'join-clip-ctrls';
+
+              const upBtn = document.createElement('button');
+              upBtn.type = 'button';
+              upBtn.className = 'join-mini-btn';
+              upBtn.textContent = '↑';
+              upBtn.title = '上へ移動';
+              upBtn.disabled = joinAudioState.isJoining || idx === 0;
+              upBtn.addEventListener('click', () => {
+                if (idx <= 0 || joinAudioState.isJoining) return;
+                const tmp = items[idx - 1];
+                items[idx - 1] = items[idx];
+                items[idx] = tmp;
+                renderJoinAudioModalUI();
+              });
+
+              const dnBtn = document.createElement('button');
+              dnBtn.type = 'button';
+              dnBtn.className = 'join-mini-btn';
+              dnBtn.textContent = '↓';
+              dnBtn.title = '下へ移動';
+              dnBtn.disabled = joinAudioState.isJoining || idx === items.length - 1;
+              dnBtn.addEventListener('click', () => {
+                if (idx >= items.length - 1 || joinAudioState.isJoining) return;
+                const tmp = items[idx + 1];
+                items[idx + 1] = items[idx];
+                items[idx] = tmp;
+                renderJoinAudioModalUI();
+              });
+
+              const delBtn = document.createElement('button');
+              delBtn.type = 'button';
+              delBtn.className = 'join-mini-btn del';
+              delBtn.textContent = '✕';
+              delBtn.title = 'リストから外す';
+              delBtn.disabled = joinAudioState.isJoining;
+              delBtn.addEventListener('click', () => {
+                if (joinAudioState.isJoining) return;
+                items.splice(idx, 1);
+                renderJoinAudioModalUI();
+              });
+
+              ctrls.appendChild(upBtn);
+              ctrls.appendChild(dnBtn);
+              ctrls.appendChild(delBtn);
+
+              row.appendChild(num);
+              row.appendChild(main);
+              row.appendChild(ctrls);
+              frag.appendChild(row);
+            });
+            joinClipList.appendChild(frag);
+          }
+        }
+
+        // Quick-add chips from loaded playlist
+        if (joinPlaylistQuickWrap && joinPlaylistChips) {
+          const plItems = (state.playlist || []).filter(p => p && p.blob);
+          if (plItems.length > 0) {
+            joinPlaylistQuickWrap.classList.remove('hidden');
+            joinPlaylistChips.innerHTML = '';
+            const pFrag = document.createDocumentFragment();
+            plItems.forEach((pl, idx) => {
+              const btn = document.createElement('button');
+              btn.type = 'button';
+              btn.className = 'join-pl-chip';
+              btn.disabled = joinAudioState.isJoining;
+              const isCur = idx === state.currentTrackIndex && state.hasAudio;
+              btn.textContent = `＋ ${isCur ? '[再生中] ' : ''}${pl.name}`;
+              btn.addEventListener('click', async () => {
+                if (joinAudioState.isJoining) return;
+                const blobToUse = isCur && state.rawBlob ? state.rawBlob : pl.blob;
+                const markersToUse = isCur ? cloneMarkerList(state.markers) : (pl.markers ? cloneMarkerList(pl.markers) : null);
+                const durToUse = isCur ? state.duration : 0;
+                const item = await buildJoinItemFromBlob(blobToUse, pl.name, {
+                  duration: durToUse,
+                  markers: markersToUse,
+                  startSectionEnabled: isCur ? state.startSectionEnabled : pl.startSectionEnabled,
+                  isCurrentTrack: isCur
+                });
+                joinAudioState.items.push(item);
+                renderJoinAudioModalUI();
+                showToast(`結合リストに追加: ${item.name}`);
+              });
+              pFrag.appendChild(btn);
+            });
+            joinPlaylistChips.appendChild(pFrag);
+          } else {
+            joinPlaylistQuickWrap.classList.add('hidden');
+          }
+        }
+
+        if (btnJoinAddFiles) btnJoinAddFiles.disabled = joinAudioState.isJoining;
+        if (btnJoinClearList) btnJoinClearList.disabled = joinAudioState.isJoining || items.length === 0;
+        if (joinOutputNameInput) joinOutputNameInput.disabled = joinAudioState.isJoining;
+        if (btnCancelJoinAudio) btnCancelJoinAudio.disabled = joinAudioState.isJoining;
+        if (btnExecJoinAudio) {
+          btnExecJoinAudio.disabled = joinAudioState.isJoining || items.length < 2;
+          btnExecJoinAudio.textContent = joinAudioState.isJoining
+            ? '結合中...'
+            : (isBinaryWav ? `完全無劣化で結合 (${items.length}曲)` : `劣化なしで結合 (${items.length}曲)`);
+        }
+      }
+
+      async function openJoinAudioModal() {
+        if (!joinAudioModal) return;
+        settingsModal.classList.add('hidden');
+        joinAudioState.isJoining = false;
+        joinAudioState.userEditedName = false;
+        joinAudioState.items = [];
+        if (joinProgressBox) joinProgressBox.classList.add('hidden');
+
+        // Pre-populate with currently open track as #1 so user only needs to pick the 2nd file
+        if (state.hasAudio && (state.rawBlob || state.audioBuffer)) {
+          let curBlob = state.rawBlob;
+          if (!curBlob && state.audioBuffer) {
+            curBlob = encodeWavFromAudioBuffer(state.audioBuffer, 24);
+          }
+          if (curBlob) {
+            const curItem = await buildJoinItemFromBlob(curBlob, trackTitleEl.textContent.trim() || state.currentFileOrigName || '現在の曲', {
+              duration: state.duration,
+              markers: cloneMarkerList(state.markers),
+              startSectionEnabled: state.startSectionEnabled,
+              isCurrentTrack: true
+            });
+            joinAudioState.items.push(curItem);
+          }
+        }
+
+        renderJoinAudioModalUI();
+        joinAudioModal.classList.remove('hidden');
+      }
+
+      function closeJoinAudioModal() {
+        if (joinAudioState.isJoining) return;
+        if (joinAudioModal) joinAudioModal.classList.add('hidden');
+      }
+
+      async function resampleAudioBufferExact(srcBuffer, targetSampleRate, targetChannels) {
+        if (srcBuffer.sampleRate === targetSampleRate && srcBuffer.numberOfChannels === targetChannels) {
+          return srcBuffer;
+        }
+        if (srcBuffer.sampleRate === targetSampleRate) {
+          // Pure channel layout adaptation without any resampling!
+          initAudioGraph();
+          const out = audioCtx.createBuffer(targetChannels, srcBuffer.length, targetSampleRate);
+          const ch0 = srcBuffer.getChannelData(0);
+          for (let c = 0; c < targetChannels; c++) {
+            const srcCh = c < srcBuffer.numberOfChannels ? srcBuffer.getChannelData(c) : ch0;
+            out.getChannelData(c).set(srcCh);
+          }
+          return out;
+        }
+        const targetFrames = Math.max(1, Math.round(srcBuffer.duration * targetSampleRate));
+        const OffCtx = window.OfflineAudioContext || window.webkitOfflineAudioContext;
+        const off = new OffCtx(targetChannels, targetFrames, targetSampleRate);
+        const src = off.createBufferSource();
+        src.buffer = srcBuffer;
+        src.connect(off.destination);
+        src.start(0);
+        return await off.startRendering();
+      }
+
+      function buildSilenceWavBytes(meta, gapSec) {
+        const gapFrames = Math.max(0, Math.round(gapSec * meta.sampleRate));
+        if (gapFrames <= 0) return null;
+        const byteLen = gapFrames * meta.blockAlign;
+        const u8 = new Uint8Array(byteLen);
+        if (meta.audioFormat === 1 && meta.bitsPerSample === 8) {
+          u8.fill(128);
+        }
+        return u8;
+      }
+
+      async function executeLosslessAudioJoin() {
+        if (joinAudioState.isJoining) return;
+        const items = joinAudioState.items;
+        if (items.length < 2) {
+          showToast('結合するファイルを2つ以上追加してください');
+          return;
+        }
+
+        if (state.isPlaying) pausePlayback();
+        stopInertia();
+
+        joinAudioState.isJoining = true;
+        renderJoinAudioModalUI();
+
+        try {
+          const gapSec = Math.max(0, Number(joinAudioState.gapSec) || 0);
+          const addBoundaryPins = Boolean(joinAudioState.addBoundaryPins);
+          const rawTitle = (joinOutputNameInput && joinOutputNameInput.value.trim()) || buildDefaultJoinedName(items);
+          const finalName = rawTitle.replace(/\.wav$/i, '') + '.wav';
+
+          const combinedMarkers = [];
+          const stripExt = (s) => String(s || '').replace(/\.[^/.]+$/, '').trim();
+
+          // ==================== PATH A: ZERO-REENCODE BINARY WAV SPLICE ====================
+          if (canBinaryJoinWavItems(items)) {
+            setJoinProgress(20, '完全無劣化バイナリ結合を準備中...');
+            await new Promise(r => setTimeout(r, 10));
+
+            const meta = items[0].wavMeta;
+            const silenceBytes = gapSec > 0 ? buildSilenceWavBytes(meta, gapSec) : null;
+            const silenceFrames = silenceBytes ? Math.floor(silenceBytes.byteLength / meta.blockAlign) : 0;
+
+            let totalFrames = 0;
+            const parts = [];
+            let cursorSec = 0;
+
+            for (let i = 0; i < items.length; i++) {
+              const it = items[i];
+              const m = it.wavMeta;
+              if (i > 0 && silenceBytes) {
+                parts.push(silenceBytes);
+                totalFrames += silenceFrames;
+                cursorSec += silenceFrames / meta.sampleRate;
+              }
+              if (i > 0 && addBoundaryPins && cursorSec > 0.05) {
+                combinedMarkers.push(makeMarkerObj(cursorSec, stripExt(it.name), true, true));
+              }
+              if (Array.isArray(it.markers)) {
+                for (const mk of it.markers) {
+                  const t = cursorSec + (Number(mk.time) || 0);
+                  if (t > 0.05 && t < cursorSec + m.duration - 0.05) {
+                    const near = combinedMarkers.find(x => Math.abs(x.time - t) < 0.06);
+                    if (!near) {
+                      combinedMarkers.push(makeMarkerObj(t, mk.name, mk.enabled, mk.sectionEnabled));
+                    }
+                  }
+                }
+              }
+              parts.push(it.blob.slice(m.dataOffset, m.dataOffset + m.dataSize));
+              totalFrames += m.totalFrames;
+              cursorSec += m.totalFrames / meta.sampleRate;
+              setJoinProgress(25 + ((i + 1) / items.length) * 65, `バイナリ結合中 (${i + 1}/${items.length})...`);
+            }
+
+            const totalDataSize = totalFrames * meta.blockAlign;
+            if (totalDataSize > 0xFFFFFFFF - 36) {
+              throw new Error('結合後のサイズがWAVの4GB上限を超えます');
+            }
+            const hdrBuf = buildWavHeaderArrayBuffer(meta, totalDataSize);
+            const mergedBlob = new Blob([hdrBuf, ...parts], { type: 'audio/wav' });
+            combinedMarkers.sort((a, b) => a.time - b.time);
+
+            setJoinProgress(96, 'プレイヤーへ読み込み中...');
+            await finishJoinedTrackLoad(mergedBlob, finalName, combinedMarkers, null, '完全無劣化（バイナリ直結）');
+            return;
+          }
+
+          // ==================== PATH B: HIGHEST-SR 24-BIT LOSSLESS PCM MERGE ====================
+          initAudioGraph();
+          const decodedBuffers = [];
+          let maxSr = 0;
+          let maxCh = 1;
+
+          for (let i = 0; i < items.length; i++) {
+            const it = items[i];
+            setJoinProgress(5 + (i / items.length) * 45, `音源デコード中 (${i + 1}/${items.length}): ${it.name}`);
+            await new Promise(r => setTimeout(r, 0));
+
+            let abuf = null;
+            if (it.isCurrentTrack && state.audioBuffer && state.rawBlob === it.blob) {
+              abuf = state.audioBuffer;
+            } else {
+              const ab = await it.blob.arrayBuffer();
+              abuf = await audioCtx.decodeAudioData(ab);
+            }
+            if (!abuf || abuf.length <= 0) {
+              throw new Error(`「${it.name}」のデコードに失敗しました`);
+            }
+            decodedBuffers.push(abuf);
+            if (abuf.sampleRate > maxSr) maxSr = abuf.sampleRate;
+            if (abuf.numberOfChannels > maxCh) maxCh = Math.min(2, abuf.numberOfChannels);
+          }
+
+          maxSr = Math.max(8000, maxSr || 48000);
+          maxCh = Math.max(1, Math.min(2, maxCh));
+
+          const alignedBuffers = [];
+          let totalFrames = 0;
+          const gapFrames = Math.max(0, Math.round(gapSec * maxSr));
+
+          for (let i = 0; i < decodedBuffers.length; i++) {
+            setJoinProgress(52 + (i / decodedBuffers.length) * 24, `レート整合中 (${i + 1}/${decodedBuffers.length})...`);
+            await new Promise(r => setTimeout(r, 0));
+            const aligned = await resampleAudioBufferExact(decodedBuffers[i], maxSr, maxCh);
+            alignedBuffers.push(aligned);
+            totalFrames += aligned.length;
+            if (i > 0) totalFrames += gapFrames;
+          }
+
+          const estRamBytes = totalFrames * maxCh * 7;
+          if (estRamBytes > 650 * 1024 * 1024) {
+            throw new Error('結合後の長さが端末メモリの安全上限を超えます（同じWAV形式同士なら大容量でもバイナリ直結可能です）');
+          }
+
+          setJoinProgress(78, '32bit Float PCMで無劣化連結中...');
+          await new Promise(r => setTimeout(r, 0));
+
+          const mergedBuf = audioCtx.createBuffer(maxCh, totalFrames, maxSr);
+          let writeOffset = 0;
+          for (let i = 0; i < alignedBuffers.length; i++) {
+            const cur = alignedBuffers[i];
+            const it = items[i];
+            if (i > 0 && gapFrames > 0) {
+              writeOffset += gapFrames;
+            }
+            const clipStartSec = writeOffset / maxSr;
+            if (i > 0 && addBoundaryPins && clipStartSec > 0.05) {
+              combinedMarkers.push(makeMarkerObj(clipStartSec, stripExt(it.name), true, true));
+            }
+            if (Array.isArray(it.markers)) {
+              for (const mk of it.markers) {
+                const t = clipStartSec + (Number(mk.time) || 0);
+                if (t > 0.05 && t < clipStartSec + cur.duration - 0.05) {
+                  const near = combinedMarkers.find(x => Math.abs(x.time - t) < 0.06);
+                  if (!near) {
+                    combinedMarkers.push(makeMarkerObj(t, mk.name, mk.enabled, mk.sectionEnabled));
+                  }
+                }
+              }
+            }
+            for (let ch = 0; ch < maxCh; ch++) {
+              mergedBuf.getChannelData(ch).set(cur.getChannelData(ch), writeOffset);
+            }
+            writeOffset += cur.length;
+          }
+
+          combinedMarkers.sort((a, b) => a.time - b.time);
+
+          setJoinProgress(88, '24bit無圧縮WAVを生成中...');
+          await new Promise(r => setTimeout(r, 0));
+          const mergedBlob = encodeWavFromAudioBuffer(mergedBuf, 24);
+
+          setJoinProgress(96, 'プレイヤーへ読み込み中...');
+          await finishJoinedTrackLoad(mergedBlob, finalName, combinedMarkers, mergedBuf, `劣化なし（24bit/${(maxSr / 1000).toFixed(1).replace(/\.0$/, '')}kHz 無圧縮WAV）`);
+        } catch (err) {
+          console.error('Lossless audio join failed:', err);
+          showToast(`結合に失敗しました: ${err && err.message ? err.message : '不明なエラー'}`);
+        } finally {
+          joinAudioState.isJoining = false;
+          if (joinProgressBox) joinProgressBox.classList.add('hidden');
+          renderJoinAudioModalUI();
+        }
+      }
+
+      async function finishJoinedTrackLoad(mergedBlob, finalName, combinedMarkers, preDecodedBuf, modeBadgeText) {
+        if (state.hasAudio) {
+          syncCurrentPlaylistMarkers();
+          saveCurrentFileMemory(true);
+        }
+        const newIdx = state.playlist.length;
+        state.playlist.push({
+          name: finalName,
+          origName: finalName,
+          blob: mergedBlob,
+          markers: cloneMarkerList(combinedMarkers),
+          startSectionEnabled: true,
+          isUnsavedRecording: true
+        });
+        state.currentTrackIndex = newIdx;
+
+        joinAudioState.isJoining = false;
+        if (joinProgressBox) joinProgressBox.classList.add('hidden');
+        if (joinAudioModal) joinAudioModal.classList.add('hidden');
+
+        await loadAudioBlob(mergedBlob, finalName, combinedMarkers, false, preDecodedBuf, true, {
+          origName: finalName,
+          restoreFromMemory: false,
+          persistSession: true,
+          isUnsavedRecording: true
+        });
+        seekTo(0, { setGreenPin: false });
+        showToast(`${modeBadgeText}で結合しました（右上の「保存」から保存できます）`);
+      }
+
+      // Wire Join Audio Modal Listeners
+      if (btnJoinAudioBar) btnJoinAudioBar.addEventListener('click', openJoinAudioModal);
+      if (btnJoinAudioFromPlaylist) btnJoinAudioFromPlaylist.addEventListener('click', openJoinAudioModal);
+      if (btnCloseJoinAudioX) btnCloseJoinAudioX.addEventListener('click', closeJoinAudioModal);
+      if (btnCancelJoinAudio) btnCancelJoinAudio.addEventListener('click', closeJoinAudioModal);
+      if (joinAudioModal) {
+        joinAudioModal.addEventListener('click', (e) => {
+          if (e.target === joinAudioModal) closeJoinAudioModal();
+        });
+      }
+      if (btnJoinAddFiles && joinFileInput) {
+        btnJoinAddFiles.addEventListener('click', () => {
+          if (joinAudioState.isJoining) return;
+          joinFileInput.value = '';
+          joinFileInput.click();
+        });
+        joinFileInput.addEventListener('change', async (e) => {
+          const picked = Array.from(e.target.files || []).filter(isAudioCandidate);
+          if (picked.length === 0) {
+            if ((e.target.files || []).length > 0) {
+              showToast('音声ファイルを選択してください');
+            }
+            return;
+          }
+          for (let i = 0; i < picked.length; i++) {
+            const f = picked[i];
+            const item = await buildJoinItemFromBlob(f, f.name);
+            joinAudioState.items.push(item);
+          }
+          renderJoinAudioModalUI();
+          showToast(picked.length > 1 ? `${picked.length}曲を追加しました` : `追加しました: ${picked[0].name}`);
+        });
+      }
+      if (btnJoinClearList) {
+        btnJoinClearList.addEventListener('click', () => {
+          if (joinAudioState.isJoining) return;
+          joinAudioState.items = [];
+          joinAudioState.userEditedName = false;
+          renderJoinAudioModalUI();
+        });
+      }
+      document.querySelectorAll('.join-gap-opt').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          if (joinAudioState.isJoining) return;
+          joinAudioState.gapSec = Math.max(0, parseFloat(btn.dataset.joinGap || '0') || 0);
+          renderJoinAudioModalUI();
+        });
+      });
+      if (btnToggleJoinPins) {
+        btnToggleJoinPins.addEventListener('click', () => {
+          if (joinAudioState.isJoining) return;
+          joinAudioState.addBoundaryPins = !joinAudioState.addBoundaryPins;
+          renderJoinAudioModalUI();
+        });
+      }
+      if (joinOutputNameInput) {
+        joinOutputNameInput.addEventListener('input', () => {
+          joinAudioState.userEditedName = joinOutputNameInput.value.trim().length > 0;
+        });
+      }
+      if (btnExecJoinAudio) {
+        btnExecJoinAudio.addEventListener('click', executeLosslessAudioJoin);
+      }
+
       // ==================== AUDIPO-STYLE MARK EDIT MODAL ====================
       const markEditModal = document.getElementById('markEditModal');
       const editMarkNameInput = document.getElementById('editMarkNameInput');
@@ -18278,7 +19289,7 @@
         const W = rect.width;
         const H = rect.height;
         const isMin = isMinimalTheme();
-        ctx.fillStyle = isMin ? '#f5f5f7' : '#111113';
+        ctx.fillStyle = isMin ? '#eceae4' : '#111113';
         ctx.fillRect(0, 0, W, H);
 
         const rows = state.numRows;
@@ -18307,16 +19318,16 @@
           ctx.font = '500 10px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace';
           ctx.textAlign = 'right';
           ctx.textBaseline = 'middle';
-          ctx.fillStyle = isMin ? '#8a8a94' : '#9ca3af';
+          ctx.fillStyle = isMin ? '#848078' : '#9ca3af';
           ctx.fillText(formatRowTime(rStart), labelW - 1, midY);
 
           // Row track background (clean white elevated strip in minimal mode)
-          ctx.fillStyle = isMin ? '#ffffff' : '#1c1c21';
+          ctx.fillStyle = isMin ? '#f6f4ef' : '#1c1c21';
           if (isMin && typeof ctx.roundRect === 'function') {
             ctx.beginPath();
             ctx.roundRect(waveX, barTop, waveW, barH, Math.min(6, barH * 0.25));
             ctx.fill();
-            ctx.strokeStyle = 'rgba(0, 0, 0, 0.045)';
+            ctx.strokeStyle = 'rgba(45, 44, 41, 0.055)';
             ctx.lineWidth = 0.75;
             ctx.stroke();
           } else {
@@ -18418,8 +19429,8 @@
                   }
                 }
                 ctx.fillStyle = inSkip
-                  ? (isMin ? 'rgba(161, 161, 170, 0.32)' : 'rgba(113, 113, 122, 0.36)')
-                  : (t0 <= displayTime ? (isMin ? '#1c1c20' : '#42a5f5') : (isMin ? '#c5c5ce' : '#6b7280'));
+                  ? (isMin ? 'rgba(180, 175, 166, 0.34)' : 'rgba(113, 113, 122, 0.36)')
+                  : (t0 <= displayTime ? (isMin ? '#69829c' : '#42a5f5') : (isMin ? '#d1cdc4' : '#6b7280'));
                 ctx.fillRect(waveX + px, yTop, Math.max(1.0, step - 0.35), Math.max(1.0, yBot - yTop));
               }
             } else {
@@ -18443,17 +19454,17 @@
                 }
 
                 ctx.fillStyle = inSkip
-                  ? (isMin ? 'rgba(161, 161, 170, 0.32)' : 'rgba(113, 113, 122, 0.36)')
-                  : (t0 <= displayTime ? (isMin ? '#1c1c20' : '#42a5f5') : (isMin ? '#c5c5ce' : '#6b7280'));
+                  ? (isMin ? 'rgba(180, 175, 166, 0.34)' : 'rgba(113, 113, 122, 0.36)')
+                  : (t0 <= displayTime ? (isMin ? '#69829c' : '#42a5f5') : (isMin ? '#d1cdc4' : '#6b7280'));
                 ctx.fillRect(waveX + px, yTop, Math.max(1.0, step - 0.35), Math.max(1.0, yBot - yTop));
               }
             }
           } else if (state.hasAudio) {
-            ctx.fillStyle = isMin ? '#e2e2e8' : '#3f3f46';
+            ctx.fillStyle = isMin ? '#dedad1' : '#3f3f46';
             ctx.fillRect(waveX, midY - 1, waveW, 2);
             if (displayTime > rStart) {
               const frac = Math.min(1, (displayTime - rStart) / rowDur);
-              ctx.fillStyle = isMin ? '#18181b' : '#42a5f5';
+              ctx.fillStyle = isMin ? '#69829c' : '#42a5f5';
               ctx.fillRect(waveX, midY - 1.5, frac * waveW, 3);
             }
           }
@@ -18466,7 +19477,7 @@
                 const mx = waveX + ((mT - rStart) / rowDur) * waveW;
                 const isEnabled = mk.enabled !== false;
 
-                ctx.fillStyle = isEnabled ? (isMin ? '#d97706' : '#facc15') : (isMin ? 'rgba(217, 119, 6, 0.34)' : 'rgba(250, 204, 21, 0.38)');
+                ctx.fillStyle = isEnabled ? (isMin ? '#c98228' : '#facc15') : (isMin ? 'rgba(201, 130, 40, 0.34)' : 'rgba(250, 204, 21, 0.38)');
                 ctx.beginPath();
                 ctx.moveTo(mx - 4.8, barTop - 2);
                 ctx.lineTo(mx + 4.8, barTop - 2);
@@ -18480,10 +19491,10 @@
                   ctx.textBaseline = 'top';
                   const maxLabelW = Math.max(24, (waveX + waveW) - (mx + 6));
                   const textY = barTop + 1;
-                  ctx.fillStyle = isMin ? 'rgba(255, 255, 255, 0.9)' : 'rgba(17, 17, 19, 0.72)';
+                  ctx.fillStyle = isMin ? 'rgba(246, 244, 239, 0.92)' : 'rgba(17, 17, 19, 0.72)';
                   const measuredW = Math.min(maxLabelW, ctx.measureText(mk.name).width + 4);
                   ctx.fillRect(mx + 5, textY - 1, measuredW, 12);
-                  ctx.fillStyle = isEnabled ? (isMin ? '#92400e' : '#fef08a') : '#a1a1aa';
+                  ctx.fillStyle = isEnabled ? (isMin ? '#8c5614' : '#fef08a') : '#a1a1aa';
                   ctx.fillText(mk.name, mx + 7, textY, maxLabelW);
                 }
               }
@@ -18493,8 +19504,8 @@
           // Single Green Temporary Pin (▼, max 1)
           if (state.hasAudio && state.tempMarker !== null && state.tempMarker >= rStart && state.tempMarker <= rEnd) {
             const gx = waveX + ((state.tempMarker - rStart) / rowDur) * waveW;
-            ctx.fillStyle = isMin ? '#16a34a' : '#22c55e';
-            ctx.strokeStyle = isMin ? '#ffffff' : '#052e16';
+            ctx.fillStyle = isMin ? '#439463' : '#22c55e';
+            ctx.strokeStyle = isMin ? '#f6f4ef' : '#052e16';
             ctx.lineWidth = 1;
             ctx.beginPath();
             ctx.moveTo(gx - 5.4, barTop - 2.5);
@@ -18508,8 +19519,8 @@
           // Vertical Playhead Bar
           if (state.hasAudio && displayTime >= rStart && displayTime <= rEnd) {
             const cx = waveX + ((displayTime - rStart) / rowDur) * waveW;
-            ctx.fillStyle = isMin ? '#141416' : '#ffffff';
-            ctx.shadowColor = isMin ? 'rgba(255,255,255,0.95)' : 'rgba(0,0,0,0.9)';
+            ctx.fillStyle = isMin ? '#3a3835' : '#ffffff';
+            ctx.shadowColor = isMin ? 'rgba(246,244,239,0.9)' : 'rgba(0,0,0,0.9)';
             ctx.shadowBlur = isMin ? 3 : 4;
             ctx.fillRect(cx - (isMin ? 1.5 : 2), barTop - 2, isMin ? 3 : 4, barH + 4);
             ctx.shadowBlur = 0;
@@ -18708,7 +19719,7 @@
         const W = rect.width;
         const H = rect.height;
         const isMin = isMinimalTheme();
-        ctx.fillStyle = isMin ? '#ffffff' : '#151518';
+        ctx.fillStyle = isMin ? '#f6f4ef' : '#151518';
         ctx.fillRect(0, 0, W, H);
 
         const centerX = W * 0.5;
@@ -18716,7 +19727,7 @@
         const halfH = H * 0.40;
 
         // Zero amplitude center baseline
-        ctx.strokeStyle = isMin ? 'rgba(24, 24, 27, 0.08)' : 'rgba(148, 163, 184, 0.22)';
+        ctx.strokeStyle = isMin ? 'rgba(45, 44, 41, 0.085)' : 'rgba(148, 163, 184, 0.22)';
         ctx.lineWidth = 1;
         ctx.beginPath();
         ctx.moveTo(0, midY);
@@ -18792,13 +19803,13 @@
         if (state.hasAudio && state.waveformPyramid) {
           drawZoomWaveformClip(
             ctx, W, H, midY, halfH, winStart, winEnd, pxPerSec, 0, centerX,
-            isMin ? 'rgba(24, 24, 27, 0.86)' : 'rgba(66, 165, 245, 0.85)',
-            isMin ? '#141416' : '#60b8ff'
+            isMin ? 'rgba(105, 130, 156, 0.54)' : 'rgba(66, 165, 245, 0.85)',
+            isMin ? '#58718c' : '#60b8ff'
           );
           drawZoomWaveformClip(
             ctx, W, H, midY, halfH, winStart, winEnd, pxPerSec, centerX, W,
-            isMin ? 'rgba(182, 182, 192, 0.72)' : 'rgba(107, 114, 128, 0.78)',
-            isMin ? '#a1a1aa' : '#9ca3af'
+            isMin ? 'rgba(196, 191, 182, 0.56)' : 'rgba(107, 114, 128, 0.78)',
+            isMin ? '#b5afa4' : '#9ca3af'
           );
         }
 
@@ -18834,9 +19845,9 @@
                 ctx.textAlign = 'left';
                 ctx.textBaseline = 'top';
                 const tw = ctx.measureText(mk.name).width;
-                ctx.fillStyle = isMin ? 'rgba(255, 255, 255, 0.94)' : 'rgba(12, 12, 14, 0.8)';
+                ctx.fillStyle = isMin ? 'rgba(246, 244, 239, 0.94)' : 'rgba(12, 12, 14, 0.8)';
                 ctx.fillRect(mx + 5, 3, tw + 8, 16);
-                ctx.fillStyle = isEnabled ? (isMin ? '#92400e' : '#fef08a') : '#a1a1aa';
+                ctx.fillStyle = isEnabled ? (isMin ? '#8c5614' : '#fef08a') : '#a1a1aa';
                 ctx.fillText(mk.name, mx + 9, 5);
               }
             }
@@ -18852,7 +19863,7 @@
             ctx.lineTo(gx, H);
             ctx.stroke();
 
-            ctx.fillStyle = isMin ? '#16a34a' : '#22c55e';
+            ctx.fillStyle = isMin ? '#439463' : '#22c55e';
             ctx.beginPath();
             ctx.moveTo(gx - 6.5, 0);
             ctx.lineTo(gx + 6.5, 0);
@@ -18882,8 +19893,8 @@
         // Fixed Center Playhead / Scrub Target Line
         const scrubbingActive = state.hasAudio && state.isPlaying && isWaveScrubbing();
         ctx.strokeStyle = scrubbingActive
-          ? (isMin ? '#d97706' : '#fde047')
-          : (isMin ? '#141416' : '#ffffff');
+          ? (isMin ? '#c98228' : '#fde047')
+          : (isMin ? '#3a3835' : '#ffffff');
         ctx.lineWidth = scrubbingActive ? 2.2 : 2;
         ctx.beginPath();
         ctx.moveTo(centerX, 0);
@@ -24354,11 +25365,23 @@
       document.addEventListener('webkitfullscreenchange', onFullscreenStateChanged);
 
       // ==================== GITHUB / PWA SOFTWARE UPDATE CHECK & APPLY ====================
-      const APP_VERSION = 'v59';
+      const APP_VERSION = 'v60';
 
       // Ordered newest-first; each release appends a new object at the top.
       // Users who skip multiple versions automatically see ALL unseen versions between lastSeen and current.
       const APP_RELEASE_NOTES = [
+        {
+          version: 'v60',
+          verNum: 60,
+          date: '2026/11/26',
+          title: 'ミニマル（白）の配色と波形をやわらかく刷新＋音声ファイルの無劣化結合を追加',
+          items: [
+            '「ミニマル（白）」テーマの白さを抑え、目にやさしい温かみのあるオフホワイト（#ECEAE4 / #F6F4EF）と柔らかなチャコール文字へ調整しました',
+            '白テーマ時の波形カラーを黒から落ち着いたくすみスレートブルー＆ウォームグレーに変更し、画面全体に自然に馴染むようにしました',
+            '別の音声ファイル同士をつなぎ合わせられる「結合」機能を追加（区間バー・曲一覧から起動）。同仕様WAV同士は再変換ゼロの完全バイナリ直結、異形式混在時は最高サンプルレート維持・24bit無圧縮WAVで劣化なく結合します',
+            '結合時のつなぎ目への黄色ピン自動追加（元の黄色ピン位置も自動引き継ぎ）や、0秒〜2秒の無音間隔設定、順番入れ替えに対応しました'
+          ]
+        },
         {
           version: 'v59',
           verNum: 59,
@@ -25986,6 +27009,10 @@
       document.getElementById('btnPitchReset').addEventListener('click', () => setPitch(0));
       document.getElementById('btnPitchP1').addEventListener('click', () => setPitch(state.pitchSemitones + 1));
 
+      document.querySelectorAll('.theme-card').forEach(card => {
+        card.addEventListener('click', () => applyUiTheme(card.dataset.uiTheme, true));
+      });
+
       document.querySelectorAll('.vocoder-tone-card').forEach(card => {
         card.addEventListener('click', () => {
           initAudioGraph();
@@ -26254,7 +27281,9 @@
 
       window.addEventListener('popstate', () => {
         // 1. Close topmost open modal if any
-        if (favFileActionModal && !favFileActionModal.classList.contains('hidden')) {
+        if (joinAudioModal && !joinAudioModal.classList.contains('hidden')) {
+          closeJoinAudioModal();
+        } else if (favFileActionModal && !favFileActionModal.classList.contains('hidden')) {
           closeFavFileActionModal();
         } else if (favFoldersModal && !favFoldersModal.classList.contains('hidden')) {
           if (favFolderBrowserView && !favFolderBrowserView.classList.contains('hidden')) {
