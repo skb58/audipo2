@@ -8,7 +8,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="Audipo2">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="app-version" content="v60">
+  <meta name="app-version" content="v61">
   <link rel="manifest" href="./manifest.json">
   <title>Audipo風 練習プレイヤー＆レコーダー</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='bg' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%231b2030'/%3E%3Cstop offset='100%25' stop-color='%230d0f15'/%3E%3C/linearGradient%3E%3ClinearGradient id='wv' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0%25' stop-color='%2360c5ff'/%3E%3Cstop offset='100%25' stop-color='%232563eb'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='url(%23bg)'/%3E%3Crect x='1' y='1' width='62' height='62' rx='15' fill='none' stroke='%233b82f6' stroke-opacity='0.3' stroke-width='2'/%3E%3Cg fill='url(%23wv)'%3E%3Crect x='10' y='28' width='4.5' height='12' rx='2.25' opacity='0.6'/%3E%3Crect x='18' y='22' width='4.5' height='24' rx='2.25' opacity='0.85'/%3E%3Crect x='26' y='15' width='4.5' height='36' rx='2.25'/%3E%3Crect x='34' y='21' width='4.5' height='25' rx='2.25' opacity='0.9'/%3E%3Crect x='42' y='26' width='4.5' height='16' rx='2.25' opacity='0.75'/%3E%3Crect x='50' y='30' width='4.5' height='9' rx='2.25' opacity='0.5'/%3E%3C/g%3E%3Cpath d='M36.25 10.5c0-1.4 1.1-2.5 2.5-2.5h5.5c1.4 0 2.5 1.1 2.5 2.5v2.4c0 .8-.3 1.5-.9 2.1l-3.2 3.1c-.6.6-1.6.6-2.2 0l-3.2-3.1c-.6-.6-.9-1.3-.9-2.1v-2.4z' fill='%23facc15'/%3E%3C/svg%3E">
@@ -5080,6 +5080,28 @@
       transform: scale(0.97);
     }
 
+    .fav-top-list-btn {
+      height: 28px;
+      padding: 0 9px;
+      border-radius: 8px;
+      background: #252530;
+      border: 1px solid var(--border-strong);
+      color: #e4e4e7;
+      font-size: 11px;
+      font-weight: 800;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      white-space: nowrap;
+      flex-shrink: 0;
+      transition: transform 0.08s ease, background-color 0.12s ease;
+    }
+
+    .fav-top-list-btn:active {
+      transform: scale(0.94);
+    }
+
     /* Toast Notification (never uses alert/confirm) */
     .toast-banner {
       position: fixed;
@@ -6925,6 +6947,7 @@
     body.theme-minimal .modal-update-btn,
     body.theme-minimal .danger-btn-safe,
     body.theme-minimal .fav-footer-back-btn,
+    body.theme-minimal .fav-top-list-btn,
     body.theme-minimal .pin-act-skip {
       background: #f6f4ef;
       border-color: rgba(45, 44, 41, 0.13);
@@ -8068,7 +8091,7 @@
         <div class="modal-section" style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
           <div>
             <div class="sec-title">バージョン情報</div>
-            <div id="settingsVersionLabel" class="engine-desc mono">現在: v60</div>
+            <div id="settingsVersionLabel" class="engine-desc mono">現在: v61</div>
           </div>
           <button id="btnShowReleaseHistory" type="button" class="step-btn" style="color:#93c5fd;border-color:rgba(66,165,245,0.45);">更新履歴を見る</button>
         </div>
@@ -8232,7 +8255,7 @@
           </div>
           <div>
             <h3 id="whatsNewTitle" class="whats-new-title">アップデートのお知らせ</h3>
-            <p id="whatsNewSub" class="whats-new-sub mono">v60 に更新されました</p>
+            <p id="whatsNewSub" class="whats-new-sub mono">v61 に更新されました</p>
           </div>
         </div>
         <button id="btnCloseWhatsNewX" type="button" class="modal-close" aria-label="閉じる">✕</button>
@@ -8559,7 +8582,8 @@
     <div class="fav-modal-card" role="dialog" aria-modal="true" aria-labelledby="favFoldersTitle">
       <div class="whats-new-head">
         <div class="whats-new-title-wrap">
-          <div class="whats-new-icon" aria-hidden="true" style="background:linear-gradient(135deg,rgba(250,204,21,0.24) 0%,rgba(245,158,11,0.30) 100%);border-color:rgba(250,204,21,0.55);color:#fde047;">
+          <button id="btnFavBackToFolders" type="button" class="fav-top-list-btn hidden" title="お気に入りフォルダ一覧に戻る">← 一覧</button>
+          <div id="favFoldersHeaderIcon" class="whats-new-icon" aria-hidden="true" style="background:linear-gradient(135deg,rgba(250,204,21,0.24) 0%,rgba(245,158,11,0.30) 100%);border-color:rgba(250,204,21,0.55);color:#fde047;">
             <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
               <path d="M4 20h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2Z"/>
             </svg>
@@ -8617,7 +8641,6 @@
           </div>
           <div class="fav-browser-actions-row">
             <button id="btnFavBookmarkCurDir" type="button" class="fav-icon-btn" style="color:#fde047;">★この階層を登録</button>
-            <button id="btnFavBackToFolders" type="button" class="fav-icon-btn">← 一覧</button>
           </div>
         </div>
 
@@ -8632,7 +8655,7 @@
             <span id="favBrowserCountBadge" class="mono" style="color:#a1a1aa;margin-left:5px;">0件</span>
           </span>
           <div class="fav-sort-group" role="group" aria-label="並び順">
-            <button id="btnFavSortName" type="button" class="fav-sort-btn active">ファイル名 ↑</button>
+            <button id="btnFavSortName" type="button" class="fav-sort-btn active">ファイル名 ↓</button>
             <button id="btnFavSortDate" type="button" class="fav-sort-btn">更新日 ↓</button>
           </div>
         </div>
@@ -8644,8 +8667,8 @@
           <span>このフォルダの全曲をリストに読み込む</span>
         </button>
         <div id="favFooterBottomRow" style="display:grid;grid-template-columns:1fr;gap:7px;">
-          <button id="btnFavBackToFoldersBottom" type="button" class="fav-footer-back-btn hidden">
-            <span>← フォルダ一覧に戻る</span>
+          <button id="btnFavBackToFoldersBottom" type="button" class="fav-footer-back-btn hidden" title="一つ上の親フォルダに戻る">
+            <span>← 戻る</span>
           </button>
           <button id="btnCloseFavFoldersOk" type="button" class="whats-new-ok-btn">閉じる</button>
         </div>
@@ -23762,6 +23785,7 @@
       const favBrowserFolderSub = document.getElementById('favBrowserFolderSub');
       const favBrowserCountBadge = document.getElementById('favBrowserCountBadge');
       const favBrowserFileListWrap = document.getElementById('favBrowserFileListWrap');
+      const favFoldersHeaderIcon = document.getElementById('favFoldersHeaderIcon');
       const btnFavBackToFolders = document.getElementById('btnFavBackToFolders');
       const btnFavBackToFoldersBottom = document.getElementById('btnFavBackToFoldersBottom');
       const favFooterBottomRow = document.getElementById('favFooterBottomRow');
@@ -23774,7 +23798,7 @@
 
       let activeBrowsedFolder = null; // { rootItem, stack: [{ name, handle }], dirs: [{ name, handle }], fileEntries: [{ name, handle, isAudio, size, lastModified, duration, verified, _metaEl }] }
       let favSortField = 'name'; // 'name' | 'date'
-      let favSortDir = 'asc';    // 'asc' | 'desc'
+      let favSortDir = 'desc';   // 'desc' | 'asc' (default: descending)
       let favMetaScanToken = 0;
 
       // ---------- Track Metadata Cache (LRU up to 1,000 files: name + size + lastModified -> duration) ----------
@@ -23930,7 +23954,7 @@
 
       function getSortedDirs(dirs) {
         const list = [...dirs];
-        const mul = (favSortField === 'name' && favSortDir === 'desc') ? -1 : 1;
+        const mul = favSortDir === 'desc' ? -1 : 1;
         list.sort((a, b) => mul * a.name.localeCompare(b.name, 'ja', { numeric: true }));
         return list;
       }
@@ -24063,10 +24087,25 @@
       }
 
       function setFavFooterBrowserMode(isBrowser) {
+        if (btnFavBackToFolders) btnFavBackToFolders.classList.toggle('hidden', !isBrowser);
+        if (favFoldersHeaderIcon) favFoldersHeaderIcon.classList.toggle('hidden', isBrowser);
         if (btnFavLoadAllTracks) btnFavLoadAllTracks.classList.toggle('hidden', !isBrowser);
         if (btnFavBackToFoldersBottom) btnFavBackToFoldersBottom.classList.toggle('hidden', !isBrowser);
         if (favFooterBottomRow) {
           favFooterBottomRow.style.gridTemplateColumns = isBrowser ? '1fr 1fr' : '1fr';
+        }
+      }
+
+      async function goUpParentFolderInBrowser() {
+        if (!activeBrowsedFolder || !Array.isArray(activeBrowsedFolder.stack)) {
+          showFavFoldersMainView();
+          return;
+        }
+        if (activeBrowsedFolder.stack.length > 1) {
+          const parentStack = activeBrowsedFolder.stack.slice(0, -1);
+          await loadDirectoryContents(activeBrowsedFolder.rootItem, parentStack);
+        } else {
+          showFavFoldersMainView();
         }
       }
 
@@ -25041,14 +25080,14 @@
 
       document.getElementById('btnFavStandardPick').addEventListener('click', () => triggerStandardFilePicker());
       if (btnFavBackToFolders) btnFavBackToFolders.addEventListener('click', showFavFoldersMainView);
-      if (btnFavBackToFoldersBottom) btnFavBackToFoldersBottom.addEventListener('click', showFavFoldersMainView);
+      if (btnFavBackToFoldersBottom) btnFavBackToFoldersBottom.addEventListener('click', goUpParentFolderInBrowser);
       if (btnFavSortName) {
         btnFavSortName.addEventListener('click', () => {
           if (favSortField === 'name') {
-            favSortDir = favSortDir === 'asc' ? 'desc' : 'asc';
+            favSortDir = favSortDir === 'desc' ? 'asc' : 'desc';
           } else {
             favSortField = 'name';
-            favSortDir = 'asc';
+            favSortDir = 'desc';
           }
           if (activeBrowsedFolder) {
             renderFolderBrowserView(activeBrowsedFolder.rootItem, activeBrowsedFolder.stack, activeBrowsedFolder.dirs, activeBrowsedFolder.fileEntries);
@@ -25365,11 +25404,22 @@
       document.addEventListener('webkitfullscreenchange', onFullscreenStateChanged);
 
       // ==================== GITHUB / PWA SOFTWARE UPDATE CHECK & APPLY ====================
-      const APP_VERSION = 'v60';
+      const APP_VERSION = 'v61';
 
       // Ordered newest-first; each release appends a new object at the top.
       // Users who skip multiple versions automatically see ALL unseen versions between lastSeen and current.
       const APP_RELEASE_NOTES = [
+        {
+          version: 'v61',
+          verNum: 61,
+          date: '2026/11/26',
+          title: '「開く」画面の並び順を降順デフォルトに変更＆戻る／一覧ボタン配置を改善',
+          items: [
+            '「開く」画面のフォルダ内一覧の初期並び順を降順（ファイル名 ↓）に変更しました',
+            '下部のボタンを「← 戻る」に変更し、サブフォルダ内では一つ親のフォルダへ1階層ずつ戻れるようにしました（最上位階層ではお気に入り一覧へ戻ります）',
+            'お気に入りフォルダ一覧へ一気に戻るための小さな「← 一覧」ボタンを画面左上に配置しました'
+          ]
+        },
         {
           version: 'v60',
           verNum: 60,
@@ -27287,7 +27337,7 @@
           closeFavFileActionModal();
         } else if (favFoldersModal && !favFoldersModal.classList.contains('hidden')) {
           if (favFolderBrowserView && !favFolderBrowserView.classList.contains('hidden')) {
-            showFavFoldersMainView();
+            goUpParentFolderInBrowser();
           } else {
             closeFavoriteFoldersModal();
           }
