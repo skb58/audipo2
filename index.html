@@ -8,7 +8,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="Audipo2">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="app-version" content="v69">
+  <meta name="app-version" content="v70">
   <link rel="manifest" href="./manifest.json">
   <title>Audipo風 練習プレイヤー＆レコーダー</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='bg' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%231b2030'/%3E%3Cstop offset='100%25' stop-color='%230d0f15'/%3E%3C/linearGradient%3E%3ClinearGradient id='wv' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0%25' stop-color='%2360c5ff'/%3E%3Cstop offset='100%25' stop-color='%232563eb'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='url(%23bg)'/%3E%3Crect x='1' y='1' width='62' height='62' rx='15' fill='none' stroke='%233b82f6' stroke-opacity='0.3' stroke-width='2'/%3E%3Cg fill='url(%23wv)'%3E%3Crect x='10' y='28' width='4.5' height='12' rx='2.25' opacity='0.6'/%3E%3Crect x='18' y='22' width='4.5' height='24' rx='2.25' opacity='0.85'/%3E%3Crect x='26' y='15' width='4.5' height='36' rx='2.25'/%3E%3Crect x='34' y='21' width='4.5' height='25' rx='2.25' opacity='0.9'/%3E%3Crect x='42' y='26' width='4.5' height='16' rx='2.25' opacity='0.75'/%3E%3Crect x='50' y='30' width='4.5' height='9' rx='2.25' opacity='0.5'/%3E%3C/g%3E%3Cpath d='M36.25 10.5c0-1.4 1.1-2.5 2.5-2.5h5.5c1.4 0 2.5 1.1 2.5 2.5v2.4c0 .8-.3 1.5-.9 2.1l-3.2 3.1c-.6.6-1.6.6-2.2 0l-3.2-3.1c-.6-.6-.9-1.3-.9-2.1v-2.4z' fill='%23facc15'/%3E%3C/svg%3E">
@@ -9021,7 +9021,7 @@
         <div class="modal-section" style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
           <div>
             <div class="sec-title">バージョン情報</div>
-            <div id="settingsVersionLabel" class="engine-desc mono">現在: v69</div>
+            <div id="settingsVersionLabel" class="engine-desc mono">現在: v70</div>
           </div>
           <button id="btnShowReleaseHistory" type="button" class="step-btn" style="color:#93c5fd;border-color:rgba(66,165,245,0.45);">更新履歴を見る</button>
         </div>
@@ -9185,7 +9185,7 @@
           </div>
           <div>
             <h3 id="whatsNewTitle" class="whats-new-title">アップデートのお知らせ</h3>
-            <p id="whatsNewSub" class="whats-new-sub mono">v69 に更新されました</p>
+            <p id="whatsNewSub" class="whats-new-sub mono">v70 に更新されました</p>
           </div>
         </div>
         <button id="btnCloseWhatsNewX" type="button" class="modal-close" aria-label="閉じる">✕</button>
@@ -29231,11 +29231,23 @@
       document.addEventListener('webkitfullscreenchange', onFullscreenStateChanged);
 
       // ==================== GITHUB / PWA SOFTWARE UPDATE CHECK & APPLY ====================
-      const APP_VERSION = 'v69';
+      const APP_VERSION = 'v70';
 
       // Ordered newest-first; each release appends a new object at the top.
       // Users who skip multiple versions automatically see ALL unseen versions between lastSeen and current.
       const APP_RELEASE_NOTES = [
+        {
+          version: 'v70',
+          verNum: 70,
+          date: '2026/11/27',
+          title: '他アプリからの「共有」＆「アプリから開く（ファイル関連付け）」に完全対応',
+          items: [
+            'ピン情報ファイル（.txt / .json）や音声ファイル（MP3 / M4A / WAV / FLAC / OGG 等）を他アプリ（LINE・ファイル管理・メール等）から「共有」または「アプリから開く」で直接 Audipo2 へ渡して開けるようになりました',
+            'YouTube アプリやブラウザから YouTube URL を「共有」→「Audipo2」で送ると、そのまま YouTube 練習モードで開けます',
+            'LINE 等で受信したピン情報テキストをそのまま「共有」→「Audipo2」で渡して取り込むことも可能です（YouTubeピンなら動画も自動オープン）',
+            '※Android で候補に反映させるには、manifest.json・sw.js・index.html を更新後、一度ホーム画面の Audipo2 アイコンを削除して Chrome の「アプリをインストール」から再インストールしてください'
+          ]
+        },
         {
           version: 'v69',
           verNum: 69,
@@ -30564,6 +30576,8 @@
           // Prime browser HTTP cache with fresh copy from GitHub before reload
           try { await fetch('./', { cache: 'reload' }); } catch (_) {}
           try { await fetch('./index.html', { cache: 'reload' }); } catch (_) {}
+          try { await fetch('./manifest.json', { cache: 'reload' }); } catch (_) {}
+          try { await fetch('./sw.js', { cache: 'reload' }); } catch (_) {}
 
           // Clean UI state before reload so Android Chrome PWA recalculates viewport insets cleanly
           try {
@@ -31336,6 +31350,9 @@
           updateTimeUI();
           updatePinButtonsUI();
           updateSectionBarUI();
+          if (appBootstrapDone) {
+            checkAndConsumeIncomingExternalLaunches();
+          }
         }
       });
 
@@ -31386,6 +31403,220 @@
           }, 300);
         });
       }
+
+      // ==================== OS FILE HANDLERS (launchQueue) & WEB SHARE TARGET RECEIVER ====================
+      const INCOMING_SHARE_DB_NAME = 'audipo2_incoming_share_v1';
+      const INCOMING_SHARE_DB_STORE = 'inbox';
+      let appBootstrapDone = false;
+      let pendingLaunchFileHandles = [];
+      let isConsumingExternalLaunch = false;
+
+      function openIncomingShareDB() {
+        return new Promise((resolve, reject) => {
+          if (!('indexedDB' in window)) return reject(new Error('No IndexedDB'));
+          const req = indexedDB.open(INCOMING_SHARE_DB_NAME, 1);
+          req.onupgradeneeded = () => {
+            const db = req.result;
+            if (!db.objectStoreNames.contains(INCOMING_SHARE_DB_STORE)) {
+              db.createObjectStore(INCOMING_SHARE_DB_STORE);
+            }
+          };
+          req.onsuccess = () => resolve(req.result);
+          req.onerror = () => reject(req.error || new Error('Incoming share IDB open failed'));
+        });
+      }
+
+      async function consumeIncomingShareFromIDB() {
+        try {
+          const db = await openIncomingShareDB();
+          const payload = await new Promise((resolve, reject) => {
+            const tx = db.transaction(INCOMING_SHARE_DB_STORE, 'readwrite');
+            const store = tx.objectStore(INCOMING_SHARE_DB_STORE);
+            const getReq = store.get('latest');
+            let resultVal = null;
+            getReq.onsuccess = () => {
+              resultVal = getReq.result || null;
+              if (resultVal) {
+                store.delete('latest');
+              }
+            };
+            tx.oncomplete = () => resolve(resultVal);
+            tx.onerror = () => reject(tx.error);
+          });
+          db.close();
+          // Ignore stale payloads older than 10 minutes
+          if (payload && payload.receivedAt && (Date.now() - payload.receivedAt) > 10 * 60 * 1000) {
+            return null;
+          }
+          return payload;
+        } catch (_) {
+          return null;
+        }
+      }
+
+      function stripIncomingLaunchQueryParams() {
+        try {
+          if (location.protocol === 'file:') return;
+          const u = new URL(location.href);
+          let changed = false;
+          ['incoming_share', 'launch_files', 'ts', 'yt'].forEach((k) => {
+            if (u.searchParams.has(k)) {
+              u.searchParams.delete(k);
+              changed = true;
+            }
+          });
+          if (changed) {
+            const cleanUrl = u.pathname + (u.search ? u.search : '') + (u.hash ? u.hash : '');
+            window.history.replaceState(window.history.state, '', cleanUrl);
+          }
+        } catch (_) {}
+      }
+
+      async function processLaunchedFileHandles(handles) {
+        if (!Array.isArray(handles) || handles.length === 0) return false;
+        const files = [];
+        const validHandles = [];
+        for (let i = 0; i < handles.length; i++) {
+          const h = handles[i];
+          if (!h || typeof h.getFile !== 'function') continue;
+          try {
+            const f = await h.getFile();
+            if (f) {
+              files.push(f);
+              validHandles.push(h);
+            }
+          } catch (err) {
+            console.warn('Launch file handle read failed:', err);
+          }
+        }
+        if (files.length === 0) return false;
+        await handlePickedFilesList(files, { fileHandles: validHandles });
+        return true;
+      }
+
+      async function processIncomingSharePayload(payload) {
+        if (!payload || typeof payload !== 'object') return false;
+
+        // 1. Files shared from OS / LINE / Files app / Quick Share
+        if (Array.isArray(payload.files) && payload.files.length > 0) {
+          const files = [];
+          for (let i = 0; i < payload.files.length; i++) {
+            const entry = payload.files[i];
+            if (!entry || !entry.blob) continue;
+            try {
+              const fileObj = new File(
+                [entry.blob],
+                entry.name || `shared_${i + 1}`,
+                {
+                  type: entry.type || entry.blob.type || '',
+                  lastModified: Number(entry.lastModified) || Date.now()
+                }
+              );
+              files.push(fileObj);
+            } catch (_) {
+              const fallbackBlob = entry.blob;
+              try { fallbackBlob.name = entry.name || `shared_${i + 1}`; } catch (__) {}
+              files.push(fallbackBlob);
+            }
+          }
+          if (files.length > 0) {
+            await handlePickedFilesList(files);
+            return true;
+          }
+        }
+
+        // 2. Shared text / URL (Pin JSON text OR YouTube URL)
+        const combinedText = [payload.text, payload.url, payload.title]
+          .filter(Boolean)
+          .join('\n')
+          .trim();
+        if (!combinedText) return false;
+
+        const parsedPins = parseAudipoPinData(combinedText);
+        if (parsedPins && parsedPins.entries.length > 0) {
+          await runPinImportFlow(parsedPins.entries, parsedPins.scope === 'current');
+          return true;
+        }
+
+        const ytInfo = extractYouTubeVideoInfo(payload.url || payload.text || payload.title || combinedText);
+        if (ytInfo) {
+          await loadYouTubeVideo(ytInfo.videoId, {
+            ytUrl: ytInfo.url,
+            startSec: ytInfo.startSec,
+            autoPlay: false
+          });
+          showToast('共有されたYouTube動画を開きました');
+          return true;
+        }
+
+        showToast('共有データ内に読み込める音声・ピン・YouTube URLがありませんでした');
+        return false;
+      }
+
+      async function checkAndConsumeIncomingExternalLaunches() {
+        if (isConsumingExternalLaunch) return false;
+        isConsumingExternalLaunch = true;
+        let handled = false;
+        try {
+          // 1. OS File Handling (window.launchQueue)
+          if (pendingLaunchFileHandles.length > 0) {
+            const batch = pendingLaunchFileHandles.splice(0, pendingLaunchFileHandles.length);
+            if (await processLaunchedFileHandles(batch)) {
+              handled = true;
+            }
+          }
+
+          // 2. Web Share Target (POST ./share-target -> IndexedDB inbox)
+          const sharePayload = await consumeIncomingShareFromIDB();
+          if (sharePayload) {
+            if (await processIncomingSharePayload(sharePayload)) {
+              handled = true;
+            }
+          }
+
+          // 3. Direct ?yt=... URL parameter
+          if (!handled && location.search) {
+            try {
+              const sp = new URLSearchParams(location.search);
+              const ytParam = sp.get('yt');
+              if (ytParam) {
+                const ytInfo = extractYouTubeVideoInfo(ytParam);
+                if (ytInfo) {
+                  await loadYouTubeVideo(ytInfo.videoId, {
+                    ytUrl: ytInfo.url,
+                    startSec: ytInfo.startSec,
+                    autoPlay: false
+                  });
+                  handled = true;
+                }
+              }
+            } catch (_) {}
+          }
+
+          stripIncomingLaunchQueryParams();
+        } catch (err) {
+          console.warn('External launch handling error:', err);
+        } finally {
+          isConsumingExternalLaunch = false;
+        }
+        return handled;
+      }
+
+      // Register launchQueue consumer immediately so files passed at cold-start are never missed
+      if ('launchQueue' in window && window.launchQueue && typeof window.launchQueue.setConsumer === 'function') {
+        try {
+          window.launchQueue.setConsumer((launchParams) => {
+            if (!launchParams || !Array.isArray(launchParams.files) || launchParams.files.length === 0) return;
+            pendingLaunchFileHandles.push(...launchParams.files);
+            if (appBootstrapDone) {
+              checkAndConsumeIncomingExternalLaunches();
+            }
+          });
+        } catch (err) {
+          console.warn('launchQueue registration skipped:', err);
+        }
+      }
+
       window.onload = async () => {
         syncAppViewportHeight(true);
         requestAnimationFrame(() => refreshViewportAndLayout());
@@ -31426,6 +31657,13 @@
 
         // Hydrate unlimited pin memory from IndexedDB (auto-migrating legacy localStorage records)
         await initFileMemoryStore();
+        appBootstrapDone = true;
+
+        // First check if app was opened via OS "Open with" (file_handlers) or "Share" (share_target)
+        const handledExternal = await checkAndConsumeIncomingExternalLaunches();
+        if (handledExternal) {
+          return;
+        }
 
         // Automatically restore the previous audio file, markers, and playhead after browser close / OS tab discard
         const cached = await loadSessionAudioFromIDB();
