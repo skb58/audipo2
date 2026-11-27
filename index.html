@@ -8,7 +8,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="Audipo2">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="app-version" content="v75">
+  <meta name="app-version" content="v76">
   <link rel="manifest" href="./manifest.json">
   <title>Audipo風 練習プレイヤー＆レコーダー</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='bg' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%231b2030'/%3E%3Cstop offset='100%25' stop-color='%230d0f15'/%3E%3C/linearGradient%3E%3ClinearGradient id='wv' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0%25' stop-color='%2360c5ff'/%3E%3Cstop offset='100%25' stop-color='%232563eb'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='url(%23bg)'/%3E%3Crect x='1' y='1' width='62' height='62' rx='15' fill='none' stroke='%233b82f6' stroke-opacity='0.3' stroke-width='2'/%3E%3Cg fill='url(%23wv)'%3E%3Crect x='10' y='28' width='4.5' height='12' rx='2.25' opacity='0.6'/%3E%3Crect x='18' y='22' width='4.5' height='24' rx='2.25' opacity='0.85'/%3E%3Crect x='26' y='15' width='4.5' height='36' rx='2.25'/%3E%3Crect x='34' y='21' width='4.5' height='25' rx='2.25' opacity='0.9'/%3E%3Crect x='42' y='26' width='4.5' height='16' rx='2.25' opacity='0.75'/%3E%3Crect x='50' y='30' width='4.5' height='9' rx='2.25' opacity='0.5'/%3E%3C/g%3E%3Cpath d='M36.25 10.5c0-1.4 1.1-2.5 2.5-2.5h5.5c1.4 0 2.5 1.1 2.5 2.5v2.4c0 .8-.3 1.5-.9 2.1l-3.2 3.1c-.6.6-1.6.6-2.2 0l-3.2-3.1c-.6-.6-.9-1.3-.9-2.1v-2.4z' fill='%23facc15'/%3E%3C/svg%3E">
@@ -9014,7 +9014,7 @@
         <div class="modal-section" style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
           <div>
             <div class="sec-title">バージョン情報</div>
-            <div id="settingsVersionLabel" class="engine-desc mono">現在: v75</div>
+            <div id="settingsVersionLabel" class="engine-desc mono">現在: v76</div>
           </div>
           <button id="btnShowReleaseHistory" type="button" class="step-btn" style="color:#93c5fd;border-color:rgba(66,165,245,0.45);">更新履歴を見る</button>
         </div>
@@ -9178,7 +9178,7 @@
           </div>
           <div>
             <h3 id="whatsNewTitle" class="whats-new-title">アップデートのお知らせ</h3>
-            <p id="whatsNewSub" class="whats-new-sub mono">v75 に更新されました</p>
+            <p id="whatsNewSub" class="whats-new-sub mono">v76 に更新されました</p>
           </div>
         </div>
         <button id="btnCloseWhatsNewX" type="button" class="modal-close" aria-label="閉じる">✕</button>
@@ -9371,7 +9371,7 @@
 
       <!-- Pin Info Share Panel (shown when share tab = 'pins') -->
       <div id="sharePinsPanel" class="modal-body hidden" style="gap:9px;">
-        <div class="save-share-notice" style="background:rgba(250,204,21,0.10);border-color:rgba(250,204,21,0.38);color:#fef08a;">
+        <div id="pinShareNotice" class="save-share-notice" style="background:rgba(250,204,21,0.10);border-color:rgba(250,204,21,0.38);color:#fef08a;">
           <strong>おすすめ：URLリンク共有</strong> — LINEやメールで送ったリンクを<strong>1タップするだけ</strong>で、受け取り側でAudipo2とYouTube動画＋ピンが自動で開きます。
         </div>
 
@@ -9392,8 +9392,8 @@
           </div>
         </div>
 
-        <!-- Primary: 1-Tap URL Link Share Card -->
-        <div class="pin-link-card">
+        <!-- Primary: 1-Tap URL Link Share Card (Current File Only) -->
+        <div id="pinLinkCard" class="pin-link-card">
           <div class="sec-head" style="margin-bottom:0;">
             <span class="sec-title">1タップ URL リンク共有（LINE・メール向け）</span>
             <span id="pinLinkLenBadge" class="sec-value mono" style="font-size:10.5px;">準備中...</span>
@@ -9409,10 +9409,10 @@
           </div>
         </div>
 
-        <!-- Secondary: File (.txt) & Raw JSON Export (Backup / Bulk Transfer) -->
+        <!-- Secondary (current) / Main (all): File (.txt) & JSON Export -->
         <div class="modal-section" style="display:flex;flex-direction:column;gap:7px;">
           <div class="sec-head" style="margin-bottom:0;">
-            <span class="sec-title">ファイル保存・バックアップ (.txt)</span>
+            <span id="pinFileSectionTitle" class="sec-title">ファイル保存・バックアップ (.txt)</span>
             <button id="btnPinShareResetName" type="button" class="step-btn" style="padding:2px 8px;font-size:10px;">標準名に戻す</button>
           </div>
           <div class="save-name-row">
@@ -9423,16 +9423,17 @@
             <div id="pinSharePreviewSpec" class="save-preview-spec mono">対象: 0ファイル • 黄色ピン 0個</div>
             <div id="pinSharePreviewSize" class="save-preview-size mono" style="font-size:11.5px;">サイズ: 約 1 KB • 形式: .txt (JSON)</div>
           </div>
-          <div class="pin-sub-actions cols-3">
+          <div id="pinSubActionsRow" class="pin-sub-actions cols-3">
             <button id="btnPinShareTxt" type="button" class="pin-sub-btn" style="font-size:11px;">
               <span>.txt シェア</span>
             </button>
             <button id="btnPinDownloadTxt" type="button" class="pin-sub-btn" style="font-size:11px;">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#60b8ff" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 11 5 5 5-5"/><path d="M5 20h14"/></svg>
-              <span>保存 (.txt)</span>
+              <span id="btnPinDownloadTxtLabel">保存 (.txt)</span>
             </button>
             <button id="btnPinCopyText" type="button" class="pin-sub-btn" style="font-size:11px;">
-              <span>JSONコピー</span>
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fde047" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              <span id="btnPinCopyTextLabel">JSONコピー</span>
             </button>
           </div>
         </div>
@@ -16537,13 +16538,19 @@
       const btnPinShareResetName = document.getElementById('btnPinShareResetName');
       const pinSharePreviewSpec = document.getElementById('pinSharePreviewSpec');
       const pinSharePreviewSize = document.getElementById('pinSharePreviewSize');
+      const pinShareNotice = document.getElementById('pinShareNotice');
+      const pinLinkCard = document.getElementById('pinLinkCard');
+      const pinFileSectionTitle = document.getElementById('pinFileSectionTitle');
+      const pinSubActionsRow = document.getElementById('pinSubActionsRow');
       const pinLinkLenBadge = document.getElementById('pinLinkLenBadge');
       const pinLinkStatusText = document.getElementById('pinLinkStatusText');
       const btnPinShareLinkLine = document.getElementById('btnPinShareLinkLine');
       const btnPinCopyLink = document.getElementById('btnPinCopyLink');
       const btnPinShareTxt = document.getElementById('btnPinShareTxt');
       const btnPinDownloadTxt = document.getElementById('btnPinDownloadTxt');
+      const btnPinDownloadTxtLabel = document.getElementById('btnPinDownloadTxtLabel');
       const btnPinCopyText = document.getElementById('btnPinCopyText');
+      const btnPinCopyTextLabel = document.getElementById('btnPinCopyTextLabel');
       const pinImportInput = document.getElementById('pinImportInput');
       const pinImportConflictModal = document.getElementById('pinImportConflictModal');
       const pinConflictBadge = document.getElementById('pinConflictBadge');
@@ -16958,12 +16965,51 @@ ${info.url}`;
         pinSharePreviewSpec.textContent = `対象: ${payload.entries.length}ファイル • 黄色ピン合計 ${payload.totalPins}個`;
         pinSharePreviewSize.textContent = `ファイルサイズ: 約 ${formatBytesApprox(byteSize)} • 形式: .txt (JSONデータ)`;
 
+        const isAllScope = saveExportState.pinScope === 'all';
         const canExport = payload.entries.length > 0;
-        if (btnPinShareTxt) btnPinShareTxt.disabled = !canExport;
+        if (btnPinShareTxt) {
+          btnPinShareTxt.disabled = !canExport;
+          btnPinShareTxt.classList.toggle('hidden', isAllScope);
+        }
+        if (pinSubActionsRow) {
+          pinSubActionsRow.classList.toggle('cols-3', !isAllScope);
+        }
+        if (btnPinDownloadTxtLabel) {
+          btnPinDownloadTxtLabel.textContent = isAllScope ? 'ファイル保存 (.txt)' : '保存 (.txt)';
+        }
+        if (btnPinCopyTextLabel) {
+          btnPinCopyTextLabel.textContent = isAllScope ? 'テキストコピー' : 'JSONコピー';
+        }
+        if (pinFileSectionTitle) {
+          pinFileSectionTitle.textContent = isAllScope ? 'ピンファイル名' : 'ファイル保存・バックアップ (.txt)';
+        }
+        if (pinShareNotice) {
+          if (isAllScope) {
+            pinShareNotice.textContent = '黄色ピン・マーク名・区間スキップ設定を共有用ファイル（.txt）として書き出します。受け取った側は「開く」または設定の「ピンを読込」から取り込めます。';
+          } else {
+            pinShareNotice.innerHTML = '<strong>おすすめ：URLリンク共有</strong> — LINEやメールで送ったリンクを<strong>1タップするだけ</strong>で、受け取り側でAudipo2とYouTube動画＋ピンが自動で開きます。';
+          }
+        }
+        if (pinLinkCard) {
+          pinLinkCard.classList.toggle('hidden', isAllScope);
+        }
+
         btnPinDownloadTxt.disabled = !canExport;
         btnPinCopyText.disabled = !canExport;
 
         const tok = ++pinLinkBuildToken;
+
+        // When sharing ALL files, never use URL link sharing — keep classic .txt file sharing identically to before
+        if (isAllScope) {
+          cachedPinShareLink = { scope: 'all', url: '', tooLong: false, entriesCount: 0, totalPins: 0, titleLabel: '' };
+          if (saveExportState.mode === 'share' && saveExportState.shareTab === 'pins') {
+            btnSaveExportRun.disabled = !canExport;
+            btnSaveExportRun.textContent = 'ピンファイルをシェア';
+            btnSaveExportRun.classList.remove('share-ready');
+          }
+          return;
+        }
+
         if (!canExport) {
           cachedPinShareLink = { scope: saveExportState.pinScope, url: '', tooLong: false, entriesCount: 0, totalPins: 0, titleLabel: '' };
           if (pinLinkLenBadge) pinLinkLenBadge.textContent = '--';
@@ -16992,7 +17038,7 @@ ${info.url}`;
         }
 
         buildPinShareUrl(scopeSnap, payload.entries).then((shareUrl) => {
-          if (tok !== pinLinkBuildToken) return;
+          if (tok !== pinLinkBuildToken || saveExportState.pinScope !== 'current') return;
           const urlLen = shareUrl.length;
           const tooLong = urlLen > PIN_LINK_MAX_LEN;
           const warnLong = !tooLong && urlLen > PIN_LINK_WARN_LEN;
@@ -17058,6 +17104,10 @@ ${info.url}`;
       }
 
       async function executeSharePinLink(via = 'native') {
+        if (saveExportState.pinScope === 'all') {
+          await executeShareOrDownloadPins('share');
+          return;
+        }
         const info = await ensurePinShareLinkReady();
         if (!info || !info.url) {
           showToast('共有できるピン情報がありません');
@@ -18319,7 +18369,7 @@ ${info.url}`;
       async function executeSaveExport() {
         if (saveExportState.isExporting) return;
         if (saveExportState.mode === 'share' && saveExportState.shareTab === 'pins') {
-          if (cachedPinShareLink.scope === saveExportState.pinScope && cachedPinShareLink.tooLong) {
+          if (saveExportState.pinScope === 'all' || (cachedPinShareLink.scope === saveExportState.pinScope && cachedPinShareLink.tooLong)) {
             await executeShareOrDownloadPins('share');
           } else {
             await executeSharePinLink('native');
@@ -29751,11 +29801,21 @@ ${info.url}`;
       document.addEventListener('webkitfullscreenchange', onFullscreenStateChanged);
 
       // ==================== GITHUB / PWA SOFTWARE UPDATE CHECK & APPLY ====================
-      const APP_VERSION = 'v75';
+      const APP_VERSION = 'v76';
 
       // Ordered newest-first; each release appends a new object at the top.
       // Users who skip multiple versions automatically see ALL unseen versions between lastSeen and current.
       const APP_RELEASE_NOTES = [
+        {
+          version: 'v76',
+          verNum: 76,
+          date: '2026/11/27',
+          title: '「すべてのファイル」ピン共有を従来の .txt ファイル共有表示に統一',
+          items: [
+            'ピン情報のシェアで「すべてのファイル」を選択したときは、URLリンク共有カードを表示せず、従来通りの .txt ファイル共有UI（「ピンファイルをシェア」「ファイル保存 (.txt)」「テキストコピー」）に戻しました',
+            '「現在のファイルのみ」を選択したときは、引き続き 1タップ URL リンク共有（LINE・コピー・OS共有）と .txt 保存の両方を利用できます'
+          ]
+        },
         {
           version: 'v75',
           verNum: 75,
