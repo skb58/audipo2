@@ -8,7 +8,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="Audipo2">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="app-version" content="v67">
+  <meta name="app-version" content="v68">
   <link rel="manifest" href="./manifest.json">
   <title>Audipo風 練習プレイヤー＆レコーダー</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='bg' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%231b2030'/%3E%3Cstop offset='100%25' stop-color='%230d0f15'/%3E%3C/linearGradient%3E%3ClinearGradient id='wv' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0%25' stop-color='%2360c5ff'/%3E%3Cstop offset='100%25' stop-color='%232563eb'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='url(%23bg)'/%3E%3Crect x='1' y='1' width='62' height='62' rx='15' fill='none' stroke='%233b82f6' stroke-opacity='0.3' stroke-width='2'/%3E%3Cg fill='url(%23wv)'%3E%3Crect x='10' y='28' width='4.5' height='12' rx='2.25' opacity='0.6'/%3E%3Crect x='18' y='22' width='4.5' height='24' rx='2.25' opacity='0.85'/%3E%3Crect x='26' y='15' width='4.5' height='36' rx='2.25'/%3E%3Crect x='34' y='21' width='4.5' height='25' rx='2.25' opacity='0.9'/%3E%3Crect x='42' y='26' width='4.5' height='16' rx='2.25' opacity='0.75'/%3E%3Crect x='50' y='30' width='4.5' height='9' rx='2.25' opacity='0.5'/%3E%3C/g%3E%3Cpath d='M36.25 10.5c0-1.4 1.1-2.5 2.5-2.5h5.5c1.4 0 2.5 1.1 2.5 2.5v2.4c0 .8-.3 1.5-.9 2.1l-3.2 3.1c-.6.6-1.6.6-2.2 0l-3.2-3.1c-.6-.6-.9-1.3-.9-2.1v-2.4z' fill='%23facc15'/%3E%3C/svg%3E">
@@ -7751,7 +7751,7 @@
                   <span>YouTube公式モード</span>
                 </span>
                 <div class="yt-bar-actions">
-                  <button id="btnYtDirectTouch" type="button" class="yt-mini-btn" title="ONにするとYouTube内の字幕・画質・広告スキップ等を直接タップできます（通常OFF時は左右スワイプで隣ページへ移動）">動画操作</button>
+                  <button id="btnYtDirectTouch" type="button" class="yt-mini-btn" title="ONにすると広告スキップなどYouTube画面内を直接タップできます（通常OFF時は動画タップで再生/停止、左右スワイプで隣ページへ移動）">動画操作</button>
                   <button id="btnYtChangeUrl" type="button" class="yt-mini-btn yt-mini-btn-accent">URL変更</button>
                   <a id="linkYtExternal" href="https://www.youtube.com/" target="_blank" rel="noopener noreferrer" class="yt-mini-btn">外部</a>
                   <button id="btnYtExitMode" type="button" class="yt-mini-btn" title="YouTubeモードを終了">終了</button>
@@ -8597,7 +8597,7 @@
         <div class="modal-section" style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
           <div>
             <div class="sec-title">バージョン情報</div>
-            <div id="settingsVersionLabel" class="engine-desc mono">現在: v67</div>
+            <div id="settingsVersionLabel" class="engine-desc mono">現在: v68</div>
           </div>
           <button id="btnShowReleaseHistory" type="button" class="step-btn" style="color:#93c5fd;border-color:rgba(66,165,245,0.45);">更新履歴を見る</button>
         </div>
@@ -8761,7 +8761,7 @@
           </div>
           <div>
             <h3 id="whatsNewTitle" class="whats-new-title">アップデートのお知らせ</h3>
-            <p id="whatsNewSub" class="whats-new-sub mono">v67 に更新されました</p>
+            <p id="whatsNewSub" class="whats-new-sub mono">v68 に更新されました</p>
           </div>
         </div>
         <button id="btnCloseWhatsNewX" type="button" class="modal-close" aria-label="閉じる">✕</button>
@@ -22312,10 +22312,13 @@
           if (isCancelled()) return;
 
           const playerVars = {
+            controls: 0,
+            fs: 0,
+            iv_load_policy: 3,
+            disablekb: 1,
             playsinline: 1,
             rel: 0,
             modestbranding: 1,
-            fs: 1,
             enablejsapi: 1
           };
           if (initStart >= 1) {
@@ -27580,11 +27583,20 @@
       document.addEventListener('webkitfullscreenchange', onFullscreenStateChanged);
 
       // ==================== GITHUB / PWA SOFTWARE UPDATE CHECK & APPLY ====================
-      const APP_VERSION = 'v67';
+      const APP_VERSION = 'v68';
 
       // Ordered newest-first; each release appends a new object at the top.
       // Users who skip multiple versions automatically see ALL unseen versions between lastSeen and current.
       const APP_RELEASE_NOTES = [
+        {
+          version: 'v68',
+          verNum: 68,
+          date: '2026/11/27',
+          title: 'YouTube画面内の再生ボタン・シークバー・最大化ボタンを非表示にしてすっきり表示',
+          items: [
+            'YouTube公式プレイヤーの内部コントロール（画面内の再生ボタン・シークバー・最大化ボタン・アノテーション）を非表示（controls:0 / fs:0）にし、アプリの操作バーと重複しないすっきりした画面にしました'
+          ]
+        },
         {
           version: 'v67',
           verNum: 67,
