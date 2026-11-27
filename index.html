@@ -8,7 +8,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="Audipo2">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="app-version" content="v77">
+  <meta name="app-version" content="v78">
   <link rel="manifest" href="./manifest.json">
   <title>Audipo風 練習プレイヤー＆レコーダー</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='bg' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%231b2030'/%3E%3Cstop offset='100%25' stop-color='%230d0f15'/%3E%3C/linearGradient%3E%3ClinearGradient id='wv' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0%25' stop-color='%2360c5ff'/%3E%3Cstop offset='100%25' stop-color='%232563eb'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='url(%23bg)'/%3E%3Crect x='1' y='1' width='62' height='62' rx='15' fill='none' stroke='%233b82f6' stroke-opacity='0.3' stroke-width='2'/%3E%3Cg fill='url(%23wv)'%3E%3Crect x='10' y='28' width='4.5' height='12' rx='2.25' opacity='0.6'/%3E%3Crect x='18' y='22' width='4.5' height='24' rx='2.25' opacity='0.85'/%3E%3Crect x='26' y='15' width='4.5' height='36' rx='2.25'/%3E%3Crect x='34' y='21' width='4.5' height='25' rx='2.25' opacity='0.9'/%3E%3Crect x='42' y='26' width='4.5' height='16' rx='2.25' opacity='0.75'/%3E%3Crect x='50' y='30' width='4.5' height='9' rx='2.25' opacity='0.5'/%3E%3C/g%3E%3Cpath d='M36.25 10.5c0-1.4 1.1-2.5 2.5-2.5h5.5c1.4 0 2.5 1.1 2.5 2.5v2.4c0 .8-.3 1.5-.9 2.1l-3.2 3.1c-.6.6-1.6.6-2.2 0l-3.2-3.1c-.6-.6-.9-1.3-.9-2.1v-2.4z' fill='%23facc15'/%3E%3C/svg%3E">
@@ -5828,8 +5828,8 @@
     }
 
     .theme-preview-clean {
-      background: #ffffff;
-      border-color: #e4e4e7;
+      background: linear-gradient(160deg, #fff5f9 0%, #fff0f6 55%, #f5f3ff 100%);
+      border-color: #f6cde0;
     }
 
     .theme-preview-monotone {
@@ -5859,11 +5859,11 @@
     }
 
     .theme-preview-clean .tp-bar span:first-child {
-      background: #18181b;
+      background: #6b4257;
     }
 
     .theme-preview-clean .tp-bar span:last-child {
-      background: #2563eb;
+      background: linear-gradient(90deg, #f472b6, #fb7185);
     }
 
     .theme-preview-monotone .tp-bar span:first-child {
@@ -5885,7 +5885,8 @@
     }
 
     .theme-preview-clean .tp-wave {
-      background: #f4f4f5;
+      background: #ffffff;
+      border: 1px solid #f7d6e5;
     }
 
     .theme-preview-monotone .tp-wave {
@@ -5905,11 +5906,11 @@
     }
 
     .theme-preview-clean .tp-wave i {
-      background: #2563eb;
+      background: #f45b96;
     }
 
     .theme-preview-clean .tp-wave i.dim {
-      background: #d4d4d8;
+      background: #f3c6d8;
     }
 
     .theme-preview-monotone .tp-wave i {
@@ -5937,13 +5938,14 @@
     }
 
     .theme-preview-clean .tp-pads span {
-      background: #f4f4f5;
-      border: 1px solid #e4e4e7;
+      background: #ffffff;
+      border: 1px solid #f6cde0;
+      border-radius: 5px;
     }
 
     .theme-preview-clean .tp-pads span.act {
-      background: #2563eb;
-      border-color: #2563eb;
+      background: linear-gradient(135deg, #f472b6 0%, #fb7185 100%);
+      border-color: #f472b6;
       border-radius: 999px;
     }
 
@@ -6147,38 +6149,38 @@
     }
 
     /* ============================================================================
-       LIGHT THEMES (theme-light + theme-clean / theme-monotone)
-       1) Clean Minimal (theme-clean): Pure White (#FFFFFF) + Royal Blue (#2563EB) + Light Gray (#F4F4F5)
-       2) Monotone (theme-monotone):   Off-White (#F8F9FA) + Dark Gray (#333333) + Black (#111111)
+       LIGHT THEMES (theme-light + theme-clean [Milky Pink] / theme-monotone)
+       1) Milky Pink (theme-clean):  Milky Sakura White (#FFF7FA) + Berry Rose (#EC4899) + Pastel Lavender/Mint
+       2) Monotone (theme-monotone): Off-White (#F8F9FA) + Dark Gray (#333333) + Black (#111111)
        ============================================================================ */
     html.theme-clean,
     body.theme-clean {
-      --lt-bg: #ffffff;
-      --lt-surface: #ffffff;
-      --lt-modal-bg: #ffffff;
-      --lt-card: #f4f4f5;
-      --lt-btn: #f4f4f5;
-      --lt-btn-active: #e4e4e7;
-      --lt-btn-border: #e4e4e7;
-      --lt-nested-btn: #ffffff;
-      --lt-subtle-bg: #f4f4f5;
-      --lt-track-bg: #e4e4e7;
+      --lt-bg: #fff7fa;
+      --lt-surface: #fff2f7;
+      --lt-modal-bg: #fff8fb;
+      --lt-card: #ffffff;
+      --lt-btn: #ffffff;
+      --lt-btn-active: #fce4ef;
+      --lt-btn-border: #f6d1e2;
+      --lt-nested-btn: #fff3f8;
+      --lt-subtle-bg: #fce8f2;
+      --lt-track-bg: #f5d2e3;
       --lt-tab-active-bg: #ffffff;
-      --lt-input-bg: #ffffff;
+      --lt-input-bg: #fff5f9;
       --lt-input-focus-bg: #ffffff;
-      --lt-border: #e4e4e7;
-      --lt-border-strong: #d4d4d8;
-      --lt-ink: #18181b;
-      --lt-ink-strong: #09090b;
-      --lt-ink-sub: #52525b;
-      --lt-ink-dim: #a1a1aa;
-      --lt-accent: #2563eb;
+      --lt-border: #f6d5e4;
+      --lt-border-strong: #ebb8cf;
+      --lt-ink: #5a3949;
+      --lt-ink-strong: #462536;
+      --lt-ink-sub: #956e82;
+      --lt-ink-dim: #c79fb3;
+      --lt-accent: #ec4899;
       --lt-accent-text: #ffffff;
-      --lt-accent-soft: #eff6ff;
-      --lt-accent-shadow: rgba(37, 99, 235, 0.22);
-      --lt-btn-shadow: 0 1px 2px rgba(9, 9, 11, 0.04);
-      --lt-card-shadow: none;
-      --lt-toast-bg: #18181b;
+      --lt-accent-soft: #fdf2f8;
+      --lt-accent-shadow: rgba(236, 72, 153, 0.28);
+      --lt-btn-shadow: 0 2px 6px rgba(236, 72, 153, 0.09);
+      --lt-card-shadow: 0 2px 8px rgba(236, 72, 153, 0.06);
+      --lt-toast-bg: #582f46;
     }
 
     html.theme-monotone,
@@ -7981,11 +7983,51 @@
       box-shadow: 0 8px 24px rgba(15, 15, 20, 0.2);
     }
 
-    /* Theme-specific crisp polish overrides */
+    /* Theme-specific polish overrides (Milky Pink girly pastel + Monotone crisp) */
+    body.theme-clean .app-header {
+      background: linear-gradient(180deg, #fff1f6 0%, #fff7fa 100%);
+      border-bottom: 1px solid #f7d6e5;
+    }
+
+    body.theme-clean .hdr-btn-open {
+      background: linear-gradient(135deg, #f472b6 0%, #fb7185 100%);
+      border-color: transparent;
+      color: #ffffff;
+      box-shadow: 0 3px 10px rgba(244, 114, 182, 0.34);
+    }
+
+    body.theme-clean .hdr-btn-rec {
+      background: #fff0f3;
+      border-color: #fecdd3;
+      color: #e11d48;
+    }
+
+    body.theme-clean .hdr-btn-save {
+      background: #f5f3ff;
+      border-color: #ddd6fe;
+      color: #6d28d9;
+    }
+
+    body.theme-clean .hdr-save-icon {
+      stroke: #7c3aed;
+    }
+
+    body.theme-clean .hdr-btn-share {
+      background: #ecfdf5;
+      border-color: #a7f3d0;
+      color: #059669;
+    }
+
+    body.theme-clean .hdr-btn-bm {
+      background: #fffbeb;
+      border-color: #fde68a;
+      color: #d97706;
+    }
+
     body.theme-clean .zoom-pane {
       background-color: #ffffff;
-      border-top: 1px solid #e4e4e7;
-      border-bottom: 1px solid #e4e4e7;
+      border-top: 1px solid #f7d6e5;
+      border-bottom: 1px solid #f7d6e5;
       box-shadow: none;
     }
 
@@ -7996,10 +8038,14 @@
       box-shadow: none;
     }
 
-    body.theme-clean .status-bar,
+    body.theme-clean .status-bar {
+      background: linear-gradient(180deg, #fff4f8 0%, #fff9fb 100%);
+      border-bottom: 1px solid #f7dce8;
+    }
+
     body.theme-clean .section-action-bar {
-      background: #fafafa;
-      border-bottom: 1px solid #ececef;
+      background: #fff8fb;
+      border-bottom: 1px solid #f7dce8;
     }
 
     body.theme-monotone .status-bar,
@@ -8008,36 +8054,107 @@
       border-bottom: 1px solid #e5e7eb;
     }
 
+    body.theme-clean .track-idx-btn {
+      background: #fce7f3;
+      color: #be185d;
+    }
+
+    body.theme-clean .pill-boost {
+      background: #fef3c7;
+      border-color: #fde68a;
+      color: #b45309;
+    }
+
+    body.theme-clean .pill-engine {
+      background: #f3e8ff;
+      border-color: #e9d5ff;
+      color: #7e22ce;
+    }
+
+    body.theme-clean .control-footer {
+      background: linear-gradient(180deg, #fff5f9 0%, #ffeef5 100%);
+    }
+
+    body.theme-clean .pad-btn {
+      background: #ffffff;
+      border: 1px solid #f6d1e2;
+      border-radius: 15px;
+      color: #5a3949;
+      box-shadow: 0 2px 6px rgba(236, 72, 153, 0.085);
+    }
+
     body.theme-clean .pad-btn:active {
-      background: #e4e4e7;
+      background: #fce7f3;
+    }
+
+    body.theme-clean .pad-btn-play {
+      background: linear-gradient(135deg, #f472b6 0%, #fb7185 100%);
+      border-color: transparent;
+      border-radius: 18px;
+      color: #ffffff;
+      box-shadow: 0 4px 13px rgba(244, 114, 182, 0.42);
+    }
+
+    body.theme-clean .pad-btn-play.playing {
+      background: #fff0f6;
+      border: 2px solid #ec4899;
+      color: #ec4899;
+      box-shadow: 0 2px 10px rgba(236, 72, 153, 0.22);
+    }
+
+    body.theme-clean .pad-btn.active-blue,
+    body.theme-clean .pad-btn.active-star,
+    body.theme-clean .pad-btn.active-green {
+      background: linear-gradient(135deg, #f472b6 0%, #fb7185 100%);
+      border-color: transparent;
+      color: #ffffff;
+      box-shadow: 0 3px 10px rgba(244, 114, 182, 0.34);
+    }
+
+    body.theme-clean .order-btn.active {
+      background: linear-gradient(135deg, #f472b6 0%, #fb7185 100%);
+      border-color: transparent;
+      color: #ffffff;
+    }
+
+    body.theme-clean .zoom-pill {
+      background: rgba(255, 255, 255, 0.94);
+      border-color: #f6d1e2;
+      color: #6b4257;
+    }
+
+    body.theme-clean .zoom-pill-lead.active {
+      background: linear-gradient(135deg, #f472b6 0%, #fb7185 100%);
+      border-color: transparent;
+      color: #ffffff;
     }
 
     body.theme-monotone .pad-btn:active {
       background: #e9ecef;
     }
 
-    body.theme-clean .hdr-btn-save,
-    body.theme-clean .hdr-btn-share,
-    body.theme-clean .hdr-btn-bm,
-    body.theme-clean .hdr-btn-rec {
-      background: #f4f4f5;
-    }
-
     body.theme-clean .sec-act-btn {
-      background: #f4f4f5;
-      border-color: #e4e4e7;
+      background: #ffffff;
+      border-color: #f6d1e2;
+      color: #5a3949;
     }
 
     body.theme-clean .sec-act-btn.skip-active {
-      background: #2563eb;
-      border-color: #2563eb;
+      background: linear-gradient(135deg, #f472b6 0%, #fb7185 100%);
+      border-color: transparent;
       color: #ffffff;
     }
 
     body.theme-clean .sec-act-btn.join-btn {
-      background: #eff6ff;
-      border-color: rgba(37, 99, 235, 0.35);
-      color: #2563eb;
+      background: #f5f3ff;
+      border-color: #ddd6fe;
+      color: #7c3aed;
+    }
+
+    body.theme-clean .sec-act-btn.cut-btn {
+      background: #fff1f2;
+      border-color: #fecdd3;
+      color: #e11d48;
     }
 
     body.theme-monotone .sec-act-btn.join-btn {
@@ -8047,7 +8164,81 @@
     }
 
     body.theme-clean .speed-val-text {
-      color: #2563eb;
+      color: #db2777;
+    }
+
+    body.theme-clean .pitch-val-text.shifted {
+      color: #7c3aed;
+    }
+
+    body.theme-clean .whats-new-ok-btn,
+    body.theme-clean .modal-footer-btn,
+    body.theme-clean .fav-primary-picker-btn,
+    body.theme-clean .bm-save-cur-btn,
+    body.theme-clean .start-btn-local,
+    body.theme-clean .metro-start-btn,
+    body.theme-clean .kbd-to-landscape-hero,
+    body.theme-clean .kbd-to-portrait-btn,
+    body.theme-clean .tr-run-btn {
+      background: linear-gradient(135deg, #f472b6 0%, #fb7185 100%);
+      border-color: transparent;
+      color: #ffffff;
+      box-shadow: 0 4px 12px rgba(244, 114, 182, 0.34);
+    }
+
+    body.theme-clean .modal-card,
+    body.theme-clean .whats-new-card,
+    body.theme-clean .help-modal-card,
+    body.theme-clean .save-modal-card,
+    body.theme-clean .join-modal-card,
+    body.theme-clean .fav-modal-card,
+    body.theme-clean .fav-act-card,
+    body.theme-clean .pin-conflict-card,
+    body.theme-clean .mark-edit-card,
+    body.theme-clean .bm-modal-card,
+    body.theme-clean .yt-modal-card {
+      border-radius: 24px;
+      border-color: #f6d1e2;
+      box-shadow: 0 20px 56px rgba(157, 23, 77, 0.14);
+    }
+
+    body.theme-clean .upper-page-dots {
+      background: rgba(255, 255, 255, 0.92);
+      border-color: #f6d1e2;
+    }
+
+    body.theme-clean .upper-dot {
+      background: #f0bfd5;
+    }
+
+    body.theme-clean .upper-dot.active,
+    body.theme-clean .upper-dot.active-metro,
+    body.theme-clean .upper-dot.active-kbd,
+    body.theme-clean .upper-dot.active-pins,
+    body.theme-clean .upper-dot.active-transcript {
+      background: #ec4899;
+      box-shadow: 0 0 6px rgba(236, 72, 153, 0.55);
+    }
+
+    body.theme-clean .start-btn-rec {
+      background: linear-gradient(135deg, #fb7185 0%, #f43f5e 100%);
+      color: #ffffff;
+    }
+
+    body.theme-clean .start-btn-bm {
+      background: #fffbeb;
+      border-color: #fde68a;
+      color: #b45309;
+    }
+
+    body.theme-clean .start-btn-demo {
+      background: #f5f3ff;
+      border-color: #ddd6fe;
+      color: #6d28d9;
+    }
+
+    body.theme-clean .start-btn-demo svg {
+      stroke: #7c3aed !important;
     }
 
     body.theme-monotone .speed-val-text {
@@ -8061,7 +8252,7 @@
 
     body.theme-clean .theme-card {
       background: #ffffff;
-      border-color: #e4e4e7;
+      border-color: #f6d1e2;
     }
 
     body.theme-clean .modal-update-btn,
@@ -8069,9 +8260,9 @@
     body.theme-clean .fav-footer-back-btn,
     body.theme-clean .fav-top-list-btn,
     body.theme-clean .pin-act-skip {
-      background: #f4f4f5;
-      border-color: #e4e4e7;
-      color: #18181b;
+      background: #ffffff;
+      border-color: #f6d1e2;
+      color: #5a3949;
     }
 
     body.theme-monotone .modal-update-btn,
@@ -8988,8 +9179,8 @@
                 </div>
                 <div class="tp-pads"><span></span><span class="act"></span><span></span></div>
               </div>
-              <div class="theme-card-name">クリーン・ミニマル</div>
-              <div class="theme-card-desc">純白×ロイヤルブルー</div>
+              <div class="theme-card-name">ミルキーピンク</div>
+              <div class="theme-card-desc">ふんわり淡色パステル</div>
             </button>
 
             <button type="button" data-ui-theme="monotone" class="theme-card">
@@ -9242,7 +9433,7 @@
         <div class="modal-section" style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
           <div>
             <div class="sec-title">バージョン情報</div>
-            <div id="settingsVersionLabel" class="engine-desc mono">現在: v77</div>
+            <div id="settingsVersionLabel" class="engine-desc mono">現在: v78</div>
           </div>
           <button id="btnShowReleaseHistory" type="button" class="step-btn" style="color:#93c5fd;border-color:rgba(66,165,245,0.45);">更新履歴を見る</button>
         </div>
@@ -9406,7 +9597,7 @@
           </div>
           <div>
             <h3 id="whatsNewTitle" class="whats-new-title">アップデートのお知らせ</h3>
-            <p id="whatsNewSub" class="whats-new-sub mono">v77 に更新されました</p>
+            <p id="whatsNewSub" class="whats-new-sub mono">v78 に更新されました</p>
           </div>
         </div>
         <button id="btnCloseWhatsNewX" type="button" class="modal-close" aria-label="閉じる">✕</button>
@@ -10292,7 +10483,7 @@
             document.documentElement.classList.add('theme-light', `theme-${savedTheme}`);
             document.body.classList.add('theme-light', `theme-${savedTheme}`);
             const tcMeta = document.querySelector('meta[name="theme-color"]');
-            if (tcMeta) tcMeta.setAttribute('content', savedTheme === 'clean' ? '#ffffff' : '#f8f9fa');
+            if (tcMeta) tcMeta.setAttribute('content', savedTheme === 'clean' ? '#fff7fa' : '#f8f9fa');
           }
         }
       } catch (_) {}
@@ -13084,44 +13275,44 @@
           reverbActive: '#42a5f5'
         },
         clean: {
-          label: 'クリーン・ミニマル',
+          label: 'ミルキーピンク',
           isLight: true,
-          themeColorMeta: '#ffffff',
-          bg: '#ffffff',
-          rowBg: '#f4f4f5',
-          rowStroke: 'rgba(24, 24, 27, 0.06)',
+          themeColorMeta: '#fff7fa',
+          bg: '#fff7fa',
+          rowBg: '#ffffff',
+          rowStroke: 'rgba(236, 72, 153, 0.14)',
           zoomBg: '#ffffff',
-          zoomBaseline: 'rgba(24, 24, 27, 0.09)',
-          ytBg: '#f4f4f5',
-          ytRail: 'rgba(24, 24, 27, 0.10)',
-          ytPlayed: '#2563eb',
-          ytPlayedTint: 'rgba(37, 99, 235, 0.13)',
-          ytUnplayedTint: 'rgba(24, 24, 27, 0.04)',
-          recBg: '#f4f4f5',
-          recGrid: 'rgba(24, 24, 27, 0.08)',
-          recStroke: '#dc2626',
-          wavePlayed: '#2563eb',
-          waveUnplayed: '#d4d4d8',
-          waveEmptyLine: '#e4e4e7',
-          waveSkipped: 'rgba(161, 161, 170, 0.35)',
-          zoomPlayedFill: 'rgba(37, 99, 235, 0.24)',
-          zoomPlayedStroke: '#2563eb',
-          zoomUnplayedFill: 'rgba(161, 161, 170, 0.24)',
-          zoomUnplayedStroke: '#a1a1aa',
-          playhead: '#18181b',
-          playheadShadow: 'rgba(255, 255, 255, 0.92)',
-          scrubPlayhead: '#2563eb',
-          liveDash: 'rgba(37, 99, 235, 0.52)',
-          timeLabel: '#71717a',
-          labelBg: 'rgba(255, 255, 255, 0.94)',
-          zoomLabelBg: 'rgba(255, 255, 255, 0.94)',
-          pinYellow: '#d97706',
-          pinYellowDim: 'rgba(217, 119, 6, 0.34)',
-          pinYellowLine: 'rgba(217, 119, 6, 0.78)',
+          zoomBaseline: 'rgba(236, 72, 153, 0.14)',
+          ytBg: '#ffffff',
+          ytRail: 'rgba(236, 72, 153, 0.14)',
+          ytPlayed: '#f45b96',
+          ytPlayedTint: 'rgba(244, 114, 182, 0.16)',
+          ytUnplayedTint: 'rgba(236, 72, 153, 0.04)',
+          recBg: '#fff5f9',
+          recGrid: 'rgba(236, 72, 153, 0.12)',
+          recStroke: '#f43f5e',
+          wavePlayed: '#f45b96',
+          waveUnplayed: '#f3c6d8',
+          waveEmptyLine: '#f6d5e4',
+          waveSkipped: 'rgba(202, 167, 184, 0.36)',
+          zoomPlayedFill: 'rgba(244, 114, 182, 0.30)',
+          zoomPlayedStroke: '#ec4899',
+          zoomUnplayedFill: 'rgba(243, 198, 216, 0.38)',
+          zoomUnplayedStroke: '#e2a3be',
+          playhead: '#db2777',
+          playheadShadow: 'rgba(255, 255, 255, 0.95)',
+          scrubPlayhead: '#a855f7',
+          liveDash: 'rgba(236, 72, 153, 0.50)',
+          timeLabel: '#9d7488',
+          labelBg: 'rgba(255, 253, 245, 0.95)',
+          zoomLabelBg: 'rgba(255, 253, 245, 0.95)',
+          pinYellow: '#f59e0b',
+          pinYellowDim: 'rgba(245, 158, 11, 0.35)',
+          pinYellowLine: 'rgba(245, 158, 11, 0.80)',
           pinYellowText: '#92400e',
-          pinGreen: '#16a34a',
+          pinGreen: '#34d399',
           pinGreenStroke: '#ffffff',
-          reverbActive: '#2563eb'
+          reverbActive: '#ec4899'
         },
         monotone: {
           label: 'モノトーン',
@@ -30175,11 +30366,22 @@ ${info.url}`;
       document.addEventListener('webkitfullscreenchange', onFullscreenStateChanged);
 
       // ==================== GITHUB / PWA SOFTWARE UPDATE CHECK & APPLY ====================
-      const APP_VERSION = 'v77';
+      const APP_VERSION = 'v78';
 
       // Ordered newest-first; each release appends a new object at the top.
       // Users who skip multiple versions automatically see ALL unseen versions between lastSeen and current.
       const APP_RELEASE_NOTES = [
+        {
+          version: 'v78',
+          verNum: 78,
+          date: '2026/11/28',
+          title: '可愛いパステル系テーマ「ミルキーピンク」へデザイン刷新',
+          items: [
+            '「クリーン・ミニマル」を、高校生女子にも好まれるふんわり可愛い淡色パステルテーマ「ミルキーピンク」に刷新しました',
+            'ほんのり桜色のミルキーホワイト背景（#FFF7FA）に、ぷっくりした真っ白な丸角ボタン、ストロベリーピンクの波形（#F45B96）、ローズピンクのツヤ感グラデーションボタン、ココアブラウンの文字色を組み合わせています',
+            '保存・結合・設定バッジにもパステルラベンダーやミントをさりげなく配色し、可愛さと見やすさを両立しました'
+          ]
+        },
         {
           version: 'v77',
           verNum: 77,
