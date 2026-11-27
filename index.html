@@ -8,7 +8,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="Audipo2">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="app-version" content="v73">
+  <meta name="app-version" content="v74">
   <link rel="manifest" href="./manifest.json">
   <title>Audipo風 練習プレイヤー＆レコーダー</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='bg' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%231b2030'/%3E%3Cstop offset='100%25' stop-color='%230d0f15'/%3E%3C/linearGradient%3E%3ClinearGradient id='wv' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0%25' stop-color='%2360c5ff'/%3E%3Cstop offset='100%25' stop-color='%232563eb'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='url(%23bg)'/%3E%3Crect x='1' y='1' width='62' height='62' rx='15' fill='none' stroke='%233b82f6' stroke-opacity='0.3' stroke-width='2'/%3E%3Cg fill='url(%23wv)'%3E%3Crect x='10' y='28' width='4.5' height='12' rx='2.25' opacity='0.6'/%3E%3Crect x='18' y='22' width='4.5' height='24' rx='2.25' opacity='0.85'/%3E%3Crect x='26' y='15' width='4.5' height='36' rx='2.25'/%3E%3Crect x='34' y='21' width='4.5' height='25' rx='2.25' opacity='0.9'/%3E%3Crect x='42' y='26' width='4.5' height='16' rx='2.25' opacity='0.75'/%3E%3Crect x='50' y='30' width='4.5' height='9' rx='2.25' opacity='0.5'/%3E%3C/g%3E%3Cpath d='M36.25 10.5c0-1.4 1.1-2.5 2.5-2.5h5.5c1.4 0 2.5 1.1 2.5 2.5v2.4c0 .8-.3 1.5-.9 2.1l-3.2 3.1c-.6.6-1.6.6-2.2 0l-3.2-3.1c-.6-.6-.9-1.3-.9-2.1v-2.4z' fill='%23facc15'/%3E%3C/svg%3E">
@@ -8977,7 +8977,7 @@
         <div class="modal-section" style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
           <div>
             <div class="sec-title">バージョン情報</div>
-            <div id="settingsVersionLabel" class="engine-desc mono">現在: v73</div>
+            <div id="settingsVersionLabel" class="engine-desc mono">現在: v74</div>
           </div>
           <button id="btnShowReleaseHistory" type="button" class="step-btn" style="color:#93c5fd;border-color:rgba(66,165,245,0.45);">更新履歴を見る</button>
         </div>
@@ -9141,7 +9141,7 @@
           </div>
           <div>
             <h3 id="whatsNewTitle" class="whats-new-title">アップデートのお知らせ</h3>
-            <p id="whatsNewSub" class="whats-new-sub mono">v73 に更新されました</p>
+            <p id="whatsNewSub" class="whats-new-sub mono">v74 に更新されました</p>
           </div>
         </div>
         <button id="btnCloseWhatsNewX" type="button" class="modal-close" aria-label="閉じる">✕</button>
@@ -9790,23 +9790,6 @@
         <button id="btnCloseBookmarksX" type="button" class="modal-close" aria-label="閉じる">✕</button>
       </div>
 
-      <!-- Current Playing Track Quick Save Card -->
-      <div id="bmCurrentTrackCard" class="bm-cur-card hidden" style="margin-bottom:9px;">
-        <div class="bm-cur-head">
-          <div class="bm-cur-info">
-            <div id="bmCurStatusLabel" class="bm-cur-label">いま開いている曲をお気に入り保存</div>
-            <div id="bmCurTrackName" class="bm-cur-name"></div>
-          </div>
-        </div>
-        <div class="bm-cur-actions">
-          <button id="btnBmSaveCurrent" type="button" class="bm-save-cur-btn">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-            <span id="bmSaveCurBtnLabel">このフォルダにお気に入り追加</span>
-          </button>
-          <button id="btnBmRemoveCurrent" type="button" class="fav-icon-btn del hidden" style="height:36px;padding:0 11px;">解除</button>
-        </div>
-      </div>
-
       <div class="modal-body" style="gap:8px;">
         <!-- Folder Breadcrumb Bar -->
         <div class="fav-crumb-bar">
@@ -9856,7 +9839,24 @@
         <div id="bmListWrap" class="fav-list"></div>
       </div>
 
-      <div class="whats-new-footer" style="margin-top:10px;">
+      <!-- Current Playing Track Quick Save Card (positioned right above the Close button) -->
+      <div id="bmCurrentTrackCard" class="bm-cur-card hidden" style="margin-top:10px;">
+        <div class="bm-cur-head">
+          <div class="bm-cur-info">
+            <div id="bmCurStatusLabel" class="bm-cur-label">いま開いている曲をお気に入り保存</div>
+            <div id="bmCurTrackName" class="bm-cur-name"></div>
+          </div>
+        </div>
+        <div class="bm-cur-actions">
+          <button id="btnBmSaveCurrent" type="button" class="bm-save-cur-btn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            <span id="bmSaveCurBtnLabel">このフォルダにお気に入り追加</span>
+          </button>
+          <button id="btnBmRemoveCurrent" type="button" class="fav-icon-btn del hidden" style="height:36px;padding:0 11px;">解除</button>
+        </div>
+      </div>
+
+      <div class="whats-new-footer" style="margin-top:8px;">
         <button id="btnCloseBookmarksOk" type="button" class="whats-new-ok-btn">閉じる</button>
       </div>
     </div>
@@ -27163,7 +27163,7 @@ ${info.url}`;
 
         bmListWrap.innerHTML = '';
         if (childFolders.length === 0 && childItems.length === 0) {
-          bmListWrap.innerHTML = '<div class="fav-empty-hint">このフォルダにはまだブックマークがありません。<br>上の「お気に入りに追加」「＋ フォルダ作成」「＋ YouTube URL追加」から登録できます。</div>';
+          bmListWrap.innerHTML = '<div class="fav-empty-hint">このフォルダにはまだブックマークがありません。<br>下の「お気に入りに追加」や上の「＋ フォルダ作成」「＋ YouTube URL追加」から登録できます。</div>';
           return;
         }
 
@@ -29609,11 +29609,20 @@ ${info.url}`;
       document.addEventListener('webkitfullscreenchange', onFullscreenStateChanged);
 
       // ==================== GITHUB / PWA SOFTWARE UPDATE CHECK & APPLY ====================
-      const APP_VERSION = 'v73';
+      const APP_VERSION = 'v74';
 
       // Ordered newest-first; each release appends a new object at the top.
       // Users who skip multiple versions automatically see ALL unseen versions between lastSeen and current.
       const APP_RELEASE_NOTES = [
+        {
+          version: 'v74',
+          verNum: 74,
+          date: '2026/11/27',
+          title: 'ブックマーク画面の「お気に入りに追加」エリアを「閉じる」ボタンのすぐ上へ移動',
+          items: [
+            'お気に入りブックマーク画面で、いま開いている曲の「お気に入りに追加」カードを一覧の上から「閉じる」ボタンのすぐ上（画面下部）へ移動し、フォルダ・一覧を上から広く見やすくしました'
+          ]
+        },
         {
           version: 'v73',
           verNum: 73,
