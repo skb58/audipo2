@@ -8,7 +8,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="Audipo2">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="app-version" content="v68">
+  <meta name="app-version" content="v69">
   <link rel="manifest" href="./manifest.json">
   <title>Audipo風 練習プレイヤー＆レコーダー</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='bg' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%231b2030'/%3E%3Cstop offset='100%25' stop-color='%230d0f15'/%3E%3C/linearGradient%3E%3ClinearGradient id='wv' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0%25' stop-color='%2360c5ff'/%3E%3Cstop offset='100%25' stop-color='%232563eb'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='url(%23bg)'/%3E%3Crect x='1' y='1' width='62' height='62' rx='15' fill='none' stroke='%233b82f6' stroke-opacity='0.3' stroke-width='2'/%3E%3Cg fill='url(%23wv)'%3E%3Crect x='10' y='28' width='4.5' height='12' rx='2.25' opacity='0.6'/%3E%3Crect x='18' y='22' width='4.5' height='24' rx='2.25' opacity='0.85'/%3E%3Crect x='26' y='15' width='4.5' height='36' rx='2.25'/%3E%3Crect x='34' y='21' width='4.5' height='25' rx='2.25' opacity='0.9'/%3E%3Crect x='42' y='26' width='4.5' height='16' rx='2.25' opacity='0.75'/%3E%3Crect x='50' y='30' width='4.5' height='9' rx='2.25' opacity='0.5'/%3E%3C/g%3E%3Cpath d='M36.25 10.5c0-1.4 1.1-2.5 2.5-2.5h5.5c1.4 0 2.5 1.1 2.5 2.5v2.4c0 .8-.3 1.5-.9 2.1l-3.2 3.1c-.6.6-1.6.6-2.2 0l-3.2-3.1c-.6-.6-.9-1.3-.9-2.1v-2.4z' fill='%23facc15'/%3E%3C/svg%3E">
@@ -204,6 +204,312 @@
       background: rgba(34, 197, 94, 0.14);
       border-color: rgba(34, 197, 94, 0.52);
       color: #86efac;
+    }
+
+    .hdr-btn-bm {
+      width: 32px;
+      padding: 0;
+      background: rgba(250, 204, 21, 0.11);
+      border-color: rgba(250, 204, 21, 0.42);
+      color: #fde68a;
+    }
+
+    .hdr-btn-bm.is-bookmarked {
+      background: rgba(250, 204, 21, 0.28);
+      border-color: #facc15;
+      color: #fef08a;
+      box-shadow: 0 0 10px rgba(250, 204, 21, 0.34);
+    }
+
+    .hdr-btn-bm.is-bookmarked svg {
+      fill: #facc15;
+      stroke: #facc15;
+    }
+
+    .start-btn-bm {
+      background: rgba(250, 204, 21, 0.14);
+      border: 1px solid rgba(250, 204, 21, 0.55);
+      color: #fef08a;
+    }
+
+    /* ==================== BOOKMARKS MODAL ==================== */
+    .bm-modal-card {
+      width: 100%;
+      max-width: 430px;
+      max-height: 88dvh;
+      background: #1c1c22;
+      border: 1px solid rgba(250, 204, 21, 0.52);
+      border-radius: 18px;
+      padding: 16px 16px 14px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.86), 0 0 24px rgba(250, 204, 21, 0.14);
+    }
+
+    .bm-cur-card {
+      padding: 9px 11px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, rgba(250, 204, 21, 0.12) 0%, rgba(245, 158, 11, 0.08) 100%);
+      border: 1px solid rgba(250, 204, 21, 0.42);
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      flex-shrink: 0;
+    }
+
+    .bm-cur-card.is-saved {
+      background: linear-gradient(135deg, rgba(34, 197, 94, 0.12) 0%, rgba(16, 185, 129, 0.08) 100%);
+      border-color: rgba(74, 222, 128, 0.48);
+    }
+
+    .bm-cur-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      min-width: 0;
+    }
+
+    .bm-cur-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .bm-cur-label {
+      font-size: 10px;
+      font-weight: 800;
+      color: #fde68a;
+      letter-spacing: 0.2px;
+    }
+
+    .bm-cur-card.is-saved .bm-cur-label {
+      color: #86efac;
+    }
+
+    .bm-cur-name {
+      font-size: 12.5px;
+      font-weight: 800;
+      color: #ffffff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-top: 1px;
+    }
+
+    .bm-cur-actions {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .bm-save-cur-btn {
+      flex: 1;
+      height: 36px;
+      padding: 0 12px;
+      border-radius: 9px;
+      background: linear-gradient(135deg, #eab308 0%, #ca8a04 100%);
+      border: 1px solid #fef08a;
+      color: #111113;
+      font-size: 12.5px;
+      font-weight: 800;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      transition: transform 0.08s ease;
+    }
+
+    .bm-save-cur-btn:active {
+      transform: scale(0.96);
+    }
+
+    .bm-cur-card.is-saved .bm-save-cur-btn {
+      background: rgba(250, 204, 21, 0.16);
+      border-color: rgba(250, 204, 21, 0.55);
+      color: #fef08a;
+    }
+
+    .bm-toolbar-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+    }
+
+    .bm-tool-btn {
+      height: 34px;
+      padding: 0 9px;
+      border-radius: 9px;
+      background: #23232c;
+      border: 1px solid var(--border-strong);
+      color: #e4e4e7;
+      font-size: 11.5px;
+      font-weight: 800;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      transition: transform 0.08s ease;
+    }
+
+    .bm-tool-btn:active {
+      transform: scale(0.96);
+    }
+
+    .bm-tool-btn-folder {
+      background: rgba(250, 204, 21, 0.12);
+      border-color: rgba(250, 204, 21, 0.44);
+      color: #fef08a;
+    }
+
+    .bm-tool-btn-yt {
+      background: rgba(239, 68, 68, 0.12);
+      border-color: rgba(248, 113, 113, 0.44);
+      color: #fecaca;
+    }
+
+    .bm-inline-box {
+      padding: 8px 9px;
+      border-radius: 10px;
+      background: #131319;
+      border: 1px solid var(--border-strong);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .bm-row {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      border-radius: 11px;
+      background: #141419;
+      border: 1px solid var(--border-subtle);
+      overflow: hidden;
+      transition: border-color 0.12s ease;
+    }
+
+    .bm-row.is-folder {
+      background: linear-gradient(180deg, #1b1b24 0%, #14141a 100%);
+      border-color: rgba(250, 204, 21, 0.30);
+    }
+
+    .bm-row.is-current-playing {
+      border-color: rgba(66, 165, 245, 0.72);
+      box-shadow: inset 3px 0 0 var(--accent-blue);
+    }
+
+    .bm-row-main {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      padding: 9px 7px 9px 11px;
+      text-align: left;
+      background: transparent;
+    }
+
+    .bm-row-main:active {
+      background: #1c1e2a;
+    }
+
+    .bm-row-title-line {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      min-width: 0;
+    }
+
+    .bm-type-pill {
+      padding: 1px 6px;
+      border-radius: 5px;
+      font-size: 9.5px;
+      font-weight: 800;
+      flex-shrink: 0;
+      letter-spacing: 0.2px;
+    }
+
+    .bm-type-pill.yt {
+      background: rgba(239, 68, 68, 0.22);
+      color: #fca5a5;
+      border: 1px solid rgba(248, 113, 113, 0.45);
+    }
+
+    .bm-type-pill.audio {
+      background: rgba(66, 165, 245, 0.20);
+      color: #93c5fd;
+      border: 1px solid rgba(96, 165, 250, 0.45);
+    }
+
+    .bm-row-title {
+      flex: 1;
+      min-width: 0;
+      font-size: 13px;
+      font-weight: 700;
+      color: #ffffff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .bm-row.is-folder .bm-row-title {
+      color: #fef08a;
+      font-size: 13.5px;
+      font-weight: 800;
+    }
+
+    .bm-row-meta {
+      font-size: 10.5px;
+      color: var(--text-sub);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .bm-row-more {
+      width: 36px;
+      align-self: stretch;
+      flex-shrink: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: #a1a1aa;
+      border-left: 1px solid rgba(255, 255, 255, 0.06);
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .bm-row-more:active {
+      background: rgba(250, 204, 21, 0.22);
+      color: #ffffff;
+    }
+
+    .bm-move-target-item {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 9px 11px;
+      border-radius: 10px;
+      background: #14141a;
+      border: 1px solid var(--border-subtle);
+      color: #e4e4e7;
+      font-size: 12.5px;
+      font-weight: 700;
+      text-align: left;
+      transition: border-color 0.12s ease, background-color 0.12s ease;
+    }
+
+    .bm-move-target-item.selected {
+      background: rgba(250, 204, 21, 0.16);
+      border-color: #facc15;
+      color: #fef08a;
+    }
+
+    .bm-move-target-item:active {
+      transform: scale(0.985);
     }
 
     .rec-dot {
@@ -5889,6 +6195,111 @@
       color: #2d2c29;
     }
 
+    body.theme-minimal .hdr-btn-bm {
+      background: #f6f4ef;
+      border-color: rgba(45, 44, 41, 0.12);
+      color: #5c5953;
+    }
+
+    body.theme-minimal .hdr-btn-bm.is-bookmarked {
+      background: #f8f1e2;
+      border-color: #c47d24;
+      color: #b46914;
+      box-shadow: 0 0 0 2px rgba(196, 125, 36, 0.18);
+    }
+
+    body.theme-minimal .hdr-btn-bm.is-bookmarked svg {
+      fill: #c47d24;
+      stroke: #c47d24;
+    }
+
+    body.theme-minimal .start-btn-bm {
+      background: #f8f1e2;
+      border-color: rgba(196, 125, 36, 0.38);
+      color: #8c5614;
+    }
+
+    body.theme-minimal .bm-modal-card {
+      background: #eceae4;
+      border: 1px solid rgba(45, 44, 41, 0.1);
+      border-radius: 22px;
+      color: #2d2c29;
+      box-shadow: 0 20px 56px rgba(35, 34, 30, 0.2);
+    }
+
+    body.theme-minimal .bm-cur-card {
+      background: #f6f4ef;
+      border-color: rgba(196, 125, 36, 0.38);
+    }
+
+    body.theme-minimal .bm-cur-card.is-saved {
+      background: #eaf4ec;
+      border-color: rgba(60, 140, 92, 0.42);
+    }
+
+    body.theme-minimal .bm-cur-label {
+      color: #a6691c;
+    }
+
+    body.theme-minimal .bm-cur-card.is-saved .bm-cur-label {
+      color: #2d6f48;
+    }
+
+    body.theme-minimal .bm-cur-name,
+    body.theme-minimal .bm-row-title,
+    body.theme-minimal .bm-row.is-folder .bm-row-title {
+      color: #252421;
+    }
+
+    body.theme-minimal .bm-save-cur-btn {
+      background: #2d2c29;
+      border-color: #2d2c29;
+      color: #f6f4ef;
+    }
+
+    body.theme-minimal .bm-cur-card.is-saved .bm-save-cur-btn {
+      background: #eae7df;
+      border-color: rgba(45, 44, 41, 0.14);
+      color: #2d2c29;
+    }
+
+    body.theme-minimal .bm-tool-btn,
+    body.theme-minimal .bm-inline-box,
+    body.theme-minimal .bm-row,
+    body.theme-minimal .bm-row.is-folder,
+    body.theme-minimal .bm-move-target-item {
+      background: #f6f4ef;
+      border-color: rgba(45, 44, 41, 0.09);
+      color: #2d2c29;
+    }
+
+    body.theme-minimal .bm-row-main:active {
+      background: #eae7df;
+    }
+
+    body.theme-minimal .bm-row-more {
+      border-left-color: rgba(45, 44, 41, 0.08);
+      color: #6f6c66;
+    }
+
+    body.theme-minimal .bm-type-pill.yt {
+      background: #f6ebeb;
+      color: #a63232;
+      border-color: rgba(196, 67, 67, 0.3);
+    }
+
+    body.theme-minimal .bm-type-pill.audio {
+      background: #ebf0f5;
+      color: #465d75;
+      border-color: rgba(85, 108, 133, 0.32);
+    }
+
+    body.theme-minimal .bm-move-target-item.selected {
+      background: #2d2c29;
+      border-color: #2d2c29;
+      color: #f6f4ef;
+    }
+
     /* 2. Workspace, Page Dots & Progress */
     body.theme-minimal .waveform-workspace,
     body.theme-minimal .upper-page-wave {
@@ -7497,7 +7908,13 @@
         <span>保存</span>
       </button>
 
-      <button id="btnShareAudio" type="button" disabled class="hdr-btn hdr-btn-share" title="音声ファイルやピン情報をシェア" aria-label="音声・ピンをシェア">
+      <button id="btnBookmarkHeader" type="button" class="hdr-btn hdr-btn-bm" title="お気に入りブックマーク（YouTube・音声ファイル保存＆フォルダ整理）" aria-label="お気に入りブックマーク">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+        </svg>
+      </button>
+
+            <button id="btnShareAudio" type="button" disabled class="hdr-btn hdr-btn-share" title="音声ファイルやピン情報をシェア" aria-label="音声・ピンをシェア">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
           <circle cx="18" cy="5" r="3"/>
           <circle cx="6" cy="12" r="3"/>
@@ -7800,6 +8217,13 @@
                       <line x1="12" y1="17" x2="12" y2="22"/>
                     </svg>
                     <span>マイクで録音する</span>
+                  </button>
+
+                  <button id="btnOpenBookmarksFromStartup" type="button" class="start-btn start-btn-bm">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+                      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                    </svg>
+                    <span>お気に入りブックマークを開く（YouTube・音声）</span>
                   </button>
 
                   <button id="btnOpenYouTubeFromStartup" type="button" class="start-btn start-btn-yt">
@@ -8597,7 +9021,7 @@
         <div class="modal-section" style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
           <div>
             <div class="sec-title">バージョン情報</div>
-            <div id="settingsVersionLabel" class="engine-desc mono">現在: v68</div>
+            <div id="settingsVersionLabel" class="engine-desc mono">現在: v69</div>
           </div>
           <button id="btnShowReleaseHistory" type="button" class="step-btn" style="color:#93c5fd;border-color:rgba(66,165,245,0.45);">更新履歴を見る</button>
         </div>
@@ -8761,7 +9185,7 @@
           </div>
           <div>
             <h3 id="whatsNewTitle" class="whats-new-title">アップデートのお知らせ</h3>
-            <p id="whatsNewSub" class="whats-new-sub mono">v68 に更新されました</p>
+            <p id="whatsNewSub" class="whats-new-sub mono">v69 に更新されました</p>
           </div>
         </div>
         <button id="btnCloseWhatsNewX" type="button" class="modal-close" aria-label="閉じる">✕</button>
@@ -9118,6 +9542,13 @@
           <span>YouTube URL を開いて練習する（公式再生）</span>
         </button>
 
+        <button id="btnFavOpenBookmarks" type="button" class="start-btn start-btn-bm" style="min-height:42px;font-size:13px;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+          </svg>
+          <span>お気に入りブックマークを開く（フォルダ整理）</span>
+        </button>
+
         <div>
           <div class="fav-section-label">
             <span>★ お気に入りフォルダ</span>
@@ -9370,6 +9801,167 @@
     </div>
   </div>
 
+  <!-- ==================== 19. BOOKMARKS (FAVORITE LINKS & FOLDERS) MODAL ==================== -->
+  <div id="bookmarksModal" class="modal-backdrop hidden" style="z-index:82;">
+    <div class="bm-modal-card" role="dialog" aria-modal="true" aria-labelledby="bookmarksModalTitle">
+      <div class="whats-new-head" style="margin-bottom:10px;">
+        <div class="whats-new-title-wrap">
+          <div class="whats-new-icon" aria-hidden="true" style="background:rgba(250,204,21,0.18);border-color:rgba(250,204,21,0.55);color:#fde047;">
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+            </svg>
+          </div>
+          <div>
+            <h3 id="bookmarksModalTitle" class="whats-new-title">お気に入りブックマーク</h3>
+            <p class="whats-new-sub">YouTube・音声ファイルの保存とフォルダ整理</p>
+          </div>
+        </div>
+        <button id="btnCloseBookmarksX" type="button" class="modal-close" aria-label="閉じる">✕</button>
+      </div>
+
+      <!-- Current Playing Track Quick Save Card -->
+      <div id="bmCurrentTrackCard" class="bm-cur-card hidden" style="margin-bottom:9px;">
+        <div class="bm-cur-head">
+          <div class="bm-cur-info">
+            <div id="bmCurStatusLabel" class="bm-cur-label">いま開いている曲をお気に入り保存</div>
+            <div id="bmCurTrackName" class="bm-cur-name"></div>
+          </div>
+        </div>
+        <div class="bm-cur-actions">
+          <button id="btnBmSaveCurrent" type="button" class="bm-save-cur-btn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            <span id="bmSaveCurBtnLabel">このフォルダにお気に入り追加</span>
+          </button>
+          <button id="btnBmRemoveCurrent" type="button" class="fav-icon-btn del hidden" style="height:36px;padding:0 11px;">解除</button>
+        </div>
+      </div>
+
+      <div class="modal-body" style="gap:8px;">
+        <!-- Folder Breadcrumb Bar -->
+        <div class="fav-crumb-bar">
+          <button id="btnBmDirUp" type="button" class="fav-icon-btn" style="height:24px;padding:0 7px;font-size:10.5px;">↑ 上へ</button>
+          <div id="bmCrumbPath" class="fav-crumb-path mono"></div>
+        </div>
+
+        <!-- Toolbar: New Folder & Direct YouTube URL Add -->
+        <div class="bm-toolbar-row">
+          <button id="btnBmToggleNewFolder" type="button" class="bm-tool-btn bm-tool-btn-folder">
+            <span>＋ フォルダ作成</span>
+          </button>
+          <button id="btnBmToggleAddYt" type="button" class="bm-tool-btn bm-tool-btn-yt">
+            <span>＋ YouTube URL追加</span>
+          </button>
+        </div>
+
+        <!-- Inline New Folder Form -->
+        <div id="bmNewFolderBox" class="bm-inline-box hidden">
+          <div class="fav-add-row">
+            <input type="text" id="inputBmNewFolderName" class="text-input" style="height:34px;font-size:12.5px;" placeholder="新しいフォルダ名（例: 発表会の曲）" autocomplete="off">
+            <button id="btnBmCreateFolderRun" type="button" class="fav-add-btn" style="height:34px;">作成</button>
+            <button id="btnBmCreateFolderCancel" type="button" class="fav-icon-btn" style="height:34px;">✕</button>
+          </div>
+        </div>
+
+        <!-- Inline Add YouTube URL Form -->
+        <div id="bmAddYtBox" class="bm-inline-box hidden">
+          <div class="fav-add-row">
+            <input type="text" id="inputBmAddYtUrl" class="text-input mono" style="height:34px;font-size:12px;" placeholder="YouTube URL または動画ID" autocomplete="off" spellcheck="false">
+            <button id="btnBmPasteYtUrl" type="button" class="fav-icon-btn" style="height:34px;">貼付</button>
+          </div>
+          <div class="fav-add-row">
+            <input type="text" id="inputBmAddYtTitle" class="text-input" style="height:34px;font-size:12.5px;" placeholder="タイトル（空欄なら自動取得）" autocomplete="off">
+            <button id="btnBmAddYtRun" type="button" class="fav-add-btn" style="height:34px;">保存</button>
+            <button id="btnBmAddYtCancel" type="button" class="fav-icon-btn" style="height:34px;">✕</button>
+          </div>
+        </div>
+
+        <!-- List Count -->
+        <div class="fav-section-label" style="margin:2px 0 0;">
+          <span id="bmListSectionLabel">一覧</span>
+          <span id="bmListCountBadge" class="mono" style="color:#a1a1aa;">0件</span>
+        </div>
+
+        <!-- Folders & Bookmarks List -->
+        <div id="bmListWrap" class="fav-list"></div>
+      </div>
+
+      <div class="whats-new-footer" style="margin-top:10px;">
+        <button id="btnCloseBookmarksOk" type="button" class="whats-new-ok-btn">閉じる</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== 20. BOOKMARK / FOLDER ACTION MODAL (RENAME, MOVE, DELETE) ==================== -->
+  <div id="bmItemActionModal" class="modal-backdrop hidden" style="z-index:85;">
+    <div class="fav-act-card" role="dialog" aria-modal="true" aria-labelledby="bmItemActionTitle">
+      <div class="whats-new-head" style="margin-bottom:10px;">
+        <div class="whats-new-title-wrap">
+          <div class="whats-new-icon" aria-hidden="true">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 20h9"/>
+              <path d="M16.5 3.5a2.12 2.12 0 1 1 3 3L7 19l-4 1 1-4Z"/>
+            </svg>
+          </div>
+          <div>
+            <h3 id="bmItemActionTitle" class="whats-new-title">ブックマークの編集</h3>
+            <p id="bmItemActionSub" class="whats-new-sub">名前変更・フォルダ移動・削除</p>
+          </div>
+        </div>
+        <button id="btnCloseBmActX" type="button" class="modal-close" aria-label="閉じる">✕</button>
+      </div>
+
+      <div class="fav-act-target-box">
+        <div id="bmActTargetName" class="fav-act-target-name">対象名</div>
+        <div id="bmActTargetMeta" class="fav-act-target-path mono">現在地</div>
+      </div>
+
+      <div class="share-mode-tabs" role="tablist" aria-label="操作切替">
+        <button id="tabBmActRename" type="button" class="share-mode-tab active" role="tab" aria-selected="true">名前変更・削除</button>
+        <button id="tabBmActMove" type="button" class="share-mode-tab" role="tab" aria-selected="false">フォルダ移動</button>
+      </div>
+
+      <!-- Tab 1: Rename & Delete -->
+      <div id="bmActRenamePanel" class="modal-body" style="gap:10px;">
+        <div class="modal-section">
+          <div class="sec-head" style="margin-bottom:6px;">
+            <span class="sec-title">表示名</span>
+          </div>
+          <input type="text" id="inputBmActRename" class="text-input" placeholder="新しい名前を入力" autocomplete="off">
+        </div>
+
+        <button id="btnBmActDelete" type="button" class="mark-action-block" style="color:#fca5a5;margin-bottom:0;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 6h18"/><path d="M8 6V4a1.5 1.5 0 0 1 1.5-1.5h5A1.5 1.5 0 0 1 16 4v2"/>
+            <path d="M19 6v13a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/>
+            <path d="M10 11v6M14 11v6"/>
+          </svg>
+          <span id="bmActDeleteLabel">このブックマークを削除</span>
+        </button>
+      </div>
+
+      <!-- Tab 2: Move to another Folder -->
+      <div id="bmActMovePanel" class="modal-body hidden" style="gap:8px;">
+        <div class="fav-section-label" style="margin:0;">
+          <span>移動先のフォルダを選択</span>
+          <button id="btnBmActMoveNewDir" type="button" class="fav-icon-btn" style="height:24px;padding:0 8px;font-size:10.5px;color:#86efac;">＋新規フォルダ</button>
+        </div>
+
+        <div id="bmActMoveNewDirBox" class="fav-add-row hidden">
+          <input type="text" id="inputBmActMoveNewDir" class="text-input" style="height:34px;font-size:12.5px;" placeholder="新しいフォルダ名（選択中のフォルダ内に作成）" autocomplete="off">
+          <button id="btnBmActMoveNewDirCreate" type="button" class="fav-add-btn" style="height:34px;">作成</button>
+          <button id="btnBmActMoveNewDirCancel" type="button" class="fav-icon-btn" style="height:34px;">✕</button>
+        </div>
+
+        <div id="bmActMoveFolderList" class="fav-list"></div>
+      </div>
+
+      <div class="modal-footer-row" style="margin-top:12px;">
+        <button id="btnCancelBmAct" type="button" class="danger-btn-safe" style="height:41px;border-radius:11px;">キャンセル</button>
+        <button id="btnExecBmAct" type="button" class="whats-new-ok-btn" style="height:41px;">名前を保存</button>
+      </div>
+    </div>
+  </div>
+
   <!-- ==================== 18. YOUTUBE URL OPEN MODAL ==================== -->
   <div id="ytOpenModal" class="modal-backdrop hidden" style="z-index:82;">
     <div class="yt-modal-card" role="dialog" aria-modal="true" aria-labelledby="ytOpenTitle">
@@ -9580,6 +10172,7 @@
       const btnRecordHeader = document.getElementById('btnRecordHeader');
       const recHeaderLabel = document.getElementById('recHeaderLabel');
       const btnSaveWav = document.getElementById('btnSaveWav');
+      const btnBookmarkHeader = document.getElementById('btnBookmarkHeader');
       const btnShareAudio = document.getElementById('btnShareAudio');
       const btnAppUpdate = document.getElementById('btnAppUpdate');
       const iconAppUpdate = document.getElementById('iconAppUpdate');
@@ -9779,6 +10372,8 @@
         wavMeta: null,
         waveformPyramid: null,
         rawBlob: null,
+        currentFileHandle: null,
+        currentFileFolderHint: '',
         currentFileOrigName: '',
         currentFileSize: 0,
         currentMemoryKey: null,
@@ -14444,6 +15039,8 @@
 
           const url = URL.createObjectURL(blob);
           state.rawBlob = blob;
+          state.currentFileHandle = opts.fileHandle || null;
+          state.currentFileFolderHint = opts.folderHint || '';
           state.audioBuffer = null;
           state.wavMeta = null;
           state.waveformPyramid = null;
@@ -14644,6 +15241,7 @@
           updateSkipLeadingSilenceUI();
           applyMasterBoost();
           updateHeaderSubInfo();
+          updateBookmarkHeaderUI();
           updateTimeUI();
           updatePinButtonsUI();
           updateSectionBarUI();
@@ -16332,6 +16930,7 @@
         let seenConflicts = 0;
         let applyAllAction = null; // null | 'merge' | 'overwrite' | 'skip'
         const stats = { added: 0, merged: 0, overwritten: 0, skipped: 0, appliedToCurrent: 0 };
+        const importedYtTargets = [];
 
         for (let i = 0; i < plan.length; i++) {
           const item = plan[i];
@@ -16401,10 +17000,18 @@
             } else if (inc.ytVideoId || (inc.size > 0 && inc.duration > 0)) {
               stagedMap[key] = finalRec;
             }
+            if (inc.ytVideoId) {
+              importedYtTargets.push({
+                videoId: inc.ytVideoId,
+                url: inc.ytUrl || finalRec.ytUrl || `https://www.youtube.com/watch?v=${inc.ytVideoId}`,
+                displayName: finalRec.displayName || inc.displayName || inc.origName
+              });
+            }
           } else {
             // No meaningful conflict!
-            // Special helpful flow: 1-file import that does NOT match memory AND does NOT match current open track -> offer applying to open track!
-            if ((isSingleScope || entries.length === 1) && state.hasAudio && !matchesLive && !hit) {
+            // Special helpful flow: 1-file LOCAL AUDIO import that does NOT match memory AND does NOT match current open track -> offer applying to open track!
+            // (YouTube pin imports always bind to their own videoId and auto-open that YouTube video!)
+            if ((isSingleScope || entries.length === 1) && state.hasAudio && !matchesLive && !hit && !inc.ytVideoId) {
               const curHasPins = state.markers.length > 0;
               const res = await promptPinConflictDialog({
                 mode: 'unmatchedSingle',
@@ -16481,6 +17088,13 @@
               } else if (inc.ytVideoId || (inc.size > 0 && inc.duration > 0)) {
                 stagedMap[key] = nextRec;
               }
+              if (inc.ytVideoId) {
+                importedYtTargets.push({
+                  videoId: inc.ytVideoId,
+                  url: inc.ytUrl || nextRec.ytUrl || `https://www.youtube.com/watch?v=${inc.ytVideoId}`,
+                  displayName: nextRec.displayName || inc.displayName || inc.origName
+                });
+              }
               stats.added++;
             }
           }
@@ -16501,13 +17115,34 @@
         updateShareButtonState();
         renderPlaylist();
 
+        // Auto-open transferred YouTube video when YouTube pin(s) were imported!
+        let openedYouTubeAuto = false;
+        if (importedYtTargets.length > 0) {
+          const allAreYouTube = entries.every(e => Boolean(e && e.ytVideoId));
+          const shouldOpenYt = isSingleScope || entries.length === 1 || allAreYouTube || !state.hasAudio;
+          const targetYt = importedYtTargets[0];
+          const alreadyOpenSameYt = Boolean(state.isYouTubeMode && state.ytVideoId === targetYt.videoId);
+          if (shouldOpenYt && !alreadyOpenSameYt) {
+            openedYouTubeAuto = true;
+            await loadYouTubeVideo(targetYt.videoId, {
+              ytUrl: targetYt.url,
+              displayName: targetYt.displayName,
+              autoPlay: false
+            });
+          }
+        }
+
         const parts = [];
         if (stats.appliedToCurrent > 0) parts.push(`今の曲へ適用 ${stats.appliedToCurrent}件`);
         if (stats.added > 0) parts.push(`新規 ${stats.added}件`);
         if (stats.merged > 0) parts.push(`マージ ${stats.merged}件`);
         if (stats.overwritten > 0) parts.push(`上書き ${stats.overwritten}件`);
         if (stats.skipped > 0) parts.push(`スキップ ${stats.skipped}件`);
-        showToast(parts.length > 0 ? `ピン読込完了: ${parts.join(' / ')}` : 'ピン情報の変更はありませんでした');
+        if (openedYouTubeAuto) {
+          showToast(`YouTubeを開きピンを読み込みました（${parts.join(' / ')}）`);
+        } else {
+          showToast(parts.length > 0 ? `ピン読込完了: ${parts.join(' / ')}` : 'ピン情報の変更はありませんでした');
+        }
       }
 
       async function tryParsePinFiles(fileList) {
@@ -20393,7 +21028,7 @@
         if (item.isYouTube && item.ytVideoId) {
           await loadYouTubeVideo(item.ytVideoId, { autoPlay, fromPlaylist: true, ytUrl: item.ytUrl, displayName: item.name });
         } else {
-          await loadAudioBlob(item.blob, item.name, item.markers || [], autoPlay, null, item.startSectionEnabled !== false, { origName: item.origName || item.name, restoreFromMemory: !item.isUnsavedRecording, persistSession: true, isUnsavedRecording: Boolean(item.isUnsavedRecording) });
+          await loadAudioBlob(item.blob, item.name, item.markers || [], autoPlay, null, item.startSectionEnabled !== false, { origName: item.origName || item.name, restoreFromMemory: !item.isUnsavedRecording, persistSession: true, isUnsavedRecording: Boolean(item.isUnsavedRecording), fileHandle: item.fileHandle || null, folderHint: item.folderHint || '' });
         }
         showToast(`トラック ${safeIdx + 1}/${state.playlist.length}: ${item.name}`);
       }
@@ -21949,6 +22584,7 @@
           updatePlayUI();
           updateVocoderUI();
           updateHeaderSubInfo();
+          updateBookmarkHeaderUI();
           updateTimeUI();
           updatePinButtonsUI();
           updateSectionBarUI();
@@ -22297,6 +22933,7 @@
         updateVocoderUI();
         updateSkipLeadingSilenceUI();
         updateHeaderSubInfo();
+        updateBookmarkHeaderUI();
         updateTimeUI();
         updatePinButtonsUI();
         updateSectionBarUI();
@@ -25694,6 +26331,809 @@
       }
 
 
+
+      // ==================== BOOKMARKS (YOUTUBE & AUDIO LINKS + NESTED FOLDERS) ====================
+      const LS_BOOKMARKS_KEY = 'audipo2_bookmarks_v1';
+      const MAX_BM_BLOB_CACHE_BYTES = 85 * 1024 * 1024; // Cache up to 85MB in IndexedDB when no FileHandle is available
+
+      const bookmarksModal = document.getElementById('bookmarksModal');
+      const bmCurrentTrackCard = document.getElementById('bmCurrentTrackCard');
+      const bmCurStatusLabel = document.getElementById('bmCurStatusLabel');
+      const bmCurTrackName = document.getElementById('bmCurTrackName');
+      const btnBmSaveCurrent = document.getElementById('btnBmSaveCurrent');
+      const bmSaveCurBtnLabel = document.getElementById('bmSaveCurBtnLabel');
+      const btnBmRemoveCurrent = document.getElementById('btnBmRemoveCurrent');
+      const btnBmDirUp = document.getElementById('btnBmDirUp');
+      const bmCrumbPath = document.getElementById('bmCrumbPath');
+      const bmNewFolderBox = document.getElementById('bmNewFolderBox');
+      const inputBmNewFolderName = document.getElementById('inputBmNewFolderName');
+      const bmAddYtBox = document.getElementById('bmAddYtBox');
+      const inputBmAddYtUrl = document.getElementById('inputBmAddYtUrl');
+      const inputBmAddYtTitle = document.getElementById('inputBmAddYtTitle');
+      const bmListSectionLabel = document.getElementById('bmListSectionLabel');
+      const bmListCountBadge = document.getElementById('bmListCountBadge');
+      const bmListWrap = document.getElementById('bmListWrap');
+
+      const bmItemActionModal = document.getElementById('bmItemActionModal');
+      const bmItemActionTitle = document.getElementById('bmItemActionTitle');
+      const bmItemActionSub = document.getElementById('bmItemActionSub');
+      const bmActTargetName = document.getElementById('bmActTargetName');
+      const bmActTargetMeta = document.getElementById('bmActTargetMeta');
+      const tabBmActRename = document.getElementById('tabBmActRename');
+      const tabBmActMove = document.getElementById('tabBmActMove');
+      const bmActRenamePanel = document.getElementById('bmActRenamePanel');
+      const bmActMovePanel = document.getElementById('bmActMovePanel');
+      const inputBmActRename = document.getElementById('inputBmActRename');
+      const btnBmActDelete = document.getElementById('btnBmActDelete');
+      const bmActDeleteLabel = document.getElementById('bmActDeleteLabel');
+      const bmActMoveFolderList = document.getElementById('bmActMoveFolderList');
+      const bmActMoveNewDirBox = document.getElementById('bmActMoveNewDirBox');
+      const inputBmActMoveNewDir = document.getElementById('inputBmActMoveNewDir');
+      const btnExecBmAct = document.getElementById('btnExecBmAct');
+
+      const bmState = {
+        curFolderId: null, // null = root
+        actionTarget: null, // { kind: 'item'|'folder', id, mode: 'rename'|'move', selectedDestFolderId: null|string }
+        pendingAudioRelinkItem: null
+      };
+
+      function readBookmarksStore() {
+        try {
+          const raw = localStorage.getItem(LS_BOOKMARKS_KEY);
+          if (!raw) return { version: 1, folders: [], items: [] };
+          const parsed = JSON.parse(raw);
+          if (!parsed || typeof parsed !== 'object') return { version: 1, folders: [], items: [] };
+          return {
+            version: 1,
+            folders: Array.isArray(parsed.folders) ? parsed.folders : [],
+            items: Array.isArray(parsed.items) ? parsed.items : []
+          };
+        } catch (_) {
+          return { version: 1, folders: [], items: [] };
+        }
+      }
+
+      function writeBookmarksStore(data) {
+        try {
+          localStorage.setItem(LS_BOOKMARKS_KEY, JSON.stringify({
+            version: 1,
+            folders: Array.isArray(data.folders) ? data.folders : [],
+            items: Array.isArray(data.items) ? data.items : []
+          }));
+        } catch (err) {
+          console.warn('Bookmarks store write failed:', err);
+          showToast('ブックマークの保存に失敗しました（容量不足の可能性があります）');
+        }
+      }
+
+      async function saveBookmarkAssetToIDB(id, kind, value) {
+        if (!id || !value) return false;
+        try {
+          const db = await openSessionDB();
+          await new Promise((resolve, reject) => {
+            const tx = db.transaction(IDB_STORE, 'readwrite');
+            tx.objectStore(IDB_STORE).put(value, `bm_${kind}_${id}`);
+            tx.oncomplete = () => resolve();
+            tx.onerror = () => reject(tx.error);
+          });
+          db.close();
+          return true;
+        } catch (err) {
+          console.warn('IDB bookmark asset save failed:', err);
+          return false;
+        }
+      }
+
+      async function loadBookmarkAssetFromIDB(id, kind) {
+        if (!id) return null;
+        try {
+          const db = await openSessionDB();
+          const val = await new Promise((resolve, reject) => {
+            const tx = db.transaction(IDB_STORE, 'readonly');
+            const req = tx.objectStore(IDB_STORE).get(`bm_${kind}_${id}`);
+            req.onsuccess = () => resolve(req.result || null);
+            req.onerror = () => reject(req.error);
+          });
+          db.close();
+          return val;
+        } catch (_) {
+          return null;
+        }
+      }
+
+      async function deleteBookmarkAssetsFromIDB(id) {
+        if (!id) return;
+        try {
+          const db = await openSessionDB();
+          await new Promise((resolve, reject) => {
+            const tx = db.transaction(IDB_STORE, 'readwrite');
+            const st = tx.objectStore(IDB_STORE);
+            st.delete(`bm_handle_${id}`);
+            st.delete(`bm_blob_${id}`);
+            tx.oncomplete = () => resolve();
+            tx.onerror = () => reject(tx.error);
+          });
+          db.close();
+        } catch (_) {}
+      }
+
+      function getBookmarkFolderPathNames(store, folderId) {
+        const names = [];
+        const visited = new Set();
+        let curId = folderId || null;
+        while (curId && !visited.has(curId)) {
+          visited.add(curId);
+          const f = store.folders.find(x => x.id === curId);
+          if (!f) break;
+          names.unshift(f.name);
+          curId = f.parentId || null;
+        }
+        return names;
+      }
+
+      function getBookmarkFolderPathLabel(store, folderId) {
+        const names = getBookmarkFolderPathNames(store, folderId);
+        return names.length > 0 ? `★ ルート / ${names.join(' / ')}` : '★ ルート（最上位）';
+      }
+
+      function findCurrentTrackBookmark(store = readBookmarksStore()) {
+        if (!state.hasAudio) return null;
+        if (state.isYouTubeMode && state.ytVideoId) {
+          return store.items.find(it => it.type === 'youtube' && it.ytVideoId === state.ytVideoId) || null;
+        }
+        const curSize = state.currentFileSize || (state.rawBlob ? state.rawBlob.size : 0);
+        const curOrig = state.currentFileOrigName || trackTitleEl.textContent.trim();
+        if (curSize > 0) {
+          const exact = store.items.find(it =>
+            it.type === 'audio' &&
+            Number(it.size) === curSize &&
+            (
+              !(it.duration > 0 && state.duration > 0) ||
+              Math.abs(it.duration - state.duration) <= 0.75
+            )
+          );
+          if (exact) return exact;
+        }
+        if (curOrig) {
+          return store.items.find(it => it.type === 'audio' && it.origName === curOrig) || null;
+        }
+        return null;
+      }
+
+      function updateBookmarkHeaderUI() {
+        if (!btnBookmarkHeader) return;
+        const saved = Boolean(findCurrentTrackBookmark());
+        btnBookmarkHeader.classList.toggle('is-bookmarked', saved);
+        btnBookmarkHeader.title = saved
+          ? 'お気に入り登録済み（タップしてブックマーク一覧・フォルダ整理を開く）'
+          : 'お気に入りブックマーク（YouTube・音声ファイル保存＆フォルダ整理）';
+      }
+
+      function collectDescendantFolderIds(store, rootFolderId) {
+        const set = new Set([rootFolderId]);
+        let changed = true;
+        while (changed) {
+          changed = false;
+          for (const f of store.folders) {
+            if (f.parentId && set.has(f.parentId) && !set.has(f.id)) {
+              set.add(f.id);
+              changed = true;
+            }
+          }
+        }
+        return set;
+      }
+
+      function countBookmarkFolderContents(store, folderId) {
+        const subFolders = store.folders.filter(f => (f.parentId || null) === folderId).length;
+        const items = store.items.filter(it => (it.folderId || null) === folderId).length;
+        return { subFolders, items };
+      }
+
+      async function saveCurrentTrackAsBookmark(targetFolderId = bmState.curFolderId) {
+        if (!state.hasAudio) {
+          showToast('保存するYouTubeまたは音声ファイルを先に開いてください');
+          return;
+        }
+        const store = readBookmarksStore();
+        const safeFolderId = (targetFolderId && store.folders.some(f => f.id === targetFolderId)) ? targetFolderId : null;
+        const now = Date.now();
+        const id = `bmi_${now}_${Math.random().toString(36).slice(2, 6)}`;
+
+        if (state.isYouTubeMode && state.ytVideoId) {
+          const title = trackTitleEl.textContent.trim() || state.currentFileOrigName || `YouTube (${state.ytVideoId})`;
+          const item = {
+            id,
+            folderId: safeFolderId,
+            type: 'youtube',
+            title,
+            ytVideoId: state.ytVideoId,
+            ytUrl: state.ytUrl || `https://www.youtube.com/watch?v=${state.ytVideoId}`,
+            duration: Math.round((Number(state.duration) || 0) * 1000) / 1000,
+            createdAt: now,
+            updatedAt: now
+          };
+          store.items.unshift(item);
+          writeBookmarksStore(store);
+          updateBookmarkHeaderUI();
+          renderBookmarksModal();
+          showToast(`お気に入りに追加しました: ${title}`);
+          return;
+        }
+
+        // Local audio file
+        const origName = state.currentFileOrigName || trackTitleEl.textContent.trim() || 'audio';
+        const title = trackTitleEl.textContent.trim() || origName;
+        const size = state.currentFileSize || (state.rawBlob ? state.rawBlob.size : 0);
+        const duration = Math.round((Number(state.duration) || 0) * 1000) / 1000;
+        let hasFileHandle = false;
+        let hasCachedBlob = false;
+
+        if (state.currentFileHandle) {
+          hasFileHandle = await saveBookmarkAssetToIDB(id, 'handle', state.currentFileHandle);
+        }
+        if (!hasFileHandle && state.rawBlob && state.rawBlob.size > 0 && state.rawBlob.size <= MAX_BM_BLOB_CACHE_BYTES) {
+          hasCachedBlob = await saveBookmarkAssetToIDB(id, 'blob', state.rawBlob);
+        }
+
+        const item = {
+          id,
+          folderId: safeFolderId,
+          type: 'audio',
+          title,
+          origName,
+          size,
+          duration,
+          folderHint: state.currentFileFolderHint || '',
+          hasFileHandle,
+          hasCachedBlob,
+          createdAt: now,
+          updatedAt: now
+        };
+        store.items.unshift(item);
+        writeBookmarksStore(store);
+        updateBookmarkHeaderUI();
+        renderBookmarksModal();
+        const modeNote = hasFileHandle
+          ? '（直リンク保存）'
+          : (hasCachedBlob ? '（端末内キャッシュ保存）' : '（ファイル情報リンク）');
+        showToast(`お気に入りに追加しました${modeNote}: ${title}`);
+      }
+
+      async function openBookmarkedItem(item) {
+        if (!item) return;
+        if (item.type === 'youtube' && item.ytVideoId) {
+          closeBookmarksModal();
+          await loadYouTubeVideo(item.ytVideoId, {
+            ytUrl: item.ytUrl || `https://www.youtube.com/watch?v=${item.ytVideoId}`,
+            displayName: item.title,
+            autoPlay: false
+          });
+          return;
+        }
+
+        // Audio bookmark
+        if (item.hasFileHandle) {
+          const fh = await loadBookmarkAssetFromIDB(item.id, 'handle');
+          if (fh && typeof fh.getFile === 'function') {
+            try {
+              if (typeof fh.queryPermission === 'function') {
+                let perm = await fh.queryPermission({ mode: 'read' });
+                if (perm !== 'granted' && typeof fh.requestPermission === 'function') {
+                  perm = await fh.requestPermission({ mode: 'read' });
+                }
+                if (perm !== 'granted') {
+                  showToast('ファイルへのアクセス許可が必要です');
+                  return;
+                }
+              }
+              const f = await fh.getFile();
+              closeBookmarksModal();
+              await handlePickedFilesList([f], { fileHandles: [fh], folderHint: item.folderHint || '' });
+              return;
+            } catch (err) {
+              console.warn('Bookmark FileHandle read failed, trying blob fallback:', err);
+            }
+          }
+        }
+
+        if (item.hasCachedBlob) {
+          const cachedBlob = await loadBookmarkAssetFromIDB(item.id, 'blob');
+          if (cachedBlob) {
+            closeBookmarksModal();
+            const fName = item.origName || item.title || 'audio.wav';
+            const existingIdx = state.playlist.findIndex(tr => !tr.isYouTube && (tr.origName || tr.name) === fName && tr.blob && tr.blob.size === cachedBlob.size);
+            if (existingIdx >= 0) {
+              state.currentTrackIndex = existingIdx;
+            } else {
+              state.playlist.push({
+                name: item.title || fName,
+                origName: fName,
+                blob: cachedBlob,
+                folderHint: item.folderHint || '',
+                markers: [],
+                startSectionEnabled: true
+              });
+              state.currentTrackIndex = state.playlist.length - 1;
+            }
+            await loadAudioBlob(cachedBlob, item.title || fName, [], false, null, true, {
+              origName: fName,
+              restoreFromMemory: true,
+              persistSession: true,
+              folderHint: item.folderHint || ''
+            });
+            showToast(`お気に入りから読み込みました: ${item.title}`);
+            return;
+          }
+        }
+
+        // Fallback: prompt user to select the local audio file again (for >85MB files opened without FileHandle)
+        const hintPart = item.folderHint ? `（フォルダ: ${item.folderHint}）` : '';
+        showToast(`ファイル「${item.origName || item.title}」を選択して開いてください${hintPart}`);
+        closeBookmarksModal();
+        triggerStandardFilePicker();
+      }
+
+      function renderBookmarksModal() {
+        if (!bookmarksModal || !bmListWrap) return;
+        const store = readBookmarksStore();
+        // Validate current folder still exists
+        if (bmState.curFolderId && !store.folders.some(f => f.id === bmState.curFolderId)) {
+          bmState.curFolderId = null;
+        }
+
+        // 1. Current track quick-save card
+        if (bmCurrentTrackCard) {
+          if (state.hasAudio) {
+            bmCurrentTrackCard.classList.remove('hidden');
+            const existingBm = findCurrentTrackBookmark(store);
+            const curTitle = trackTitleEl.textContent.trim() || state.currentFileOrigName || '現在の曲';
+            bmCurTrackName.textContent = (state.isYouTubeMode ? '[YouTube] ' : '[音声] ') + curTitle;
+            if (existingBm) {
+              bmCurrentTrackCard.classList.add('is-saved');
+              const savedPath = getBookmarkFolderPathLabel(store, existingBm.folderId);
+              bmCurStatusLabel.textContent = `★ お気に入り登録済み（保存先: ${savedPath}）`;
+              bmSaveCurBtnLabel.textContent = 'このフォルダにも追加';
+              btnBmRemoveCurrent.classList.remove('hidden');
+            } else {
+              bmCurrentTrackCard.classList.remove('is-saved');
+              bmCurStatusLabel.textContent = 'いま開いている曲をお気に入り保存';
+              bmSaveCurBtnLabel.textContent = bmState.curFolderId ? 'このフォルダにお気に入り追加' : 'お気に入りに追加';
+              btnBmRemoveCurrent.classList.add('hidden');
+            }
+          } else {
+            bmCurrentTrackCard.classList.add('hidden');
+          }
+        }
+
+        // 2. Breadcrumb trail
+        if (bmCrumbPath) {
+          bmCrumbPath.innerHTML = '';
+          const chain = [{ id: null, name: '★ ルート' }];
+          const pathIds = [];
+          const visited = new Set();
+          let cid = bmState.curFolderId;
+          while (cid && !visited.has(cid)) {
+            visited.add(cid);
+            const f = store.folders.find(x => x.id === cid);
+            if (!f) break;
+            pathIds.unshift({ id: f.id, name: f.name });
+            cid = f.parentId || null;
+          }
+          chain.push(...pathIds);
+
+          chain.forEach((seg, idx) => {
+            if (idx > 0) {
+              const sep = document.createElement('span');
+              sep.className = 'fav-crumb-sep';
+              sep.textContent = '/';
+              bmCrumbPath.appendChild(sep);
+            }
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'fav-crumb-seg' + (idx === chain.length - 1 ? ' is-current' : '');
+            btn.textContent = seg.name;
+            if (idx < chain.length - 1) {
+              btn.addEventListener('click', () => {
+                bmState.curFolderId = seg.id;
+                renderBookmarksModal();
+              });
+            }
+            bmCrumbPath.appendChild(btn);
+          });
+          bmCrumbPath.scrollLeft = bmCrumbPath.scrollWidth;
+        }
+
+        if (btnBmDirUp) {
+          btnBmDirUp.disabled = !bmState.curFolderId;
+          btnBmDirUp.style.opacity = bmState.curFolderId ? '1' : '0.35';
+        }
+
+        // 3. Filter folders & items in current folder
+        const childFolders = store.folders
+          .filter(f => (f.parentId || null) === bmState.curFolderId)
+          .sort((a, b) => a.name.localeCompare(b.name, 'ja'));
+        const childItems = store.items
+          .filter(it => (it.folderId || null) === bmState.curFolderId);
+
+        if (bmListSectionLabel) {
+          const curFolderObj = bmState.curFolderId ? store.folders.find(f => f.id === bmState.curFolderId) : null;
+          bmListSectionLabel.textContent = curFolderObj ? `フォルダ: ${curFolderObj.name}` : 'ブックマーク一覧';
+        }
+        if (bmListCountBadge) {
+          bmListCountBadge.textContent = `フォルダ ${childFolders.length} • 項目 ${childItems.length}`;
+        }
+
+        bmListWrap.innerHTML = '';
+        if (childFolders.length === 0 && childItems.length === 0) {
+          bmListWrap.innerHTML = '<div class="fav-empty-hint">このフォルダにはまだブックマークがありません。<br>上の「お気に入りに追加」「＋ フォルダ作成」「＋ YouTube URL追加」から登録できます。</div>';
+          return;
+        }
+
+        const memMap = readAllFileMemories();
+
+        // Render folders first
+        childFolders.forEach((folder) => {
+          const counts = countBookmarkFolderContents(store, folder.id);
+          const row = document.createElement('div');
+          row.className = 'bm-row is-folder';
+
+          const mainBtn = document.createElement('button');
+          mainBtn.type = 'button';
+          mainBtn.className = 'bm-row-main';
+          const countParts = [];
+          if (counts.subFolders > 0) countParts.push(`フォルダ ${counts.subFolders}`);
+          countParts.push(`ブックマーク ${counts.items}件`);
+          mainBtn.innerHTML = `
+            <div class="bm-row-title-line">
+              <span style="font-size:14px;flex-shrink:0;">📁</span>
+              <span class="bm-row-title">${escapeHtml(folder.name)}</span>
+            </div>
+            <div class="bm-row-meta mono">${countParts.join(' • ')}</div>
+          `;
+          mainBtn.addEventListener('click', () => {
+            bmState.curFolderId = folder.id;
+            renderBookmarksModal();
+          });
+
+          const moreBtn = document.createElement('button');
+          moreBtn.type = 'button';
+          moreBtn.className = 'bm-row-more';
+          moreBtn.title = 'フォルダ名変更・移動・削除';
+          moreBtn.setAttribute('aria-label', `${folder.name}の操作`);
+          moreBtn.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="2.1"/><circle cx="12" cy="12" r="2.1"/><circle cx="12" cy="19" r="2.1"/></svg>';
+          moreBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            openBookmarkItemActionModal('folder', folder.id);
+          });
+
+          row.appendChild(mainBtn);
+          row.appendChild(moreBtn);
+          bmListWrap.appendChild(row);
+        });
+
+        // Render bookmark items
+        childItems.forEach((item) => {
+          const isYt = item.type === 'youtube';
+          let isCurPlaying = false;
+          if (state.hasAudio) {
+            if (isYt && state.isYouTubeMode && state.ytVideoId === item.ytVideoId) isCurPlaying = true;
+            else if (!isYt && !state.isYouTubeMode && item.size > 0 && item.size === (state.currentFileSize || (state.rawBlob ? state.rawBlob.size : 0))) isCurPlaying = true;
+          }
+
+          let pinCount = 0;
+          if (isYt && item.ytVideoId) {
+            const rec = memMap[makeYouTubeMemoryKey(item.ytVideoId)];
+            if (rec && Array.isArray(rec.markers)) pinCount = rec.markers.length;
+          } else if (item.size > 0) {
+            const hit = findMatchInMemoryMap(memMap, item.size, item.duration || null);
+            if (hit && hit.rec && Array.isArray(hit.rec.markers)) pinCount = hit.rec.markers.length;
+          }
+
+          const metaParts = [];
+          if (item.duration > 0) metaParts.push(formatTime(item.duration));
+          metaParts.push(`黄色ピン ${pinCount}個`);
+          if (isYt) {
+            metaParts.push(`ID:${item.ytVideoId}`);
+          } else if (item.hasFileHandle) {
+            metaParts.push('直リンク');
+          } else if (item.hasCachedBlob) {
+            metaParts.push('キャッシュ済');
+          } else if (item.folderHint) {
+            metaParts.push(item.folderHint);
+          }
+
+          const row = document.createElement('div');
+          row.className = 'bm-row' + (isCurPlaying ? ' is-current-playing' : '');
+
+          const mainBtn = document.createElement('button');
+          mainBtn.type = 'button';
+          mainBtn.className = 'bm-row-main';
+          mainBtn.innerHTML = `
+            <div class="bm-row-title-line">
+              <span class="bm-type-pill ${isYt ? 'yt' : 'audio'}">${isYt ? 'YouTube' : '音声'}</span>
+              <span class="bm-row-title">${escapeHtml(item.title)}</span>
+            </div>
+            <div class="bm-row-meta mono">${escapeHtml(metaParts.join(' • '))}</div>
+          `;
+          mainBtn.addEventListener('click', () => openBookmarkedItem(item));
+
+          const moreBtn = document.createElement('button');
+          moreBtn.type = 'button';
+          moreBtn.className = 'bm-row-more';
+          moreBtn.title = '名前変更・フォルダ移動・削除';
+          moreBtn.setAttribute('aria-label', `${item.title}の操作`);
+          moreBtn.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="2.1"/><circle cx="12" cy="12" r="2.1"/><circle cx="12" cy="19" r="2.1"/></svg>';
+          moreBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            openBookmarkItemActionModal('item', item.id);
+          });
+
+          row.appendChild(mainBtn);
+          row.appendChild(moreBtn);
+          bmListWrap.appendChild(row);
+        });
+      }
+
+      function openBookmarksModal() {
+        if (!bookmarksModal) return;
+        closeFavoriteFoldersModal();
+        closeYouTubeOpenModal();
+        settingsModal.classList.add('hidden');
+        if (bmNewFolderBox) bmNewFolderBox.classList.add('hidden');
+        if (bmAddYtBox) bmAddYtBox.classList.add('hidden');
+        renderBookmarksModal();
+        bookmarksModal.classList.remove('hidden');
+      }
+
+      function closeBookmarksModal() {
+        if (bookmarksModal) bookmarksModal.classList.add('hidden');
+        if (bmNewFolderBox) bmNewFolderBox.classList.add('hidden');
+        if (bmAddYtBox) bmAddYtBox.classList.add('hidden');
+      }
+
+      function createBookmarkFolder(name, parentId) {
+        const clean = String(name || '').trim();
+        if (!clean) {
+          showToast('フォルダ名を入力してください');
+          return null;
+        }
+        const store = readBookmarksStore();
+        const safeParent = (parentId && store.folders.some(f => f.id === parentId)) ? parentId : null;
+        const dup = store.folders.find(f => (f.parentId || null) === safeParent && f.name === clean);
+        if (dup) {
+          showToast(`同じ名前のフォルダが既にあります: ${clean}`);
+          return null;
+        }
+        const now = Date.now();
+        const folder = {
+          id: `bmf_${now}_${Math.random().toString(36).slice(2, 6)}`,
+          name: clean,
+          parentId: safeParent,
+          createdAt: now,
+          updatedAt: now
+        };
+        store.folders.push(folder);
+        writeBookmarksStore(store);
+        showToast(`フォルダを作成しました: ${clean}`);
+        return folder;
+      }
+
+      async function addDirectYouTubeBookmark() {
+        const parsed = extractYouTubeVideoInfo(inputBmAddYtUrl ? inputBmAddYtUrl.value : '');
+        if (!parsed) {
+          showToast('有効な YouTube URL または11文字の動画IDを入力してください');
+          return;
+        }
+        let title = String(inputBmAddYtTitle ? inputBmAddYtTitle.value : '').trim();
+        const memHit = lookupYouTubeMemory(parsed.videoId);
+        if (!title && memHit && memHit.rec && (memHit.rec.displayName || memHit.rec.origName)) {
+          title = memHit.rec.displayName || memHit.rec.origName;
+        }
+        if (!title) {
+          title = `YouTube (${parsed.videoId})`;
+          try {
+            const res = await fetch(`https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${encodeURIComponent(parsed.videoId)}&format=json`);
+            if (res.ok) {
+              const d = await res.json();
+              if (d && typeof d.title === 'string' && d.title.trim()) {
+                title = d.title.trim();
+              }
+            }
+          } catch (_) {}
+        }
+
+        const store = readBookmarksStore();
+        const safeFolderId = (bmState.curFolderId && store.folders.some(f => f.id === bmState.curFolderId)) ? bmState.curFolderId : null;
+        const now = Date.now();
+        store.items.unshift({
+          id: `bmi_${now}_${Math.random().toString(36).slice(2, 6)}`,
+          folderId: safeFolderId,
+          type: 'youtube',
+          title,
+          ytVideoId: parsed.videoId,
+          ytUrl: parsed.url,
+          duration: (memHit && memHit.rec && Number(memHit.rec.duration)) || 0,
+          createdAt: now,
+          updatedAt: now
+        });
+        writeBookmarksStore(store);
+        if (inputBmAddYtUrl) inputBmAddYtUrl.value = '';
+        if (inputBmAddYtTitle) inputBmAddYtTitle.value = '';
+        if (bmAddYtBox) bmAddYtBox.classList.add('hidden');
+        updateBookmarkHeaderUI();
+        renderBookmarksModal();
+        showToast(`YouTubeをブックマーク追加しました: ${title}`);
+      }
+
+      // ---------- Bookmark / Folder Action Modal (Rename, Move, Delete) ----------
+      function openBookmarkItemActionModal(kind, id) {
+        const store = readBookmarksStore();
+        const obj = kind === 'folder'
+          ? store.folders.find(f => f.id === id)
+          : store.items.find(it => it.id === id);
+        if (!obj || !bmItemActionModal) return;
+
+        const curParentId = kind === 'folder' ? (obj.parentId || null) : (obj.folderId || null);
+        bmState.actionTarget = {
+          kind,
+          id,
+          mode: 'rename',
+          selectedDestFolderId: curParentId
+        };
+
+        if (bmItemActionTitle) bmItemActionTitle.textContent = kind === 'folder' ? 'フォルダの編集' : 'ブックマークの編集';
+        if (bmItemActionSub) bmItemActionSub.textContent = kind === 'folder' ? 'フォルダ名変更・別フォルダへ移動・削除' : '表示名変更・フォルダ移動・削除';
+        if (bmActTargetName) bmActTargetName.textContent = kind === 'folder' ? `📁 ${obj.name}` : obj.title;
+        if (bmActTargetMeta) bmActTargetMeta.textContent = `現在地: ${getBookmarkFolderPathLabel(store, curParentId)}`;
+        if (inputBmActRename) inputBmActRename.value = kind === 'folder' ? obj.name : obj.title;
+        if (bmActDeleteLabel) {
+          bmActDeleteLabel.textContent = kind === 'folder'
+            ? 'このフォルダと中身をすべて削除'
+            : 'このブックマークを削除';
+        }
+        if (bmActMoveNewDirBox) bmActMoveNewDirBox.classList.add('hidden');
+        setBookmarkActionTab('rename');
+        bmItemActionModal.classList.remove('hidden');
+      }
+
+      function closeBookmarkItemActionModal() {
+        bmState.actionTarget = null;
+        if (bmItemActionModal) bmItemActionModal.classList.add('hidden');
+        if (bmActMoveNewDirBox) bmActMoveNewDirBox.classList.add('hidden');
+      }
+
+      function setBookmarkActionTab(mode) {
+        if (!bmState.actionTarget) return;
+        bmState.actionTarget.mode = mode === 'move' ? 'move' : 'rename';
+        const isMove = bmState.actionTarget.mode === 'move';
+        if (tabBmActRename) tabBmActRename.classList.toggle('active', !isMove);
+        if (tabBmActMove) tabBmActMove.classList.toggle('active', isMove);
+        if (bmActRenamePanel) bmActRenamePanel.classList.toggle('hidden', isMove);
+        if (bmActMovePanel) bmActMovePanel.classList.toggle('hidden', !isMove);
+        if (btnExecBmAct) btnExecBmAct.textContent = isMove ? '選択フォルダへ移動する' : '名前を保存';
+        if (isMove) renderBookmarkMoveTargets();
+      }
+
+      function renderBookmarkMoveTargets() {
+        const tgt = bmState.actionTarget;
+        if (!tgt || !bmActMoveFolderList) return;
+        const store = readBookmarksStore();
+        const excludedIds = tgt.kind === 'folder' ? collectDescendantFolderIds(store, tgt.id) : new Set();
+
+        // Build flat indented tree list (Root + nested folders)
+        const rows = [{ id: null, label: '★ ルート（最上位）', depth: 0 }];
+        const walk = (parentId, depth) => {
+          const kids = store.folders
+            .filter(f => (f.parentId || null) === parentId && !excludedIds.has(f.id))
+            .sort((a, b) => a.name.localeCompare(b.name, 'ja'));
+          for (const k of kids) {
+            rows.push({ id: k.id, label: `📁 ${k.name}`, depth });
+            walk(k.id, depth + 1);
+          }
+        };
+        walk(null, 1);
+
+        bmActMoveFolderList.innerHTML = '';
+        rows.forEach((r) => {
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          const isSel = (tgt.selectedDestFolderId || null) === (r.id || null);
+          btn.className = 'bm-move-target-item' + (isSel ? ' selected' : '');
+          btn.style.paddingLeft = `${11 + r.depth * 16}px`;
+          btn.innerHTML = `<span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escapeHtml(r.label)}</span><span class="mono" style="font-size:10.5px;flex-shrink:0;">${isSel ? '選択中 ✓' : ''}</span>`;
+          btn.addEventListener('click', () => {
+            tgt.selectedDestFolderId = r.id;
+            renderBookmarkMoveTargets();
+          });
+          bmActMoveFolderList.appendChild(btn);
+        });
+      }
+
+      async function executeBookmarkItemAction() {
+        const tgt = bmState.actionTarget;
+        if (!tgt) return;
+        const store = readBookmarksStore();
+        const obj = tgt.kind === 'folder'
+          ? store.folders.find(f => f.id === tgt.id)
+          : store.items.find(it => it.id === tgt.id);
+        if (!obj) {
+          closeBookmarkItemActionModal();
+          return;
+        }
+
+        if (tgt.mode === 'rename') {
+          const nextName = String(inputBmActRename ? inputBmActRename.value : '').trim();
+          if (!nextName) {
+            showToast('名前を入力してください');
+            return;
+          }
+          if (tgt.kind === 'folder') {
+            obj.name = nextName;
+          } else {
+            obj.title = nextName;
+          }
+          obj.updatedAt = Date.now();
+          writeBookmarksStore(store);
+          closeBookmarkItemActionModal();
+          renderBookmarksModal();
+          showToast(`名前を変更しました: ${nextName}`);
+        } else {
+          const destId = tgt.selectedDestFolderId || null;
+          if (tgt.kind === 'folder') {
+            const forbidden = collectDescendantFolderIds(store, tgt.id);
+            if (destId && forbidden.has(destId)) {
+              showToast('自分自身の中には移動できません');
+              return;
+            }
+            obj.parentId = destId;
+          } else {
+            obj.folderId = destId;
+          }
+          obj.updatedAt = Date.now();
+          writeBookmarksStore(store);
+          const destLabel = getBookmarkFolderPathLabel(store, destId);
+          closeBookmarkItemActionModal();
+          renderBookmarksModal();
+          showToast(`「${destLabel}」へ移動しました`);
+        }
+      }
+
+      async function deleteBookmarkActionTarget() {
+        const tgt = bmState.actionTarget;
+        if (!tgt) return;
+        const store = readBookmarksStore();
+        if (tgt.kind === 'folder') {
+          const fObj = store.folders.find(f => f.id === tgt.id);
+          const removeFolderIds = collectDescendantFolderIds(store, tgt.id);
+          const removeItems = store.items.filter(it => it.folderId && removeFolderIds.has(it.folderId));
+          store.folders = store.folders.filter(f => !removeFolderIds.has(f.id));
+          store.items = store.items.filter(it => !(it.folderId && removeFolderIds.has(it.folderId)));
+          writeBookmarksStore(store);
+          for (const it of removeItems) {
+            await deleteBookmarkAssetsFromIDB(it.id);
+          }
+          if (bmState.curFolderId && removeFolderIds.has(bmState.curFolderId)) {
+            bmState.curFolderId = (fObj && fObj.parentId) || null;
+          }
+          closeBookmarkItemActionModal();
+          updateBookmarkHeaderUI();
+          renderBookmarksModal();
+          showToast(`フォルダを削除しました（中の項目 ${removeItems.length}件も削除）`);
+        } else {
+          const idx = store.items.findIndex(it => it.id === tgt.id);
+          if (idx >= 0) {
+            const [removed] = store.items.splice(idx, 1);
+            writeBookmarksStore(store);
+            await deleteBookmarkAssetsFromIDB(removed.id);
+            closeBookmarkItemActionModal();
+            updateBookmarkHeaderUI();
+            renderBookmarksModal();
+            showToast(`ブックマークを削除しました: ${removed.title}`);
+          }
+        }
+      }
+
       // ==================== FAVORITE FOLDERS & FILE OPEN FLOW ====================
       const favFoldersModal = document.getElementById('favFoldersModal');
       const favFolderListWrap = document.getElementById('favFolderListWrap');
@@ -26229,10 +27669,13 @@
       async function openSingleFileFromFolder(fileEntry) {
         if (!fileEntry || !fileEntry.handle) return;
         favMetaScanToken++;
+        const folderPathHint = (activeBrowsedFolder && Array.isArray(activeBrowsedFolder.stack))
+          ? activeBrowsedFolder.stack.map(s => s.name).filter(Boolean).join(' / ')
+          : '';
         try {
           const f = await fileEntry.handle.getFile();
           closeFavoriteFoldersModal();
-          await handlePickedFilesList([f]);
+          await handlePickedFilesList([f], { fileHandles: [fileEntry.handle], folderHint: folderPathHint });
         } catch (err) {
           console.warn('Single file open failed:', err);
           showToast('ファイルの読み込みに失敗しました');
@@ -26244,12 +27687,17 @@
         favMetaScanToken++;
         const entries = getSortedFileEntries(activeBrowsedFolder.fileEntries);
         closeFavoriteFoldersModal();
+        const folderPathHint = (activeBrowsedFolder && Array.isArray(activeBrowsedFolder.stack))
+          ? activeBrowsedFolder.stack.map(s => s.name).filter(Boolean).join(' / ')
+          : '';
         try {
           const files = [];
+          const handles = [];
           for (let i = 0; i < entries.length; i++) {
             files.push(await entries[i].handle.getFile());
+            handles.push(entries[i].handle || null);
           }
-          await handlePickedFilesList(files);
+          await handlePickedFilesList(files, { fileHandles: handles, folderHint: folderPathHint });
         } catch (err) {
           console.warn('Batch folder open failed:', err);
           showToast('フォルダ内ファイルの読み込みに失敗しました');
@@ -27101,8 +28549,15 @@
         if (favFoldersModal) favFoldersModal.classList.add('hidden');
       }
 
-      async function handlePickedFilesList(files) {
+      async function handlePickedFilesList(files, extraOpts = {}) {
         if (!files || files.length === 0) return;
+        const pickedHandlesMap = new Map();
+        if (Array.isArray(extraOpts.fileHandles)) {
+          files.forEach((f, idx) => {
+            if (extraOpts.fileHandles[idx]) pickedHandlesMap.set(f, extraOpts.fileHandles[idx]);
+          });
+        }
+        const pickedFolderHint = String(extraOpts.folderHint || '');
 
         // Extract folder name from webkitRelativePath if available
         for (const f of files) {
@@ -27137,6 +28592,8 @@
             const existingIdx = state.playlist.findIndex(item => (item.origName || item.name) === f.name && item.blob && item.blob.size === f.size);
             if (existingIdx >= 0) {
               state.playlist[existingIdx].blob = f;
+              if (pickedHandlesMap.get(f)) state.playlist[existingIdx].fileHandle = pickedHandlesMap.get(f);
+              if (pickedFolderHint) state.playlist[existingIdx].folderHint = pickedFolderHint;
               if (k === 0) targetIdx = existingIdx;
             } else {
               const mem = lookupFileMemory(f.size, null);
@@ -27146,6 +28603,8 @@
                 name: customTitle,
                 origName: f.name,
                 blob: f,
+                fileHandle: pickedHandlesMap.get(f) || null,
+                folderHint: pickedFolderHint,
                 markers: mem ? cloneMarkerList(mem.markers) : [],
                 startSectionEnabled: mem ? (mem.startSectionEnabled !== false) : true
               });
@@ -27154,7 +28613,7 @@
           }
           state.currentTrackIndex = targetIdx >= 0 ? targetIdx : 0;
           const firstFile = audioFiles[0];
-          const loadRes = await loadAudioBlob(firstFile, firstFile.name, [], false, null, true, { origName: firstFile.name, restoreFromMemory: true, persistSession: true });
+          const loadRes = await loadAudioBlob(firstFile, firstFile.name, [], false, null, true, { origName: firstFile.name, restoreFromMemory: true, persistSession: true, fileHandle: pickedHandlesMap.get(firstFile) || null, folderHint: pickedFolderHint });
           if (pinResult.entries.length === 0 && (!loadRes || !loadRes.restoredFromMem)) {
             showToast(audioFiles.length > 1 ? `${audioFiles.length}個のローカルファイルを読み込みました` : `読込完了: ${firstFile.name}`);
           }
@@ -27273,6 +28732,195 @@
       if (btnStartTabRecordEl) btnStartTabRecordEl.addEventListener('click', startTabAudioRecording);
       const btnOpenYtStartup = document.getElementById('btnOpenYouTubeFromStartup');
       if (btnOpenYtStartup) btnOpenYtStartup.addEventListener('click', openYouTubeOpenModal);
+      if (btnBookmarkHeader) btnBookmarkHeader.addEventListener('click', openBookmarksModal);
+      const btnOpenBmStartup = document.getElementById('btnOpenBookmarksFromStartup');
+      if (btnOpenBmStartup) btnOpenBmStartup.addEventListener('click', openBookmarksModal);
+      const btnFavOpenBm = document.getElementById('btnFavOpenBookmarks');
+      if (btnFavOpenBm) btnFavOpenBm.addEventListener('click', openBookmarksModal);
+
+      const btnCloseBookmarksX = document.getElementById('btnCloseBookmarksX');
+      if (btnCloseBookmarksX) btnCloseBookmarksX.addEventListener('click', closeBookmarksModal);
+      const btnCloseBookmarksOk = document.getElementById('btnCloseBookmarksOk');
+      if (btnCloseBookmarksOk) btnCloseBookmarksOk.addEventListener('click', closeBookmarksModal);
+      if (bookmarksModal) {
+        bookmarksModal.addEventListener('click', (e) => {
+          if (e.target === bookmarksModal) closeBookmarksModal();
+        });
+      }
+      if (btnBmSaveCurrent) {
+        btnBmSaveCurrent.addEventListener('click', () => saveCurrentTrackAsBookmark(bmState.curFolderId));
+      }
+      if (btnBmRemoveCurrent) {
+        btnBmRemoveCurrent.addEventListener('click', async () => {
+          const store = readBookmarksStore();
+          const curBm = findCurrentTrackBookmark(store);
+          if (!curBm) return;
+          store.items = store.items.filter(it => it.id !== curBm.id);
+          writeBookmarksStore(store);
+          await deleteBookmarkAssetsFromIDB(curBm.id);
+          updateBookmarkHeaderUI();
+          renderBookmarksModal();
+          showToast(`お気に入りを解除しました: ${curBm.title}`);
+        });
+      }
+      if (btnBmDirUp) {
+        btnBmDirUp.addEventListener('click', () => {
+          if (!bmState.curFolderId) return;
+          const store = readBookmarksStore();
+          const curF = store.folders.find(f => f.id === bmState.curFolderId);
+          bmState.curFolderId = (curF && curF.parentId) || null;
+          renderBookmarksModal();
+        });
+      }
+      const btnBmToggleNewFolder = document.getElementById('btnBmToggleNewFolder');
+      if (btnBmToggleNewFolder) {
+        btnBmToggleNewFolder.addEventListener('click', () => {
+          if (bmAddYtBox) bmAddYtBox.classList.add('hidden');
+          if (bmNewFolderBox) {
+            const willOpen = bmNewFolderBox.classList.contains('hidden');
+            bmNewFolderBox.classList.toggle('hidden', !willOpen);
+            if (willOpen && inputBmNewFolderName) {
+              inputBmNewFolderName.value = '';
+              setTimeout(() => inputBmNewFolderName.focus(), 40);
+            }
+          }
+        });
+      }
+      const btnBmCreateFolderRun = document.getElementById('btnBmCreateFolderRun');
+      if (btnBmCreateFolderRun) {
+        btnBmCreateFolderRun.addEventListener('click', () => {
+          const created = createBookmarkFolder(inputBmNewFolderName ? inputBmNewFolderName.value : '', bmState.curFolderId);
+          if (created) {
+            if (inputBmNewFolderName) inputBmNewFolderName.value = '';
+            if (bmNewFolderBox) bmNewFolderBox.classList.add('hidden');
+            renderBookmarksModal();
+          }
+        });
+      }
+      const btnBmCreateFolderCancel = document.getElementById('btnBmCreateFolderCancel');
+      if (btnBmCreateFolderCancel) {
+        btnBmCreateFolderCancel.addEventListener('click', () => {
+          if (bmNewFolderBox) bmNewFolderBox.classList.add('hidden');
+        });
+      }
+      if (inputBmNewFolderName) {
+        inputBmNewFolderName.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            if (btnBmCreateFolderRun) btnBmCreateFolderRun.click();
+          }
+        });
+      }
+
+      const btnBmToggleAddYt = document.getElementById('btnBmToggleAddYt');
+      if (btnBmToggleAddYt) {
+        btnBmToggleAddYt.addEventListener('click', () => {
+          if (bmNewFolderBox) bmNewFolderBox.classList.add('hidden');
+          if (bmAddYtBox) {
+            const willOpen = bmAddYtBox.classList.contains('hidden');
+            bmAddYtBox.classList.toggle('hidden', !willOpen);
+            if (willOpen && inputBmAddYtUrl) {
+              inputBmAddYtUrl.value = '';
+              if (inputBmAddYtTitle) inputBmAddYtTitle.value = '';
+              setTimeout(() => inputBmAddYtUrl.focus(), 40);
+            }
+          }
+        });
+      }
+      const btnBmPasteYtUrl = document.getElementById('btnBmPasteYtUrl');
+      if (btnBmPasteYtUrl) {
+        btnBmPasteYtUrl.addEventListener('click', async () => {
+          try {
+            const txt = await navigator.clipboard.readText();
+            if (txt && inputBmAddYtUrl) {
+              inputBmAddYtUrl.value = txt.trim();
+              showToast('URLを貼り付けました');
+            }
+          } catch (_) {
+            showToast('入力欄を長押しして「貼り付け」を選んでください');
+          }
+        });
+      }
+      const btnBmAddYtRun = document.getElementById('btnBmAddYtRun');
+      if (btnBmAddYtRun) btnBmAddYtRun.addEventListener('click', addDirectYouTubeBookmark);
+      const btnBmAddYtCancel = document.getElementById('btnBmAddYtCancel');
+      if (btnBmAddYtCancel) {
+        btnBmAddYtCancel.addEventListener('click', () => {
+          if (bmAddYtBox) bmAddYtBox.classList.add('hidden');
+        });
+      }
+      if (inputBmAddYtUrl) {
+        inputBmAddYtUrl.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            addDirectYouTubeBookmark();
+          }
+        });
+      }
+
+      if (tabBmActRename) tabBmActRename.addEventListener('click', () => setBookmarkActionTab('rename'));
+      if (tabBmActMove) tabBmActMove.addEventListener('click', () => setBookmarkActionTab('move'));
+      const btnCloseBmActX = document.getElementById('btnCloseBmActX');
+      if (btnCloseBmActX) btnCloseBmActX.addEventListener('click', closeBookmarkItemActionModal);
+      const btnCancelBmAct = document.getElementById('btnCancelBmAct');
+      if (btnCancelBmAct) btnCancelBmAct.addEventListener('click', closeBookmarkItemActionModal);
+      if (btnExecBmAct) btnExecBmAct.addEventListener('click', executeBookmarkItemAction);
+      if (btnBmActDelete) btnBmActDelete.addEventListener('click', deleteBookmarkActionTarget);
+      if (bmItemActionModal) {
+        bmItemActionModal.addEventListener('click', (e) => {
+          if (e.target === bmItemActionModal) closeBookmarkItemActionModal();
+        });
+      }
+      if (inputBmActRename) {
+        inputBmActRename.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            executeBookmarkItemAction();
+          }
+        });
+      }
+      const btnBmActMoveNewDir = document.getElementById('btnBmActMoveNewDir');
+      if (btnBmActMoveNewDir) {
+        btnBmActMoveNewDir.addEventListener('click', () => {
+          if (!bmActMoveNewDirBox) return;
+          const willOpen = bmActMoveNewDirBox.classList.contains('hidden');
+          bmActMoveNewDirBox.classList.toggle('hidden', !willOpen);
+          if (willOpen && inputBmActMoveNewDir) {
+            inputBmActMoveNewDir.value = '';
+            setTimeout(() => inputBmActMoveNewDir.focus(), 40);
+          }
+        });
+      }
+      const btnBmActMoveNewDirCreate = document.getElementById('btnBmActMoveNewDirCreate');
+      if (btnBmActMoveNewDirCreate) {
+        btnBmActMoveNewDirCreate.addEventListener('click', () => {
+          if (!bmState.actionTarget) return;
+          const created = createBookmarkFolder(
+            inputBmActMoveNewDir ? inputBmActMoveNewDir.value : '',
+            bmState.actionTarget.selectedDestFolderId
+          );
+          if (created) {
+            bmState.actionTarget.selectedDestFolderId = created.id;
+            if (inputBmActMoveNewDir) inputBmActMoveNewDir.value = '';
+            if (bmActMoveNewDirBox) bmActMoveNewDirBox.classList.add('hidden');
+            renderBookmarkMoveTargets();
+          }
+        });
+      }
+      const btnBmActMoveNewDirCancel = document.getElementById('btnBmActMoveNewDirCancel');
+      if (btnBmActMoveNewDirCancel) {
+        btnBmActMoveNewDirCancel.addEventListener('click', () => {
+          if (bmActMoveNewDirBox) bmActMoveNewDirBox.classList.add('hidden');
+        });
+      }
+      if (inputBmActMoveNewDir) {
+        inputBmActMoveNewDir.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            if (btnBmActMoveNewDirCreate) btnBmActMoveNewDirCreate.click();
+          }
+        });
+      }
       const btnFavOpenYt = document.getElementById('btnFavOpenYouTube');
       if (btnFavOpenYt) btnFavOpenYt.addEventListener('click', openYouTubeOpenModal);
       const btnYtChangeUrl = document.getElementById('btnYtChangeUrl');
@@ -27583,11 +29231,22 @@
       document.addEventListener('webkitfullscreenchange', onFullscreenStateChanged);
 
       // ==================== GITHUB / PWA SOFTWARE UPDATE CHECK & APPLY ====================
-      const APP_VERSION = 'v68';
+      const APP_VERSION = 'v69';
 
       // Ordered newest-first; each release appends a new object at the top.
       // Users who skip multiple versions automatically see ALL unseen versions between lastSeen and current.
       const APP_RELEASE_NOTES = [
+        {
+          version: 'v69',
+          verNum: 69,
+          date: '2026/11/27',
+          title: 'YouTubeピン読込時の自動オープン＆フォルダ整理対応「お気に入りブックマーク」機能を追加',
+          items: [
+            '他端末から転送されたYouTubeのピン情報（.txtファイル / テキスト貼付）を読み込んだ際、ピンを反映すると同時にそのYouTube動画も自動で開くようにしました',
+            'ヘッダー右上に★（お気に入りブックマーク）ボタンを追加し、YouTube動画やローカル音声ファイルへのリンクをワンタップで保存・再オープンできるようにしました（起動画面・開くメニューからも開けます）',
+            'ブックマーク内でフォルダ作成（サブフォルダの入れ子にも対応）・フォルダ移動・名前変更・削除が行え、お気に入りフォルダ経由の音声ファイルは直リンク、通常ファイルも自動キャッシュ（85MBまで）でワンタップ再生できます'
+          ]
+        },
         {
           version: 'v68',
           verNum: 68,
@@ -29608,7 +31267,18 @@
 
       window.addEventListener('popstate', () => {
         // 1. Close topmost open modal if any
-        if (ytOpenModal && !ytOpenModal.classList.contains('hidden')) {
+        if (bmItemActionModal && !bmItemActionModal.classList.contains('hidden')) {
+          closeBookmarkItemActionModal();
+        } else if (bookmarksModal && !bookmarksModal.classList.contains('hidden')) {
+          if (bmState.curFolderId) {
+            const st = readBookmarksStore();
+            const cf = st.folders.find(f => f.id === bmState.curFolderId);
+            bmState.curFolderId = (cf && cf.parentId) || null;
+            renderBookmarksModal();
+          } else {
+            closeBookmarksModal();
+          }
+        } else if (ytOpenModal && !ytOpenModal.classList.contains('hidden')) {
           closeYouTubeOpenModal();
         } else if (recSourceModal && !recSourceModal.classList.contains('hidden')) {
           closeRecSourceModal();
