@@ -8,7 +8,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="Audipo2">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="app-version" content="v65">
+  <meta name="app-version" content="v66">
   <link rel="manifest" href="./manifest.json">
   <title>Audipo風 練習プレイヤー＆レコーダー</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='bg' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%231b2030'/%3E%3Cstop offset='100%25' stop-color='%230d0f15'/%3E%3C/linearGradient%3E%3ClinearGradient id='wv' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0%25' stop-color='%2360c5ff'/%3E%3Cstop offset='100%25' stop-color='%232563eb'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='url(%23bg)'/%3E%3Crect x='1' y='1' width='62' height='62' rx='15' fill='none' stroke='%233b82f6' stroke-opacity='0.3' stroke-width='2'/%3E%3Cg fill='url(%23wv)'%3E%3Crect x='10' y='28' width='4.5' height='12' rx='2.25' opacity='0.6'/%3E%3Crect x='18' y='22' width='4.5' height='24' rx='2.25' opacity='0.85'/%3E%3Crect x='26' y='15' width='4.5' height='36' rx='2.25'/%3E%3Crect x='34' y='21' width='4.5' height='25' rx='2.25' opacity='0.9'/%3E%3Crect x='42' y='26' width='4.5' height='16' rx='2.25' opacity='0.75'/%3E%3Crect x='50' y='30' width='4.5' height='9' rx='2.25' opacity='0.5'/%3E%3C/g%3E%3Cpath d='M36.25 10.5c0-1.4 1.1-2.5 2.5-2.5h5.5c1.4 0 2.5 1.1 2.5 2.5v2.4c0 .8-.3 1.5-.9 2.1l-3.2 3.1c-.6.6-1.6.6-2.2 0l-3.2-3.1c-.6-.6-.9-1.3-.9-2.1v-2.4z' fill='%23facc15'/%3E%3C/svg%3E">
@@ -2102,6 +2102,26 @@
       height: 100%;
       border: 0;
       display: block;
+    }
+
+    /* Transparent Gesture Shield over YouTube iframe so left/right swipe switches tabs identically to waveform */
+    .yt-gesture-shield {
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      background: transparent;
+      touch-action: pan-y;
+      cursor: pointer;
+    }
+
+    .yt-gesture-shield.passthrough {
+      pointer-events: none;
+    }
+
+    .yt-mini-btn.active-direct {
+      background: rgba(34, 197, 94, 0.24);
+      border-color: rgba(74, 222, 128, 0.72);
+      color: #bbf7d0;
     }
 
     .yt-loading-msg {
@@ -6260,6 +6280,12 @@
       color: #a63232;
     }
 
+    body.theme-minimal .yt-mini-btn.active-direct {
+      background: #2d2c29;
+      border-color: #2d2c29;
+      color: #f6f4ef;
+    }
+
     body.theme-minimal .yt-modal-card {
       background: #eceae4;
       border: 1px solid rgba(45, 44, 41, 0.1);
@@ -7720,13 +7746,15 @@
                   <span>YouTube公式モード</span>
                 </span>
                 <div class="yt-bar-actions">
+                  <button id="btnYtDirectTouch" type="button" class="yt-mini-btn" title="ONにするとYouTube内の字幕・画質・広告スキップ等を直接タップできます（通常OFF時は左右スワイプで隣ページへ移動）">動画操作</button>
                   <button id="btnYtChangeUrl" type="button" class="yt-mini-btn yt-mini-btn-accent">URL変更</button>
-                  <a id="linkYtExternal" href="https://www.youtube.com/" target="_blank" rel="noopener noreferrer" class="yt-mini-btn">YouTubeで開く</a>
+                  <a id="linkYtExternal" href="https://www.youtube.com/" target="_blank" rel="noopener noreferrer" class="yt-mini-btn">外部</a>
                   <button id="btnYtExitMode" type="button" class="yt-mini-btn" title="YouTubeモードを終了">終了</button>
                 </div>
               </div>
               <div class="yt-player-box">
                 <div id="ytPlayerHost"></div>
+                <div id="ytGestureShield" class="yt-gesture-shield" title="タップで再生/一時停止・左右スワイプで隣のページへ移動"></div>
                 <div id="ytLoadingMsg" class="yt-loading-msg hidden">
                   <span id="ytLoadingText">YouTubeプレイヤーを読み込み中...</span>
                 </div>
@@ -8564,7 +8592,7 @@
         <div class="modal-section" style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
           <div>
             <div class="sec-title">バージョン情報</div>
-            <div id="settingsVersionLabel" class="engine-desc mono">現在: v65</div>
+            <div id="settingsVersionLabel" class="engine-desc mono">現在: v66</div>
           </div>
           <button id="btnShowReleaseHistory" type="button" class="step-btn" style="color:#93c5fd;border-color:rgba(66,165,245,0.45);">更新履歴を見る</button>
         </div>
@@ -8728,7 +8756,7 @@
           </div>
           <div>
             <h3 id="whatsNewTitle" class="whats-new-title">アップデートのお知らせ</h3>
-            <p id="whatsNewSub" class="whats-new-sub mono">v65 に更新されました</p>
+            <p id="whatsNewSub" class="whats-new-sub mono">v66 に更新されました</p>
           </div>
         </div>
         <button id="btnCloseWhatsNewX" type="button" class="modal-close" aria-label="閉じる">✕</button>
@@ -9522,6 +9550,8 @@
       const ytStageWrap = document.getElementById('ytStageWrap');
       const ytLoadingMsg = document.getElementById('ytLoadingMsg');
       const ytLoadingText = document.getElementById('ytLoadingText');
+      const ytGestureShield = document.getElementById('ytGestureShield');
+      const btnYtDirectTouch = document.getElementById('btnYtDirectTouch');
       const linkYtExternal = document.getElementById('linkYtExternal');
       const ytOverviewCanvas = document.getElementById('ytOverviewCanvas');
       const ytOverviewCtx = ytOverviewCanvas ? ytOverviewCanvas.getContext('2d') : null;
@@ -20106,7 +20136,6 @@
         // Cleanly transition between direct native AudioBufferSourceNode and Vocoder DSP mid-playback
         stopTapeSource();
         if (!audioEl.paused) audioEl.pause();
-        if (state.isYouTubeMode) pauseYouTubePlayer();
         state.currentTime = curTimeSec;
         state.lastSyncTime = curTimeSec;
         state.lastSyncPerf = performance.now();
@@ -20228,12 +20257,24 @@
         state.lastSyncPerf = performance.now();
         stopTapeSource();
         if (!audioEl.paused) audioEl.pause();
+        if (state.isYouTubeMode) pauseYouTubePlayer();
         updatePlayUI();
         saveCurrentFileMemory(true);
       }
 
       function togglePlayPause() {
         if (!state.hasAudio) return;
+        if (state.isYouTubeMode && ytPlayer && typeof ytPlayer.getPlayerState === 'function') {
+          let ytSt = -1;
+          try { ytSt = ytPlayer.getPlayerState(); } catch (_) {}
+          // 1 = PLAYING, 3 = BUFFERING
+          if (state.isPlaying || ytSt === 1 || ytSt === 3) {
+            pausePlayback();
+            return;
+          }
+          startPlayback();
+          return;
+        }
         if (state.isPlaying) pausePlayback();
         else startPlayback();
       }
@@ -21070,7 +21111,7 @@
 
       function beginPagerGesture(clientX, clientY, targetEl, sourceType) {
         // Never hijack range sliders, inputs, or piano keyboard keys!
-        if (targetEl && targetEl.closest && targetEl.closest('input, select, textarea, #kbdStage, #ytOverviewCanvas, .yt-player-box')) {
+        if (targetEl && targetEl.closest && targetEl.closest('input, select, textarea, #kbdStage, #ytOverviewCanvas')) {
           return false;
         }
         // In landscape full-screen keyboard mode, disable horizontal pager swipe so tapping toolbar controls is rock-solid
@@ -21629,7 +21670,25 @@
       let ytPendingPlayAfterReady = false;
       let ytLastSeekIssuedAt = 0;
       let ytLastSeekTarget = 0;
+      let ytPauseGuardUntil = 0;
+      let ytDirectTouchEnabled = false;
       let ytMetaFetchToken = 0;
+
+      function setYouTubeDirectTouch(enabled, announce = false) {
+        ytDirectTouchEnabled = Boolean(enabled);
+        if (ytGestureShield) {
+          ytGestureShield.classList.toggle('passthrough', ytDirectTouchEnabled);
+        }
+        if (btnYtDirectTouch) {
+          btnYtDirectTouch.classList.toggle('active-direct', ytDirectTouchEnabled);
+          btnYtDirectTouch.textContent = ytDirectTouchEnabled ? '動画操作中' : '動画操作';
+        }
+        if (announce) {
+          showToast(ytDirectTouchEnabled
+            ? 'YouTube直接操作: ON（動画内のボタン操作可・上バーのスワイプで移動可）'
+            : 'YouTube直接操作: OFF（動画上の左右スワイプで隣ページへ移動）');
+        }
+      }
 
       function extractYouTubeVideoInfo(rawInput) {
         const raw = String(rawInput || '').trim();
@@ -21789,21 +21848,27 @@
       }
 
       function playYouTubePlayer() {
+        ytPauseGuardUntil = 0;
         if (!ytPlayer || !ytPlayerReady) {
           ytPendingPlayAfterReady = true;
           return;
         }
         try {
           applyYouTubePlaybackRate(state.playbackRate);
-          ytPlayer.playVideo();
+          if (typeof ytPlayer.playVideo === 'function') {
+            ytPlayer.playVideo();
+          }
         } catch (_) {}
       }
 
       function pauseYouTubePlayer() {
         ytPendingPlayAfterReady = false;
-        if (!ytPlayer || !ytPlayerReady) return;
+        ytPauseGuardUntil = performance.now() + 450;
+        if (!ytPlayer) return;
         try {
-          ytPlayer.pauseVideo();
+          if (typeof ytPlayer.pauseVideo === 'function') {
+            ytPlayer.pauseVideo();
+          }
         } catch (_) {}
       }
 
@@ -21811,6 +21876,8 @@
         ytPlayerReady = false;
         ytPendingSeekAfterReady = null;
         ytPendingPlayAfterReady = false;
+        ytPauseGuardUntil = 0;
+        setYouTubeDirectTouch(false, false);
         if (ytPlayer) {
           try { ytPlayer.stopVideo(); } catch (_) {}
           try { ytPlayer.destroy(); } catch (_) {}
@@ -21822,7 +21889,7 @@
           if (!host) {
             host = document.createElement('div');
             host.id = 'ytPlayerHost';
-            box.insertBefore(host, ytLoadingMsg || null);
+            box.insertBefore(host, ytGestureShield || ytLoadingMsg || null);
           } else {
             host.innerHTML = '';
           }
@@ -22302,6 +22369,12 @@
                 }
 
                 if (st === YTState.PLAYING) {
+                  if (performance.now() < ytPauseGuardUntil) {
+                    try { ev.target.pauseVideo(); } catch (_) {}
+                    state.isPlaying = false;
+                    updatePlayUI();
+                    return;
+                  }
                   if (ytLoadingMsg) ytLoadingMsg.classList.add('hidden');
                   const t = getYouTubeCurrentTime();
                   state.isPlaying = true;
@@ -22550,6 +22623,9 @@
         if (prevPage === 'kbd' && nextPage !== 'kbd') {
           stopAllKeyboardNotes();
           exitKbdLandscapeMode();
+        }
+        if (prevPage === 'wave' && nextPage !== 'wave' && ytDirectTouchEnabled) {
+          setYouTubeDirectTouch(false, false);
         }
         syncKbdImmersiveLayout();
         updateUpperDotsUI();
@@ -27181,6 +27257,14 @@
       if (btnFavOpenYt) btnFavOpenYt.addEventListener('click', openYouTubeOpenModal);
       const btnYtChangeUrl = document.getElementById('btnYtChangeUrl');
       if (btnYtChangeUrl) btnYtChangeUrl.addEventListener('click', openYouTubeOpenModal);
+      if (btnYtDirectTouch) {
+        btnYtDirectTouch.addEventListener('click', () => setYouTubeDirectTouch(!ytDirectTouchEnabled, true));
+      }
+      if (ytGestureShield) {
+        ytGestureShield.addEventListener('click', () => {
+          if (state.isYouTubeMode) togglePlayPause();
+        });
+      }
       const btnYtExitMode = document.getElementById('btnYtExitMode');
       if (btnYtExitMode) btnYtExitMode.addEventListener('click', () => {
         exitYouTubeMode({ showStartup: true });
@@ -27478,11 +27562,22 @@
       document.addEventListener('webkitfullscreenchange', onFullscreenStateChanged);
 
       // ==================== GITHUB / PWA SOFTWARE UPDATE CHECK & APPLY ====================
-      const APP_VERSION = 'v65';
+      const APP_VERSION = 'v66';
 
       // Ordered newest-first; each release appends a new object at the top.
       // Users who skip multiple versions automatically see ALL unseen versions between lastSeen and current.
       const APP_RELEASE_NOTES = [
+        {
+          version: 'v66',
+          verNum: 66,
+          date: '2026/11/27',
+          title: 'YouTubeモードの一時停止不具合を修正＆動画上の左右スワイプで隣ページへ移動可能に',
+          items: [
+            'YouTube公式モード再生中に下部の一時停止ボタンが効かなかった不具合を修正し、即座に停止・再開できるようにしました',
+            'YouTube動画画面の上をそのまま左右にスワイプすることで、通常の波形画面と同じく隣のページ（左: チューナー＆メトロノーム / 右: 黄色ピン一覧）へスムーズに移動できるようにしました（動画タップで再生/一時停止にも対応）',
+            'YouTube内の字幕・画質・広告スキップ・全画面などを直接触りたいとき用に、上段バーへ「動画操作」切替ボタンを追加しました'
+          ]
+        },
         {
           version: 'v65',
           verNum: 65,
