@@ -8,7 +8,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="Audipo2">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="app-version" content="v71">
+  <meta name="app-version" content="v72">
   <link rel="manifest" href="./manifest.json">
   <title>Audipo風 練習プレイヤー＆レコーダー</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='bg' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%231b2030'/%3E%3Cstop offset='100%25' stop-color='%230d0f15'/%3E%3C/linearGradient%3E%3ClinearGradient id='wv' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0%25' stop-color='%2360c5ff'/%3E%3Cstop offset='100%25' stop-color='%232563eb'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='url(%23bg)'/%3E%3Crect x='1' y='1' width='62' height='62' rx='15' fill='none' stroke='%233b82f6' stroke-opacity='0.3' stroke-width='2'/%3E%3Cg fill='url(%23wv)'%3E%3Crect x='10' y='28' width='4.5' height='12' rx='2.25' opacity='0.6'/%3E%3Crect x='18' y='22' width='4.5' height='24' rx='2.25' opacity='0.85'/%3E%3Crect x='26' y='15' width='4.5' height='36' rx='2.25'/%3E%3Crect x='34' y='21' width='4.5' height='25' rx='2.25' opacity='0.9'/%3E%3Crect x='42' y='26' width='4.5' height='16' rx='2.25' opacity='0.75'/%3E%3Crect x='50' y='30' width='4.5' height='9' rx='2.25' opacity='0.5'/%3E%3C/g%3E%3Cpath d='M36.25 10.5c0-1.4 1.1-2.5 2.5-2.5h5.5c1.4 0 2.5 1.1 2.5 2.5v2.4c0 .8-.3 1.5-.9 2.1l-3.2 3.1c-.6.6-1.6.6-2.2 0l-3.2-3.1c-.6-.6-.9-1.3-.9-2.1v-2.4z' fill='%23facc15'/%3E%3C/svg%3E">
@@ -7965,7 +7965,9 @@
 <body>
 
   <!-- Hidden Audio Element for OS Standard engine & extreme-large fallback -->
-  <audio id="audioEl" preload="auto"></audio>
+  <audio id="audioEl" preload="auto" playsinline></audio>
+  <!-- Independent silent keep-alive audio (NOT routed to Web Audio) so OS keeps background/screen-off audio & MediaSession alive -->
+  <audio id="bgKeepAliveAudio" loop playsinline preload="auto" class="sr-only"></audio>
 
   <!-- Plain multi-file input with NO restrictive accept filter so Android opens native storage/SD picker -->
   <input type="file" id="fileInput" accept="audio/*,.m4a,.mp3,.wav,.aac,.flac,.ogg,.opus,.wma,.aif,.aiff,.caf,.txt,.json" multiple class="sr-only">
@@ -9114,7 +9116,7 @@
         <div class="modal-section" style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
           <div>
             <div class="sec-title">バージョン情報</div>
-            <div id="settingsVersionLabel" class="engine-desc mono">現在: v71</div>
+            <div id="settingsVersionLabel" class="engine-desc mono">現在: v72</div>
           </div>
           <button id="btnShowReleaseHistory" type="button" class="step-btn" style="color:#93c5fd;border-color:rgba(66,165,245,0.45);">更新履歴を見る</button>
         </div>
@@ -9278,7 +9280,7 @@
           </div>
           <div>
             <h3 id="whatsNewTitle" class="whats-new-title">アップデートのお知らせ</h3>
-            <p id="whatsNewSub" class="whats-new-sub mono">v71 に更新されました</p>
+            <p id="whatsNewSub" class="whats-new-sub mono">v72 に更新されました</p>
           </div>
         </div>
         <button id="btnCloseWhatsNewX" type="button" class="modal-close" aria-label="閉じる">✕</button>
@@ -10250,6 +10252,7 @@
 
       // ==================== DOM ELEMENTS ====================
       const audioEl = document.getElementById('audioEl');
+      const bgKeepAliveAudio = document.getElementById('bgKeepAliveAudio');
       const fileInput = document.getElementById('fileInput');
       const overviewCanvas = document.getElementById('overviewCanvas');
       const ytStageWrap = document.getElementById('ytStageWrap');
@@ -11990,6 +11993,14 @@
       let masterLimiterNode = null;
       let audioGraphReady = false;
       let currentRouteKey = '';
+      let currentRouteFlags = { lpf: null, reverb: null, limiter: null };
+      let vocoderConnected = false;
+      let playSessionToken = 0;
+      let playbackStallTracker = { ctxTime: -1, perf: 0, recoveryCount: 0 };
+      let bgKeepAliveBlobUrl = '';
+      let screenWakeLockSentinel = null;
+      let mediaSessionHandlersBound = false;
+      let recTimeDomainBuf = null;
 
       // ---------- Identity Phase-Locked Phase Vocoder (Laroche & Dolson, FFT 2048, Hop 512) ----------
       const PV_N = 2048;
@@ -12400,6 +12411,160 @@
         }
       }
 
+      function syncVocoderConnection() {
+        if (!audioGraphReady || !vocoderNode || !inputBusNode) return;
+        const shouldConnect = Boolean(
+          state.isPlaying &&
+          state.hasAudio &&
+          !state.isRecording &&
+          getActivePlaybackPath() === 'vocoderDsp'
+        );
+        if (shouldConnect && !vocoderConnected) {
+          try {
+            vocoderNode.connect(inputBusNode);
+            vocoderConnected = true;
+          } catch (_) {}
+        } else if (!shouldConnect && vocoderConnected) {
+          try { vocoderNode.disconnect(); } catch (_) {}
+          vocoderConnected = false;
+        }
+      }
+
+      // ---------- Screen Wake Lock (keeps screen awake during recording so OS never drops mic chunks) ----------
+      async function acquireScreenWakeLock() {
+        if (!navigator.wakeLock || typeof navigator.wakeLock.request !== 'function') return;
+        if (screenWakeLockSentinel && !screenWakeLockSentinel.released) return;
+        try {
+          const sentinel = await navigator.wakeLock.request('screen');
+          screenWakeLockSentinel = sentinel;
+          sentinel.addEventListener('release', () => {
+            if (screenWakeLockSentinel === sentinel) {
+              screenWakeLockSentinel = null;
+            }
+          });
+        } catch (_) {}
+      }
+
+      async function releaseScreenWakeLock() {
+        const s = screenWakeLockSentinel;
+        screenWakeLockSentinel = null;
+        if (s && !s.released) {
+          try { await s.release(); } catch (_) {}
+        }
+      }
+
+      // ---------- Silent Keep-Alive <audio> + Media Session API (prevents screen-off / background audio cut-out) ----------
+      function ensureBgKeepAliveUrl() {
+        if (bgKeepAliveBlobUrl) return bgKeepAliveBlobUrl;
+        // Generate a tiny 1-second silent 8kHz 8-bit mono WAV in memory (zero network/external dependency)
+        const sr = 8000;
+        const numSamples = sr;
+        const ab = new ArrayBuffer(44 + numSamples);
+        const dv = new DataView(ab);
+        const u8 = new Uint8Array(ab);
+        const wStr = (off, str) => { for (let i = 0; i < str.length; i++) dv.setUint8(off + i, str.charCodeAt(i)); };
+        wStr(0, 'RIFF');
+        dv.setUint32(4, 36 + numSamples, true);
+        wStr(8, 'WAVE');
+        wStr(12, 'fmt ');
+        dv.setUint32(16, 16, true);
+        dv.setUint16(20, 1, true);
+        dv.setUint16(22, 1, true);
+        dv.setUint32(24, sr, true);
+        dv.setUint32(28, sr, true);
+        dv.setUint16(32, 1, true);
+        dv.setUint16(34, 8, true);
+        wStr(36, 'data');
+        dv.setUint32(40, numSamples, true);
+        u8.fill(128, 44); // 8-bit unsigned PCM silence = 0x80
+        bgKeepAliveBlobUrl = URL.createObjectURL(new Blob([ab], { type: 'audio/wav' }));
+        return bgKeepAliveBlobUrl;
+      }
+
+      function startBgKeepAlive() {
+        if (!bgKeepAliveAudio || state.isRecording || state.isYouTubeMode) return;
+        const path = getActivePlaybackPath();
+        if (path !== 'bufferDirect' && path !== 'vocoderDsp') {
+          stopBgKeepAlive();
+          return;
+        }
+        try {
+          const url = ensureBgKeepAliveUrl();
+          if (bgKeepAliveAudio.src !== url) {
+            bgKeepAliveAudio.src = url;
+          }
+          bgKeepAliveAudio.volume = 0.001;
+          if (bgKeepAliveAudio.paused) {
+            bgKeepAliveAudio.play().catch(() => {});
+          }
+        } catch (_) {}
+      }
+
+      function stopBgKeepAlive() {
+        if (!bgKeepAliveAudio) return;
+        try {
+          if (!bgKeepAliveAudio.paused) bgKeepAliveAudio.pause();
+        } catch (_) {}
+      }
+
+      function syncMediaSessionState() {
+        if (!('mediaSession' in navigator) || !navigator.mediaSession) return;
+        try {
+          if (!mediaSessionHandlersBound) {
+            mediaSessionHandlersBound = true;
+            const bind = (action, fn) => {
+              try { navigator.mediaSession.setActionHandler(action, fn); } catch (_) {}
+            };
+            bind('play', () => { if (state.hasAudio && !state.isPlaying) startPlayback(); });
+            bind('pause', () => { if (state.isPlaying) pausePlayback(); });
+            bind('seekbackward', (d) => { if (state.hasAudio) seekTo(state.currentTime - (d?.seekOffset || 3), { setGreenPin: false }); });
+            bind('seekforward', (d) => { if (state.hasAudio) seekTo(state.currentTime + (d?.seekOffset || 3), { setGreenPin: false }); });
+            bind('previoustrack', () => { if (state.hasAudio && state.playlist.length > 1) switchTrack(state.currentTrackIndex - 1, state.isPlaying); });
+            bind('nexttrack', () => { if (state.hasAudio && state.playlist.length > 1) switchTrack(state.currentTrackIndex + 1, state.isPlaying); });
+            bind('seekto', (d) => { if (state.hasAudio && d && typeof d.seekTime === 'number') seekTo(d.seekTime, { setGreenPin: false }); });
+          }
+
+          if (!state.hasAudio) {
+            navigator.mediaSession.playbackState = 'none';
+            return;
+          }
+
+          if (typeof MediaMetadata === 'function') {
+            const title = trackTitleEl.textContent.trim() || state.currentFileOrigName || 'Audipo2';
+            navigator.mediaSession.metadata = new MediaMetadata({
+              title,
+              artist: state.isYouTubeMode ? 'YouTube公式モード' : 'Audipo2 練習プレイヤー',
+              artwork: [{ src: './icon-192.png', sizes: '192x192', type: 'image/png' }]
+            });
+          }
+
+          navigator.mediaSession.playbackState = state.isPlaying ? 'playing' : 'paused';
+          if (typeof navigator.mediaSession.setPositionState === 'function' && state.duration > 0) {
+            const pos = Math.max(0, Math.min(state.duration, getLivePlayheadTime()));
+            navigator.mediaSession.setPositionState({
+              duration: state.duration,
+              playbackRate: Math.max(0.25, Math.min(2.0, state.playbackRate || 1.0)),
+              position: pos
+            });
+          }
+        } catch (_) {}
+      }
+
+      async function ensureAudioCtxRunning(timeoutMs = 700) {
+        initAudioGraph();
+        if (!audioCtx) return false;
+        if (audioCtx.state === 'running') return true;
+        if (audioCtx.state === 'suspended' || audioCtx.state === 'interrupted') {
+          try {
+            await Promise.race([
+              audioCtx.resume(),
+              new Promise((resolve) => setTimeout(resolve, timeoutMs))
+            ]);
+          } catch (_) {}
+        }
+        return audioCtx.state === 'running';
+      }
+
       function updateAudioRouting() {
         if (!audioGraphReady || !audioCtx || !inputBusNode || !postFilterNode) return;
 
@@ -12411,42 +12576,78 @@
         const needLimiter = getEffectiveBoost() > 1.02;
 
         const key = `${needLpf ? 1 : 0}_${needReverb ? 1 : 0}_${needLimiter ? 1 : 0}`;
-        if (key === currentRouteKey) return;
+        if (key === currentRouteKey) {
+          syncVocoderConnection();
+          return;
+        }
+        const prev = currentRouteFlags;
         currentRouteKey = key;
+        currentRouteFlags = { lpf: needLpf, reverb: needReverb, limiter: needLimiter };
 
-        try { inputBusNode.disconnect(); } catch (_) {}
-        try { lowpassNode.disconnect(); } catch (_) {}
-        try { postFilterNode.disconnect(); } catch (_) {}
-        try { masterBoostNode.disconnect(); } catch (_) {}
-        try { masterLimiterNode.disconnect(); } catch (_) {}
-
-        if (needLpf) {
-          inputBusNode.connect(lowpassNode);
-          lowpassNode.connect(postFilterNode);
-        } else {
-          inputBusNode.connect(postFilterNode);
+        // Make-before-break per sub-stage so mid-playback Boost/Reverb/LPF updates NEVER cut out the audio stream!
+        if (prev.lpf !== needLpf) {
+          if (needLpf) {
+            try { inputBusNode.connect(lowpassNode); } catch (_) {}
+            try { lowpassNode.connect(postFilterNode); } catch (_) {}
+            if (prev.lpf === false) {
+              try { inputBusNode.disconnect(postFilterNode); } catch (_) {}
+            }
+          } else {
+            try { inputBusNode.connect(postFilterNode); } catch (_) {}
+            if (prev.lpf === true) {
+              try { inputBusNode.disconnect(lowpassNode); } catch (_) {}
+              try { lowpassNode.disconnect(postFilterNode); } catch (_) {}
+            }
+          }
         }
 
-        postFilterNode.connect(dryGainNode);
-        if (needReverb) {
-          postFilterNode.connect(convolverNode);
+        if (prev.reverb === null) {
+          try { postFilterNode.connect(dryGainNode); } catch (_) {}
+          if (needReverb) {
+            try { postFilterNode.connect(convolverNode); } catch (_) {}
+          }
+        } else if (prev.reverb !== needReverb) {
+          if (needReverb) {
+            try { postFilterNode.connect(convolverNode); } catch (_) {}
+          } else {
+            try { postFilterNode.disconnect(convolverNode); } catch (_) {}
+          }
         }
 
-        if (needLimiter) {
-          masterBoostNode.connect(masterLimiterNode);
-          masterLimiterNode.connect(audioCtx.destination);
-        } else {
-          masterBoostNode.connect(audioCtx.destination);
+        if (prev.limiter !== needLimiter) {
+          if (needLimiter) {
+            try { masterBoostNode.connect(masterLimiterNode); } catch (_) {}
+            try { masterLimiterNode.connect(audioCtx.destination); } catch (_) {}
+            if (prev.limiter === false) {
+              try { masterBoostNode.disconnect(audioCtx.destination); } catch (_) {}
+            }
+          } else {
+            try { masterBoostNode.connect(audioCtx.destination); } catch (_) {}
+            if (prev.limiter === true) {
+              try { masterBoostNode.disconnect(masterLimiterNode); } catch (_) {}
+              try { masterLimiterNode.disconnect(audioCtx.destination); } catch (_) {}
+            }
+          }
         }
+
+        syncVocoderConnection();
       }
 
       function initAudioGraph() {
         if (!audioCtx) {
           const Ctx = window.AudioContext || window.webkitAudioContext;
           audioCtx = new Ctx();
+          audioCtx.onstatechange = () => {
+            if (!audioCtx) return;
+            if ((state.isPlaying && !state.isYouTubeMode) || state.isRecording) {
+              if (audioCtx.state === 'suspended' || audioCtx.state === 'interrupted') {
+                audioCtx.resume().catch(() => {});
+              }
+            }
+          };
         }
-        if (audioCtx.state === 'suspended') {
-          audioCtx.resume();
+        if (audioCtx.state === 'suspended' || audioCtx.state === 'interrupted') {
+          audioCtx.resume().catch(() => {});
         }
         if (audioGraphReady) return;
 
@@ -12457,8 +12658,10 @@
           postFilterNode = audioCtx.createGain();
           postFilterNode.gain.value = 1.0;
 
-          vocoderNode = audioCtx.createScriptProcessor(2048, 0, 2);
+          // 4096-sample buffer (~85ms) halves main-thread interrupt rate & is disconnected when not in vocoderDsp mode!
+          vocoderNode = audioCtx.createScriptProcessor(4096, 0, 2);
           vocoderNode.onaudioprocess = onVocoderProcess;
+          vocoderConnected = false;
 
           lowpassNode = audioCtx.createBiquadFilter();
           lowpassNode.type = 'lowpass';
@@ -12482,8 +12685,6 @@
           masterLimiterNode.attack.value = 0.001;
           masterLimiterNode.release.value = 0.06;
 
-          vocoderNode.connect(inputBusNode);
-
           mediaElSource = audioCtx.createMediaElementSource(audioEl);
           mediaElSource.connect(inputBusNode);
 
@@ -12493,6 +12694,7 @@
 
           audioGraphReady = true;
           currentRouteKey = '';
+          currentRouteFlags = { lpf: null, reverb: null, limiter: null };
           updateLowpassFilter();
           applyMasterBoost();
           updateAudioRouting();
@@ -12529,6 +12731,8 @@
         };
         tapeAnchorCtxTime = audioCtx.currentTime;
         tapeAnchorOffset = clamped;
+        playbackStallTracker.ctxTime = audioCtx.currentTime;
+        playbackStallTracker.perf = performance.now();
         src.start(0, clamped);
         tapeSourceNode = src;
       }
@@ -12821,6 +13025,8 @@
         const curT = getLivePlayheadTime();
         state.isFallbackLargeFile = true;
         stopTapeSource();
+        syncVocoderConnection();
+        stopBgKeepAlive();
         audioEl.preservesPitch = true;
         audioEl.mozPreservesPitch = true;
         audioEl.webkitPreservesPitch = true;
@@ -15382,7 +15588,7 @@
               isCancelled
             );
             if (isCancelled() || !pyr) return;
-            finalizeDecodedAudio(preDecodedBuffer, pyr, myToken);
+            finalizeDecodedAudio(preDecodedBuffer, pyr, myToken, { alreadyBoundBuffer: true });
             return { restoredFromMem };
           }
 
@@ -15729,10 +15935,11 @@
         hideWaveProgress(650);
       }
 
-      function finalizeDecodedAudio(decoded, pyramid, token) {
+      function finalizeDecodedAudio(decoded, pyramid, token, opts = {}) {
         if (token !== state.loadToken) return;
 
         const wasPlaying = state.isPlaying;
+        const alreadySameBuf = Boolean(opts.alreadyBoundBuffer && state.audioBuffer === decoded);
         const liveT = getLivePlayheadTime();
 
         state.audioBuffer = decoded;
@@ -15767,21 +15974,33 @@
         state.lastSyncTime = clampedT;
         state.lastSyncPerf = performance.now();
 
-        resetVocoderAtSample(Math.floor(clampedT * decoded.sampleRate));
+        const alreadyPlayingBuffer = Boolean(
+          alreadySameBuf &&
+          wasPlaying &&
+          ((getActivePlaybackPath() === 'bufferDirect' && tapeSourceNode) ||
+           (getActivePlaybackPath() === 'vocoderDsp' && vocoderConnected))
+        );
 
-        // Hot-swap smoothly if user was already playing via audioEl
-        if (wasPlaying) {
-          const path = getActivePlaybackPath();
-          if (path === 'bufferDirect') {
-            if (!audioEl.paused) audioEl.pause();
-            startTapeSourceAt(clampedT);
-          } else if (path === 'vocoderDsp') {
-            if (!audioEl.paused) audioEl.pause();
-            resetVocoderAtSample(Math.floor(clampedT * decoded.sampleRate));
+        if (!alreadyPlayingBuffer) {
+          resetVocoderAtSample(Math.floor(clampedT * decoded.sampleRate));
+
+          // Hot-swap smoothly ONLY if user was playing via audioEl before PCM decode finished
+          if (wasPlaying) {
+            const path = getActivePlaybackPath();
+            if (path === 'bufferDirect') {
+              if (!audioEl.paused) audioEl.pause();
+              startTapeSourceAt(clampedT);
+              startBgKeepAlive();
+            } else if (path === 'vocoderDsp') {
+              if (!audioEl.paused) audioEl.pause();
+              resetVocoderAtSample(Math.floor(clampedT * decoded.sampleRate));
+              syncVocoderConnection();
+              startBgKeepAlive();
+            }
           }
         }
 
-        recomputeLeadingSilence({ applyJump: !state.restoredFromMemory });
+        recomputeLeadingSilence({ applyJump: !state.restoredFromMemory && !wasPlaying });
         btnCutYellowSection.disabled = false;
         updateVocoderUI();
         updateWaveGainUI();
@@ -18775,7 +18994,9 @@ ${info.url}`;
           if (state.tunerRunning) stopTuner();
           if (state.isYouTubeMode) exitYouTubeMode({ showStartup: false });
           if (state.isPlaying) pausePlayback();
-          initAudioGraph();
+          stopBgKeepAlive();
+          await ensureAudioCtxRunning(600);
+          syncVocoderConnection();
 
           let displayStream = null;
           try {
@@ -18890,7 +19111,7 @@ ${info.url}`;
             silentGain.connect(audioCtx.destination);
           } else {
             const spCh = actualCh >= 2 ? 2 : 1;
-            processor = audioCtx.createScriptProcessor(4096, spCh, 1);
+            processor = audioCtx.createScriptProcessor(8192, spCh, 1);
             processor.onaudioprocess = (ev) => {
               if (!state.isRecording) return;
               const inL = ev.inputBuffer.getChannelData(0);
@@ -18926,6 +19147,7 @@ ${info.url}`;
           recMarkerCountBadge.textContent = '0';
           recLiveGainLabel.textContent = 'デジタル直録';
 
+          acquireScreenWakeLock();
           renderLiveRecordingLoop();
           const khz = (state.recSampleRate / 1000).toFixed(1).replace(/\.0$/, '');
           const chLabel = actualCh >= 2 ? 'ステレオ' : 'モノラル';
@@ -18946,7 +19168,9 @@ ${info.url}`;
           if (state.tunerRunning) stopTuner();
           if (state.isYouTubeMode) exitYouTubeMode({ showStartup: false });
           if (state.isPlaying) pausePlayback();
-          initAudioGraph();
+          stopBgKeepAlive();
+          await ensureAudioCtxRunning(600);
+          syncVocoderConnection();
 
           const supported = (navigator.mediaDevices && navigator.mediaDevices.getSupportedConstraints)
             ? navigator.mediaDevices.getSupportedConstraints()
@@ -19152,7 +19376,7 @@ ${info.url}`;
           } else {
             // ScriptProcessorNode fallback: request 2ch when stream reports >=2ch, otherwise actualCh
             const spCh = actualCh >= 2 ? 2 : 1;
-            processor = audioCtx.createScriptProcessor(4096, spCh, 1);
+            processor = audioCtx.createScriptProcessor(8192, spCh, 1);
             processor.onaudioprocess = (ev) => {
               if (!state.isRecording) return;
               const inL = ev.inputBuffer.getChannelData(0);
@@ -19188,6 +19412,7 @@ ${info.url}`;
           recMarkerCountBadge.textContent = '0';
           recLiveGainLabel.textContent = `${state.micGain.toFixed(1)}x`;
 
+          acquireScreenWakeLock();
           renderLiveRecordingLoop();
           const khz = (state.recSampleRate / 1000).toFixed(1).replace(/\.0$/, '');
           const chLabel = actualCh >= 2 ? 'ステレオ' : 'モノラル';
@@ -19207,7 +19432,10 @@ ${info.url}`;
 
         if (state.recAnalyser) {
           const bufLen = state.recAnalyser.fftSize;
-          const timeData = new Uint8Array(bufLen);
+          if (!recTimeDomainBuf || recTimeDomainBuf.length !== bufLen) {
+            recTimeDomainBuf = new Uint8Array(bufLen);
+          }
+          const timeData = recTimeDomainBuf;
           state.recAnalyser.getByteTimeDomainData(timeData);
 
           let frameMean = 0;
@@ -19291,6 +19519,7 @@ ${info.url}`;
         const wasTabMode = state.recMode === 'tab';
         state.isRecording = false;
         if (state.recAnimId) cancelAnimationFrame(state.recAnimId);
+        releaseScreenWakeLock();
 
         // Flush remaining samples from AudioWorklet before disconnecting
         if (state.recWorkletNode) {
@@ -19335,6 +19564,13 @@ ${info.url}`;
           if (state.recDisplayStream) state.recDisplayStream.getTracks().forEach(t => { t.onended = null; t.stop(); });
         } catch (_) {}
 
+        // After stopping mic tracks, iOS/Android may briefly suspend/interrupt the shared AudioContext during PlayAndRecord->Playback switch
+        setTimeout(() => {
+          if (audioCtx && !state.isRecording && (audioCtx.state === 'suspended' || audioCtx.state === 'interrupted')) {
+            audioCtx.resume().catch(() => {});
+          }
+        }, 140);
+
         state.recSourceNode = null;
         state.recGainNode = null;
         state.recLimiterNode = null;
@@ -19377,8 +19613,18 @@ ${info.url}`;
           for (let j = 0; j < cL.length; j++) sumL += cL[j];
           if (dstR) {
             const cR = chunksR[i];
-            dstR.set(cR, offset);
-            for (let j = 0; j < cR.length; j++) sumR += cR[j];
+            if (cR && cR.length === cL.length) {
+              dstR.set(cR, offset);
+              for (let j = 0; j < cR.length; j++) sumR += cR[j];
+            } else if (cR && cR.length > 0) {
+              const copyLen = Math.min(cL.length, cR.length);
+              dstR.set(cR.subarray(0, copyLen), offset);
+              if (copyLen < cL.length) dstR.set(cL.subarray(copyLen), offset + copyLen);
+              for (let j = 0; j < copyLen; j++) sumR += cR[j];
+            } else {
+              dstR.set(cL, offset);
+              for (let j = 0; j < cL.length; j++) sumR += cL[j];
+            }
           }
           offset += cL.length;
         }
@@ -21272,17 +21518,28 @@ ${info.url}`;
         state.lastSyncTime = curTimeSec;
         state.lastSyncPerf = performance.now();
 
-        if (!state.hasAudio || !state.isPlaying) return;
+        if (!state.hasAudio || !state.isPlaying) {
+          syncVocoderConnection();
+          stopBgKeepAlive();
+          return;
+        }
 
         if (nextPath === 'bufferDirect') {
+          syncVocoderConnection();
           startTapeSourceAt(curTimeSec);
+          startBgKeepAlive();
         } else if (nextPath === 'vocoderDsp') {
           resetVocoderAtSample(Math.floor(curTimeSec * state.audioBuffer.sampleRate));
+          syncVocoderConnection();
+          startBgKeepAlive();
         } else {
+          syncVocoderConnection();
+          stopBgKeepAlive();
           audioEl.currentTime = curTimeSec;
           audioEl.playbackRate = state.playbackRate;
           audioEl.play().catch(() => {});
         }
+        syncMediaSessionState();
       }
 
       function seekTo(timeSec, opts = {}) {
@@ -21353,29 +21610,66 @@ ${info.url}`;
           seekTo(skipDest, { setGreenPin: false, isAutoSkip: true });
         }
 
+        const myPlayTok = ++playSessionToken;
         state.isPlaying = true;
         state.lastSyncTime = state.currentTime;
         state.lastSyncPerf = performance.now();
+        playbackStallTracker.recoveryCount = 0;
+        playbackStallTracker.ctxTime = audioCtx ? audioCtx.currentTime : -1;
+        playbackStallTracker.perf = performance.now();
 
         updateLowpassFilter();
         updateAudioRouting();
 
         const path = getActivePlaybackPath();
         if (path === 'youtube') {
+          stopBgKeepAlive();
+          syncVocoderConnection();
           playYouTubePlayer();
-        } else if (path === 'vocoderDsp') {
-          resetVocoderAtSample(Math.floor(state.currentTime * state.audioBuffer.sampleRate));
-        } else if (path === 'bufferDirect') {
-          startTapeSourceAt(state.currentTime);
-        } else {
-          audioEl.currentTime = state.currentTime;
-          audioEl.playbackRate = state.playbackRate;
-          audioEl.play().catch(() => {});
+          updatePlayUI();
+          syncMediaSessionState();
+          return;
         }
+
+        // Kick off silent keep-alive <audio> synchronously inside user gesture so screen-off won't kill Web Audio
+        if (path === 'bufferDirect' || path === 'vocoderDsp') {
+          startBgKeepAlive();
+        } else {
+          stopBgKeepAlive();
+        }
+
+        const beginActiveAudio = () => {
+          if (myPlayTok !== playSessionToken || !state.isPlaying || !state.hasAudio) return;
+          const livePath = getActivePlaybackPath();
+          if (livePath === 'vocoderDsp') {
+            resetVocoderAtSample(Math.floor(state.currentTime * state.audioBuffer.sampleRate));
+            syncVocoderConnection();
+          } else if (livePath === 'bufferDirect') {
+            syncVocoderConnection();
+            startTapeSourceAt(state.currentTime);
+          } else if (livePath === 'audioEl') {
+            syncVocoderConnection();
+            audioEl.currentTime = state.currentTime;
+            audioEl.playbackRate = state.playbackRate;
+            audioEl.play().catch(() => {});
+          }
+          syncMediaSessionState();
+        };
+
         updatePlayUI();
+
+        // Wait for AudioContext to leave suspended/interrupted state (critical right after mic recording on iOS/Android!)
+        if (audioCtx && audioCtx.state !== 'running') {
+          ensureAudioCtxRunning(700).then(() => {
+            beginActiveAudio();
+          });
+        } else {
+          beginActiveAudio();
+        }
       }
 
       function pausePlayback() {
+        playSessionToken++;
         const wasScrubbing = isWaveScrubbing();
         stopInertia(false);
         state.isDraggingZoom = false;
@@ -21388,9 +21682,12 @@ ${info.url}`;
         state.lastSyncTime = state.currentTime;
         state.lastSyncPerf = performance.now();
         stopTapeSource();
+        syncVocoderConnection();
+        stopBgKeepAlive();
         if (!audioEl.paused) audioEl.pause();
         if (state.isYouTubeMode) pauseYouTubePlayer();
         updatePlayUI();
+        syncMediaSessionState();
         saveCurrentFileMemory(true);
       }
 
@@ -22717,6 +23014,35 @@ ${info.url}`;
           renderAllCanvases();
         } else if (state.hasAudio && state.isPlaying && !state.isDraggingOverview && !isWaveScrubbing()) {
           if (getActivePlaybackPath() === 'bufferDirect' && tapeSourceNode) {
+            // Post-recording AudioContext stall watchdog: auto-recovers if OS audio route froze after mic release
+            if (audioCtx) {
+              const ctxNow = audioCtx.currentTime;
+              const perfNow = performance.now();
+              if (Math.abs(ctxNow - playbackStallTracker.ctxTime) > 0.004) {
+                playbackStallTracker.ctxTime = ctxNow;
+                playbackStallTracker.perf = perfNow;
+                playbackStallTracker.recoveryCount = 0;
+              } else if (perfNow - playbackStallTracker.perf > 750) {
+                playbackStallTracker.perf = perfNow;
+                playbackStallTracker.recoveryCount += 1;
+                if (playbackStallTracker.recoveryCount === 1) {
+                  ensureAudioCtxRunning(500).then((ok) => {
+                    if (ok && state.isPlaying && getActivePlaybackPath() === 'bufferDirect') {
+                      startTapeSourceAt(state.currentTime);
+                    }
+                  });
+                } else if (playbackStallTracker.recoveryCount >= 2 && audioEl.src) {
+                  // Seamless fallback to native <audio> playback if Web Audio hardware clock remains stalled
+                  stopTapeSource();
+                  stopBgKeepAlive();
+                  state.isFallbackLargeFile = true;
+                  audioEl.currentTime = state.currentTime;
+                  audioEl.playbackRate = state.playbackRate;
+                  audioEl.play().catch(() => {});
+                  updateVocoderUI();
+                }
+              }
+            }
             state.currentTime = getTapeCurrentTime();
             const skipDest = resolveSkipTarget(state.currentTime);
             if (skipDest !== null) {
@@ -22800,7 +23126,7 @@ ${info.url}`;
           updatePinButtonsUI();
           updateSectionBarUI();
           renderAllCanvases();
-          if (performance.now() - lastPeriodicSavePerf > 2500) {
+          if (performance.now() - lastPeriodicSavePerf > 10000) {
             saveCurrentFileMemory(true);
           }
         }
@@ -29723,11 +30049,24 @@ ${info.url}`;
       document.addEventListener('webkitfullscreenchange', onFullscreenStateChanged);
 
       // ==================== GITHUB / PWA SOFTWARE UPDATE CHECK & APPLY ====================
-      const APP_VERSION = 'v71';
+      const APP_VERSION = 'v72';
 
       // Ordered newest-first; each release appends a new object at the top.
       // Users who skip multiple versions automatically see ALL unseen versions between lastSeen and current.
       const APP_RELEASE_NOTES = [
+        {
+          version: 'v72',
+          verNum: 72,
+          date: '2026/11/27',
+          title: '録音・再生時の音切れ対策（全5項目）を実施',
+          items: [
+            '等速再生時・録音時はボコーダー処理（ScriptProcessor）をオーディオ経路から完全に切り離し、バッファも4096化・再生中の自動保存も軽量化してプチプチ音切れを防止しました',
+            '再生開始前に AudioContext の suspended / interrupted 状態を確実に復帰させ、録音終了後のOS音声ルート切替による無音化・停止を自動復旧する監視処理を追加しました',
+            'バックグラウンド・画面消灯時の音切れ対策として Media Session（ロック画面操作）と独立キープアライブ再生に対応しました',
+            '録音中の画面スリープ防止（Wake Lock）・リアルタイム描画の省メモリ化・L/Rステレオ結合の安全化・フォールバックバッファ8192化により録音時のデータ欠落を防止しました',
+            '録音停止直後にすぐ再生しても、波形生成完了や自動ブースト確定のタイミングで再生ソースが途切れないようシームレス化しました'
+          ]
+        },
         {
           version: 'v71',
           verNum: 71,
@@ -31849,6 +32188,12 @@ ${info.url}`;
           saveAppPrefs();
         } else {
           syncAppViewportHeight(true);
+          if (state.isRecording) {
+            acquireScreenWakeLock();
+          }
+          if (((state.isPlaying && !state.isYouTubeMode) || state.isRecording) && audioCtx && audioCtx.state !== 'running') {
+            audioCtx.resume().catch(() => {});
+          }
           renderAllCanvases();
           updateTimeUI();
           updatePinButtonsUI();
