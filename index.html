@@ -8,7 +8,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="Audipo2">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="app-version" content="v74">
+  <meta name="app-version" content="v75">
   <link rel="manifest" href="./manifest.json">
   <title>Audipo風 練習プレイヤー＆レコーダー</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='bg' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%231b2030'/%3E%3Cstop offset='100%25' stop-color='%230d0f15'/%3E%3C/linearGradient%3E%3ClinearGradient id='wv' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0%25' stop-color='%2360c5ff'/%3E%3Cstop offset='100%25' stop-color='%232563eb'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='url(%23bg)'/%3E%3Crect x='1' y='1' width='62' height='62' rx='15' fill='none' stroke='%233b82f6' stroke-opacity='0.3' stroke-width='2'/%3E%3Cg fill='url(%23wv)'%3E%3Crect x='10' y='28' width='4.5' height='12' rx='2.25' opacity='0.6'/%3E%3Crect x='18' y='22' width='4.5' height='24' rx='2.25' opacity='0.85'/%3E%3Crect x='26' y='15' width='4.5' height='36' rx='2.25'/%3E%3Crect x='34' y='21' width='4.5' height='25' rx='2.25' opacity='0.9'/%3E%3Crect x='42' y='26' width='4.5' height='16' rx='2.25' opacity='0.75'/%3E%3Crect x='50' y='30' width='4.5' height='9' rx='2.25' opacity='0.5'/%3E%3C/g%3E%3Cpath d='M36.25 10.5c0-1.4 1.1-2.5 2.5-2.5h5.5c1.4 0 2.5 1.1 2.5 2.5v2.4c0 .8-.3 1.5-.9 2.1l-3.2 3.1c-.6.6-1.6.6-2.2 0l-3.2-3.1c-.6-.6-.9-1.3-.9-2.1v-2.4z' fill='%23facc15'/%3E%3C/svg%3E">
@@ -510,6 +510,27 @@
 
     .bm-move-target-item:active {
       transform: scale(0.985);
+    }
+
+    .bm-dup-list {
+      margin: 6px 0 0;
+      padding: 6px 8px;
+      border-radius: 8px;
+      background: rgba(250, 204, 21, 0.08);
+      border: 1px solid rgba(250, 204, 21, 0.28);
+      font-size: 11px;
+      line-height: 1.5;
+      color: #fde68a;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .bm-dup-desc {
+      margin: 0 0 2px;
+      font-size: 12.5px;
+      line-height: 1.55;
+      color: #e4e4e7;
     }
 
     .rec-dot {
@@ -6286,6 +6307,22 @@
       color: #f6f4ef;
     }
 
+    body.theme-minimal .pin-conflict-badge {
+      background: #f8f1e2;
+      border-color: rgba(196, 125, 36, 0.45);
+      color: #8c5614;
+    }
+
+    body.theme-minimal .bm-dup-list {
+      background: #f8f1e2;
+      border-color: rgba(196, 125, 36, 0.35);
+      color: #8c5614;
+    }
+
+    body.theme-minimal .bm-dup-desc {
+      color: #4a4843;
+    }
+
     /* 2. Workspace, Page Dots & Progress */
     body.theme-minimal .waveform-workspace,
     body.theme-minimal .upper-page-wave {
@@ -8977,7 +9014,7 @@
         <div class="modal-section" style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
           <div>
             <div class="sec-title">バージョン情報</div>
-            <div id="settingsVersionLabel" class="engine-desc mono">現在: v74</div>
+            <div id="settingsVersionLabel" class="engine-desc mono">現在: v75</div>
           </div>
           <button id="btnShowReleaseHistory" type="button" class="step-btn" style="color:#93c5fd;border-color:rgba(66,165,245,0.45);">更新履歴を見る</button>
         </div>
@@ -9141,7 +9178,7 @@
           </div>
           <div>
             <h3 id="whatsNewTitle" class="whats-new-title">アップデートのお知らせ</h3>
-            <p id="whatsNewSub" class="whats-new-sub mono">v74 に更新されました</p>
+            <p id="whatsNewSub" class="whats-new-sub mono">v75 に更新されました</p>
           </div>
         </div>
         <button id="btnCloseWhatsNewX" type="button" class="modal-close" aria-label="閉じる">✕</button>
@@ -9843,16 +9880,15 @@
       <div id="bmCurrentTrackCard" class="bm-cur-card hidden" style="margin-top:10px;">
         <div class="bm-cur-head">
           <div class="bm-cur-info">
-            <div id="bmCurStatusLabel" class="bm-cur-label">いま開いている曲をお気に入り保存</div>
+            <div id="bmCurStatusLabel" class="bm-cur-label">いま開いている曲をお気に入り登録</div>
             <div id="bmCurTrackName" class="bm-cur-name"></div>
           </div>
         </div>
         <div class="bm-cur-actions">
           <button id="btnBmSaveCurrent" type="button" class="bm-save-cur-btn">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-            <span id="bmSaveCurBtnLabel">このフォルダにお気に入り追加</span>
+            <span id="bmSaveCurBtnLabel">お気に入りに追加</span>
           </button>
-          <button id="btnBmRemoveCurrent" type="button" class="fav-icon-btn del hidden" style="height:36px;padding:0 11px;">解除</button>
         </div>
       </div>
 
@@ -9929,6 +9965,28 @@
       <div class="modal-footer-row" style="margin-top:12px;">
         <button id="btnCancelBmAct" type="button" class="danger-btn-safe" style="height:41px;border-radius:11px;">キャンセル</button>
         <button id="btnExecBmAct" type="button" class="whats-new-ok-btn" style="height:41px;">名前を保存</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== 21. BOOKMARK DUPLICATE CONFIRMATION MODAL ==================== -->
+  <div id="bmDuplicateModal" class="modal-backdrop hidden" style="z-index:87;">
+    <div class="pin-conflict-card" role="dialog" aria-modal="true" aria-labelledby="bmDupTitle">
+      <div class="pin-conflict-badge mono">二重登録の確認</div>
+      <h3 id="bmDupTitle" class="mark-edit-title" style="margin-bottom:9px;font-size:15.5px;">すでにお気に入り登録されています</h3>
+
+      <div class="pin-conflict-file-box">
+        <div id="bmDupTrackName" class="pin-conflict-fname"></div>
+        <div id="bmDupExistingPaths" class="bm-dup-list"></div>
+      </div>
+
+      <p id="bmDupDesc" class="bm-dup-desc">
+        すでに同じ曲（動画）がお気に入りに登録されています。二重で登録しますか？
+      </p>
+
+      <div class="modal-footer-row" style="margin-top:12px;">
+        <button id="btnBmDupCancel" type="button" class="danger-btn-safe" style="height:41px;border-radius:11px;">キャンセル</button>
+        <button id="btnBmDupConfirm" type="button" class="whats-new-ok-btn" style="height:41px;">二重で登録する</button>
       </div>
     </div>
   </div>
@@ -26739,7 +26797,12 @@ ${info.url}`;
       const bmCurTrackName = document.getElementById('bmCurTrackName');
       const btnBmSaveCurrent = document.getElementById('btnBmSaveCurrent');
       const bmSaveCurBtnLabel = document.getElementById('bmSaveCurBtnLabel');
-      const btnBmRemoveCurrent = document.getElementById('btnBmRemoveCurrent');
+      const bmDuplicateModal = document.getElementById('bmDuplicateModal');
+      const bmDupTrackName = document.getElementById('bmDupTrackName');
+      const bmDupExistingPaths = document.getElementById('bmDupExistingPaths');
+      const bmDupDesc = document.getElementById('bmDupDesc');
+      const btnBmDupCancel = document.getElementById('btnBmDupCancel');
+      const btnBmDupConfirm = document.getElementById('btnBmDupConfirm');
       const btnBmDirUp = document.getElementById('btnBmDirUp');
       const bmCrumbPath = document.getElementById('bmCrumbPath');
       const bmNewFolderBox = document.getElementById('bmNewFolderBox');
@@ -26873,28 +26936,95 @@ ${info.url}`;
         return names.length > 0 ? `★ ルート / ${names.join(' / ')}` : '★ ルート（最上位）';
       }
 
-      function findCurrentTrackBookmark(store = readBookmarksStore()) {
-        if (!state.hasAudio) return null;
-        if (state.isYouTubeMode && state.ytVideoId) {
-          return store.items.find(it => it.type === 'youtube' && it.ytVideoId === state.ytVideoId) || null;
+      function findAllMatchingBookmarks(store, criteria) {
+        if (!store || !Array.isArray(store.items) || !criteria) return [];
+        if (criteria.type === 'youtube' && criteria.ytVideoId) {
+          return store.items.filter(it => it.type === 'youtube' && it.ytVideoId === criteria.ytVideoId);
         }
-        const curSize = state.currentFileSize || (state.rawBlob ? state.rawBlob.size : 0);
-        const curOrig = state.currentFileOrigName || trackTitleEl.textContent.trim();
+        const curSize = Number(criteria.size) || 0;
+        const curDur = Number(criteria.duration) || 0;
+        const curOrig = String(criteria.origName || '').trim();
         if (curSize > 0) {
-          const exact = store.items.find(it =>
+          const exactMatches = store.items.filter(it =>
             it.type === 'audio' &&
             Number(it.size) === curSize &&
             (
-              !(it.duration > 0 && state.duration > 0) ||
-              Math.abs(it.duration - state.duration) <= 0.75
+              !(it.duration > 0 && curDur > 0) ||
+              Math.abs(it.duration - curDur) <= 0.75
             )
           );
-          if (exact) return exact;
+          if (exactMatches.length > 0) return exactMatches;
         }
         if (curOrig) {
-          return store.items.find(it => it.type === 'audio' && it.origName === curOrig) || null;
+          return store.items.filter(it => it.type === 'audio' && it.origName === curOrig);
         }
-        return null;
+        return [];
+      }
+
+      function findCurrentTrackBookmark(store = readBookmarksStore()) {
+        if (!state.hasAudio) return null;
+        if (state.isYouTubeMode && state.ytVideoId) {
+          const matches = findAllMatchingBookmarks(store, { type: 'youtube', ytVideoId: state.ytVideoId });
+          return matches[0] || null;
+        }
+        const curSize = state.currentFileSize || (state.rawBlob ? state.rawBlob.size : 0);
+        const curOrig = state.currentFileOrigName || trackTitleEl.textContent.trim();
+        const matches = findAllMatchingBookmarks(store, {
+          type: 'audio',
+          size: curSize,
+          duration: state.duration,
+          origName: curOrig
+        });
+        return matches[0] || null;
+      }
+
+      let bmDuplicateModalResolver = null;
+      function closeBookmarkDuplicateModal(confirmed = false) {
+        if (bmDuplicateModal) bmDuplicateModal.classList.add('hidden');
+        const resolver = bmDuplicateModalResolver;
+        bmDuplicateModalResolver = null;
+        if (resolver) resolver(Boolean(confirmed));
+      }
+
+      function confirmBookmarkDuplicateModal(store, displayTitle, matches, targetFolderId) {
+        if (!bmDuplicateModal) return Promise.resolve(true);
+        if (bmDuplicateModalResolver) {
+          closeBookmarkDuplicateModal(false);
+        }
+        const safeTarget = targetFolderId || null;
+        const alreadyInSameFolder = matches.some(m => (m.folderId || null) === safeTarget);
+        if (bmDupTrackName) bmDupTrackName.textContent = displayTitle || 'お気に入り項目';
+        if (bmDupExistingPaths) {
+          bmDupExistingPaths.innerHTML = '';
+          const seen = new Map();
+          matches.forEach((m) => {
+            const fid = m.folderId || null;
+            const key = fid || '__root__';
+            seen.set(key, (seen.get(key) || 0) + 1);
+          });
+          const headLine = document.createElement('div');
+          headLine.style.fontWeight = '800';
+          headLine.textContent = `現在の登録先（計${matches.length}件）:`;
+          bmDupExistingPaths.appendChild(headLine);
+          seen.forEach((cnt, key) => {
+            const fid = key === '__root__' ? null : key;
+            const pathStr = getBookmarkFolderPathLabel(store, fid);
+            const sameTag = fid === safeTarget ? '（いま開いているフォルダ）' : '';
+            const cntTag = cnt > 1 ? ` ×${cnt}` : '';
+            const line = document.createElement('div');
+            line.textContent = `・${pathStr}${sameTag}${cntTag}`;
+            bmDupExistingPaths.appendChild(line);
+          });
+        }
+        if (bmDupDesc) {
+          bmDupDesc.textContent = alreadyInSameFolder
+            ? 'いま開いているフォルダに、同じ曲（動画）がすでに登録されています。二重で登録しますか？'
+            : 'すでに別のフォルダに同じ曲（動画）が登録されています。このフォルダにも二重で登録しますか？';
+        }
+        bmDuplicateModal.classList.remove('hidden');
+        return new Promise((resolve) => {
+          bmDuplicateModalResolver = resolve;
+        });
       }
 
       function updateBookmarkHeaderUI() {
@@ -26932,16 +27062,23 @@ ${info.url}`;
           showToast('保存するYouTubeまたは音声ファイルを先に開いてください');
           return;
         }
-        const store = readBookmarksStore();
-        const safeFolderId = (targetFolderId && store.folders.some(f => f.id === targetFolderId)) ? targetFolderId : null;
-        const now = Date.now();
-        const id = `bmi_${now}_${Math.random().toString(36).slice(2, 6)}`;
+        const initialStore = readBookmarksStore();
+        const safeFolderId = (targetFolderId && initialStore.folders.some(f => f.id === targetFolderId)) ? targetFolderId : null;
 
         if (state.isYouTubeMode && state.ytVideoId) {
           const title = trackTitleEl.textContent.trim() || state.currentFileOrigName || `YouTube (${state.ytVideoId})`;
+          const existingMatches = findAllMatchingBookmarks(initialStore, { type: 'youtube', ytVideoId: state.ytVideoId });
+          if (existingMatches.length > 0) {
+            const okDup = await confirmBookmarkDuplicateModal(initialStore, `[YouTube] ${title}`, existingMatches, safeFolderId);
+            if (!okDup) return;
+          }
+          const store = readBookmarksStore();
+          const finalFolderId = (safeFolderId && store.folders.some(f => f.id === safeFolderId)) ? safeFolderId : null;
+          const now = Date.now();
+          const id = `bmi_${now}_${Math.random().toString(36).slice(2, 6)}`;
           const item = {
             id,
-            folderId: safeFolderId,
+            folderId: finalFolderId,
             type: 'youtube',
             title,
             ytVideoId: state.ytVideoId,
@@ -26963,6 +27100,20 @@ ${info.url}`;
         const title = trackTitleEl.textContent.trim() || origName;
         const size = state.currentFileSize || (state.rawBlob ? state.rawBlob.size : 0);
         const duration = Math.round((Number(state.duration) || 0) * 1000) / 1000;
+        const existingMatches = findAllMatchingBookmarks(initialStore, {
+          type: 'audio',
+          size,
+          duration,
+          origName
+        });
+        if (existingMatches.length > 0) {
+          const okDup = await confirmBookmarkDuplicateModal(initialStore, `[音声] ${title}`, existingMatches, safeFolderId);
+          if (!okDup) return;
+        }
+        const store = readBookmarksStore();
+        const finalFolderId = (safeFolderId && store.folders.some(f => f.id === safeFolderId)) ? safeFolderId : null;
+        const now = Date.now();
+        const id = `bmi_${now}_${Math.random().toString(36).slice(2, 6)}`;
         let hasFileHandle = false;
         let hasCachedBlob = false;
 
@@ -26975,7 +27126,7 @@ ${info.url}`;
 
         const item = {
           id,
-          folderId: safeFolderId,
+          folderId: finalFolderId,
           type: 'audio',
           title,
           origName,
@@ -27079,25 +27230,15 @@ ${info.url}`;
           bmState.curFolderId = null;
         }
 
-        // 1. Current track quick-save card
+        // 1. Current track quick-save card (always normal add button; duplicates prompt via confirmation modal)
         if (bmCurrentTrackCard) {
           if (state.hasAudio) {
             bmCurrentTrackCard.classList.remove('hidden');
-            const existingBm = findCurrentTrackBookmark(store);
+            bmCurrentTrackCard.classList.remove('is-saved');
             const curTitle = trackTitleEl.textContent.trim() || state.currentFileOrigName || '現在の曲';
             bmCurTrackName.textContent = (state.isYouTubeMode ? '[YouTube] ' : '[音声] ') + curTitle;
-            if (existingBm) {
-              bmCurrentTrackCard.classList.add('is-saved');
-              const savedPath = getBookmarkFolderPathLabel(store, existingBm.folderId);
-              bmCurStatusLabel.textContent = `★ お気に入り登録済み（保存先: ${savedPath}）`;
-              bmSaveCurBtnLabel.textContent = 'このフォルダにも追加';
-              btnBmRemoveCurrent.classList.remove('hidden');
-            } else {
-              bmCurrentTrackCard.classList.remove('is-saved');
-              bmCurStatusLabel.textContent = 'いま開いている曲をお気に入り保存';
-              bmSaveCurBtnLabel.textContent = bmState.curFolderId ? 'このフォルダにお気に入り追加' : 'お気に入りに追加';
-              btnBmRemoveCurrent.classList.add('hidden');
-            }
+            bmCurStatusLabel.textContent = 'いま開いている曲をお気に入り登録';
+            bmSaveCurBtnLabel.textContent = bmState.curFolderId ? 'このフォルダにお気に入り追加' : 'お気に入りに追加';
           } else {
             bmCurrentTrackCard.classList.add('hidden');
           }
@@ -27340,12 +27481,19 @@ ${info.url}`;
           } catch (_) {}
         }
 
+        const initialStore = readBookmarksStore();
+        const safeFolderId = (bmState.curFolderId && initialStore.folders.some(f => f.id === bmState.curFolderId)) ? bmState.curFolderId : null;
+        const existingYtMatches = findAllMatchingBookmarks(initialStore, { type: 'youtube', ytVideoId: parsed.videoId });
+        if (existingYtMatches.length > 0) {
+          const okDup = await confirmBookmarkDuplicateModal(initialStore, `[YouTube] ${title}`, existingYtMatches, safeFolderId);
+          if (!okDup) return;
+        }
         const store = readBookmarksStore();
-        const safeFolderId = (bmState.curFolderId && store.folders.some(f => f.id === bmState.curFolderId)) ? bmState.curFolderId : null;
+        const finalFolderId = (safeFolderId && store.folders.some(f => f.id === safeFolderId)) ? safeFolderId : null;
         const now = Date.now();
         store.items.unshift({
           id: `bmi_${now}_${Math.random().toString(36).slice(2, 6)}`,
-          folderId: safeFolderId,
+          folderId: finalFolderId,
           type: 'youtube',
           title,
           ytVideoId: parsed.videoId,
@@ -29143,17 +29291,11 @@ ${info.url}`;
       if (btnBmSaveCurrent) {
         btnBmSaveCurrent.addEventListener('click', () => saveCurrentTrackAsBookmark(bmState.curFolderId));
       }
-      if (btnBmRemoveCurrent) {
-        btnBmRemoveCurrent.addEventListener('click', async () => {
-          const store = readBookmarksStore();
-          const curBm = findCurrentTrackBookmark(store);
-          if (!curBm) return;
-          store.items = store.items.filter(it => it.id !== curBm.id);
-          writeBookmarksStore(store);
-          await deleteBookmarkAssetsFromIDB(curBm.id);
-          updateBookmarkHeaderUI();
-          renderBookmarksModal();
-          showToast(`お気に入りを解除しました: ${curBm.title}`);
+      if (btnBmDupCancel) btnBmDupCancel.addEventListener('click', () => closeBookmarkDuplicateModal(false));
+      if (btnBmDupConfirm) btnBmDupConfirm.addEventListener('click', () => closeBookmarkDuplicateModal(true));
+      if (bmDuplicateModal) {
+        bmDuplicateModal.addEventListener('click', (e) => {
+          if (e.target === bmDuplicateModal) closeBookmarkDuplicateModal(false);
         });
       }
       if (btnBmDirUp) {
@@ -29609,11 +29751,21 @@ ${info.url}`;
       document.addEventListener('webkitfullscreenchange', onFullscreenStateChanged);
 
       // ==================== GITHUB / PWA SOFTWARE UPDATE CHECK & APPLY ====================
-      const APP_VERSION = 'v74';
+      const APP_VERSION = 'v75';
 
       // Ordered newest-first; each release appends a new object at the top.
       // Users who skip multiple versions automatically see ALL unseen versions between lastSeen and current.
       const APP_RELEASE_NOTES = [
+        {
+          version: 'v75',
+          verNum: 75,
+          date: '2026/11/27',
+          title: 'お気に入りブックマークの二重登録確認ウィンドウを追加',
+          items: [
+            'ブックマーク画面下の「このフォルダにも追加」表示をやめ、常に通常の登録ボタン（「お気に入りに追加」／「このフォルダにお気に入り追加」）としてシンプルに表示するようにしました',
+            'すでに同じ曲（またはYouTube動画）がお気に入りに登録されている状態で登録ボタンを押すと、現在の登録先フォルダ一覧を表示する確認ウィンドウが開き、「二重で登録する」か「キャンセル」を選択できるようになりました'
+          ]
+        },
         {
           version: 'v74',
           verNum: 74,
@@ -31702,7 +31854,9 @@ ${info.url}`;
 
       window.addEventListener('popstate', () => {
         // 1. Close topmost open modal if any
-        if (bmItemActionModal && !bmItemActionModal.classList.contains('hidden')) {
+        if (bmDuplicateModal && !bmDuplicateModal.classList.contains('hidden')) {
+          closeBookmarkDuplicateModal(false);
+        } else if (bmItemActionModal && !bmItemActionModal.classList.contains('hidden')) {
           closeBookmarkItemActionModal();
         } else if (bookmarksModal && !bookmarksModal.classList.contains('hidden')) {
           if (bmState.curFolderId) {
