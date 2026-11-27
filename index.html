@@ -8,7 +8,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="Audipo2">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="app-version" content="v62">
+  <meta name="app-version" content="v63">
   <link rel="manifest" href="./manifest.json">
   <title>Audipo風 練習プレイヤー＆レコーダー</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='bg' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%231b2030'/%3E%3Cstop offset='100%25' stop-color='%230d0f15'/%3E%3C/linearGradient%3E%3ClinearGradient id='wv' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0%25' stop-color='%2360c5ff'/%3E%3Cstop offset='100%25' stop-color='%232563eb'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='url(%23bg)'/%3E%3Crect x='1' y='1' width='62' height='62' rx='15' fill='none' stroke='%233b82f6' stroke-opacity='0.3' stroke-width='2'/%3E%3Cg fill='url(%23wv)'%3E%3Crect x='10' y='28' width='4.5' height='12' rx='2.25' opacity='0.6'/%3E%3Crect x='18' y='22' width='4.5' height='24' rx='2.25' opacity='0.85'/%3E%3Crect x='26' y='15' width='4.5' height='36' rx='2.25'/%3E%3Crect x='34' y='21' width='4.5' height='25' rx='2.25' opacity='0.9'/%3E%3Crect x='42' y='26' width='4.5' height='16' rx='2.25' opacity='0.75'/%3E%3Crect x='50' y='30' width='4.5' height='9' rx='2.25' opacity='0.5'/%3E%3C/g%3E%3Cpath d='M36.25 10.5c0-1.4 1.1-2.5 2.5-2.5h5.5c1.4 0 2.5 1.1 2.5 2.5v2.4c0 .8-.3 1.5-.9 2.1l-3.2 3.1c-.6.6-1.6.6-2.2 0l-3.2-3.1c-.6-.6-.9-1.3-.9-2.1v-2.4z' fill='%23facc15'/%3E%3C/svg%3E">
@@ -8091,7 +8091,7 @@
         <div class="modal-section" style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
           <div>
             <div class="sec-title">バージョン情報</div>
-            <div id="settingsVersionLabel" class="engine-desc mono">現在: v62</div>
+            <div id="settingsVersionLabel" class="engine-desc mono">現在: v63</div>
           </div>
           <button id="btnShowReleaseHistory" type="button" class="step-btn" style="color:#93c5fd;border-color:rgba(66,165,245,0.45);">更新履歴を見る</button>
         </div>
@@ -8255,7 +8255,7 @@
           </div>
           <div>
             <h3 id="whatsNewTitle" class="whats-new-title">アップデートのお知らせ</h3>
-            <p id="whatsNewSub" class="whats-new-sub mono">v62 に更新されました</p>
+            <p id="whatsNewSub" class="whats-new-sub mono">v63 に更新されました</p>
           </div>
         </div>
         <button id="btnCloseWhatsNewX" type="button" class="modal-close" aria-label="閉じる">✕</button>
@@ -20294,8 +20294,8 @@
         if (zoomTrackSamples.length < 2) return 0;
         const now = performance.now();
         const last = zoomTrackSamples[zoomTrackSamples.length - 1];
-        // If finger paused motionless for > 110ms before lifting, do not coast
-        if (now - last.t > 110) return 0;
+        // If finger paused motionless for > 85ms before lifting, do not coast
+        if (now - last.t > 85) return 0;
 
         // Find earliest sample within ~95ms before the last move
         let first = zoomTrackSamples[0];
@@ -20307,13 +20307,13 @@
         if (dt < 4) return 0;
 
         const vxPxPerMs = (last.x - first.x) / dt;
-        // Require a genuine flick (> 0.08 px/ms) regardless of zoom span
-        if (Math.abs(vxPxPerMs) < 0.08) return 0;
+        // Require a genuine flick (> 0.10 px/ms) regardless of zoom span
+        if (Math.abs(vxPxPerMs) < 0.10) return 0;
 
         // Convert screen px/ms to audio seconds/ms (dragging right -> earlier in time -> negative delta)
         const secPerMs = -(vxPxPerMs / Math.max(1, W)) * state.zoomWindowSeconds;
         // Clamp extreme single-frame spikes
-        const maxSecPerMs = (6.0 / Math.max(1, W)) * state.zoomWindowSeconds;
+        const maxSecPerMs = (5.0 / Math.max(1, W)) * state.zoomWindowSeconds;
         return Math.max(-maxSecPerMs, Math.min(maxSecPerMs, secPerMs));
       }
 
@@ -20336,8 +20336,10 @@
 
         const rect = zoomCanvas.getBoundingClientRect();
         const W = Math.max(1, rect.width);
-        // Minimum stopping velocity equivalent to ~0.015 px/ms on screen (consistent across all zoom levels!)
-        const minStopSecPerMs = (0.015 / W) * state.zoomWindowSeconds;
+        // Stopping velocity (~0.025 px/ms) & subtle dry Coulomb friction (~0.00038 px/ms^2) for natural tactile grip
+        const secPerPx = state.zoomWindowSeconds / W;
+        const minStopSecPerMs = 0.025 * secPerPx;
+        const coulombDecelSecPerMs2 = 0.00038 * secPerPx;
         if (Math.abs(velSecPerMs) <= minStopSecPerMs) return false;
 
         state.isInertiaActive = true;
@@ -20361,8 +20363,16 @@
           // Keep audio playing uninterrupted during inertial glide; jump once when glide settles
           seekTo(nextT, { keepInertia: true, setGreenPin: false, deferAudioSeek: true });
 
-          // Smooth iOS/Android-like exponential deceleration (0.955 per 16.67ms frame)
-          state.zoomVelSecPerMs *= Math.pow(0.955, dt / 16.67);
+          // Viscous damping (0.925 per 16.67ms) + gentle dry Coulomb friction so the glide settles cleanly instead of sliding like ice
+          let nextVel = state.zoomVelSecPerMs * Math.pow(0.925, dt / 16.67);
+          const frictionDrop = coulombDecelSecPerMs2 * dt;
+          if (Math.abs(nextVel) <= frictionDrop) {
+            nextVel = 0;
+          } else {
+            nextVel -= Math.sign(nextVel) * frictionDrop;
+          }
+          state.zoomVelSecPerMs = nextVel;
+
           if (Math.abs(state.zoomVelSecPerMs) < minStopSecPerMs) {
             stopInertia(true);
             return;
@@ -25552,11 +25562,21 @@
       document.addEventListener('webkitfullscreenchange', onFullscreenStateChanged);
 
       // ==================== GITHUB / PWA SOFTWARE UPDATE CHECK & APPLY ====================
-      const APP_VERSION = 'v62';
+      const APP_VERSION = 'v63';
 
       // Ordered newest-first; each release appends a new object at the top.
       // Users who skip multiple versions automatically see ALL unseen versions between lastSeen and current.
       const APP_RELEASE_NOTES = [
+        {
+          version: 'v63',
+          verNum: 63,
+          date: '2026/11/27',
+          title: '拡大波形の慣性スクロールに程よい摩擦抵抗を追加',
+          items: [
+            '下の拡大波形をフリックしたときの慣性スクロールを調整し、粘性減衰とわずかな乾燥摩擦（クーロン摩擦）を組み合わせることで、滑らかに流れつつ狙った位置付近でスッと止まる心地よい手触りにしました',
+            '指を止めて離した際の誤スライド判定も引き締め、細かい位置合わせがしやすくなりました'
+          ]
+        },
         {
           version: 'v62',
           verNum: 62,
