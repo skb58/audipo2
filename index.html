@@ -8,7 +8,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="Audipo2">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="app-version" content="v61">
+  <meta name="app-version" content="v62">
   <link rel="manifest" href="./manifest.json">
   <title>Audipo風 練習プレイヤー＆レコーダー</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='bg' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%231b2030'/%3E%3Cstop offset='100%25' stop-color='%230d0f15'/%3E%3C/linearGradient%3E%3ClinearGradient id='wv' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0%25' stop-color='%2360c5ff'/%3E%3Cstop offset='100%25' stop-color='%232563eb'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='url(%23bg)'/%3E%3Crect x='1' y='1' width='62' height='62' rx='15' fill='none' stroke='%233b82f6' stroke-opacity='0.3' stroke-width='2'/%3E%3Cg fill='url(%23wv)'%3E%3Crect x='10' y='28' width='4.5' height='12' rx='2.25' opacity='0.6'/%3E%3Crect x='18' y='22' width='4.5' height='24' rx='2.25' opacity='0.85'/%3E%3Crect x='26' y='15' width='4.5' height='36' rx='2.25'/%3E%3Crect x='34' y='21' width='4.5' height='25' rx='2.25' opacity='0.9'/%3E%3Crect x='42' y='26' width='4.5' height='16' rx='2.25' opacity='0.75'/%3E%3Crect x='50' y='30' width='4.5' height='9' rx='2.25' opacity='0.5'/%3E%3C/g%3E%3Cpath d='M36.25 10.5c0-1.4 1.1-2.5 2.5-2.5h5.5c1.4 0 2.5 1.1 2.5 2.5v2.4c0 .8-.3 1.5-.9 2.1l-3.2 3.1c-.6.6-1.6.6-2.2 0l-3.2-3.1c-.6-.6-.9-1.3-.9-2.1v-2.4z' fill='%23facc15'/%3E%3C/svg%3E">
@@ -8072,10 +8072,10 @@
               <span class="sec-title">ピン記憶・セッション自動復元</span>
               <button type="button" class="setting-help-btn" data-help-key="pinMemory" aria-label="ピン記憶・セッション自動復元の説明">?</button>
             </span>
-            <span id="modalMemoryCount" class="sec-value mono" style="color:#fde047;">0 / 1000件</span>
+            <span id="modalMemoryCount" class="sec-value mono" style="color:#fde047;">0曲 記憶中</span>
           </div>
           <div class="engine-desc" style="margin-bottom:9px;">
-            再生時間とファイルサイズで音源を判別し、ピン・名前・スキップ設定・再生位置を最大1000件まで自動記憶します（ファイル名を変えても引き継がれます）。
+            再生時間とファイルサイズで音源を判別し、ピン・名前・スキップ設定・再生位置を端末内データベース（IndexedDB）へ件数制限なく自動記憶します（ファイル名を変えても引き継がれます）。
           </div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:8px;">
             <button id="btnImportPinsFile" type="button" class="step-btn" style="background:rgba(250,204,21,0.14);border-color:rgba(250,204,21,0.55);color:#fef08a;">ピンを読込 (ファイル)</button>
@@ -8091,7 +8091,7 @@
         <div class="modal-section" style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
           <div>
             <div class="sec-title">バージョン情報</div>
-            <div id="settingsVersionLabel" class="engine-desc mono">現在: v61</div>
+            <div id="settingsVersionLabel" class="engine-desc mono">現在: v62</div>
           </div>
           <button id="btnShowReleaseHistory" type="button" class="step-btn" style="color:#93c5fd;border-color:rgba(66,165,245,0.45);">更新履歴を見る</button>
         </div>
@@ -8255,7 +8255,7 @@
           </div>
           <div>
             <h3 id="whatsNewTitle" class="whats-new-title">アップデートのお知らせ</h3>
-            <p id="whatsNewSub" class="whats-new-sub mono">v61 に更新されました</p>
+            <p id="whatsNewSub" class="whats-new-sub mono">v62 に更新されました</p>
           </div>
         </div>
         <button id="btnCloseWhatsNewX" type="button" class="modal-close" aria-label="閉じる">✕</button>
@@ -9116,6 +9116,7 @@
         skipLeadingSilence: false,
         leadingSilenceSensitivity: 'normal', // 'gentle' | 'normal' | 'strong'
         leadingSilenceEnd: 0,
+        manualLeadingPlay: false,
 
         // Markers: Yellow Confirmed Pins (objects) & startSectionEnabled (0:00 -> 1st yellow) & Green Temporary Pin (max 1)
         markers: [],
@@ -9399,7 +9400,10 @@
       const MAX_TRACK_META_CACHE = 1000;
       const IDB_NAME = 'audipo2_session_db_v1';
       const IDB_STORE = 'session_store';
-      const MAX_REMEMBERED_FILES = 1000;
+      const IDB_FILE_MEM_KEY = 'file_memory_map_v1';
+      const LS_ACTIVE_MEM_SNAPSHOT_KEY = 'audipo2_active_mem_snapshot_v1';
+      let fileMemoryCache = null;
+      let fileMemoryIdbQueue = Promise.resolve();
 
       function loadTempSessionState(size, duration = null) {
         try {
@@ -9434,38 +9438,154 @@
         return `sz:${s}::dur:${dDeci}`;
       }
 
-      function readAllFileMemories() {
+      function readLegacyLocalStorageMemories() {
+        const merged = {};
         try {
           const raw = localStorage.getItem(LS_FILE_MEM_KEY);
-          if (!raw) return {};
-          const parsed = JSON.parse(raw);
-          return (parsed && typeof parsed === 'object') ? parsed : {};
+          if (raw) {
+            const parsed = JSON.parse(raw);
+            if (parsed && typeof parsed === 'object') {
+              Object.assign(merged, parsed);
+            }
+          }
+        } catch (_) {}
+        try {
+          const rawActive = localStorage.getItem(LS_ACTIVE_MEM_SNAPSHOT_KEY);
+          if (rawActive) {
+            const act = JSON.parse(rawActive);
+            if (act && act.key && act.rec && typeof act.rec === 'object') {
+              const prev = merged[act.key];
+              if (!prev || (act.rec.updatedAt || 0) >= (prev.updatedAt || 0)) {
+                merged[act.key] = act.rec;
+              }
+            }
+          }
+        } catch (_) {}
+        return merged;
+      }
+
+      function mergeMemoryMaps(baseMap, incomingMap) {
+        const out = { ...(baseMap || {}) };
+        if (!incomingMap || typeof incomingMap !== 'object') return out;
+        for (const k in incomingMap) {
+          const inc = incomingMap[k];
+          if (!inc || typeof inc !== 'object') continue;
+          const cur = out[k];
+          if (!cur || (inc.updatedAt || 0) >= (cur.updatedAt || 0)) {
+            out[k] = inc;
+          }
+        }
+        return out;
+      }
+
+      function saveActiveMemoryFallbackSync(key, snapshot) {
+        if (!key || !snapshot) return;
+        try {
+          localStorage.setItem(LS_ACTIVE_MEM_SNAPSHOT_KEY, JSON.stringify({ key, rec: snapshot }));
+        } catch (_) {}
+      }
+
+      function persistFileMemoriesToIDB(snapshotObj) {
+        const payload = { ...snapshotObj };
+        fileMemoryIdbQueue = fileMemoryIdbQueue
+          .catch(() => {})
+          .then(async () => {
+            try {
+              const db = await openSessionDB();
+              await new Promise((resolve, reject) => {
+                const tx = db.transaction(IDB_STORE, 'readwrite');
+                tx.objectStore(IDB_STORE).put(payload, IDB_FILE_MEM_KEY);
+                tx.oncomplete = () => resolve();
+                tx.onerror = () => reject(tx.error);
+                tx.onabort = () => reject(tx.error || new Error('IDB tx aborted'));
+              });
+              db.close();
+              // Once persisted safely to IndexedDB, free legacy localStorage space
+              try {
+                if (localStorage.getItem(LS_FILE_MEM_KEY) !== null) {
+                  localStorage.removeItem(LS_FILE_MEM_KEY);
+                }
+              } catch (_) {}
+            } catch (err) {
+              console.warn('IDB pin memory write failed, falling back to localStorage:', err);
+              let entries = Object.entries(payload).sort((a, b) => (b[1]?.updatedAt || 0) - (a[1]?.updatedAt || 0));
+              while (entries.length > 0) {
+                try {
+                  localStorage.setItem(LS_FILE_MEM_KEY, JSON.stringify(Object.fromEntries(entries)));
+                  return;
+                } catch (_) {
+                  if (entries.length <= 1) return;
+                  entries = entries.slice(0, entries.length - Math.max(1, Math.ceil(entries.length * 0.1)));
+                }
+              }
+            }
+          });
+        return fileMemoryIdbQueue;
+      }
+
+      async function loadFileMemoriesFromIDB() {
+        try {
+          const db = await openSessionDB();
+          const data = await new Promise((resolve, reject) => {
+            const tx = db.transaction(IDB_STORE, 'readonly');
+            const req = tx.objectStore(IDB_STORE).get(IDB_FILE_MEM_KEY);
+            req.onsuccess = () => resolve(req.result || null);
+            req.onerror = () => reject(req.error);
+          });
+          db.close();
+          return (data && typeof data === 'object') ? data : null;
         } catch (_) {
-          return {};
+          return null;
         }
       }
 
-      function writeAllFileMemories(map) {
-        // Sort newest-first so any entries beyond MAX_REMEMBERED_FILES (1000) are evicted oldest-first
-        let entries = Object.entries(map).sort((a, b) => (b[1]?.updatedAt || 0) - (a[1]?.updatedAt || 0));
-        if (entries.length > MAX_REMEMBERED_FILES) {
-          entries = entries.slice(0, MAX_REMEMBERED_FILES);
-        }
+      async function clearFileMemoriesFromIDB() {
+        fileMemoryIdbQueue = fileMemoryIdbQueue
+          .catch(() => {})
+          .then(async () => {
+            try {
+              const db = await openSessionDB();
+              await new Promise((resolve, reject) => {
+                const tx = db.transaction(IDB_STORE, 'readwrite');
+                tx.objectStore(IDB_STORE).delete(IDB_FILE_MEM_KEY);
+                tx.oncomplete = () => resolve();
+                tx.onerror = () => reject(tx.error);
+              });
+              db.close();
+            } catch (_) {}
+          });
+        return fileMemoryIdbQueue;
+      }
 
-        // Attempt write; if browser localStorage quota is tight, trim oldest entries until it fits
-        while (entries.length > 0) {
-          try {
-            localStorage.setItem(LS_FILE_MEM_KEY, JSON.stringify(Object.fromEntries(entries)));
-            return;
-          } catch (err) {
-            if (entries.length <= 1) {
-              console.warn('localStorage file memory write failed:', err);
-              return;
-            }
-            const drop = Math.max(1, Math.ceil(entries.length * 0.1));
-            entries = entries.slice(0, entries.length - drop);
-          }
+      async function initFileMemoryStore() {
+        const legacyMap = readLegacyLocalStorageMemories();
+        const idbMap = await loadFileMemoriesFromIDB();
+        let merged = mergeMemoryMaps(idbMap || {}, legacyMap);
+        if (fileMemoryCache && typeof fileMemoryCache === 'object') {
+          merged = mergeMemoryMaps(merged, fileMemoryCache);
         }
+        fileMemoryCache = merged;
+
+        const hadLegacy = Boolean(localStorage.getItem(LS_FILE_MEM_KEY) || localStorage.getItem(LS_ACTIVE_MEM_SNAPSHOT_KEY));
+        if (hadLegacy && Object.keys(merged).length > 0) {
+          await persistFileMemoriesToIDB(merged);
+          try { localStorage.removeItem(LS_ACTIVE_MEM_SNAPSHOT_KEY); } catch (_) {}
+        }
+        updateMemoryCountBadge();
+        updateStartupLastFileHint();
+      }
+
+      function readAllFileMemories() {
+        if (fileMemoryCache === null) {
+          fileMemoryCache = readLegacyLocalStorageMemories();
+        }
+        return { ...fileMemoryCache };
+      }
+
+      function writeAllFileMemories(map) {
+        const nextMap = (map && typeof map === 'object') ? { ...map } : {};
+        fileMemoryCache = nextMap;
+        persistFileMemoriesToIDB(nextMap);
       }
 
       // Match audio purely by exact file size + duration (tolerates minor metadata vs PCM decode duration drift <= 0.6s)
@@ -9668,6 +9788,7 @@
 
           state.currentMemoryKey = key;
           map[key] = snapshot;
+          saveActiveMemoryFallbackSync(key, snapshot);
           writeAllFileMemories(map);
           if (effectiveDur > 0 && state.rawBlob) {
             const lm = (typeof state.rawBlob.lastModified === 'number' && state.rawBlob.lastModified > 0) ? state.rawBlob.lastModified : 0;
@@ -10000,7 +10121,7 @@
       function updateMemoryCountBadge() {
         const el = document.getElementById('modalMemoryCount');
         const count = Object.keys(readAllFileMemories()).length;
-        if (el) el.textContent = `${count} / ${MAX_REMEMBERED_FILES}件`;
+        if (el) el.textContent = `${count}曲 記憶中`;
         updateShareButtonState();
       }
 
@@ -10378,10 +10499,11 @@
         state.leadingSilenceEnd = detectLeadingSilenceEnd();
         updateSkipLeadingSilenceUI();
 
-        if (applyJump && state.skipLeadingSilence && state.leadingSilenceEnd >= 0.25 && !isWaveScrubbing()) {
+        if (applyJump && state.skipLeadingSilence && state.leadingSilenceEnd >= 0.25 && !isWaveScrubbing() && !state.manualLeadingPlay) {
           const liveT = getLivePlayheadTime();
           if (liveT < state.leadingSilenceEnd - 0.05) {
-            seekTo(state.leadingSilenceEnd, { setGreenPin: false });
+            state.manualLeadingPlay = false;
+            seekTo(state.leadingSilenceEnd, { setGreenPin: false, isAutoSkip: true });
           }
         }
         renderAllCanvases();
@@ -10395,10 +10517,13 @@
         updateSkipLeadingSilenceUI();
         saveAppPrefs();
 
+        if (state.skipLeadingSilence) {
+          state.manualLeadingPlay = false;
+        }
         if (state.skipLeadingSilence && state.hasAudio && state.leadingSilenceEnd >= 0.25) {
           const liveT = getLivePlayheadTime();
           if (liveT < state.leadingSilenceEnd - 0.05 && !isWaveScrubbing()) {
-            seekTo(state.leadingSilenceEnd, { setGreenPin: false });
+            seekTo(state.leadingSilenceEnd, { setGreenPin: false, isAutoSkip: true });
           }
           if (announce) {
             showToast(`先頭無音スキップ: ON（${formatTime(state.leadingSilenceEnd, true)} までスキップ）`);
@@ -10434,9 +10559,13 @@
         let jumped = false;
 
         const leadStart = getEffectiveTrackStartTime();
-        if (leadStart >= 0.25 && cur < leadStart - 0.03) {
-          cur = leadStart;
-          jumped = true;
+        if (leadStart >= 0.25) {
+          if (cur >= leadStart - 0.03) {
+            state.manualLeadingPlay = false;
+          } else if (!state.manualLeadingPlay && cur < leadStart - 0.03) {
+            cur = leadStart;
+            jumped = true;
+          }
         }
 
         const secs = getAllSections();
@@ -10825,7 +10954,12 @@
         const skipRanges = [];
         const leadStart = getEffectiveTrackStartTime();
         if (leadStart >= 0.25) {
-          skipRanges.push([0, Math.min(totalSamples, Math.floor(leadStart * bufSr))]);
+          const leadSample = Math.min(totalSamples, Math.floor(leadStart * bufSr));
+          if (pv.analysisPos >= leadSample - 32) {
+            state.manualLeadingPlay = false;
+          } else if (!state.manualLeadingPlay) {
+            skipRanges.push([0, leadSample]);
+          }
         }
         for (let i = 0; i < allSecs.length; i++) {
           if (!allSecs[i].sectionEnabled) {
@@ -13623,6 +13757,7 @@
           state.wavMeta = null;
           state.waveformPyramid = null;
           state.leadingSilenceEnd = 0;
+          state.manualLeadingPlay = false;
           state.isFallbackLargeFile = false;
           state.isAnalyzingWave = false;
           state.undoCutSnapshot = null;
@@ -17809,7 +17944,7 @@
           }
         }
         const leadStart = getEffectiveTrackStartTime();
-        if (segStart <= 0.02 && leadStart >= 0.25 && leadStart < segEnd - 0.25) {
+        if (segStart <= 0.02 && leadStart >= 0.25 && leadStart < segEnd - 0.25 && !state.manualLeadingPlay) {
           segStart = leadStart;
         }
         if (state.tempMarker !== null && state.tempMarker > segStart + 0.05 && state.tempMarker < segEnd - 0.2 && t >= state.tempMarker - 0.05) {
@@ -19079,10 +19214,20 @@
 
       function seekTo(timeSec, opts = {}) {
         if (!state.hasAudio) return;
-        const { keepInertia = false, setGreenPin = false, deferAudioSeek = false } = opts;
+        const { keepInertia = false, setGreenPin = false, deferAudioSeek = false, isAutoSkip = false } = opts;
         if (!keepInertia) stopInertia();
 
         const clamped = Math.max(0, Math.min(state.duration, timeSec));
+        const leadStart = getEffectiveTrackStartTime();
+        if (leadStart >= 0.25) {
+          if (!isAutoSkip && clamped < leadStart - 0.03) {
+            state.manualLeadingPlay = true;
+          } else if (clamped >= leadStart - 0.03) {
+            state.manualLeadingPlay = false;
+          }
+        } else {
+          state.manualLeadingPlay = false;
+        }
         state.currentTime = clamped;
         state.lastSyncTime = clamped;
         state.lastSyncPerf = performance.now();
@@ -19119,17 +19264,18 @@
         initAudioGraph();
 
         if (state.currentTime >= state.duration - 0.05) {
-          seekTo(getEffectiveTrackStartTime(), { setGreenPin: false });
+          state.manualLeadingPlay = false;
+          seekTo(getEffectiveTrackStartTime(), { setGreenPin: false, isAutoSkip: true });
         }
 
-        // If starting inside a skipped section, jump past it immediately
+        // If starting inside a skipped section, jump past it immediately (unless user explicitly sought into leading silence)
         const skipDest = resolveSkipTarget(state.currentTime);
         if (skipDest !== null) {
           if (skipDest >= state.duration - 0.05) {
             handleTrackEnded();
             return;
           }
-          seekTo(skipDest, { setGreenPin: false });
+          seekTo(skipDest, { setGreenPin: false, isAutoSkip: true });
         }
 
         state.isPlaying = true;
@@ -19268,7 +19414,8 @@
           return;
         }
         if (state.orderMode === 'loop1') {
-          seekTo(getEffectiveTrackStartTime(), { setGreenPin: false });
+          state.manualLeadingPlay = false;
+          seekTo(getEffectiveTrackStartTime(), { setGreenPin: false, isAutoSkip: true });
           startPlayback();
         } else if (state.orderMode === 'shuffle' && state.playlist.length > 1) {
           let next = state.currentTrackIndex;
@@ -19280,7 +19427,8 @@
           if (state.playlist.length > 1) {
             switchTrack(state.currentTrackIndex + 1, true);
           } else {
-            seekTo(getEffectiveTrackStartTime(), { setGreenPin: false });
+            state.manualLeadingPlay = false;
+            seekTo(getEffectiveTrackStartTime(), { setGreenPin: false, isAutoSkip: true });
             startPlayback();
           }
         } else {
@@ -25404,11 +25552,22 @@
       document.addEventListener('webkitfullscreenchange', onFullscreenStateChanged);
 
       // ==================== GITHUB / PWA SOFTWARE UPDATE CHECK & APPLY ====================
-      const APP_VERSION = 'v61';
+      const APP_VERSION = 'v62';
 
       // Ordered newest-first; each release appends a new object at the top.
       // Users who skip multiple versions automatically see ALL unseen versions between lastSeen and current.
       const APP_RELEASE_NOTES = [
+        {
+          version: 'v62',
+          verNum: 62,
+          date: '2026/11/27',
+          title: '先頭スキップ区間の手動再生に対応＆ピン記憶をIndexedDB移行で件数制限を撤廃',
+          items: [
+            '「ファイル先頭の無音スキップ」がONのときでも、波形タップ・ドラッグ・3秒戻し・頭出し2回押し等でユーザーがスキップ区間内を直接選んだ場合は自動で弾かれずそのまま再生できるようにしました（本編へ入ると自動で通常スキップに戻ります）',
+            'ピン記憶の保存先を端末内の大容量データベース（IndexedDB）へ移行し、1000件の上限を撤廃しました（従来のデータも起動時に自動移行されます）',
+            '設定画面の記憶数表示を「〇〇 / 1000件」から「〇〇曲 記憶中」へ変更し、残量を気にせず使えるようにしました'
+          ]
+        },
         {
           version: 'v61',
           verNum: 61,
@@ -26039,7 +26198,7 @@
               bullets: [
                 ['新規にファイルを開いたとき', '波形解析が完了すると、自動で音の始まり付近へ頭出しされます（前回途中の位置を復元したときは上書きしません）。'],
                 ['再生開始・リピート・頭出し', '0:00 から再生するときや、1曲リピート・区間リピート（第1区間）・頭出しボタン（|<）で先頭に戻るときも自動で無音をスキップします。'],
-                ['先頭の無音を聴きたいとき', 'メイン画面の拡大波形左上にある「先頭スキップ」ボタンを1回タップしてOFFにするだけで、いつでも 0:00 から聴けます。']
+                ['先頭の無音を聴きたいとき', '先頭スキップがONのままでも、波形タップ・ドラッグ・3秒戻し・頭出し2回押し等で先頭スキップ区間内を自分で選ぶと、その位置からそのまま再生できます（本編へ入ると自動で通常スキップに戻ります）。']
               ]
             }
           ]
@@ -26277,16 +26436,17 @@
         pinMemory: {
           title: 'ピン記憶・セッション自動復元',
           sub: 'ファイルごとのピン自動保存とキャッシュ管理',
-          summary: '黄色ピン・マーク名・スキップ設定・再生位置を最大1000ファイルまで自動記憶し、次に開いたとき自動で復元します。',
+          summary: '黄色ピン・マーク名・スキップ設定・再生位置を端末内の大容量データベース（IndexedDB）へ件数制限なく自動記憶し、次に開いたとき自動で復元します。',
           sections: [
             {
               title: '仕組みとボタンの違い',
               bullets: [
+                ['件数制限なしの自動記憶（IndexedDB）', '保存先を端末内の大容量データベース（IndexedDB）にしているため、曲数の上限を気にせず使い続けられます。これまでの記憶データも自動で引き継がれます。'],
                 ['時間とサイズで自動判別', 'ファイル名ではなく「再生時間＋ファイルサイズ」で音源を判別するため、スマホ側でファイル名を変更してもピンが引き継がれます。区間削除後の新しいサイズ・ピン位置にも追従します。'],
-                ['未保存の録音について', '録音直後の未保存データは1000件の保存枠を使わず、一時キャッシュ枠にのみ保持されます。「保存」すると正式に1000件枠へ登録されます。'],
+                ['未保存の録音について', '録音直後の未保存データは一時キャッシュ枠にのみ保持され、「保存」すると正式にピン記憶へ登録されます。'],
                 ['ピンの共有・読込（バックアップ）', '右上の共有ボタンの「ピン情報」タブから、現在の曲だけ・または全曲分のピンを .txt ファイルやテキストとして書き出せます。取り込みは普段の「開く」ボタン（音源との同時選択も可）またはここの「ピンを読込」「テキスト貼付で読込」から行え、同じファイルが既にある場合はファイルごと／すべてに適用で「マージ・上書き・スキップ」を選べます。'],
-                ['一時音源キャッシュ削除', '次回起動時に前回の音源を自動で開き直す一時データだけを削除します（1000件のピン記憶は消えません）。'],
-                ['全ピン記憶を初期化', 'これまで記憶した最大1000ファイル分のピン情報をすべて消去します。']
+                ['一時音源キャッシュ削除', '次回起動時に前回の音源を自動で開き直す一時データだけを削除します（記憶済みのピン情報は消えません）。'],
+                ['全ピン記憶を初期化', 'これまで記憶したすべてのファイル分のピン情報を消去します。']
               ]
             }
           ]
@@ -26990,11 +27150,12 @@
         const leadStart = getEffectiveTrackStartTime();
         if (leadStart >= 0.25) {
           if (state.currentTime > leadStart + 0.35) {
-            seekTo(leadStart, { setGreenPin: false });
+            state.manualLeadingPlay = false;
+            seekTo(leadStart, { setGreenPin: false, isAutoSkip: true });
           } else if (state.playlist.length > 1) {
             switchTrack(state.currentTrackIndex - 1, state.isPlaying);
           } else {
-            seekTo(state.currentTime > 0.05 ? leadStart : 0, { setGreenPin: false });
+            seekTo(0, { setGreenPin: false });
           }
         } else if (state.currentTime > 0.05 || state.playlist.length <= 1) {
           seekTo(0, { setGreenPin: false });
@@ -27173,7 +27334,7 @@
       document.getElementById('btnClearSessionCache').addEventListener('click', async () => {
         await clearSessionAudioFromIDB();
         clearTempSessionState();
-        showToast('一時音源・未保存ピンキャッシュを削除しました（1000件のピン記憶は保持されます）');
+        showToast('一時音源・未保存ピンキャッシュを削除しました（記憶済みのピン情報は保持されます）');
       });
 
       const clearPinMemoryConfirmModal = document.getElementById('clearPinMemoryConfirmModal');
@@ -27257,8 +27418,11 @@
 
       function executeClearAllPinMemory() {
         closeClearPinMemoryModal();
+        fileMemoryCache = {};
+        clearFileMemoriesFromIDB();
         try {
           localStorage.removeItem(LS_FILE_MEM_KEY);
+          localStorage.removeItem(LS_ACTIVE_MEM_SNAPSHOT_KEY);
           localStorage.removeItem(LS_LAST_SESSION_KEY);
         } catch (_) {}
         state.currentMemoryKey = null;
@@ -27472,6 +27636,9 @@
         initBackButtonGuard();
         requestAnimationFrame(animationLoop);
         setTimeout(() => checkForAppUpdate({ silent: true }), 1800);
+
+        // Hydrate unlimited pin memory from IndexedDB (auto-migrating legacy localStorage records)
+        await initFileMemoryStore();
 
         // Automatically restore the previous audio file, markers, and playhead after browser close / OS tab discard
         const cached = await loadSessionAudioFromIDB();
