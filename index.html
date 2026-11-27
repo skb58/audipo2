@@ -8,7 +8,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="Audipo2">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="app-version" content="v70">
+  <meta name="app-version" content="v71">
   <link rel="manifest" href="./manifest.json">
   <title>Audipo風 練習プレイヤー＆レコーダー</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='bg' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%231b2030'/%3E%3Cstop offset='100%25' stop-color='%230d0f15'/%3E%3C/linearGradient%3E%3ClinearGradient id='wv' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0%25' stop-color='%2360c5ff'/%3E%3Cstop offset='100%25' stop-color='%232563eb'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='url(%23bg)'/%3E%3Crect x='1' y='1' width='62' height='62' rx='15' fill='none' stroke='%233b82f6' stroke-opacity='0.3' stroke-width='2'/%3E%3Cg fill='url(%23wv)'%3E%3Crect x='10' y='28' width='4.5' height='12' rx='2.25' opacity='0.6'/%3E%3Crect x='18' y='22' width='4.5' height='24' rx='2.25' opacity='0.85'/%3E%3Crect x='26' y='15' width='4.5' height='36' rx='2.25'/%3E%3Crect x='34' y='21' width='4.5' height='25' rx='2.25' opacity='0.9'/%3E%3Crect x='42' y='26' width='4.5' height='16' rx='2.25' opacity='0.75'/%3E%3Crect x='50' y='30' width='4.5' height='9' rx='2.25' opacity='0.5'/%3E%3C/g%3E%3Cpath d='M36.25 10.5c0-1.4 1.1-2.5 2.5-2.5h5.5c1.4 0 2.5 1.1 2.5 2.5v2.4c0 .8-.3 1.5-.9 2.1l-3.2 3.1c-.6.6-1.6.6-2.2 0l-3.2-3.1c-.6-.6-.9-1.3-.9-2.1v-2.4z' fill='%23facc15'/%3E%3C/svg%3E">
@@ -4795,6 +4795,74 @@
       gap: 7px;
     }
 
+    .pin-sub-actions.cols-3 {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 6px;
+    }
+
+    .pin-link-card {
+      background: linear-gradient(135deg, rgba(250, 204, 21, 0.10) 0%, rgba(56, 189, 248, 0.08) 100%);
+      border: 1px solid rgba(250, 204, 21, 0.45);
+      border-radius: 13px;
+      padding: 10px 11px;
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+
+    .pin-link-status {
+      font-size: 11px;
+      line-height: 1.45;
+      color: #fde68a;
+      font-weight: 700;
+    }
+
+    .pin-link-status.warn {
+      color: #fca5a5;
+    }
+
+    .pin-link-btn-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+    }
+
+    .pin-link-btn {
+      height: 36px;
+      border-radius: 9px;
+      background: #23232c;
+      border: 1px solid var(--border-strong);
+      color: #e4e4e7;
+      font-size: 11.5px;
+      font-weight: 800;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      transition: transform 0.08s ease;
+    }
+
+    .pin-link-btn:active {
+      transform: scale(0.96);
+    }
+
+    .pin-link-btn:disabled {
+      opacity: 0.38;
+      pointer-events: none;
+    }
+
+    .pin-link-btn-line {
+      background: rgba(6, 199, 85, 0.18);
+      border-color: rgba(6, 199, 85, 0.58);
+      color: #86efac;
+    }
+
+    .pin-link-btn-copy {
+      background: rgba(66, 165, 245, 0.16);
+      border-color: rgba(96, 165, 250, 0.58);
+      color: #bae6fd;
+    }
+
     .pin-sub-btn {
       height: 36px;
       border-radius: 9px;
@@ -7861,6 +7929,31 @@
       stroke: #2d2c29 !important;
     }
 
+    body.theme-minimal .pin-link-card {
+      background: #f6f4ef;
+      border-color: rgba(196, 125, 36, 0.42);
+    }
+
+    body.theme-minimal .pin-link-status {
+      color: #8c5614;
+    }
+
+    body.theme-minimal .pin-link-status.warn {
+      color: #b83b3b;
+    }
+
+    body.theme-minimal .pin-link-btn-line {
+      background: #eaf4ec;
+      border-color: rgba(60, 140, 92, 0.4);
+      color: #2d6f48;
+    }
+
+    body.theme-minimal .pin-link-btn-copy {
+      background: #ebf0f5;
+      border-color: rgba(85, 108, 133, 0.38);
+      color: #364c63;
+    }
+
     body.theme-minimal .toast-banner {
       background: #2d2c29;
       border-color: #2d2c29;
@@ -9021,7 +9114,7 @@
         <div class="modal-section" style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
           <div>
             <div class="sec-title">バージョン情報</div>
-            <div id="settingsVersionLabel" class="engine-desc mono">現在: v70</div>
+            <div id="settingsVersionLabel" class="engine-desc mono">現在: v71</div>
           </div>
           <button id="btnShowReleaseHistory" type="button" class="step-btn" style="color:#93c5fd;border-color:rgba(66,165,245,0.45);">更新履歴を見る</button>
         </div>
@@ -9185,7 +9278,7 @@
           </div>
           <div>
             <h3 id="whatsNewTitle" class="whats-new-title">アップデートのお知らせ</h3>
-            <p id="whatsNewSub" class="whats-new-sub mono">v70 に更新されました</p>
+            <p id="whatsNewSub" class="whats-new-sub mono">v71 に更新されました</p>
           </div>
         </div>
         <button id="btnCloseWhatsNewX" type="button" class="modal-close" aria-label="閉じる">✕</button>
@@ -9377,9 +9470,9 @@
       </div>
 
       <!-- Pin Info Share Panel (shown when share tab = 'pins') -->
-      <div id="sharePinsPanel" class="modal-body hidden" style="gap:10px;">
+      <div id="sharePinsPanel" class="modal-body hidden" style="gap:9px;">
         <div class="save-share-notice" style="background:rgba(250,204,21,0.10);border-color:rgba(250,204,21,0.38);color:#fef08a;">
-          黄色ピン・マーク名・区間スキップ設定を共有用ファイル（.txt）として書き出します。受け取った側は「開く」または設定の「ピンを読込」から取り込めます。
+          <strong>おすすめ：URLリンク共有</strong> — LINEやメールで送ったリンクを<strong>1タップするだけ</strong>で、受け取り側でAudipo2とYouTube動画＋ピンが自動で開きます。
         </div>
 
         <!-- Scope Selector -->
@@ -9399,34 +9492,49 @@
           </div>
         </div>
 
-        <!-- Pin File Name -->
-        <div class="modal-section">
-          <div class="sec-head" style="margin-bottom:6px;">
-            <span class="sec-title">ピンファイル名</span>
+        <!-- Primary: 1-Tap URL Link Share Card -->
+        <div class="pin-link-card">
+          <div class="sec-head" style="margin-bottom:0;">
+            <span class="sec-title">1タップ URL リンク共有（LINE・メール向け）</span>
+            <span id="pinLinkLenBadge" class="sec-value mono" style="font-size:10.5px;">準備中...</span>
+          </div>
+          <div id="pinLinkStatusText" class="pin-link-status">リンク生成中...</div>
+          <div class="pin-link-btn-row">
+            <button id="btnPinShareLinkLine" type="button" class="pin-link-btn pin-link-btn-line">
+              <span>LINEで送る</span>
+            </button>
+            <button id="btnPinCopyLink" type="button" class="pin-link-btn pin-link-btn-copy">
+              <span>URLリンクコピー</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Secondary: File (.txt) & Raw JSON Export (Backup / Bulk Transfer) -->
+        <div class="modal-section" style="display:flex;flex-direction:column;gap:7px;">
+          <div class="sec-head" style="margin-bottom:0;">
+            <span class="sec-title">ファイル保存・バックアップ (.txt)</span>
             <button id="btnPinShareResetName" type="button" class="step-btn" style="padding:2px 8px;font-size:10px;">標準名に戻す</button>
           </div>
           <div class="save-name-row">
             <input type="text" id="pinShareFileNameInput" class="text-input" placeholder="ファイル名を入力" autocomplete="off">
             <span class="save-ext-badge mono">.txt</span>
           </div>
-        </div>
-
-        <!-- Preview -->
-        <div class="save-preview-box">
-          <div id="pinSharePreviewSpec" class="save-preview-spec mono">対象: 0ファイル • 黄色ピン 0個</div>
-          <div id="pinSharePreviewSize" class="save-preview-size mono">サイズ: 約 1 KB • 形式: .txt (JSON)</div>
-        </div>
-
-        <!-- Sub actions: Direct Download / Copy Text -->
-        <div class="pin-sub-actions">
-          <button id="btnPinDownloadTxt" type="button" class="pin-sub-btn">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#60b8ff" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 11 5 5 5-5"/><path d="M5 20h14"/></svg>
-            <span>ファイル保存 (.txt)</span>
-          </button>
-          <button id="btnPinCopyText" type="button" class="pin-sub-btn">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fde047" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-            <span>テキストコピー</span>
-          </button>
+          <div class="save-preview-box" style="padding:7px 9px;">
+            <div id="pinSharePreviewSpec" class="save-preview-spec mono">対象: 0ファイル • 黄色ピン 0個</div>
+            <div id="pinSharePreviewSize" class="save-preview-size mono" style="font-size:11.5px;">サイズ: 約 1 KB • 形式: .txt (JSON)</div>
+          </div>
+          <div class="pin-sub-actions cols-3">
+            <button id="btnPinShareTxt" type="button" class="pin-sub-btn" style="font-size:11px;">
+              <span>.txt シェア</span>
+            </button>
+            <button id="btnPinDownloadTxt" type="button" class="pin-sub-btn" style="font-size:11px;">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#60b8ff" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 11 5 5 5-5"/><path d="M5 20h14"/></svg>
+              <span>保存 (.txt)</span>
+            </button>
+            <button id="btnPinCopyText" type="button" class="pin-sub-btn" style="font-size:11px;">
+              <span>JSONコピー</span>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -9494,7 +9602,7 @@
     <div class="mark-edit-card" role="dialog" aria-modal="true" aria-labelledby="pinTextImportTitle" style="max-width:410px;">
       <h3 id="pinTextImportTitle" class="mark-edit-title" style="margin-bottom:8px;font-size:15.5px;">テキスト貼付でピンを読み込む</h3>
       <p style="margin:0 0 9px;font-size:11.5px;line-height:1.5;color:#a1a1aa;">
-        LINEやメール等で共有されたピン情報テキスト（JSON）を貼り付けてください。
+        LINEやメール等で共有されたピン共有URL（#pin=...）またはJSONテキストを貼り付けてください。
       </p>
       <div style="display:flex;justify-content:flex-end;margin-bottom:6px;">
         <button id="btnPinPasteClipboard" type="button" class="step-btn" style="color:#93c5fd;border-color:rgba(66,165,245,0.48);">クリップボードから貼付</button>
@@ -16343,6 +16451,11 @@
       const btnPinShareResetName = document.getElementById('btnPinShareResetName');
       const pinSharePreviewSpec = document.getElementById('pinSharePreviewSpec');
       const pinSharePreviewSize = document.getElementById('pinSharePreviewSize');
+      const pinLinkLenBadge = document.getElementById('pinLinkLenBadge');
+      const pinLinkStatusText = document.getElementById('pinLinkStatusText');
+      const btnPinShareLinkLine = document.getElementById('btnPinShareLinkLine');
+      const btnPinCopyLink = document.getElementById('btnPinCopyLink');
+      const btnPinShareTxt = document.getElementById('btnPinShareTxt');
       const btnPinDownloadTxt = document.getElementById('btnPinDownloadTxt');
       const btnPinCopyText = document.getElementById('btnPinCopyText');
       const pinImportInput = document.getElementById('pinImportInput');
@@ -16517,6 +16630,217 @@
         return s || getDefaultPinShareBaseName(scope);
       }
 
+      // ---------- Compact Pin URL Link Encoder / Decoder (#pin=z.<deflate-raw-base64url> / #pin=j.<base64url>) ----------
+      const PIN_LINK_MAX_LEN = 16000;
+      const PIN_LINK_WARN_LEN = 8000;
+      let pinLinkBuildToken = 0;
+      let cachedPinShareLink = { scope: '', url: '', tooLong: false, entriesCount: 0, totalPins: 0, titleLabel: '' };
+
+      function getPinShareBaseUrl() {
+        try {
+          if (location.protocol === 'https:' || location.protocol === 'http:') {
+            const cleanPath = location.pathname.replace(/\/index\.html$/i, '/');
+            return `${location.origin}${cleanPath}`;
+          }
+        } catch (_) {}
+        return 'https://skb58.github.io/audipo2/';
+      }
+
+      function bytesToBase64Url(bytes) {
+        let bin = '';
+        const chunk = 0x8000;
+        for (let i = 0; i < bytes.length; i += chunk) {
+          bin += String.fromCharCode.apply(null, bytes.subarray(i, Math.min(bytes.length, i + chunk)));
+        }
+        return btoa(bin).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+      }
+
+      function base64UrlToBytes(b64url) {
+        let b64 = String(b64url || '').replace(/-/g, '+').replace(/_/g, '/');
+        while (b64.length % 4 !== 0) b64 += '=';
+        const bin = atob(b64);
+        const out = new Uint8Array(bin.length);
+        for (let i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
+        return out;
+      }
+
+      async function deflateRawBytes(bytes) {
+        if (typeof CompressionStream !== 'function') return null;
+        try {
+          const cs = new CompressionStream('deflate-raw');
+          const writer = cs.writable.getWriter();
+          writer.write(bytes);
+          writer.close();
+          const buf = await new Response(cs.readable).arrayBuffer();
+          return new Uint8Array(buf);
+        } catch (_) {
+          return null;
+        }
+      }
+
+      async function inflateRawBytes(bytes) {
+        if (typeof DecompressionStream !== 'function') return null;
+        try {
+          const ds = new DecompressionStream('deflate-raw');
+          const writer = ds.writable.getWriter();
+          writer.write(bytes);
+          writer.close();
+          const buf = await new Response(ds.readable).arrayBuffer();
+          return new Uint8Array(buf);
+        } catch (_) {
+          return null;
+        }
+      }
+
+      function packPinPayloadCompact(scope, entries) {
+        return {
+          v: 2,
+          sc: scope === 'current' ? 'c' : 'a',
+          e: (entries || []).map((ent) => {
+            const o = {};
+            if (ent.ytVideoId) o.y = ent.ytVideoId;
+            if (ent.origName) o.o = ent.origName;
+            if (ent.displayName && ent.displayName !== ent.origName) o.d = ent.displayName;
+            if (ent.size > 0) o.s = ent.size;
+            if (ent.duration > 0) o.l = Math.round(ent.duration * 100) / 100;
+            if (ent.startSectionEnabled === false) o.se = 0;
+            if (typeof ent.tempMarker === 'number' && isFinite(ent.tempMarker)) {
+              o.tm = Math.round(ent.tempMarker * 100) / 100;
+            }
+            if (typeof ent.playbackRate === 'number' && Math.abs(ent.playbackRate - 1.0) >= 0.005) {
+              o.r = Math.round(ent.playbackRate * 100) / 100;
+            }
+            if (ent.pitchSemitones) o.p = Math.round(ent.pitchSemitones);
+            if (ent.sectionRepeat) o.sr = 1;
+            o.m = (ent.markers || []).map((mk) => {
+              const t = Math.round((Number(mk.time) || 0) * 1000) / 1000;
+              const fl = (mk.enabled !== false ? 1 : 0) | (mk.sectionEnabled !== false ? 2 : 0);
+              const nm = String(mk.name || '');
+              if (fl === 3 && !nm) return [t];
+              if (fl === 3) return [t, nm];
+              return [t, nm, fl];
+            });
+            return o;
+          })
+        };
+      }
+
+      function unpackCompactPinPayload(obj) {
+        if (!obj || typeof obj !== 'object') return null;
+        if (obj.format === 'audipo2_pins_v1' && Array.isArray(obj.entries)) {
+          const entries = obj.entries.map(normalizeImportedPinEntry).filter(Boolean);
+          if (entries.length === 0) return null;
+          return { scope: obj.scope === 'current' ? 'current' : 'all', entries };
+        }
+        if (obj.v !== 2 || !Array.isArray(obj.e)) return null;
+        const entries = [];
+        for (const item of obj.e) {
+          if (!item || typeof item !== 'object') continue;
+          const markers = Array.isArray(item.m)
+            ? item.m.map((tup) => {
+                if (Array.isArray(tup)) {
+                  const fl = typeof tup[2] === 'number' ? tup[2] : 3;
+                  return {
+                    time: Number(tup[0]) || 0,
+                    name: typeof tup[1] === 'string' ? tup[1] : '',
+                    enabled: Boolean(fl & 1),
+                    sectionEnabled: Boolean(fl & 2)
+                  };
+                }
+                return tup;
+              })
+            : [];
+          const normalized = normalizeImportedPinEntry({
+            ytVideoId: item.y || '',
+            ytUrl: item.y ? `https://www.youtube.com/watch?v=${item.y}` : '',
+            origName: item.o || item.d || (item.y ? `YouTube (${item.y})` : 'audio'),
+            displayName: item.d || item.o || (item.y ? `YouTube (${item.y})` : 'audio'),
+            size: item.s || 0,
+            duration: item.l || 0,
+            markers,
+            startSectionEnabled: item.se !== 0,
+            tempMarker: typeof item.tm === 'number' ? item.tm : null,
+            playbackRate: typeof item.r === 'number' ? item.r : 1.0,
+            pitchSemitones: typeof item.p === 'number' ? item.p : 0,
+            sectionRepeat: item.sr === 1
+          });
+          if (normalized) entries.push(normalized);
+        }
+        if (entries.length === 0) return null;
+        return { scope: obj.sc === 'c' ? 'current' : 'all', entries };
+      }
+
+      async function buildPinShareUrl(scope, entries) {
+        const compact = packPinPayloadCompact(scope, entries);
+        const jsonStr = JSON.stringify(compact);
+        const rawBytes = new TextEncoder().encode(jsonStr);
+        const plainToken = `j.${bytesToBase64Url(rawBytes)}`;
+        let token = plainToken;
+        const compressed = await deflateRawBytes(rawBytes);
+        if (compressed && compressed.length > 0) {
+          const zToken = `z.${bytesToBase64Url(compressed)}`;
+          if (zToken.length < plainToken.length) {
+            token = zToken;
+          }
+        }
+        return `${getPinShareBaseUrl()}#pin=${token}`;
+      }
+
+      function extractPinTokenFromText(rawText) {
+        if (typeof rawText !== 'string') return '';
+        const text = rawText.trim();
+        if (!text) return '';
+        const m = text.match(/(?:[#?&]|^)pin=([zj]\.[A-Za-z0-9_-]+)/);
+        if (m && m[1]) return m[1];
+        if (/^[zj]\.[A-Za-z0-9_-]{8,}$/.test(text)) return text;
+        return '';
+      }
+
+      async function decodePinUrlToken(token) {
+        const clean = String(token || '').trim().replace(/^#?pin=/i, '');
+        if (!clean || clean.length < 4) return null;
+        try {
+          let jsonText = '';
+          if (clean.startsWith('z.')) {
+            const bytes = base64UrlToBytes(clean.slice(2));
+            const inflated = await inflateRawBytes(bytes);
+            if (!inflated) return null;
+            jsonText = new TextDecoder().decode(inflated);
+          } else if (clean.startsWith('j.')) {
+            const bytes = base64UrlToBytes(clean.slice(2));
+            jsonText = new TextDecoder().decode(bytes);
+          } else {
+            return null;
+          }
+          const parsed = JSON.parse(jsonText);
+          return unpackCompactPinPayload(parsed);
+        } catch (err) {
+          console.warn('Pin URL token decode failed:', err);
+          return null;
+        }
+      }
+
+      async function parseAudipoPinDataAsync(rawText) {
+        const syncRes = parseAudipoPinData(rawText);
+        if (syncRes && syncRes.entries.length > 0) return syncRes;
+        const token = extractPinTokenFromText(rawText);
+        if (token) {
+          const urlRes = await decodePinUrlToken(token);
+          if (urlRes && urlRes.entries.length > 0) return urlRes;
+        }
+        return null;
+      }
+
+      function buildPinShareMessageText(info) {
+        if (!info || !info.url) return '';
+        const head = info.entriesCount === 1
+          ? `Audipo2 ピン共有: ${info.titleLabel}（黄色ピン ${info.totalPins}個）`
+          : `Audipo2 ピン共有（${info.entriesCount}曲・黄色ピン合計 ${info.totalPins}個）`;
+        return `${head}
+タップして開く:
+${info.url}`;
+      }
+
       function updatePinSharePanelUI() {
         const hasAudio = Boolean(state.hasAudio);
         const curEntries = collectPinExportEntries('current');
@@ -16549,13 +16873,164 @@
         pinSharePreviewSize.textContent = `ファイルサイズ: 約 ${formatBytesApprox(byteSize)} • 形式: .txt (JSONデータ)`;
 
         const canExport = payload.entries.length > 0;
+        if (btnPinShareTxt) btnPinShareTxt.disabled = !canExport;
         btnPinDownloadTxt.disabled = !canExport;
         btnPinCopyText.disabled = !canExport;
-        if (saveExportState.mode === 'share' && saveExportState.shareTab === 'pins') {
-          btnSaveExportRun.disabled = !canExport;
-          btnSaveExportRun.textContent = 'ピンファイルをシェア';
-          btnSaveExportRun.classList.remove('share-ready');
+
+        const tok = ++pinLinkBuildToken;
+        if (!canExport) {
+          cachedPinShareLink = { scope: saveExportState.pinScope, url: '', tooLong: false, entriesCount: 0, totalPins: 0, titleLabel: '' };
+          if (pinLinkLenBadge) pinLinkLenBadge.textContent = '--';
+          if (pinLinkStatusText) {
+            pinLinkStatusText.textContent = '共有できるピン情報がありません';
+            pinLinkStatusText.classList.add('warn');
+          }
+          if (btnPinShareLinkLine) btnPinShareLinkLine.disabled = true;
+          if (btnPinCopyLink) btnPinCopyLink.disabled = true;
+          if (saveExportState.mode === 'share' && saveExportState.shareTab === 'pins') {
+            btnSaveExportRun.disabled = true;
+            btnSaveExportRun.textContent = 'URLリンクをシェア';
+            btnSaveExportRun.classList.remove('share-ready');
+          }
+          return;
         }
+
+        const scopeSnap = saveExportState.pinScope;
+        const firstTitle = payload.entries[0]?.displayName || payload.entries[0]?.origName || 'ピン情報';
+        const isYtFirst = Boolean(payload.entries.length === 1 && payload.entries[0]?.ytVideoId);
+
+        if (saveExportState.mode === 'share' && saveExportState.shareTab === 'pins') {
+          btnSaveExportRun.disabled = false;
+          btnSaveExportRun.textContent = 'URLリンクをシェア';
+          btnSaveExportRun.classList.add('share-ready');
+        }
+
+        buildPinShareUrl(scopeSnap, payload.entries).then((shareUrl) => {
+          if (tok !== pinLinkBuildToken) return;
+          const urlLen = shareUrl.length;
+          const tooLong = urlLen > PIN_LINK_MAX_LEN;
+          const warnLong = !tooLong && urlLen > PIN_LINK_WARN_LEN;
+          cachedPinShareLink = {
+            scope: scopeSnap,
+            url: shareUrl,
+            tooLong,
+            entriesCount: payload.entries.length,
+            totalPins: payload.totalPins,
+            titleLabel: firstTitle
+          };
+
+          if (pinLinkLenBadge) {
+            pinLinkLenBadge.textContent = `${urlLen.toLocaleString()}文字`;
+          }
+          if (pinLinkStatusText) {
+            pinLinkStatusText.classList.toggle('warn', tooLong || warnLong);
+            if (tooLong) {
+              pinLinkStatusText.textContent = '曲数が多くURL上限を超えるため、下の「.txt シェア / 保存」をご利用ください。';
+            } else if (warnLong) {
+              pinLinkStatusText.textContent = 'URLが長めです（一部アプリで切れる場合は下の .txt 共有をご利用ください）。';
+            } else if (isYtFirst) {
+              pinLinkStatusText.textContent = `準備OK：相手がリンクを1タップすると YouTube動画＋黄色ピン${payload.totalPins}個が自動で開きます。`;
+            } else if (payload.entries.length === 1) {
+              pinLinkStatusText.textContent = `準備OK：相手がリンクを1タップするとピン${payload.totalPins}個を自動記憶します。`;
+            } else {
+              pinLinkStatusText.textContent = `準備OK：${payload.entries.length}曲分（ピン${payload.totalPins}個）を1つのURLでまとめて送れます。`;
+            }
+          }
+          if (btnPinShareLinkLine) btnPinShareLinkLine.disabled = tooLong;
+          if (btnPinCopyLink) btnPinCopyLink.disabled = tooLong;
+
+          if (saveExportState.mode === 'share' && saveExportState.shareTab === 'pins') {
+            btnSaveExportRun.disabled = false;
+            if (tooLong) {
+              btnSaveExportRun.textContent = 'ピンファイル(.txt)をシェア';
+              btnSaveExportRun.classList.remove('share-ready');
+            } else {
+              btnSaveExportRun.textContent = 'URLリンクをシェア';
+              btnSaveExportRun.classList.add('share-ready');
+            }
+          }
+        }).catch(() => {});
+      }
+
+      async function ensurePinShareLinkReady() {
+        const scope = saveExportState.pinScope;
+        if (cachedPinShareLink.scope === scope && cachedPinShareLink.url) {
+          return cachedPinShareLink;
+        }
+        const payload = buildPinExportPayload(scope);
+        if (payload.entries.length === 0) return null;
+        const url = await buildPinShareUrl(scope, payload.entries);
+        cachedPinShareLink = {
+          scope,
+          url,
+          tooLong: url.length > PIN_LINK_MAX_LEN,
+          entriesCount: payload.entries.length,
+          totalPins: payload.totalPins,
+          titleLabel: payload.entries[0]?.displayName || payload.entries[0]?.origName || 'ピン情報'
+        };
+        return cachedPinShareLink;
+      }
+
+      async function executeSharePinLink(via = 'native') {
+        const info = await ensurePinShareLinkReady();
+        if (!info || !info.url) {
+          showToast('共有できるピン情報がありません');
+          return;
+        }
+        if (info.tooLong) {
+          showToast('URLが長すぎるため、.txt ファイルで共有してください');
+          return;
+        }
+
+        if (via === 'copy') {
+          const ok = await copyTextToClipboard(info.url);
+          showToast(ok
+            ? `ピン共有URLをコピーしました（${info.entriesCount}曲・ピン${info.totalPins}個）`
+            : 'URLのコピーに失敗しました');
+          return;
+        }
+
+        if (via === 'line') {
+          const msg = buildPinShareMessageText(info);
+          const lineUrl = `https://line.me/R/share?text=${encodeURIComponent(msg)}`;
+          window.open(lineUrl, '_blank', 'noopener,noreferrer');
+          saveExportModal.classList.add('hidden');
+          showToast('LINE共有画面を開きました');
+          return;
+        }
+
+        // Native OS Share Sheet (URL + short description — works cleanly with LINE, Mail, Keep, etc.)
+        const shareTitle = info.entriesCount === 1
+          ? `Audipo2 ピン: ${info.titleLabel}`
+          : `Audipo2 ピン共有 (${info.entriesCount}曲)`;
+        const shareDesc = info.entriesCount === 1
+          ? `黄色ピン ${info.totalPins}個（1タップで開けます）`
+          : `${info.entriesCount}曲・黄色ピン合計 ${info.totalPins}個（1タップで読込）`;
+
+        if (navigator.share) {
+          try {
+            await navigator.share({
+              title: shareTitle,
+              text: shareDesc,
+              url: info.url
+            });
+            saveExportModal.classList.add('hidden');
+            showToast(`ピン共有URLを送信しました（${info.entriesCount}曲・ピン${info.totalPins}個）`);
+            return;
+          } catch (err) {
+            if (err && err.name === 'AbortError') {
+              showToast('シェアをキャンセルしました');
+              return;
+            }
+          }
+        }
+
+        // Fallback: copy URL to clipboard
+        const ok = await copyTextToClipboard(info.url);
+        saveExportModal.classList.add('hidden');
+        showToast(ok
+          ? 'ピン共有URLをコピーしました（LINE等に貼り付けて送れます）'
+          : 'URLの共有に失敗しました（ファイル保存をお試しください）');
       }
 
       async function executeShareOrDownloadPins(action = 'share') {
@@ -16970,6 +17445,13 @@
 
             if (decision === 'skip') {
               stats.skipped++;
+              if (inc.ytVideoId && entries.length === 1) {
+                importedYtTargets.push({
+                  videoId: inc.ytVideoId,
+                  url: inc.ytUrl || existingRec.ytUrl || `https://www.youtube.com/watch?v=${inc.ytVideoId}`,
+                  displayName: existingRec.displayName || inc.displayName || inc.origName
+                });
+              }
               continue;
             }
 
@@ -17139,7 +17621,10 @@
         if (stats.overwritten > 0) parts.push(`上書き ${stats.overwritten}件`);
         if (stats.skipped > 0) parts.push(`スキップ ${stats.skipped}件`);
         if (openedYouTubeAuto) {
-          showToast(`YouTubeを開きピンを読み込みました（${parts.join(' / ')}）`);
+          showToast(parts.length > 0 ? `YouTubeを開きピンを読み込みました（${parts.join(' / ')}）` : 'YouTube動画を開きました');
+        } else if (!state.hasAudio && entries.length === 1 && !entries[0].ytVideoId && (stats.added > 0 || stats.merged > 0 || stats.overwritten > 0)) {
+          const titleHint = entries[0].displayName || entries[0].origName || '音声ファイル';
+          showToast(`「${titleHint}」のピン(${entries[0].markers.length}個)を記憶しました。「開く」から同じ音声を選ぶと自動適用されます`);
         } else {
           showToast(parts.length > 0 ? `ピン読込完了: ${parts.join(' / ')}` : 'ピン情報の変更はありませんでした');
         }
@@ -17153,7 +17638,7 @@
           if (!f || f.size > 20 * 1024 * 1024) continue;
           try {
             const txt = await f.text();
-            const parsed = parseAudipoPinData(txt);
+            const parsed = await parseAudipoPinDataAsync(txt);
             if (parsed && parsed.entries.length > 0) {
               validFileCount++;
               if (parsed.scope !== 'current' || parsed.entries.length > 1) singleScope = false;
@@ -17748,7 +18233,11 @@
       async function executeSaveExport() {
         if (saveExportState.isExporting) return;
         if (saveExportState.mode === 'share' && saveExportState.shareTab === 'pins') {
-          await executeShareOrDownloadPins('share');
+          if (cachedPinShareLink.scope === saveExportState.pinScope && cachedPinShareLink.tooLong) {
+            await executeShareOrDownloadPins('share');
+          } else {
+            await executeSharePinLink('native');
+          }
           return;
         }
         if (!state.audioBuffer && !state.rawBlob) return;
@@ -18031,6 +18520,9 @@
         pinShareFileNameInput.value = getDefaultPinShareBaseName(saveExportState.pinScope);
         pinShareFileNameInput.focus();
       });
+      if (btnPinShareLinkLine) btnPinShareLinkLine.addEventListener('click', () => executeSharePinLink('line'));
+      if (btnPinCopyLink) btnPinCopyLink.addEventListener('click', () => executeSharePinLink('copy'));
+      if (btnPinShareTxt) btnPinShareTxt.addEventListener('click', () => executeShareOrDownloadPins('share'));
       btnPinDownloadTxt.addEventListener('click', () => executeShareOrDownloadPins('download'));
       btnPinCopyText.addEventListener('click', () => executeShareOrDownloadPins('copy'));
 
@@ -18086,9 +18578,9 @@
         if (e.target === pinTextImportModal) closePinTextImportModal();
       });
       document.getElementById('btnPinTextImportRun').addEventListener('click', async () => {
-        const parsed = parseAudipoPinData(pinTextImportArea.value);
+        const parsed = await parseAudipoPinDataAsync(pinTextImportArea.value);
         if (!parsed || parsed.entries.length === 0) {
-          showToast('有効なピン情報テキストが見つかりませんでした');
+          showToast('有効なピン情報（URLリンク / JSON）が見つかりませんでした');
           return;
         }
         closePinTextImportModal();
@@ -29231,11 +29723,22 @@
       document.addEventListener('webkitfullscreenchange', onFullscreenStateChanged);
 
       // ==================== GITHUB / PWA SOFTWARE UPDATE CHECK & APPLY ====================
-      const APP_VERSION = 'v70';
+      const APP_VERSION = 'v71';
 
       // Ordered newest-first; each release appends a new object at the top.
       // Users who skip multiple versions automatically see ALL unseen versions between lastSeen and current.
       const APP_RELEASE_NOTES = [
+        {
+          version: 'v71',
+          verNum: 71,
+          date: '2026/11/27',
+          title: 'LINE等で1タップ起動できる「ピンURLリンク共有」機能を追加',
+          items: [
+            '「シェア → ピン情報」から、ピン情報を圧縮URLリンク（https://skb58.github.io/audipo2/#pin=...）として送信・LINE共有・コピーできるようになりました',
+            '受け取った側はそのURLを1タップするだけでAudipo2が開き、YouTube動画のピンなら動画もそのまま自動で開いてピンが反映されます（Androidの「アプリから開く」制限やファイル保存が不要になります）',
+            '設定の「テキスト貼付で読込」にもピン共有URLをそのまま貼り付けて取り込めます。大量の曲のバックアップ用に .txt ファイル保存／シェアも引き続き利用できます'
+          ]
+        },
         {
           version: 'v70',
           verNum: 70,
@@ -31459,12 +31962,16 @@
           if (location.protocol === 'file:') return;
           const u = new URL(location.href);
           let changed = false;
-          ['incoming_share', 'launch_files', 'ts', 'yt'].forEach((k) => {
+          ['incoming_share', 'launch_files', 'ts', 'yt', 'pin'].forEach((k) => {
             if (u.searchParams.has(k)) {
               u.searchParams.delete(k);
               changed = true;
             }
           });
+          if (u.hash && /(?:^#|&)pin=[zj]\./i.test(u.hash)) {
+            u.hash = '';
+            changed = true;
+          }
           if (changed) {
             const cleanUrl = u.pathname + (u.search ? u.search : '') + (u.hash ? u.hash : '');
             window.history.replaceState(window.history.state, '', cleanUrl);
@@ -31532,7 +32039,7 @@
           .trim();
         if (!combinedText) return false;
 
-        const parsedPins = parseAudipoPinData(combinedText);
+        const parsedPins = await parseAudipoPinDataAsync(combinedText);
         if (parsedPins && parsedPins.entries.length > 0) {
           await runPinImportFlow(parsedPins.entries, parsedPins.scope === 'current');
           return true;
@@ -31574,7 +32081,22 @@
             }
           }
 
-          // 3. Direct ?yt=... URL parameter
+          // 3. Direct #pin=... or ?pin=... URL link (1-tap share from LINE / Mail / Browser!)
+          if (!handled) {
+            const pinToken = extractPinTokenFromText(location.hash || '') || extractPinTokenFromText(location.search || '');
+            if (pinToken) {
+              const decodedPins = await decodePinUrlToken(pinToken);
+              stripIncomingLaunchQueryParams();
+              if (decodedPins && decodedPins.entries.length > 0) {
+                await runPinImportFlow(decodedPins.entries, decodedPins.scope === 'current' && decodedPins.entries.length === 1);
+                handled = true;
+              } else {
+                showToast('ピン共有URLの読み取りに失敗しました（リンクが途中で切れている可能性があります）');
+              }
+            }
+          }
+
+          // 4. Direct ?yt=... URL parameter
           if (!handled && location.search) {
             try {
               const sp = new URLSearchParams(location.search);
@@ -31616,6 +32138,12 @@
           console.warn('launchQueue registration skipped:', err);
         }
       }
+
+      window.addEventListener('hashchange', () => {
+        if (appBootstrapDone && extractPinTokenFromText(location.hash || '')) {
+          checkAndConsumeIncomingExternalLaunches();
+        }
+      });
 
       window.onload = async () => {
         syncAppViewportHeight(true);
@@ -31659,9 +32187,9 @@
         await initFileMemoryStore();
         appBootstrapDone = true;
 
-        // First check if app was opened via OS "Open with" (file_handlers) or "Share" (share_target)
+        // First check if app was opened via #pin=... URL link, OS "Open with", or "Share"
         const handledExternal = await checkAndConsumeIncomingExternalLaunches();
-        if (handledExternal) {
+        if (handledExternal && state.hasAudio) {
           return;
         }
 
