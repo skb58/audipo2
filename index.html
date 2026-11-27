@@ -8,7 +8,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="Audipo2">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="app-version" content="v66">
+  <meta name="app-version" content="v67">
   <link rel="manifest" href="./manifest.json">
   <title>Audipo風 練習プレイヤー＆レコーダー</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='bg' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%231b2030'/%3E%3Cstop offset='100%25' stop-color='%230d0f15'/%3E%3C/linearGradient%3E%3ClinearGradient id='wv' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0%25' stop-color='%2360c5ff'/%3E%3Cstop offset='100%25' stop-color='%232563eb'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='url(%23bg)'/%3E%3Crect x='1' y='1' width='62' height='62' rx='15' fill='none' stroke='%233b82f6' stroke-opacity='0.3' stroke-width='2'/%3E%3Cg fill='url(%23wv)'%3E%3Crect x='10' y='28' width='4.5' height='12' rx='2.25' opacity='0.6'/%3E%3Crect x='18' y='22' width='4.5' height='24' rx='2.25' opacity='0.85'/%3E%3Crect x='26' y='15' width='4.5' height='36' rx='2.25'/%3E%3Crect x='34' y='21' width='4.5' height='25' rx='2.25' opacity='0.9'/%3E%3Crect x='42' y='26' width='4.5' height='16' rx='2.25' opacity='0.75'/%3E%3Crect x='50' y='30' width='4.5' height='9' rx='2.25' opacity='0.5'/%3E%3C/g%3E%3Cpath d='M36.25 10.5c0-1.4 1.1-2.5 2.5-2.5h5.5c1.4 0 2.5 1.1 2.5 2.5v2.4c0 .8-.3 1.5-.9 2.1l-3.2 3.1c-.6.6-1.6.6-2.2 0l-3.2-3.1c-.6-.6-.9-1.3-.9-2.1v-2.4z' fill='%23facc15'/%3E%3C/svg%3E">
@@ -2104,13 +2104,18 @@
       display: block;
     }
 
+    .yt-player-box:not(.direct-touch) iframe {
+      pointer-events: none !important;
+    }
+
     /* Transparent Gesture Shield over YouTube iframe so left/right swipe switches tabs identically to waveform */
     .yt-gesture-shield {
       position: absolute;
       inset: 0;
-      z-index: 2;
-      background: transparent;
-      touch-action: pan-y;
+      z-index: 5;
+      background: rgba(0, 0, 0, 0.002);
+      touch-action: none;
+      transform: translateZ(0);
       cursor: pointer;
     }
 
@@ -8592,7 +8597,7 @@
         <div class="modal-section" style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
           <div>
             <div class="sec-title">バージョン情報</div>
-            <div id="settingsVersionLabel" class="engine-desc mono">現在: v66</div>
+            <div id="settingsVersionLabel" class="engine-desc mono">現在: v67</div>
           </div>
           <button id="btnShowReleaseHistory" type="button" class="step-btn" style="color:#93c5fd;border-color:rgba(66,165,245,0.45);">更新履歴を見る</button>
         </div>
@@ -8756,7 +8761,7 @@
           </div>
           <div>
             <h3 id="whatsNewTitle" class="whats-new-title">アップデートのお知らせ</h3>
-            <p id="whatsNewSub" class="whats-new-sub mono">v66 に更新されました</p>
+            <p id="whatsNewSub" class="whats-new-sub mono">v67 に更新されました</p>
           </div>
         </div>
         <button id="btnCloseWhatsNewX" type="button" class="modal-close" aria-label="閉じる">✕</button>
@@ -20293,6 +20298,32 @@
         totalTimeText.textContent = formatTime(state.duration);
       }
 
+      const LOCAL_SPEED_PRESETS = [0.30, 0.50, 1.00, 1.35, 1.70];
+      const YT_SPEED_PRESETS = [0.25, 0.50, 1.00, 1.25, 1.75];
+
+      function updateSpeedPresetsUI(rate = state.playbackRate) {
+        const clamped = Math.max(0.25, Math.min(2.0, Math.round((Number(rate) || 1.0) * 100) / 100));
+        const presets = state.isYouTubeMode ? YT_SPEED_PRESETS : LOCAL_SPEED_PRESETS;
+        const txt = `${clamped.toFixed(2)}x`;
+        speedBadgeText.textContent = txt;
+        const modalValEl = document.getElementById('modalSpeedVal');
+        if (modalValEl) modalValEl.textContent = txt;
+        const sliderEl = document.getElementById('speedSlider');
+        if (sliderEl) {
+          sliderEl.step = state.isYouTubeMode ? '0.25' : '0.01';
+          sliderEl.value = clamped;
+        }
+
+        const btns = document.querySelectorAll('.speed-preset-btn');
+        btns.forEach((btn, idx) => {
+          const presetVal = presets[idx] !== undefined ? presets[idx] : parseFloat(btn.dataset.speed);
+          btn.dataset.speed = presetVal.toFixed(2);
+          const lblEl = btn.querySelector('.pad-sub');
+          if (lblEl) lblEl.textContent = `${presetVal.toFixed(2)}x`;
+          btn.classList.toggle('active-star', Math.abs(presetVal - clamped) < 0.005);
+        });
+      }
+
       function setPlaybackSpeed(rate) {
         let clamped = Math.max(0.25, Math.min(2.0, Math.round(rate * 100) / 100));
         if (state.isYouTubeMode) {
@@ -20308,15 +20339,7 @@
           syncPlaybackPathTransition(prevPath, curT);
         }
 
-        const txt = `${clamped.toFixed(2)}x`;
-        speedBadgeText.textContent = txt;
-        document.getElementById('modalSpeedVal').textContent = txt;
-        document.getElementById('speedSlider').value = clamped;
-
-        document.querySelectorAll('.speed-preset-btn').forEach(btn => {
-          const v = parseFloat(btn.dataset.speed);
-          btn.classList.toggle('active-star', Math.abs(v - clamped) < 0.005);
-        });
+        updateSpeedPresetsUI(clamped);
         saveCurrentFileMemory(false);
       }
 
@@ -21676,6 +21699,10 @@
 
       function setYouTubeDirectTouch(enabled, announce = false) {
         ytDirectTouchEnabled = Boolean(enabled);
+        const ytBox = ytStageWrap ? ytStageWrap.querySelector('.yt-player-box') : null;
+        if (ytBox) {
+          ytBox.classList.toggle('direct-touch', ytDirectTouchEnabled);
+        }
         if (ytGestureShield) {
           ytGestureShield.classList.toggle('passthrough', ytDirectTouchEnabled);
         }
@@ -21907,6 +21934,7 @@
         state.ytUrl = '';
         if (ytStageWrap) ytStageWrap.classList.add('hidden');
         if (ytLoadingMsg) ytLoadingMsg.classList.add('hidden');
+        updateSpeedPresetsUI(state.playbackRate);
 
         if (showStartup) {
           state.isPlaying = false;
@@ -22227,12 +22255,7 @@
 
         const initRate = snapYouTubePlaybackRate((mem && typeof mem.playbackRate === 'number') ? mem.playbackRate : 1.0);
         state.playbackRate = initRate;
-        speedBadgeText.textContent = `${initRate.toFixed(2)}x`;
-        document.getElementById('modalSpeedVal').textContent = `${initRate.toFixed(2)}x`;
-        document.getElementById('speedSlider').value = initRate;
-        document.querySelectorAll('.speed-preset-btn').forEach(btn => {
-          btn.classList.toggle('active-star', Math.abs(parseFloat(btn.dataset.speed) - initRate) < 0.005);
-        });
+        updateSpeedPresetsUI(initRate);
 
         // Add or select in playlist
         if (!opts.fromPlaylist) {
@@ -22406,13 +22429,7 @@
                 const r = Number(ev.data);
                 if (isFinite(r) && r > 0 && Math.abs(r - state.playbackRate) > 0.005) {
                   state.playbackRate = r;
-                  const txt = `${r.toFixed(2)}x`;
-                  speedBadgeText.textContent = txt;
-                  document.getElementById('modalSpeedVal').textContent = txt;
-                  document.getElementById('speedSlider').value = r;
-                  document.querySelectorAll('.speed-preset-btn').forEach(btn => {
-                    btn.classList.toggle('active-star', Math.abs(parseFloat(btn.dataset.speed) - r) < 0.005);
-                  });
+                  updateSpeedPresetsUI(r);
                   saveCurrentFileMemory(false);
                 }
               },
@@ -27262,6 +27279,7 @@
       }
       if (ytGestureShield) {
         ytGestureShield.addEventListener('click', () => {
+          if (performance.now() < pagerDrag.suppressClickUntil) return;
           if (state.isYouTubeMode) togglePlayPause();
         });
       }
@@ -27562,11 +27580,21 @@
       document.addEventListener('webkitfullscreenchange', onFullscreenStateChanged);
 
       // ==================== GITHUB / PWA SOFTWARE UPDATE CHECK & APPLY ====================
-      const APP_VERSION = 'v66';
+      const APP_VERSION = 'v67';
 
       // Ordered newest-first; each release appends a new object at the top.
       // Users who skip multiple versions automatically see ALL unseen versions between lastSeen and current.
       const APP_RELEASE_NOTES = [
+        {
+          version: 'v67',
+          verNum: 67,
+          date: '2026/11/27',
+          title: 'YouTube画面での左右スワイプ切替を確実化＆速度プリセットのハイライト表示を修正',
+          items: [
+            'YouTube公式モード通常時にiframeがタッチ操作を横取りしないよう制御を強化し、動画のどこを左右にスワイプしても確実に隣のページ（チューナー＆メトロノーム / 黄色ピン一覧）へ移動できるようにしました',
+            'YouTube公式モード中は下段の速度プリセットボタンをYouTube対応速度（0.25x / 0.50x / 1.00x / 1.25x / 1.75x）へ自動切替し、どの速度ボタンを押しても正しくハイライトされるようにしました（ローカル音源に戻すと0.30x〜1.70xへ自動復帰します）'
+          ]
+        },
         {
           version: 'v66',
           verNum: 66,
