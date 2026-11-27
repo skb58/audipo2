@@ -8,7 +8,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="Audipo2">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="app-version" content="v63">
+  <meta name="app-version" content="v65">
   <link rel="manifest" href="./manifest.json">
   <title>Audipo風 練習プレイヤー＆レコーダー</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='bg' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%231b2030'/%3E%3Cstop offset='100%25' stop-color='%230d0f15'/%3E%3C/linearGradient%3E%3ClinearGradient id='wv' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0%25' stop-color='%2360c5ff'/%3E%3Cstop offset='100%25' stop-color='%232563eb'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='url(%23bg)'/%3E%3Crect x='1' y='1' width='62' height='62' rx='15' fill='none' stroke='%233b82f6' stroke-opacity='0.3' stroke-width='2'/%3E%3Cg fill='url(%23wv)'%3E%3Crect x='10' y='28' width='4.5' height='12' rx='2.25' opacity='0.6'/%3E%3Crect x='18' y='22' width='4.5' height='24' rx='2.25' opacity='0.85'/%3E%3Crect x='26' y='15' width='4.5' height='36' rx='2.25'/%3E%3Crect x='34' y='21' width='4.5' height='25' rx='2.25' opacity='0.9'/%3E%3Crect x='42' y='26' width='4.5' height='16' rx='2.25' opacity='0.75'/%3E%3Crect x='50' y='30' width='4.5' height='9' rx='2.25' opacity='0.5'/%3E%3C/g%3E%3Cpath d='M36.25 10.5c0-1.4 1.1-2.5 2.5-2.5h5.5c1.4 0 2.5 1.1 2.5 2.5v2.4c0 .8-.3 1.5-.9 2.1l-3.2 3.1c-.6.6-1.6.6-2.2 0l-3.2-3.1c-.6-.6-.9-1.3-.9-2.1v-2.4z' fill='%23facc15'/%3E%3C/svg%3E">
@@ -1990,6 +1990,321 @@
     .start-btn-rec {
       background: #dc2626;
       color: #ffffff;
+    }
+
+    .start-btn-tab {
+      background: rgba(56, 189, 248, 0.14);
+      border: 1px solid rgba(56, 189, 248, 0.5);
+      color: #bae6fd;
+    }
+
+    .start-btn-yt {
+      background: rgba(239, 68, 68, 0.14);
+      border: 1px solid rgba(248, 113, 113, 0.55);
+      color: #fecaca;
+    }
+
+    /* YouTube Official Embedded Player Stage (overlays upper waveform page when in YouTube mode) */
+    .yt-stage-wrap {
+      position: absolute;
+      inset: 0;
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      background: #0c0c0f;
+      padding: 4px 6px 14px;
+      gap: 4px;
+    }
+
+    .yt-top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+      padding: 4px 7px;
+      border-radius: 9px;
+      background: #17171d;
+      border: 1px solid var(--border-subtle);
+      flex-shrink: 0;
+    }
+
+    .yt-badge-group {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      min-width: 0;
+      font-size: 11px;
+      font-weight: 800;
+      color: #fecaca;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .yt-badge-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #ef4444;
+      flex-shrink: 0;
+    }
+
+    .yt-bar-actions {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      flex-shrink: 0;
+    }
+
+    .yt-mini-btn {
+      height: 24px;
+      padding: 0 8px;
+      border-radius: 6px;
+      background: #252530;
+      border: 1px solid var(--border-strong);
+      color: #e4e4e7;
+      font-size: 10.5px;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      white-space: nowrap;
+      text-decoration: none;
+    }
+
+    .yt-mini-btn:active {
+      transform: scale(0.95);
+    }
+
+    .yt-mini-btn-accent {
+      background: rgba(239, 68, 68, 0.2);
+      border-color: rgba(248, 113, 113, 0.55);
+      color: #fecaca;
+    }
+
+    .yt-player-box {
+      position: relative;
+      flex: 1;
+      min-height: 0;
+      width: 100%;
+      background: #000000;
+      border-radius: 10px;
+      border: 1px solid var(--border-subtle);
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #ytPlayerHost,
+    .yt-player-box iframe {
+      width: 100%;
+      height: 100%;
+      border: 0;
+      display: block;
+    }
+
+    .yt-loading-msg {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 12px;
+      text-align: center;
+      background: rgba(10, 10, 14, 0.88);
+      color: #d4d4d8;
+      font-size: 12px;
+      font-weight: 700;
+      z-index: 3;
+      pointer-events: none;
+    }
+
+    .yt-overview-bar {
+      position: relative;
+      height: 36px;
+      width: 100%;
+      border-radius: 9px;
+      background: #141419;
+      border: 1px solid var(--border-subtle);
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+
+    #ytOverviewCanvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+      touch-action: none;
+      cursor: pointer;
+    }
+
+    .yt-modal-card {
+      width: 100%;
+      max-width: 420px;
+      max-height: 86dvh;
+      background: #1c1c22;
+      border: 1px solid rgba(248, 113, 113, 0.52);
+      border-radius: 18px;
+      padding: 16px 16px 14px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.86), 0 0 24px rgba(239, 68, 68, 0.14);
+    }
+
+    .yt-url-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .yt-url-row .text-input {
+      flex: 1;
+      min-width: 0;
+      height: 38px;
+      font-size: 12.5px;
+      user-select: text;
+      -webkit-user-select: text;
+    }
+
+    .yt-note-box {
+      padding: 8px 10px;
+      border-radius: 10px;
+      background: rgba(239, 68, 68, 0.09);
+      border: 1px solid rgba(248, 113, 113, 0.32);
+      font-size: 11px;
+      line-height: 1.5;
+      color: #fecaca;
+    }
+
+    .yt-hist-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .yt-hist-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 8px 10px;
+      border-radius: 10px;
+      background: #141419;
+      border: 1px solid var(--border-subtle);
+    }
+
+    .yt-hist-main {
+      flex: 1;
+      min-width: 0;
+      text-align: left;
+      background: transparent;
+      padding: 0;
+    }
+
+    .yt-hist-title {
+      font-size: 12.5px;
+      font-weight: 700;
+      color: #ffffff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .yt-hist-meta {
+      font-size: 10.5px;
+      color: var(--text-sub);
+      margin-top: 2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .pill-engine.yt-mode {
+      background: rgba(239, 68, 68, 0.18);
+      border-color: rgba(248, 113, 113, 0.58);
+      color: #fecaca;
+    }
+
+    .rec-src-card {
+      width: 100%;
+      padding: 12px 13px;
+      border-radius: 13px;
+      background: #141419;
+      border: 1px solid var(--border-strong);
+      text-align: left;
+      display: flex;
+      align-items: flex-start;
+      gap: 11px;
+      transition: transform 0.08s ease, border-color 0.14s ease, background-color 0.14s ease;
+    }
+
+    .rec-src-card:active {
+      transform: scale(0.97);
+    }
+
+    .rec-src-card-mic {
+      border-color: rgba(239, 68, 68, 0.45);
+      background: rgba(239, 68, 68, 0.08);
+    }
+
+    .rec-src-card-tab {
+      border-color: rgba(56, 189, 248, 0.52);
+      background: rgba(56, 189, 248, 0.09);
+    }
+
+    .rec-src-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .rec-src-card-mic .rec-src-icon {
+      background: rgba(239, 68, 68, 0.2);
+      color: #fca5a5;
+    }
+
+    .rec-src-card-tab .rec-src-icon {
+      background: rgba(56, 189, 248, 0.2);
+      color: #7dd3fc;
+    }
+
+    .rec-src-body {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .rec-src-title {
+      font-size: 13.5px;
+      font-weight: 800;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      line-height: 1.3;
+    }
+
+    .rec-src-badge {
+      padding: 1px 6px;
+      border-radius: 999px;
+      font-size: 9.5px;
+      font-weight: 800;
+      background: rgba(56, 189, 248, 0.22);
+      color: #bae6fd;
+    }
+
+    .rec-src-desc {
+      margin-top: 3px;
+      font-size: 11px;
+      line-height: 1.45;
+      color: var(--text-sub);
     }
 
     .start-btn-demo {
@@ -5907,6 +6222,106 @@
       color: #2d2c29;
     }
 
+    body.theme-minimal .start-btn-tab {
+      background: #ebf0f5;
+      border-color: rgba(85, 108, 133, 0.34);
+      color: #364c63;
+    }
+
+    body.theme-minimal .start-btn-yt {
+      background: #f6ebeb;
+      border-color: rgba(196, 67, 67, 0.34);
+      color: #a63232;
+    }
+
+    body.theme-minimal .yt-stage-wrap {
+      background: #eceae4;
+    }
+
+    body.theme-minimal .yt-top-bar,
+    body.theme-minimal .yt-overview-bar {
+      background: #f6f4ef;
+      border-color: rgba(45, 44, 41, 0.09);
+    }
+
+    body.theme-minimal .yt-badge-group {
+      color: #a63232;
+    }
+
+    body.theme-minimal .yt-mini-btn {
+      background: #eae7df;
+      border-color: rgba(45, 44, 41, 0.1);
+      color: #2d2c29;
+    }
+
+    body.theme-minimal .yt-mini-btn-accent {
+      background: #f6ebeb;
+      border-color: rgba(196, 67, 67, 0.34);
+      color: #a63232;
+    }
+
+    body.theme-minimal .yt-modal-card {
+      background: #eceae4;
+      border: 1px solid rgba(45, 44, 41, 0.1);
+      border-radius: 22px;
+      color: #2d2c29;
+      box-shadow: 0 20px 56px rgba(35, 34, 30, 0.2);
+    }
+
+    body.theme-minimal .yt-note-box {
+      background: #f6ebeb;
+      border-color: rgba(196, 67, 67, 0.28);
+      color: #8f2d2d;
+    }
+
+    body.theme-minimal .yt-hist-item {
+      background: #f6f4ef;
+      border-color: rgba(45, 44, 41, 0.07);
+    }
+
+    body.theme-minimal .yt-hist-title {
+      color: #252421;
+    }
+
+    body.theme-minimal .yt-hist-meta {
+      color: #6f6c66;
+    }
+
+    body.theme-minimal .pill-engine.yt-mode {
+      background: #f6ebeb;
+      border-color: rgba(196, 67, 67, 0.32);
+      color: #a63232;
+    }
+
+    body.theme-minimal .rec-src-card {
+      background: #f6f4ef;
+      border-color: rgba(45, 44, 41, 0.1);
+      box-shadow: 0 1.5px 5px rgba(45, 44, 41, 0.045);
+    }
+
+    body.theme-minimal .rec-src-card-mic .rec-src-icon {
+      background: #f6ebeb;
+      color: #b83b3b;
+    }
+
+    body.theme-minimal .rec-src-card-tab .rec-src-icon {
+      background: #ebf0f5;
+      color: #465d75;
+    }
+
+    body.theme-minimal .rec-src-title {
+      color: #252421;
+    }
+
+    body.theme-minimal .rec-src-badge {
+      background: #e1e8ef;
+      color: #364c63;
+    }
+
+    body.theme-minimal .rec-src-desc {
+      color: #6f6c66;
+    }
+
     body.theme-minimal .start-btn-demo svg {
       stroke: #2d2c29 !important;
     }
@@ -7293,9 +7708,33 @@
             </div>
           </div>
 
-          <!-- Page 1 (Center / Default): Full Multi-Row Overview Waveform + Startup Overlay -->
+          <!-- Page 1 (Center / Default): Full Multi-Row Overview Waveform + YouTube Official Player + Startup Overlay -->
           <div class="upper-page upper-page-wave">
             <canvas id="overviewCanvas"></canvas>
+
+            <!-- YouTube Official Embedded Player Stage (shown only in YouTube Practice Mode) -->
+            <div id="ytStageWrap" class="yt-stage-wrap hidden">
+              <div class="yt-top-bar">
+                <span class="yt-badge-group">
+                  <span class="yt-badge-dot"></span>
+                  <span>YouTube公式モード</span>
+                </span>
+                <div class="yt-bar-actions">
+                  <button id="btnYtChangeUrl" type="button" class="yt-mini-btn yt-mini-btn-accent">URL変更</button>
+                  <a id="linkYtExternal" href="https://www.youtube.com/" target="_blank" rel="noopener noreferrer" class="yt-mini-btn">YouTubeで開く</a>
+                  <button id="btnYtExitMode" type="button" class="yt-mini-btn" title="YouTubeモードを終了">終了</button>
+                </div>
+              </div>
+              <div class="yt-player-box">
+                <div id="ytPlayerHost"></div>
+                <div id="ytLoadingMsg" class="yt-loading-msg hidden">
+                  <span id="ytLoadingText">YouTubeプレイヤーを読み込み中...</span>
+                </div>
+              </div>
+              <div class="yt-overview-bar" title="タップ・ドラッグで動画の再生位置を移動（緑一時ピン連動）">
+                <canvas id="ytOverviewCanvas"></canvas>
+              </div>
+            </div>
 
             <!-- Startup Quick-Start Card (NO auto demo load on startup; swipe right anytime for Metronome!) -->
             <div id="startupOverlay" class="startup-overlay">
@@ -7328,6 +7767,24 @@
                       <line x1="12" y1="17" x2="12" y2="22"/>
                     </svg>
                     <span>マイクで録音する</span>
+                  </button>
+
+                  <button id="btnOpenYouTubeFromStartup" type="button" class="start-btn start-btn-yt">
+                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <rect x="2" y="5" width="20" height="14" rx="4"/>
+                      <polygon points="10 9 15.5 12 10 15 10 9" fill="currentColor" stroke="none"/>
+                    </svg>
+                    <span>YouTube URL で練習する（公式再生）</span>
+                  </button>
+
+                  <button id="btnStartTabRecord" type="button" class="start-btn start-btn-tab">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <rect x="2" y="4" width="20" height="14" rx="2"/>
+                      <path d="M8 21h8"/>
+                      <path d="M12 18v3"/>
+                      <polygon points="10 8.5 15 11 10 13.5 10 8.5" fill="currentColor" stroke="none"/>
+                    </svg>
+                    <span>別タブ・PCの音を録音（YouTube等）</span>
                   </button>
 
                   <button id="btnOpenMetroFromStart" type="button" class="start-btn start-btn-demo">
@@ -7499,7 +7956,7 @@
         <div class="rec-head">
           <div class="rec-label-group">
             <span class="rec-dot" style="animation: pulseDot 1s infinite ease-in-out;"></span>
-            <span>録音中 (<span id="recLiveSpecLabel">PCM</span>・<span id="recLiveGainLabel">1.0x</span>)</span>
+            <span><span id="recModeTitle">録音中</span> (<span id="recLiveSpecLabel">PCM</span>・<span id="recLiveGainLabel">1.0x</span>)</span>
           </div>
           <span id="recTimerText" class="rec-timer mono">00:00.0</span>
         </div>
@@ -8055,6 +8512,22 @@
           <select id="selectMicDevice" class="text-input" style="font-size:12px;">
             <option value="">端末の標準マイク（自動）</option>
           </select>
+
+          <div class="toggle-row" style="margin-top:11px;padding-top:10px;flex-direction:column;align-items:stretch;gap:7px;">
+            <div>
+              <div class="sec-title">別タブ・PC音声の直接録音（YouTube等・PC向け）</div>
+              <div class="engine-desc">PCのChrome/Edgeで別タブに開いたYouTube等の音声を、環境音なしのデジタル無劣化ステレオPCMとして直接取り込みます。</div>
+            </div>
+            <button id="btnStartTabRecordSettings" type="button" class="start-btn start-btn-tab" style="min-height:38px;font-size:12.5px;">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="2" y="4" width="20" height="14" rx="2"/>
+                <path d="M8 21h8"/>
+                <path d="M12 18v3"/>
+                <polygon points="10 8.5 15 11 10 13.5 10 8.5" fill="currentColor" stroke="none"/>
+              </svg>
+              <span>別タブ・PCの音を直接録音する</span>
+            </button>
+          </div>
         </div>
 
         <!-- Track Name Rename -->
@@ -8091,7 +8564,7 @@
         <div class="modal-section" style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
           <div>
             <div class="sec-title">バージョン情報</div>
-            <div id="settingsVersionLabel" class="engine-desc mono">現在: v63</div>
+            <div id="settingsVersionLabel" class="engine-desc mono">現在: v65</div>
           </div>
           <button id="btnShowReleaseHistory" type="button" class="step-btn" style="color:#93c5fd;border-color:rgba(66,165,245,0.45);">更新履歴を見る</button>
         </div>
@@ -8255,7 +8728,7 @@
           </div>
           <div>
             <h3 id="whatsNewTitle" class="whats-new-title">アップデートのお知らせ</h3>
-            <p id="whatsNewSub" class="whats-new-sub mono">v63 に更新されました</p>
+            <p id="whatsNewSub" class="whats-new-sub mono">v65 に更新されました</p>
           </div>
         </div>
         <button id="btnCloseWhatsNewX" type="button" class="modal-close" aria-label="閉じる">✕</button>
@@ -8604,6 +9077,14 @@
           <span>通常のファイル選択から開く</span>
         </button>
 
+        <button id="btnFavOpenYouTube" type="button" class="start-btn start-btn-yt" style="min-height:42px;font-size:13px;">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="5" width="20" height="14" rx="4"/>
+            <polygon points="10 9 15.5 12 10 15 10 9" fill="currentColor" stroke="none"/>
+          </svg>
+          <span>YouTube URL を開いて練習する（公式再生）</span>
+        </button>
+
         <div>
           <div class="fav-section-label">
             <span>★ お気に入りフォルダ</span>
@@ -8856,6 +9337,110 @@
     </div>
   </div>
 
+  <!-- ==================== 18. YOUTUBE URL OPEN MODAL ==================== -->
+  <div id="ytOpenModal" class="modal-backdrop hidden" style="z-index:82;">
+    <div class="yt-modal-card" role="dialog" aria-modal="true" aria-labelledby="ytOpenTitle">
+      <div class="whats-new-head" style="margin-bottom:10px;">
+        <div class="whats-new-title-wrap">
+          <div class="whats-new-icon" aria-hidden="true" style="background:rgba(239,68,68,0.18);border-color:rgba(248,113,113,0.55);color:#fca5a5;">
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="2" y="5" width="20" height="14" rx="4"/>
+              <polygon points="10 9 15.5 12 10 15 10 9" fill="currentColor" stroke="none"/>
+            </svg>
+          </div>
+          <div>
+            <h3 id="ytOpenTitle" class="whats-new-title">YouTube URL で練習</h3>
+            <p class="whats-new-sub">公式埋め込み再生＋ピン・区間リピート対応</p>
+          </div>
+        </div>
+        <button id="btnCloseYtOpenX" type="button" class="modal-close" aria-label="閉じる">✕</button>
+      </div>
+
+      <div class="modal-body" style="gap:10px;">
+        <div class="modal-section">
+          <div class="sec-head" style="margin-bottom:6px;">
+            <span class="sec-title">YouTube の URL または動画ID</span>
+            <button id="btnYtPasteUrl" type="button" class="step-btn" style="padding:2px 9px;font-size:10.5px;color:#93c5fd;border-color:rgba(66,165,245,0.5);">貼付</button>
+          </div>
+          <div class="yt-url-row">
+            <input type="text" id="inputYtUrl" class="text-input mono" placeholder="https://youtu.be/... または watch?v=..." autocomplete="off" spellcheck="false">
+          </div>
+          <div class="engine-desc" style="margin-top:6px;">
+            通常動画・共有リンク（youtu.be）・Shorts・Live・11文字の動画IDに対応しています。
+          </div>
+        </div>
+
+        <div class="yt-note-box">
+          <strong>使える機能:</strong> 黄色ピン（名前・時刻編集）・緑一時ピン・区間リピート（A-B）・区間スキップ・3秒戻し/進み・再生速度（0.25x〜2.0x）・ピン自動記憶（IndexedDB）<br>
+          <strong>ローカル音源のみ:</strong> 波形表示・ピッチ変更・ボコーダー・リバーブ・WAV保存・区間削除
+        </div>
+
+        <div>
+          <div class="fav-section-label">
+            <span style="color:#fecaca;">最近の YouTube 練習履歴（ピン記憶つき）</span>
+            <span id="ytHistCountBadge" class="mono" style="color:#a1a1aa;">0件</span>
+          </div>
+          <div id="ytHistoryListWrap" class="yt-hist-list"></div>
+        </div>
+      </div>
+
+      <div class="modal-footer-row" style="margin-top:12px;">
+        <button id="btnCancelYtOpen" type="button" class="danger-btn-safe" style="height:41px;border-radius:11px;">キャンセル</button>
+        <button id="btnLoadYtUrlRun" type="button" class="whats-new-ok-btn" style="height:41px;background:linear-gradient(135deg,#ef4444 0%,#dc2626 100%);border-color:rgba(252,165,165,0.7);">読み込んで練習</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== 17. RECORDING SOURCE PICKER MODAL (PC) ==================== -->
+  <div id="recSourceModal" class="modal-backdrop hidden" style="z-index:81;">
+    <div class="mark-edit-card" role="dialog" aria-modal="true" aria-labelledby="recSourceTitle" style="max-width:400px;">
+      <div class="whats-new-head" style="margin-bottom:10px;">
+        <div class="whats-new-title-wrap">
+          <div>
+            <h3 id="recSourceTitle" class="whats-new-title">録音方法を選択</h3>
+            <p class="whats-new-sub">録音する音源を選んでください</p>
+          </div>
+        </div>
+        <button id="btnCloseRecSourceX" type="button" class="modal-close" aria-label="閉じる">✕</button>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:9px;">
+        <button id="btnRecChoiceMic" type="button" class="rec-src-card rec-src-card-mic">
+          <span class="rec-src-icon" aria-hidden="true">
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="9" y="2" width="6" height="12" rx="3"/>
+              <path d="M5 10a7 7 0 0 0 14 0"/>
+              <line x1="12" y1="17" x2="12" y2="22"/>
+            </svg>
+          </span>
+          <span class="rec-src-body">
+            <span class="rec-src-title">マイクで録音</span>
+            <span class="rec-src-desc">端末マイクや外部マイクから楽器演奏・声を24bit高音質PCMで録音します。</span>
+          </span>
+        </button>
+
+        <button id="btnRecChoiceTab" type="button" class="rec-src-card rec-src-card-tab">
+          <span class="rec-src-icon" aria-hidden="true">
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="2" y="4" width="20" height="14" rx="2"/>
+              <path d="M8 21h8"/>
+              <path d="M12 18v3"/>
+              <polygon points="10 8.5 15 11 10 13.5 10 8.5" fill="currentColor" stroke="none"/>
+            </svg>
+          </span>
+          <span class="rec-src-body">
+            <span class="rec-src-title">別タブ・PCの音を録音 <span class="rec-src-badge">YouTube等</span></span>
+            <span class="rec-src-desc">別タブの音声をデジタル無劣化ステレオで直接録音します。次の画面でタブを選び<strong>「タブの音声を共有」</strong>をONにしてください。</span>
+          </span>
+        </button>
+      </div>
+
+      <div class="mark-edit-footer" style="margin-top:12px;">
+        <button id="btnCancelRecSource" type="button" class="mark-dialog-btn">キャンセル</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Toast Banner -->
   <div id="toastBanner" class="toast-banner"></div>
 
@@ -8934,6 +9519,16 @@
       const audioEl = document.getElementById('audioEl');
       const fileInput = document.getElementById('fileInput');
       const overviewCanvas = document.getElementById('overviewCanvas');
+      const ytStageWrap = document.getElementById('ytStageWrap');
+      const ytLoadingMsg = document.getElementById('ytLoadingMsg');
+      const ytLoadingText = document.getElementById('ytLoadingText');
+      const linkYtExternal = document.getElementById('linkYtExternal');
+      const ytOverviewCanvas = document.getElementById('ytOverviewCanvas');
+      const ytOverviewCtx = ytOverviewCanvas ? ytOverviewCanvas.getContext('2d') : null;
+      const ytOpenModal = document.getElementById('ytOpenModal');
+      const inputYtUrl = document.getElementById('inputYtUrl');
+      const ytHistoryListWrap = document.getElementById('ytHistoryListWrap');
+      const ytHistCountBadge = document.getElementById('ytHistCountBadge');
       const overviewCtx = overviewCanvas.getContext('2d');
       const zoomCanvas = document.getElementById('zoomCanvas');
       const zoomCtx = zoomCanvas.getContext('2d');
@@ -8959,7 +9554,9 @@
       const recMeterBar = document.getElementById('recMeterBar');
       const recMarkerCountBadge = document.getElementById('recMarkerCountBadge');
       const recLiveGainLabel = document.getElementById('recLiveGainLabel');
+      const recModeTitle = document.getElementById('recModeTitle');
       const recLiveSpecLabel = document.getElementById('recLiveSpecLabel');
+      const recSourceModal = document.getElementById('recSourceModal');
       const recGainHintBox = document.getElementById('recGainHintBox');
       const recGainHintText = document.getElementById('recGainHintText');
       const recStereoStatusNote = document.getElementById('recStereoStatusNote');
@@ -9101,6 +9698,10 @@
 
       const state = {
         hasAudio: false,
+        isYouTubeMode: false,
+        ytVideoId: '',
+        ytUrl: '',
+        ytAvailableRates: [0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2],
         isPlaying: false,
         duration: 0,
         currentTime: 0,
@@ -9227,7 +9828,9 @@
 
         // Live PCM Recording state
         isRecording: false,
+        recMode: 'mic', // 'mic' | 'tab'
         recStream: null,
+        recDisplayStream: null,
         recSourceNode: null,
         recGainNode: null,
         recLimiterNode: null,
@@ -9291,10 +9894,10 @@
         return `${mins}:${String(secs).padStart(2, '0')}`;
       }
 
-      function makeRecordingFilename() {
+      function makeRecordingFilename(prefix = '') {
         const d = new Date();
         const pad = (n) => String(n).padStart(2, '0');
-        return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}_${pad(d.getHours())}-${pad(d.getMinutes())}-${pad(d.getSeconds())}.wav`;
+        return `${prefix}${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}_${pad(d.getHours())}-${pad(d.getMinutes())}-${pad(d.getSeconds())}.wav`;
       }
 
       function isAudioCandidate(file) {
@@ -9314,6 +9917,9 @@
       //  - 'bufferDirect': Native AudioBufferSourceNode (1.00x / ±0 lossless direct passthrough, zero DSP)
       //  - 'vocoderDsp':   Phase-locked Phase Vocoder (automatically used whenever speed != 1.00x or pitch != 0)
       function getActivePlaybackPath() {
+        if (state.isYouTubeMode) {
+          return 'youtube';
+        }
         if (!state.audioBuffer || state.isFallbackLargeFile) {
           return 'audioEl';
         }
@@ -9436,6 +10042,18 @@
         const s = Math.max(0, Math.round(Number(size) || 0));
         const dDeci = Math.max(0, Math.round((Number(duration) || 0) * 10));
         return `sz:${s}::dur:${dDeci}`;
+      }
+
+      function makeYouTubeMemoryKey(videoId) {
+        return `yt:${String(videoId || '').trim()}`;
+      }
+
+      function lookupYouTubeMemory(videoId) {
+        const vid = String(videoId || '').trim();
+        if (!vid) return null;
+        const map = readAllFileMemories();
+        const key = makeYouTubeMemoryKey(vid);
+        return map[key] ? { key, rec: map[key] } : null;
       }
 
       function readLegacyLocalStorageMemories() {
@@ -9715,6 +10333,39 @@
           clearTimeout(saveMemTimer);
           saveMemTimer = null;
           lastPeriodicSavePerf = performance.now();
+
+          if (state.isYouTubeMode && state.ytVideoId) {
+            const ytDur = Math.max(0, Number(state.duration) || 0);
+            const liveYtTime = getLivePlayheadTime();
+            const ytOrig = state.currentFileOrigName || `YouTube (${state.ytVideoId})`;
+            const ytDisp = trackTitleEl.textContent.trim() || ytOrig;
+            const ytKey = makeYouTubeMemoryKey(state.ytVideoId);
+            const ytSnapshot = {
+              sourceType: 'youtube',
+              ytVideoId: state.ytVideoId,
+              ytUrl: state.ytUrl || `https://www.youtube.com/watch?v=${state.ytVideoId}`,
+              origName: ytOrig,
+              displayName: ytDisp,
+              size: 0,
+              duration: Math.round(ytDur * 1000) / 1000,
+              markers: cloneMarkerList(state.markers),
+              startSectionEnabled: state.startSectionEnabled !== false,
+              tempMarker: state.tempMarker !== null ? Number(state.tempMarker) : null,
+              currentTime: Math.max(0, Math.min(ytDur > 0 ? ytDur : Math.max(30, liveYtTime), Number(liveYtTime) || 0)),
+              playbackRate: state.playbackRate,
+              pitchSemitones: 0,
+              sectionRepeat: Boolean(state.sectionRepeat),
+              zoomWindowSeconds: state.zoomWindowSeconds,
+              updatedAt: Date.now()
+            };
+            const map = readAllFileMemories();
+            state.currentMemoryKey = ytKey;
+            map[ytKey] = ytSnapshot;
+            saveActiveMemoryFallbackSync(ytKey, ytSnapshot);
+            writeAllFileMemories(map);
+            updateShareButtonState();
+            return;
+          }
 
           // Adopt audioEl.duration if metadata resolved after initial load
           if (!state.durationProbed && audioEl && isFinite(audioEl.duration) && audioEl.duration > 0) {
@@ -11388,11 +12039,15 @@
         const isLowMem = Boolean(state.hasAudio && state.isFallbackLargeFile);
 
         if (btnEngineQuick) {
-          btnEngineQuick.textContent = isLowMem ? '省メモリ' : meta.pill;
-          btnEngineQuick.classList.toggle('low-mem', isLowMem);
-          btnEngineQuick.title = isLowMem
-            ? '大容量ファイルのため一時的に省メモリ再生中（通常曲・録音では自動でボコーダーへ戻ります）'
-            : `スロー再生の質感: ${meta.full}（タップで切替）`;
+          const isYt = Boolean(state.hasAudio && state.isYouTubeMode);
+          btnEngineQuick.textContent = isYt ? 'YouTube公式' : (isLowMem ? '省メモリ' : meta.pill);
+          btnEngineQuick.classList.toggle('yt-mode', isYt);
+          btnEngineQuick.classList.toggle('low-mem', !isYt && isLowMem);
+          btnEngineQuick.title = isYt
+            ? 'YouTube公式埋め込みプレイヤーで再生中（ボコーダー・ピッチ変更はローカル音源のみ）'
+            : (isLowMem
+              ? '大容量ファイルのため一時的に省メモリ再生中（通常曲・録音では自動でボコーダーへ戻ります）'
+              : `スロー再生の質感: ${meta.full}（タップで切替）`);
         }
 
         const valEl = document.getElementById('modalVocoderToneVal');
@@ -13747,6 +14402,7 @@
         const isCancelled = () => myToken !== state.loadToken;
 
         try {
+          if (state.isYouTubeMode) exitYouTubeMode({ showStartup: false });
           pausePlayback();
           stopInertia();
           hideWaveProgress(0);
@@ -15126,9 +15782,9 @@
         if (!state.hasAudio) return null;
         const origName = state.currentFileOrigName || trackTitleEl.textContent.trim() || 'audio';
         const displayName = trackTitleEl.textContent.trim() || origName;
-        const size = state.currentFileSize || (state.rawBlob ? state.rawBlob.size : 0);
+        const size = state.isYouTubeMode ? 0 : (state.currentFileSize || (state.rawBlob ? state.rawBlob.size : 0));
         const dur = Math.round((Number(state.duration) || 0) * 1000) / 1000;
-        return {
+        const baseRec = {
           origName,
           displayName,
           size: Math.max(0, Math.round(Number(size) || 0)),
@@ -15148,6 +15804,12 @@
           zoomWindowSeconds: state.zoomWindowSeconds,
           updatedAt: Date.now()
         };
+        if (state.isYouTubeMode && state.ytVideoId) {
+          baseRec.sourceType = 'youtube';
+          baseRec.ytVideoId = state.ytVideoId;
+          baseRec.ytUrl = state.ytUrl || `https://www.youtube.com/watch?v=${state.ytVideoId}`;
+        }
+        return baseRec;
       }
 
       function collectPinExportEntries(scope) {
@@ -15163,6 +15825,7 @@
           const sz = Math.max(0, Math.round(Number(rec.size) || 0));
           const dur = Math.round((Number(rec.duration) || 0) * 1000) / 1000;
           const clean = {
+            ...(rec.ytVideoId ? { sourceType: 'youtube', ytVideoId: String(rec.ytVideoId), ytUrl: String(rec.ytUrl || `https://www.youtube.com/watch?v=${rec.ytVideoId}`) } : {}),
             origName: String(rec.origName || rec.displayName || 'audio'),
             displayName: String(rec.displayName || rec.origName || 'audio'),
             size: sz,
@@ -15185,8 +15848,8 @@
           byKey.set(k, clean);
         });
         const cur = buildCurrentTrackPinRecord();
-        if (cur && cur.size > 0 && cur.duration > 0) {
-          const ck = state.currentMemoryKey || makeFileFingerprint(cur.size, cur.duration);
+        if (cur && (cur.ytVideoId || (cur.size > 0 && cur.duration > 0))) {
+          const ck = cur.ytVideoId ? makeYouTubeMemoryKey(cur.ytVideoId) : (state.currentMemoryKey || makeFileFingerprint(cur.size, cur.duration));
           byKey.set(ck, cur);
         }
         return Array.from(byKey.values()).sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0));
@@ -15367,7 +16030,9 @@
         const duration = Math.max(0, Math.round((Number(raw.duration) || 0) * 1000) / 1000);
         const markers = cloneMarkerList(Array.isArray(raw.markers) ? raw.markers : [])
           .filter(m => isFinite(m.time) && m.time >= 0 && (duration <= 0 || m.time < duration));
+        const ytId = typeof raw.ytVideoId === 'string' && /^[a-zA-Z0-9_-]{11}$/.test(raw.ytVideoId.trim()) ? raw.ytVideoId.trim() : '';
         return {
+          ...(ytId ? { sourceType: 'youtube', ytVideoId: ytId, ytUrl: String(raw.ytUrl || `https://www.youtube.com/watch?v=${ytId}`) } : {}),
           origName,
           displayName,
           size,
@@ -15467,7 +16132,11 @@
         };
       }
 
-      function findMatchInMemoryMap(map, size, duration) {
+      function findMatchInMemoryMap(map, size, duration, ytVideoId = '') {
+        if (ytVideoId) {
+          const yk = makeYouTubeMemoryKey(ytVideoId);
+          return map[yk] ? { key: yk, rec: map[yk] } : null;
+        }
         const targetSize = Math.max(0, Math.round(Number(size) || 0));
         if (targetSize <= 0) return null;
         const hasDur = typeof duration === 'number' && isFinite(duration) && duration > 0;
@@ -15495,6 +16164,9 @@
 
       function doesEntryMatchCurrentTrack(entry) {
         if (!state.hasAudio || !entry) return false;
+        if (state.isYouTubeMode || entry.ytVideoId) {
+          return Boolean(state.isYouTubeMode && state.ytVideoId && entry.ytVideoId === state.ytVideoId);
+        }
         const curSize = state.currentFileSize || (state.rawBlob ? state.rawBlob.size : 0);
         if (curSize <= 0 || Number(entry.size) !== curSize) return false;
         if (state.duration > 0 && entry.duration > 0) {
@@ -15611,7 +16283,7 @@
 
         // Pre-classify entries to know exact conflict count for the "(1 / N件目)" & "残り M件" labels
         const plan = entries.map((inc) => {
-          const hit = findMatchInMemoryMap(stagedMap, inc.size, inc.duration);
+          const hit = findMatchInMemoryMap(stagedMap, inc.size, inc.duration, inc.ytVideoId || '');
           const matchesLive = doesEntryMatchCurrentTrack(inc);
           let existingRec = hit ? hit.rec : null;
           if (matchesLive && curLiveRec && (!existingRec || state.isUnsavedRecording)) {
@@ -15631,7 +16303,7 @@
           const { inc } = item;
 
           // Re-check against stagedMap in case multiple imported files contained the same song
-          const hit = findMatchInMemoryMap(stagedMap, inc.size, inc.duration);
+          const hit = findMatchInMemoryMap(stagedMap, inc.size, inc.duration, inc.ytVideoId || '');
           const matchesLive = doesEntryMatchCurrentTrack(inc);
           let existingRec = hit ? hit.rec : null;
           if (matchesLive && curLiveRec && !existingRec) {
@@ -15667,7 +16339,7 @@
               continue;
             }
 
-            const key = hit ? hit.key : makeFileFingerprint(inc.size, inc.duration);
+            const key = hit ? hit.key : (inc.ytVideoId ? makeYouTubeMemoryKey(inc.ytVideoId) : makeFileFingerprint(inc.size, inc.duration));
             let finalRec;
             if (decision === 'merge') {
               finalRec = mergePinRecords(existingRec, inc, matchesLive ? state.duration : 0);
@@ -15686,12 +16358,12 @@
 
             if (matchesLive) {
               liveTrackUpdatedRecord = finalRec;
-              if (!state.isUnsavedRecording && inc.size > 0 && inc.duration > 0) {
+              if (!state.isUnsavedRecording && (inc.ytVideoId || (inc.size > 0 && inc.duration > 0))) {
                 stagedMap[key] = finalRec;
               } else {
                 liveTrackNeedsSave = true;
               }
-            } else if (inc.size > 0 && inc.duration > 0) {
+            } else if (inc.ytVideoId || (inc.size > 0 && inc.duration > 0)) {
               stagedMap[key] = finalRec;
             }
           } else {
@@ -15729,8 +16401,8 @@
                   liveTrackNeedsSave = true;
                   stats.appliedToCurrent++;
                 } else {
-                  if (inc.size > 0 && inc.duration > 0) {
-                    stagedMap[makeFileFingerprint(inc.size, inc.duration)] = inc;
+                  if (inc.ytVideoId || (inc.size > 0 && inc.duration > 0)) {
+                    stagedMap[inc.ytVideoId ? makeYouTubeMemoryKey(inc.ytVideoId) : makeFileFingerprint(inc.size, inc.duration)] = inc;
                     stats.added++;
                   } else {
                     stats.skipped++;
@@ -15750,8 +16422,8 @@
                   liveTrackNeedsSave = true;
                   stats.appliedToCurrent++;
                 } else if (res.action === 'overwrite') {
-                  if (inc.size > 0 && inc.duration > 0) {
-                    stagedMap[makeFileFingerprint(inc.size, inc.duration)] = inc;
+                  if (inc.ytVideoId || (inc.size > 0 && inc.duration > 0)) {
+                    stagedMap[inc.ytVideoId ? makeYouTubeMemoryKey(inc.ytVideoId) : makeFileFingerprint(inc.size, inc.duration)] = inc;
                     stats.added++;
                   } else {
                     stats.skipped++;
@@ -15762,16 +16434,16 @@
               }
             } else {
               // Clean add (or populate an existing 0-pin entry)
-              const key = hit ? hit.key : makeFileFingerprint(inc.size, inc.duration);
+              const key = hit ? hit.key : (inc.ytVideoId ? makeYouTubeMemoryKey(inc.ytVideoId) : makeFileFingerprint(inc.size, inc.duration));
               const nextRec = hit ? { ...hit.rec, ...inc, updatedAt: Date.now() } : { ...inc, updatedAt: Date.now() };
               if (matchesLive) {
                 liveTrackUpdatedRecord = nextRec;
-                if (!state.isUnsavedRecording && inc.size > 0 && inc.duration > 0) {
+                if (!state.isUnsavedRecording && (inc.ytVideoId || (inc.size > 0 && inc.duration > 0))) {
                   stagedMap[key] = nextRec;
                 } else {
                   liveTrackNeedsSave = true;
                 }
-              } else if (inc.size > 0 && inc.duration > 0) {
+              } else if (inc.ytVideoId || (inc.size > 0 && inc.duration > 0)) {
                 stagedMap[key] = nextRec;
               }
               stats.added++;
@@ -16284,7 +16956,7 @@
 
       async function openSaveExportModal(mode = 'save', opts = {}) {
         const targetMode = mode === 'share' ? 'share' : 'save';
-        const hasAudioData = Boolean(state.hasAudio && (state.audioBuffer || state.rawBlob));
+        const hasAudioData = Boolean(state.hasAudio && !state.isYouTubeMode && (state.audioBuffer || state.rawBlob));
         const memCount = Object.keys(readAllFileMemories()).length;
         if (targetMode === 'save' && !hasAudioData) return;
         if (targetMode === 'share' && !hasAudioData && memCount === 0) {
@@ -16300,7 +16972,7 @@
         saveExportState.shareTab = targetMode === 'share'
           ? (opts.initialTab === 'pins' || !hasAudioData ? 'pins' : 'audio')
           : 'audio';
-        saveExportState.pinScope = hasAudioData ? 'current' : 'all';
+        saveExportState.pinScope = state.hasAudio ? 'current' : 'all';
         saveExportState.pinNameEdited = false;
         saveExportState.isExporting = false;
         saveExportState.cancelled = false;
@@ -16895,6 +17567,12 @@
 
       function updateRecGainHintUI(isLowLevel) {
         if (!recGainHintBox || !recGainHintText) return;
+        if (state.recMode === 'tab') {
+          state.recLowLevelAlertActive = false;
+          recGainHintBox.classList.remove('low-level');
+          recGainHintText.textContent = 'YouTube等の別タブ音声をデジタル無劣化ステレオで直接録音中。別タブで再生し、終わったら「共有を停止」または下の「停止して波形化」を押してください。';
+          return;
+        }
         state.recLowLevelAlertActive = Boolean(isLowLevel);
         recGainHintBox.classList.toggle('low-level', state.recLowLevelAlertActive);
         if (state.recLowLevelAlertActive) {
@@ -16904,10 +17582,207 @@
         }
       }
 
+      function canCaptureTabAudio() {
+        return Boolean(navigator.mediaDevices && typeof navigator.mediaDevices.getDisplayMedia === 'function');
+      }
+
+      function openRecSourceModal() {
+        if (!recSourceModal) {
+          startRecording();
+          return;
+        }
+        settingsModal.classList.add('hidden');
+        recSourceModal.classList.remove('hidden');
+      }
+
+      function closeRecSourceModal() {
+        if (recSourceModal) recSourceModal.classList.add('hidden');
+      }
+
+      async function startTabAudioRecording() {
+        if (state.isRecording) return;
+        closeRecSourceModal();
+        settingsModal.classList.add('hidden');
+
+        if (!canCaptureTabAudio()) {
+          showToast('別タブ音声の直接録音はPCブラウザ（Chrome / Edge）専用です。スマホではPC等で録音したファイルを「開く」から読み込んでください');
+          return;
+        }
+
+        try {
+          if (state.tunerRunning) stopTuner();
+          if (state.isYouTubeMode) exitYouTubeMode({ showStartup: false });
+          if (state.isPlaying) pausePlayback();
+          initAudioGraph();
+
+          let displayStream = null;
+          try {
+            displayStream = await navigator.mediaDevices.getDisplayMedia({
+              video: { width: { ideal: 320 }, height: { ideal: 180 }, frameRate: { ideal: 5 } },
+              audio: {
+                echoCancellation: false,
+                noiseSuppression: false,
+                autoGainControl: false,
+                channelCount: 2,
+                sampleRate: 48000
+              },
+              preferCurrentTab: false,
+              selfBrowserSurface: 'exclude',
+              systemAudio: 'include'
+            });
+          } catch (firstErr) {
+            if (firstErr && (firstErr.name === 'NotAllowedError' || firstErr.name === 'AbortError')) {
+              showToast('別タブ録音をキャンセルしました');
+              return;
+            }
+            displayStream = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: true });
+          }
+
+          if (!displayStream) return;
+
+          const audioTracks = displayStream.getAudioTracks();
+          if (!audioTracks || audioTracks.length === 0) {
+            displayStream.getTracks().forEach(t => t.stop());
+            showToast('音声が含まれていません。タブ選択時に「タブの音声を共有」をONにしてください');
+            return;
+          }
+
+          const audioOnlyStream = new MediaStream(audioTracks);
+          const track = audioTracks[0];
+          const trackSettings = (track && track.getSettings) ? track.getSettings() : {};
+
+          // Auto-stop and build waveform when user clicks Chrome's floating "共有を停止" button
+          displayStream.getTracks().forEach((tr) => {
+            tr.onended = () => {
+              if (state.isRecording && state.recMode === 'tab') {
+                stopRecording();
+              }
+            };
+          });
+
+          const src = audioCtx.createMediaStreamSource(audioOnlyStream);
+          src.channelCountMode = 'max';
+          src.channelInterpretation = 'discrete';
+
+          const actualCh = (Number(trackSettings.channelCount) || Number(src.channelCount) || 2) >= 2 ? 2 : 1;
+
+          state.isRecording = true;
+          state.recMode = 'tab';
+          state.recStream = audioOnlyStream;
+          state.recDisplayStream = displayStream;
+          state.recBuffersL = [];
+          state.recBuffersR = [];
+          state.recChannelCount = actualCh;
+          state.recHasTrueStereoDiff = actualCh >= 2;
+          state.recPendingMarkers = [];
+          state.recSampleRate = audioCtx.sampleRate;
+          state.recStartPerf = performance.now();
+          state.recLastDecentLevelPerf = state.recStartPerf;
+          state.recLowLevelAlertActive = false;
+
+          // Pure 1.0x (0dB) lossless digital passthrough (no mic gain boost or limiter coloration)
+          const gainNode = audioCtx.createGain();
+          gainNode.gain.value = 1.0;
+          gainNode.channelCount = 2;
+          gainNode.channelCountMode = 'max';
+          gainNode.channelInterpretation = 'discrete';
+          src.connect(gainNode);
+
+          const analyser = audioCtx.createAnalyser();
+          analyser.fftSize = 512;
+          gainNode.connect(analyser);
+
+          const silentGain = audioCtx.createGain();
+          silentGain.gain.value = 0;
+
+          const workletOk = await ensureRecWorkletLoaded();
+          let workletNode = null;
+          let processor = null;
+
+          if (workletOk) {
+            workletNode = new AudioWorkletNode(audioCtx, 'raw-pcm-recorder-processor', {
+              numberOfInputs: 1,
+              numberOfOutputs: 1,
+              channelCount: 2,
+              channelCountMode: 'max',
+              channelInterpretation: 'discrete'
+            });
+            workletNode.port.onmessage = (ev) => {
+              const d = ev.data;
+              if (!d || d.done) return;
+              if (d.meta) {
+                const liveCh = d.channels >= 2 ? 2 : 1;
+                state.recChannelCount = liveCh;
+                if (d.stereoDiff) state.recHasTrueStereoDiff = true;
+                updateRecLiveSpecBadge(liveCh, false);
+                return;
+              }
+              if (d.l) state.recBuffersL.push(d.l);
+              if (d.stereo && d.r) {
+                state.recChannelCount = 2;
+                state.recBuffersR.push(d.r);
+              }
+            };
+            gainNode.connect(workletNode);
+            workletNode.connect(silentGain);
+            silentGain.connect(audioCtx.destination);
+          } else {
+            const spCh = actualCh >= 2 ? 2 : 1;
+            processor = audioCtx.createScriptProcessor(4096, spCh, 1);
+            processor.onaudioprocess = (ev) => {
+              if (!state.isRecording) return;
+              const inL = ev.inputBuffer.getChannelData(0);
+              state.recBuffersL.push(new Float32Array(inL));
+              if (ev.inputBuffer.numberOfChannels > 1) {
+                state.recChannelCount = 2;
+                state.recBuffersR.push(new Float32Array(ev.inputBuffer.getChannelData(1)));
+              }
+            };
+            gainNode.connect(processor);
+            processor.connect(silentGain);
+            silentGain.connect(audioCtx.destination);
+          }
+
+          state.recSourceNode = src;
+          state.recGainNode = gainNode;
+          state.recLimiterNode = null;
+          state.recAnalyser = analyser;
+          state.recWorkletNode = workletNode;
+          state.recProcessor = processor;
+          state.recSilentGain = silentGain;
+
+          if (recModeTitle) recModeTitle.textContent = 'タブ録音中';
+          if (btnRecOpenMicGain) btnRecOpenMicGain.classList.add('hidden');
+          updateRecLiveSpecBadge(actualCh, false);
+          updateRecGainHintUI(false);
+          if (recMidGainWarn) recMidGainWarn.classList.add('hidden');
+
+          startupOverlay.classList.add('hidden');
+          recOverlay.classList.remove('hidden');
+          btnRecordHeader.classList.add('recording');
+          recHeaderLabel.textContent = '停止';
+          recMarkerCountBadge.textContent = '0';
+          recLiveGainLabel.textContent = 'デジタル直録';
+
+          renderLiveRecordingLoop();
+          const khz = (state.recSampleRate / 1000).toFixed(1).replace(/\.0$/, '');
+          const chLabel = actualCh >= 2 ? 'ステレオ' : 'モノラル';
+          showToast(`別タブ音声の録音を開始しました（${khz}kHz ${state.recBitDepth}bit ${chLabel}・デジタル直録）`);
+        } catch (err) {
+          if (err && (err.name === 'NotAllowedError' || err.name === 'AbortError')) {
+            showToast('別タブ録音をキャンセルしました');
+          } else {
+            console.error('Tab audio capture failed:', err);
+            showToast('別タブ音声の録音を開始できませんでした（PCのChrome / Edgeでお試しください）');
+          }
+        }
+      }
+
       async function startRecording() {
         if (state.isRecording) return;
         try {
           if (state.tunerRunning) stopTuner();
+          if (state.isYouTubeMode) exitYouTubeMode({ showStartup: false });
           if (state.isPlaying) pausePlayback();
           initAudioGraph();
 
@@ -17031,7 +17906,9 @@
           const stereoDeniedByOs = actualCh < 2 && !stereoExplicitSucceeded;
 
           state.isRecording = true;
+          state.recMode = 'mic';
           state.recStream = stream;
+          state.recDisplayStream = null;
           state.recBuffersL = [];
           state.recBuffersR = [];
           state.recChannelCount = actualCh;
@@ -17136,6 +18013,8 @@
           state.recProcessor = processor;
           state.recSilentGain = silentGain;
 
+          if (recModeTitle) recModeTitle.textContent = '録音中';
+          if (btnRecOpenMicGain) btnRecOpenMicGain.classList.remove('hidden');
           updateRecLiveSpecBadge(actualCh, stereoDeniedByOs);
           updateRecGainHintUI(false);
           if (recMidGainWarn) recMidGainWarn.classList.remove('hidden');
@@ -17189,6 +18068,7 @@
               updateRecGainHintUI(false);
             }
           } else if (
+            state.recMode === 'mic' &&
             state.micGain < 5.9 &&
             (nowPerf - state.recStartPerf) >= 2600 &&
             (nowPerf - state.recLastDecentLevelPerf) >= 2600
@@ -17246,6 +18126,7 @@
 
       async function stopRecording() {
         if (!state.isRecording) return;
+        const wasTabMode = state.recMode === 'tab';
         state.isRecording = false;
         if (state.recAnimId) cancelAnimationFrame(state.recAnimId);
 
@@ -17288,7 +18169,8 @@
           if (state.recGainNode) state.recGainNode.disconnect();
           if (state.recLimiterNode) state.recLimiterNode.disconnect();
           if (state.recSilentGain) state.recSilentGain.disconnect();
-          if (state.recStream) state.recStream.getTracks().forEach(t => t.stop());
+          if (state.recStream) state.recStream.getTracks().forEach(t => { t.onended = null; t.stop(); });
+          if (state.recDisplayStream) state.recDisplayStream.getTracks().forEach(t => { t.onended = null; t.stop(); });
         } catch (_) {}
 
         state.recSourceNode = null;
@@ -17299,6 +18181,10 @@
         state.recProcessor = null;
         state.recSilentGain = null;
         state.recStream = null;
+        state.recDisplayStream = null;
+        state.recMode = 'mic';
+        if (recModeTitle) recModeTitle.textContent = '録音中';
+        if (btnRecOpenMicGain) btnRecOpenMicGain.classList.remove('hidden');
         state.recBuffersL = [];
         state.recBuffersR = [];
 
@@ -17372,8 +18258,22 @@
           }
         };
 
-        applyZeroPhaseSubsonicCut(dstL, sr, 20.0);
-        if (dstR) applyZeroPhaseSubsonicCut(dstR, sr, 20.0);
+        if (!wasTabMode) {
+          applyZeroPhaseSubsonicCut(dstL, sr, 20.0);
+          if (dstR) applyZeroPhaseSubsonicCut(dstR, sr, 20.0);
+        } else {
+          // Pure digital tab audio: preserve full bass down to DC, apply only a 2ms edge anti-click taper
+          const edgeLen = Math.min(Math.floor(totalSamples / 4), Math.round(sr * 0.002));
+          for (let i = 0; i < edgeLen; i++) {
+            const w = 0.5 * (1.0 - Math.cos((Math.PI * i) / Math.max(1, edgeLen)));
+            dstL[i] *= w;
+            dstL[totalSamples - 1 - i] *= w;
+            if (dstR) {
+              dstR[i] *= w;
+              dstR[totalSamples - 1 - i] *= w;
+            }
+          }
+        }
 
         let maxAbs = 0;
         for (let i = 0; i < totalSamples; i++) {
@@ -17389,9 +18289,9 @@
           }
         }
 
-        // Optional linear peak normalization ONLY when user enables it in Settings (default OFF = pure raw PCM)
+        // Optional linear peak normalization ONLY for mic recordings when user enables it
         let normGain = 1.0;
-        if (state.recAutoNormalize && maxAbs > 0.001 && maxAbs < 0.89) {
+        if (!wasTabMode && state.recAutoNormalize && maxAbs > 0.001 && maxAbs < 0.89) {
           normGain = Math.min(6.0, 0.89 / maxAbs);
           if (normGain > 1.04) {
             for (let i = 0; i < totalSamples; i++) {
@@ -17404,7 +18304,7 @@
         }
 
         const wavBlob = encodeWavFromAudioBuffer(recBuffer, state.recBitDepth);
-        const title = makeRecordingFilename();
+        const title = makeRecordingFilename(wasTabMode ? 'tab_' : '');
         state.playlist.push({ name: title, origName: title, blob: wavBlob, markers: capturedMarkers, startSectionEnabled: true, isUnsavedRecording: true });
         state.currentTrackIndex = state.playlist.length - 1;
 
@@ -17414,8 +18314,12 @@
           persistSession: true,
           isUnsavedRecording: true
         });
-        const normNote = normGain > 1.04 ? `・ノーマライズ(${normGain.toFixed(1)}x)` : '';
-        showToast(`録音完了（${state.recBitDepth}bit・黄色ピン ${capturedMarkers.length}個${normNote} • 未保存）`);
+        if (wasTabMode) {
+          showToast(`タブ録音完了（${state.recBitDepth}bit・${isStereo ? 'ステレオ' : 'モノラル'}・デジタル直録 • 未保存）`);
+        } else {
+          const normNote = normGain > 1.04 ? `・ノーマライズ(${normGain.toFixed(1)}x)` : '';
+          showToast(`録音完了（${state.recBitDepth}bit・黄色ピン ${capturedMarkers.length}個${normNote} • 未保存）`);
+        }
       }
 
       // ==================== PIN (MARKER) & BIDIRECTIONAL GREEN <-> YELLOW LOGIC ====================
@@ -17970,6 +18874,10 @@
           trackSubtitleEl.textContent = '待機中 • 0/0 • 黄色ピン 0個';
           return;
         }
+        if (state.isYouTubeMode) {
+          trackSubtitleEl.textContent = `YouTube公式 • ${curIdx}/${totalTracks} • 黄色ピン ${state.markers.length}個`;
+          return;
+        }
         const mb = state.rawBlob ? `${(state.rawBlob.size / (1024 * 1024)).toFixed(1)}MB` : '';
         const unsavedPrefix = state.isUnsavedRecording ? '未保存 • ' : '';
         trackSubtitleEl.textContent = `${unsavedPrefix}${mb} • ${curIdx}/${totalTracks} • 黄色ピン ${state.markers.length}個`;
@@ -17988,7 +18896,7 @@
           return;
         }
         btnToggleSectionSkip.disabled = false;
-        btnCutYellowSection.disabled = !(state.audioBuffer || state.wavMeta);
+        btnCutYellowSection.disabled = state.isYouTubeMode || !(state.audioBuffer || state.wavMeta);
 
         const sec = getCurrentYellowSection(state.currentTime);
         if (!sec) return;
@@ -19148,6 +20056,9 @@
         if (state.isPlaying && path === 'bufferDirect' && tapeSourceNode) {
           return getTapeCurrentTime();
         }
+        if (path === 'youtube') {
+          return getYouTubeCurrentTime();
+        }
         if (state.isPlaying && path === 'audioEl') {
           return audioEl.currentTime;
         }
@@ -19171,7 +20082,7 @@
           return getTapeCurrentTime();
         }
         const dtSec = Math.max(0, (performance.now() - state.lastSyncPerf) / 1000);
-        const adv = Math.min(0.06, dtSec) * state.playbackRate;
+        const adv = Math.min(state.isYouTubeMode ? 0.25 : 0.06, dtSec) * state.playbackRate;
         let t = state.lastSyncTime + adv;
         if (state.sectionRepeat) {
           const sec = getActiveLoopSection();
@@ -19195,6 +20106,7 @@
         // Cleanly transition between direct native AudioBufferSourceNode and Vocoder DSP mid-playback
         stopTapeSource();
         if (!audioEl.paused) audioEl.pause();
+        if (state.isYouTubeMode) pauseYouTubePlayer();
         state.currentTime = curTimeSec;
         state.lastSyncTime = curTimeSec;
         state.lastSyncPerf = performance.now();
@@ -19238,7 +20150,9 @@
 
         if (!deferAudioSeek) {
           const path = getActivePlaybackPath();
-          if (path === 'vocoderDsp') {
+          if (path === 'youtube') {
+            seekYouTubePlayer(clamped);
+          } else if (path === 'vocoderDsp') {
             resetVocoderAtSample(Math.floor(clamped * state.audioBuffer.sampleRate));
           } else if (path === 'bufferDirect') {
             if (state.isPlaying) {
@@ -19286,7 +20200,9 @@
         updateAudioRouting();
 
         const path = getActivePlaybackPath();
-        if (path === 'vocoderDsp') {
+        if (path === 'youtube') {
+          playYouTubePlayer();
+        } else if (path === 'vocoderDsp') {
           resetVocoderAtSample(Math.floor(state.currentTime * state.audioBuffer.sampleRate));
         } else if (path === 'bufferDirect') {
           startTapeSourceAt(state.currentTime);
@@ -19337,14 +20253,19 @@
       }
 
       function setPlaybackSpeed(rate) {
-        const clamped = Math.max(0.25, Math.min(2.0, Math.round(rate * 100) / 100));
-        const prevPath = getActivePlaybackPath();
-        const curT = getLivePlayheadTime();
-
-        state.playbackRate = clamped;
-        audioEl.playbackRate = clamped;
-        updateLowpassFilter();
-        syncPlaybackPathTransition(prevPath, curT);
+        let clamped = Math.max(0.25, Math.min(2.0, Math.round(rate * 100) / 100));
+        if (state.isYouTubeMode) {
+          clamped = snapYouTubePlaybackRate(clamped);
+          state.playbackRate = clamped;
+          applyYouTubePlaybackRate(clamped);
+        } else {
+          const prevPath = getActivePlaybackPath();
+          const curT = getLivePlayheadTime();
+          state.playbackRate = clamped;
+          audioEl.playbackRate = clamped;
+          updateLowpassFilter();
+          syncPlaybackPathTransition(prevPath, curT);
+        }
 
         const txt = `${clamped.toFixed(2)}x`;
         speedBadgeText.textContent = txt;
@@ -19359,7 +20280,11 @@
       }
 
       function setPitch(semi) {
-        const clamped = Math.max(-6, Math.min(6, Math.round(semi)));
+        let clamped = Math.max(-6, Math.min(6, Math.round(semi)));
+        if (state.isYouTubeMode && clamped !== 0) {
+          clamped = 0;
+          showToast('YouTube公式モードではピッチ変更できません（ローカル音源のみ対応）');
+        }
         const prevPath = getActivePlaybackPath();
         const curT = getLivePlayheadTime();
 
@@ -19401,7 +20326,11 @@
         const safeIdx = ((idx % state.playlist.length) + state.playlist.length) % state.playlist.length;
         state.currentTrackIndex = safeIdx;
         const item = state.playlist[safeIdx];
-        await loadAudioBlob(item.blob, item.name, item.markers || [], autoPlay, null, item.startSectionEnabled !== false, { origName: item.origName || item.name, restoreFromMemory: !item.isUnsavedRecording, persistSession: true, isUnsavedRecording: Boolean(item.isUnsavedRecording) });
+        if (item.isYouTube && item.ytVideoId) {
+          await loadYouTubeVideo(item.ytVideoId, { autoPlay, fromPlaylist: true, ytUrl: item.ytUrl, displayName: item.name });
+        } else {
+          await loadAudioBlob(item.blob, item.name, item.markers || [], autoPlay, null, item.startSectionEnabled !== false, { origName: item.origName || item.name, restoreFromMemory: !item.isUnsavedRecording, persistSession: true, isUnsavedRecording: Boolean(item.isUnsavedRecording) });
+        }
         showToast(`トラック ${safeIdx + 1}/${state.playlist.length}: ${item.name}`);
       }
 
@@ -19970,8 +20899,10 @@
           }
         }
 
-        // Draw Played (left of center playhead) & Unplayed (right)
-        if (state.hasAudio && state.waveformPyramid) {
+        // Draw Played (left of center playhead) & Unplayed (right), OR crisp time ruler in YouTube Mode
+        if (state.hasAudio && state.isYouTubeMode) {
+          drawYouTubeZoomTimeline(ctx, W, H, midY, winStart, winEnd, pxPerSec, centerX, isMin);
+        } else if (state.hasAudio && state.waveformPyramid) {
           drawZoomWaveformClip(
             ctx, W, H, midY, halfH, winStart, winEnd, pxPerSec, 0, centerX,
             isMin ? 'rgba(105, 130, 156, 0.54)' : 'rgba(66, 165, 245, 0.85)',
@@ -20076,7 +21007,11 @@
       }
 
       function renderAllCanvases() {
-        renderOverviewCanvas();
+        if (state.isYouTubeMode) {
+          renderYouTubeOverviewCanvas();
+        } else {
+          renderOverviewCanvas();
+        }
         renderZoomCanvas();
       }
 
@@ -20135,7 +21070,7 @@
 
       function beginPagerGesture(clientX, clientY, targetEl, sourceType) {
         // Never hijack range sliders, inputs, or piano keyboard keys!
-        if (targetEl && targetEl.closest && targetEl.closest('input, select, textarea, #kbdStage')) {
+        if (targetEl && targetEl.closest && targetEl.closest('input, select, textarea, #kbdStage, #ytOverviewCanvas, .yt-player-box')) {
           return false;
         }
         // In landscape full-screen keyboard mode, disable horizontal pager swipe so tapping toolbar controls is rock-solid
@@ -20609,6 +21544,39 @@
                 state.currentTime = sec.start;
               }
             }
+          } else if (getActivePlaybackPath() === 'youtube') {
+            const ytT = getYouTubeCurrentTime();
+            const ytD = getYouTubeDuration();
+            if (ytD > 0 && Math.abs(state.duration - ytD) > 0.25) {
+              state.duration = ytD;
+              state.durationProbed = true;
+            }
+            if (Math.abs(ytT - state.lastSyncTime) > 0.015) {
+              state.lastSyncTime = ytT;
+              state.lastSyncPerf = performance.now();
+            }
+            state.currentTime = ytT;
+            const skipDest = resolveSkipTarget(state.currentTime);
+            if (skipDest !== null) {
+              if (skipDest >= state.duration - 0.1) {
+                handleTrackEnded();
+                requestAnimationFrame(animationLoop);
+                return;
+              }
+              seekYouTubePlayer(skipDest);
+              state.currentTime = skipDest;
+              state.lastSyncTime = skipDest;
+              state.lastSyncPerf = performance.now();
+            }
+            if (state.sectionRepeat) {
+              const sec = getActiveLoopSection();
+              if (sec.end - sec.start > 0.2 && state.currentTime >= sec.end - 0.08) {
+                seekYouTubePlayer(sec.start);
+                state.currentTime = sec.start;
+                state.lastSyncTime = sec.start;
+                state.lastSyncPerf = performance.now();
+              }
+            }
           } else if (isUsingAudioEl()) {
             if (Math.abs(audioEl.currentTime - state.lastSyncTime) > 0.002) {
               state.lastSyncTime = audioEl.currentTime;
@@ -20651,6 +21619,881 @@
       audioEl.addEventListener('ended', () => {
         if (isUsingAudioEl()) handleTrackEnded();
       });
+
+
+      // ==================== YOUTUBE OFFICIAL IFRAME PLAYER PRACTICE MODE ====================
+      let ytApiPromise = null;
+      let ytPlayer = null;
+      let ytPlayerReady = false;
+      let ytPendingSeekAfterReady = null;
+      let ytPendingPlayAfterReady = false;
+      let ytLastSeekIssuedAt = 0;
+      let ytLastSeekTarget = 0;
+      let ytMetaFetchToken = 0;
+
+      function extractYouTubeVideoInfo(rawInput) {
+        const raw = String(rawInput || '').trim();
+        if (!raw) return null;
+
+        // Direct 11-char video ID
+        if (/^[a-zA-Z0-9_-]{11}$/.test(raw)) {
+          return { videoId: raw, startSec: 0, url: `https://www.youtube.com/watch?v=${raw}` };
+        }
+
+        const parseTimeParam = (tStr) => {
+          if (!tStr) return 0;
+          const s = String(tStr).trim();
+          if (/^\d+$/.test(s)) return parseInt(s, 10);
+          let total = 0;
+          const hm = s.match(/(\d+)h/i);
+          const mm = s.match(/(\d+)m/i);
+          const sm = s.match(/(\d+)s/i);
+          if (hm) total += parseInt(hm[1], 10) * 3600;
+          if (mm) total += parseInt(mm[1], 10) * 60;
+          if (sm) total += parseInt(sm[1], 10);
+          return total;
+        };
+
+        try {
+          const normalized = /^https?:\/\//i.test(raw) ? raw : `https://${raw}`;
+          const u = new URL(normalized);
+          const host = u.hostname.replace(/^www\./i, '').toLowerCase();
+          let vid = '';
+
+          if (host === 'youtu.be') {
+            vid = u.pathname.split('/').filter(Boolean)[0] || '';
+          } else if (host.endsWith('youtube.com') || host.endsWith('youtube-nocookie.com')) {
+            if (u.searchParams.get('v')) {
+              vid = u.searchParams.get('v');
+            } else {
+              const parts = u.pathname.split('/').filter(Boolean);
+              if (parts.length >= 2 && ['shorts', 'embed', 'live', 'v'].includes(parts[0].toLowerCase())) {
+                vid = parts[1];
+              }
+            }
+          }
+
+          if (vid && /^[a-zA-Z0-9_-]{11}$/.test(vid)) {
+            const startSec = parseTimeParam(u.searchParams.get('t') || u.searchParams.get('start') || '');
+            return { videoId: vid, startSec, url: `https://www.youtube.com/watch?v=${vid}` };
+          }
+        } catch (_) {}
+
+        // Fallback regex scan (tolerates pasted share text containing a YouTube URL)
+        const m = raw.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?[^\s]*?v=|shorts\/|embed\/|live\/))([a-zA-Z0-9_-]{11})/i);
+        if (m && m[1]) {
+          return { videoId: m[1], startSec: 0, url: `https://www.youtube.com/watch?v=${m[1]}` };
+        }
+        return null;
+      }
+
+      function ensureYouTubeApiReady() {
+        if (window.YT && window.YT.Player) return Promise.resolve(window.YT);
+        if (ytApiPromise) return ytApiPromise;
+
+        ytApiPromise = new Promise((resolve, reject) => {
+          const timeout = setTimeout(() => {
+            ytApiPromise = null;
+            reject(new Error('YouTube API timeout'));
+          }, 12000);
+
+          const prevReady = window.onYouTubeIframeAPIReady;
+          window.onYouTubeIframeAPIReady = () => {
+            clearTimeout(timeout);
+            if (typeof prevReady === 'function') {
+              try { prevReady(); } catch (_) {}
+            }
+            resolve(window.YT);
+          };
+
+          const existing = document.querySelector('script[src*="youtube.com/iframe_api"]');
+          if (!existing) {
+            const tag = document.createElement('script');
+            tag.src = 'https://www.youtube.com/iframe_api';
+            tag.async = true;
+            tag.onerror = () => {
+              clearTimeout(timeout);
+              ytApiPromise = null;
+              reject(new Error('YouTube API script load error'));
+            };
+            document.head.appendChild(tag);
+          }
+        });
+        return ytApiPromise;
+      }
+
+      function snapYouTubePlaybackRate(rate) {
+        const rates = (Array.isArray(state.ytAvailableRates) && state.ytAvailableRates.length > 0)
+          ? state.ytAvailableRates
+          : [0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2];
+        let best = rates[0];
+        let bestDiff = Math.abs(rate - best);
+        for (let i = 1; i < rates.length; i++) {
+          const d = Math.abs(rate - rates[i]);
+          if (d < bestDiff) {
+            bestDiff = d;
+            best = rates[i];
+          }
+        }
+        return best;
+      }
+
+      function applyYouTubePlaybackRate(rate) {
+        if (!ytPlayer || !ytPlayerReady) return;
+        try {
+          if (typeof ytPlayer.setPlaybackRate === 'function') {
+            ytPlayer.setPlaybackRate(rate);
+          }
+        } catch (_) {}
+      }
+
+      function getYouTubeCurrentTime() {
+        if (!ytPlayer || !ytPlayerReady || typeof ytPlayer.getCurrentTime !== 'function') {
+          return state.currentTime;
+        }
+        // Avoid stale readback immediately after calling ytPlayer.seekTo()
+        if (performance.now() - ytLastSeekIssuedAt < 260) {
+          return ytLastSeekTarget;
+        }
+        try {
+          const t = Number(ytPlayer.getCurrentTime());
+          return isFinite(t) && t >= 0 ? t : state.currentTime;
+        } catch (_) {
+          return state.currentTime;
+        }
+      }
+
+      function getYouTubeDuration() {
+        if (!ytPlayer || !ytPlayerReady || typeof ytPlayer.getDuration !== 'function') {
+          return state.duration;
+        }
+        try {
+          const d = Number(ytPlayer.getDuration());
+          return isFinite(d) && d > 0 ? d : state.duration;
+        } catch (_) {
+          return state.duration;
+        }
+      }
+
+      function seekYouTubePlayer(sec) {
+        const clamped = Math.max(0, Math.min(state.duration > 0 ? state.duration : sec, sec));
+        ytLastSeekTarget = clamped;
+        ytLastSeekIssuedAt = performance.now();
+        if (!ytPlayer || !ytPlayerReady) {
+          ytPendingSeekAfterReady = clamped;
+          return;
+        }
+        try {
+          ytPlayer.seekTo(clamped, true);
+        } catch (_) {}
+      }
+
+      function playYouTubePlayer() {
+        if (!ytPlayer || !ytPlayerReady) {
+          ytPendingPlayAfterReady = true;
+          return;
+        }
+        try {
+          applyYouTubePlaybackRate(state.playbackRate);
+          ytPlayer.playVideo();
+        } catch (_) {}
+      }
+
+      function pauseYouTubePlayer() {
+        ytPendingPlayAfterReady = false;
+        if (!ytPlayer || !ytPlayerReady) return;
+        try {
+          ytPlayer.pauseVideo();
+        } catch (_) {}
+      }
+
+      function destroyYouTubePlayerInstance() {
+        ytPlayerReady = false;
+        ytPendingSeekAfterReady = null;
+        ytPendingPlayAfterReady = false;
+        if (ytPlayer) {
+          try { ytPlayer.stopVideo(); } catch (_) {}
+          try { ytPlayer.destroy(); } catch (_) {}
+          ytPlayer = null;
+        }
+        const box = ytStageWrap ? ytStageWrap.querySelector('.yt-player-box') : null;
+        if (box) {
+          let host = document.getElementById('ytPlayerHost');
+          if (!host) {
+            host = document.createElement('div');
+            host.id = 'ytPlayerHost';
+            box.insertBefore(host, ytLoadingMsg || null);
+          } else {
+            host.innerHTML = '';
+          }
+        }
+      }
+
+      function exitYouTubeMode(opts = {}) {
+        const { showStartup = true } = opts;
+        if (state.isYouTubeMode) {
+          saveCurrentFileMemory(true);
+        }
+        destroyYouTubePlayerInstance();
+        state.isYouTubeMode = false;
+        state.ytVideoId = '';
+        state.ytUrl = '';
+        if (ytStageWrap) ytStageWrap.classList.add('hidden');
+        if (ytLoadingMsg) ytLoadingMsg.classList.add('hidden');
+
+        if (showStartup) {
+          state.isPlaying = false;
+          state.hasAudio = false;
+          state.duration = 0;
+          state.currentTime = 0;
+          state.markers = [];
+          state.tempMarker = null;
+          state.startSectionEnabled = true;
+          btnSaveWav.disabled = true;
+          trackTitleEl.textContent = 'Audipo風 練習プレイヤー';
+          updatePlayUI();
+          updateVocoderUI();
+          updateHeaderSubInfo();
+          updateTimeUI();
+          updatePinButtonsUI();
+          updateSectionBarUI();
+          renderMarkerList();
+          updateShareButtonState();
+          startupOverlay.classList.remove('hidden');
+          renderAllCanvases();
+        }
+      }
+
+      async function fetchYouTubeOembedTitle(videoId, token) {
+        try {
+          const res = await fetch(`https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${encodeURIComponent(videoId)}&format=json`);
+          if (!res.ok) return;
+          const data = await res.json();
+          if (token !== ytMetaFetchToken || !state.isYouTubeMode || state.ytVideoId !== videoId) return;
+          if (data && typeof data.title === 'string' && data.title.trim()) {
+            const fetchedTitle = data.title.trim();
+            const isDefaultPlaceholder = (
+              !state.currentFileOrigName ||
+              state.currentFileOrigName === `YouTube (${videoId})`
+            );
+            const userRenamed = trackTitleEl.textContent.trim() && trackTitleEl.textContent.trim() !== state.currentFileOrigName;
+            state.currentFileOrigName = fetchedTitle;
+            if (!userRenamed || isDefaultPlaceholder) {
+              trackTitleEl.textContent = fetchedTitle;
+              if (state.playlist[state.currentTrackIndex] && state.playlist[state.currentTrackIndex].ytVideoId === videoId) {
+                state.playlist[state.currentTrackIndex].name = fetchedTitle;
+                state.playlist[state.currentTrackIndex].origName = fetchedTitle;
+              }
+            }
+            saveCurrentFileMemory(true);
+            renderYouTubeHistoryList();
+          }
+        } catch (_) {}
+      }
+
+      function renderYouTubeOverviewCanvas() {
+        if (!ytOverviewCanvas || !ytOverviewCtx || !state.isYouTubeMode) return;
+        const dpr = window.devicePixelRatio || 1;
+        const rect = ytOverviewCanvas.getBoundingClientRect();
+        if (rect.width <= 0 || rect.height <= 0) return;
+        const pw = Math.round(rect.width * dpr);
+        const ph = Math.round(rect.height * dpr);
+        if (ytOverviewCanvas.width !== pw || ytOverviewCanvas.height !== ph) {
+          ytOverviewCanvas.width = pw;
+          ytOverviewCanvas.height = ph;
+        }
+
+        const ctx = ytOverviewCtx;
+        ctx.save();
+        ctx.scale(dpr, dpr);
+
+        const W = rect.width;
+        const H = rect.height;
+        const isMin = isMinimalTheme();
+        ctx.fillStyle = isMin ? '#f6f4ef' : '#141419';
+        ctx.fillRect(0, 0, W, H);
+
+        const padX = 10;
+        const barW = Math.max(20, W - padX * 2);
+        const barY = H * 0.54;
+        const barH = 8;
+        const dur = Math.max(0.01, state.duration || 0);
+        const curT = getSmoothPlayheadTime();
+        const curFrac = Math.max(0, Math.min(1, curT / dur));
+        const curX = padX + curFrac * barW;
+
+        // Track background rail
+        ctx.fillStyle = isMin ? 'rgba(45,44,41,0.12)' : 'rgba(255,255,255,0.12)';
+        ctx.beginPath();
+        ctx.roundRect(padX, barY - barH / 2, barW, barH, 4);
+        ctx.fill();
+
+        // Played progress bar
+        ctx.fillStyle = isMin ? '#58718c' : '#ef4444';
+        ctx.beginPath();
+        ctx.roundRect(padX, barY - barH / 2, Math.max(0, curX - padX), barH, 4);
+        ctx.fill();
+
+        // Skipped sections shading
+        const allSecs = getAllSections();
+        for (let i = 0; i < allSecs.length; i++) {
+          const s = allSecs[i];
+          if (!s.sectionEnabled && dur > 0) {
+            const x0 = padX + (s.start / dur) * barW;
+            const x1 = padX + (s.end / dur) * barW;
+            ctx.fillStyle = isMin ? 'rgba(217,119,6,0.22)' : 'rgba(245,158,11,0.28)';
+            ctx.fillRect(x0, 2, Math.max(1, x1 - x0), H - 4);
+          }
+        }
+
+        // Active Section Repeat highlight
+        if (state.sectionRepeat && dur > 0) {
+          const sec = getActiveLoopSection();
+          const x0 = padX + (sec.start / dur) * barW;
+          const x1 = padX + (sec.end / dur) * barW;
+          ctx.fillStyle = isMin ? 'rgba(22,163,74,0.18)' : 'rgba(34,197,94,0.24)';
+          ctx.fillRect(x0, 2, Math.max(2, x1 - x0), H - 4);
+        }
+
+        // Yellow Confirmed Pins
+        for (const mk of state.markers) {
+          const mx = padX + Math.max(0, Math.min(1, mk.time / dur)) * barW;
+          const en = mk.enabled !== false;
+          ctx.strokeStyle = en ? (isMin ? '#d97706' : '#facc15') : 'rgba(250,204,21,0.38)';
+          ctx.lineWidth = 1.6;
+          ctx.beginPath();
+          ctx.moveTo(mx, 0);
+          ctx.lineTo(mx, H);
+          ctx.stroke();
+
+          ctx.fillStyle = en ? (isMin ? '#d97706' : '#facc15') : 'rgba(250,204,21,0.42)';
+          ctx.beginPath();
+          ctx.moveTo(mx - 4.5, 0);
+          ctx.lineTo(mx + 4.5, 0);
+          ctx.lineTo(mx, 7);
+          ctx.closePath();
+          ctx.fill();
+        }
+
+        // Green Temporary Pin
+        if (state.tempMarker !== null && dur > 0) {
+          const gx = padX + Math.max(0, Math.min(1, state.tempMarker / dur)) * barW;
+          ctx.strokeStyle = isMin ? '#3c8c5c' : '#22c55e';
+          ctx.lineWidth = 1.8;
+          ctx.beginPath();
+          ctx.moveTo(gx, 0);
+          ctx.lineTo(gx, H);
+          ctx.stroke();
+
+          ctx.fillStyle = isMin ? '#3c8c5c' : '#22c55e';
+          ctx.beginPath();
+          ctx.moveTo(gx - 5, 0);
+          ctx.lineTo(gx + 5, 0);
+          ctx.lineTo(gx, 7.5);
+          ctx.closePath();
+          ctx.fill();
+        }
+
+        // Playhead thumb
+        ctx.fillStyle = isMin ? '#2d2c29' : '#ffffff';
+        ctx.beginPath();
+        ctx.arc(curX, barY, 5.5, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Corner time labels
+        ctx.font = '700 9.5px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace';
+        ctx.fillStyle = isMin ? '#6f6c66' : '#a1a1aa';
+        ctx.textBaseline = 'bottom';
+        ctx.textAlign = 'left';
+        ctx.fillText(formatTime(curT), padX, H - 1);
+        ctx.textAlign = 'right';
+        ctx.fillText(formatTime(state.duration), W - padX, H - 1);
+
+        ctx.restore();
+      }
+
+      function drawYouTubeZoomTimeline(ctx, W, H, midY, winStart, winEnd, pxPerSec, centerX, isMin) {
+        // Choose crisp major/minor time tick intervals based on zoom span
+        const span = Math.max(0.05, state.zoomWindowSeconds);
+        let majorStep = 1;
+        if (span <= 1.2) majorStep = 0.2;
+        else if (span <= 3.0) majorStep = 0.5;
+        else if (span <= 10.0) majorStep = 1;
+        else if (span <= 24.0) majorStep = 2;
+        else if (span <= 45.0) majorStep = 5;
+        else majorStep = 10;
+        const minorStep = majorStep / 5;
+
+        // Subtle played tint left of center
+        const trackStartX = Math.max(0, (0 - winStart) * pxPerSec);
+        const trackEndX = Math.min(W, (state.duration - winStart) * pxPerSec);
+        const playedRightX = Math.min(centerX, trackEndX);
+        if (playedRightX > trackStartX) {
+          ctx.fillStyle = isMin ? 'rgba(105, 130, 156, 0.14)' : 'rgba(239, 68, 68, 0.14)';
+          ctx.fillRect(trackStartX, midY - 12, playedRightX - trackStartX, 24);
+        }
+        if (trackEndX > Math.max(centerX, trackStartX)) {
+          const rx0 = Math.max(centerX, trackStartX);
+          ctx.fillStyle = isMin ? 'rgba(45, 44, 41, 0.05)' : 'rgba(255, 255, 255, 0.05)';
+          ctx.fillRect(rx0, midY - 12, trackEndX - rx0, 24);
+        }
+
+        // Minor ticks
+        const firstMinor = Math.max(0, Math.floor(winStart / minorStep) * minorStep);
+        const lastTick = Math.min(state.duration, winEnd);
+        ctx.strokeStyle = isMin ? 'rgba(45, 44, 41, 0.16)' : 'rgba(161, 161, 170, 0.24)';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        for (let t = firstMinor; t <= lastTick + 1e-6; t += minorStep) {
+          if (t < winStart) continue;
+          const x = (t - winStart) * pxPerSec;
+          ctx.moveTo(x, midY - 6);
+          ctx.lineTo(x, midY + 6);
+        }
+        ctx.stroke();
+
+        // Major ticks + time labels
+        const firstMajor = Math.max(0, Math.floor(winStart / majorStep) * majorStep);
+        ctx.strokeStyle = isMin ? 'rgba(45, 44, 41, 0.36)' : 'rgba(228, 228, 231, 0.44)';
+        ctx.lineWidth = 1.25;
+        ctx.font = '700 10px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace';
+        ctx.fillStyle = isMin ? '#5c5953' : '#a1a1aa';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'top';
+        ctx.beginPath();
+        for (let t = firstMajor; t <= lastTick + 1e-6; t += majorStep) {
+          if (t < winStart) continue;
+          const x = (t - winStart) * pxPerSec;
+          ctx.moveTo(x, midY - 13);
+          ctx.lineTo(x, midY + 13);
+          const lbl = majorStep < 1 ? formatTime(t, true) : formatTime(t, false);
+          ctx.fillText(lbl, x, midY + 16);
+        }
+        ctx.stroke();
+
+        // Subtle explanatory label at bottom-left
+        ctx.font = '700 9.5px -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Noto Sans JP", sans-serif';
+        ctx.fillStyle = isMin ? 'rgba(111,108,102,0.72)' : 'rgba(161,161,170,0.62)';
+        ctx.textAlign = 'left';
+        ctx.textBaseline = 'bottom';
+        ctx.fillText('YouTube拡大タイムライン（ドラッグ・ピンチ拡大・タップで微調整）', 8, H - 3);
+      }
+
+      async function loadYouTubeVideo(videoId, opts = {}) {
+        const vid = String(videoId || '').trim();
+        if (!/^[a-zA-Z0-9_-]{11}$/.test(vid)) {
+          showToast('有効な YouTube URL または動画IDを入力してください');
+          return;
+        }
+        const myToken = ++state.loadToken;
+        const isCancelled = () => myToken !== state.loadToken;
+
+        closeYouTubeOpenModal();
+        closeFavoriteFoldersModal();
+        settingsModal.classList.add('hidden');
+        setUpperPage('wave', { scrollActive: false });
+
+        pausePlayback();
+        stopInertia(false);
+        hideWaveProgress(0);
+        destroyYouTubePlayerInstance();
+
+        // Reset local PCM audio state so no stale waveform/buffer leaks into YouTube mode
+        state.rawBlob = null;
+        state.audioBuffer = null;
+        state.wavMeta = null;
+        state.waveformPyramid = null;
+        state.leadingSilenceEnd = 0;
+        state.manualLeadingPlay = false;
+        state.isFallbackLargeFile = false;
+        state.isAnalyzingWave = false;
+        state.isUnsavedRecording = false;
+        state.undoCutSnapshot = null;
+        state.transcriptSegments = [];
+        state.currentFileSize = 0;
+        state.pitchSemitones = 0;
+        pitchBadgeText.textContent = '#:±0';
+        pitchBadgeText.classList.remove('shifted');
+        const modalPitchValEl = document.getElementById('modalPitchVal');
+        if (modalPitchValEl) modalPitchValEl.textContent = '#:±0';
+        const pitchSliderEl = document.getElementById('pitchSlider');
+        if (pitchSliderEl) pitchSliderEl.value = 0;
+
+        // Restore saved pins & state for this YouTube video from IndexedDB
+        const hit = lookupYouTubeMemory(vid);
+        const mem = hit ? hit.rec : null;
+        const ytUrl = opts.ytUrl || (mem && mem.ytUrl) || `https://www.youtube.com/watch?v=${vid}`;
+        const origName = (mem && mem.origName) || opts.displayName || `YouTube (${vid})`;
+        const displayName = (mem && mem.displayName) || opts.displayName || origName;
+
+        state.isYouTubeMode = true;
+        state.ytVideoId = vid;
+        state.ytUrl = ytUrl;
+        state.hasAudio = true;
+        state.isPlaying = false;
+        state.currentFileOrigName = origName;
+        state.currentMemoryKey = makeYouTubeMemoryKey(vid);
+        state.duration = (mem && typeof mem.duration === 'number' && mem.duration > 0) ? mem.duration : 180;
+        state.durationProbed = Boolean(mem && mem.duration > 0);
+        state.restoredFromMemory = Boolean(mem);
+        state.markers = mem && Array.isArray(mem.markers) ? cloneMarkerList(mem.markers) : [];
+        state.startSectionEnabled = mem ? (mem.startSectionEnabled !== false) : true;
+        state.tempMarker = (mem && typeof mem.tempMarker === 'number' && isFinite(mem.tempMarker)) ? mem.tempMarker : null;
+
+        let initStart = 0;
+        if (mem && typeof mem.currentTime === 'number' && isFinite(mem.currentTime) && mem.currentTime > 0.2) {
+          initStart = mem.currentTime;
+        } else if (typeof opts.startSec === 'number' && opts.startSec > 0) {
+          initStart = opts.startSec;
+        }
+        state.currentTime = initStart;
+        state.lastSyncTime = initStart;
+        state.lastSyncPerf = performance.now();
+
+        state.sectionRepeat = Boolean(mem && mem.sectionRepeat);
+        btnSectionRepeat.classList.toggle('active-green', state.sectionRepeat);
+        sectionRepeatLabel.textContent = state.sectionRepeat ? '区間ON' : '区間OFF';
+
+        if (mem && typeof mem.zoomWindowSeconds === 'number' && isFinite(mem.zoomWindowSeconds)) {
+          setZoomSpan(mem.zoomWindowSeconds);
+        }
+
+        const initRate = snapYouTubePlaybackRate((mem && typeof mem.playbackRate === 'number') ? mem.playbackRate : 1.0);
+        state.playbackRate = initRate;
+        speedBadgeText.textContent = `${initRate.toFixed(2)}x`;
+        document.getElementById('modalSpeedVal').textContent = `${initRate.toFixed(2)}x`;
+        document.getElementById('speedSlider').value = initRate;
+        document.querySelectorAll('.speed-preset-btn').forEach(btn => {
+          btn.classList.toggle('active-star', Math.abs(parseFloat(btn.dataset.speed) - initRate) < 0.005);
+        });
+
+        // Add or select in playlist
+        if (!opts.fromPlaylist) {
+          const existingIdx = state.playlist.findIndex(tr => tr.isYouTube && tr.ytVideoId === vid);
+          if (existingIdx >= 0) {
+            state.currentTrackIndex = existingIdx;
+            state.playlist[existingIdx].name = displayName;
+            state.playlist[existingIdx].markers = cloneMarkerList(state.markers);
+            state.playlist[existingIdx].startSectionEnabled = state.startSectionEnabled;
+          } else {
+            state.playlist.push({
+              isYouTube: true,
+              ytVideoId: vid,
+              ytUrl,
+              name: displayName,
+              origName,
+              blob: null,
+              markers: cloneMarkerList(state.markers),
+              startSectionEnabled: state.startSectionEnabled,
+              isUnsavedRecording: false
+            });
+            state.currentTrackIndex = state.playlist.length - 1;
+          }
+        }
+
+        startupOverlay.classList.add('hidden');
+        if (ytStageWrap) ytStageWrap.classList.remove('hidden');
+        if (ytLoadingMsg) ytLoadingMsg.classList.remove('hidden');
+        if (ytLoadingText) ytLoadingText.textContent = 'YouTube公式プレイヤーを読み込み中...';
+        if (linkYtExternal) linkYtExternal.href = ytUrl;
+
+        btnSaveWav.disabled = true;
+        btnShareAudio.disabled = false;
+        btnToggleSectionSkip.disabled = false;
+        btnCutYellowSection.disabled = true;
+        trackTitleEl.textContent = displayName;
+
+        updatePlayUI();
+        updateVocoderUI();
+        updateSkipLeadingSilenceUI();
+        updateHeaderSubInfo();
+        updateTimeUI();
+        updatePinButtonsUI();
+        updateSectionBarUI();
+        renderMarkerList();
+        renderTranscriptList();
+        renderAllCanvases();
+
+        const metaTok = ++ytMetaFetchToken;
+        fetchYouTubeOembedTitle(vid, metaTok);
+
+        try {
+          const YT = await ensureYouTubeApiReady();
+          if (isCancelled()) return;
+
+          const playerVars = {
+            playsinline: 1,
+            rel: 0,
+            modestbranding: 1,
+            fs: 1,
+            enablejsapi: 1
+          };
+          if (initStart >= 1) {
+            playerVars.start = Math.floor(initStart);
+          }
+          if (window.location.protocol === 'https:' || window.location.protocol === 'http:') {
+            playerVars.origin = window.location.origin;
+          }
+
+          ytPendingSeekAfterReady = initStart > 0.1 ? initStart : null;
+          ytPendingPlayAfterReady = Boolean(opts.autoPlay);
+
+          ytPlayer = new YT.Player('ytPlayerHost', {
+            videoId: vid,
+            width: '100%',
+            height: '100%',
+            playerVars,
+            events: {
+              onReady: (ev) => {
+                if (isCancelled() || !state.isYouTubeMode || state.ytVideoId !== vid) return;
+                ytPlayerReady = true;
+                if (ytLoadingMsg) ytLoadingMsg.classList.add('hidden');
+
+                try {
+                  const avail = ev.target.getAvailablePlaybackRates ? ev.target.getAvailablePlaybackRates() : null;
+                  if (Array.isArray(avail) && avail.length > 0) {
+                    state.ytAvailableRates = avail;
+                  }
+                  const dur = Number(ev.target.getDuration ? ev.target.getDuration() : 0);
+                  if (isFinite(dur) && dur > 0) {
+                    state.duration = dur;
+                    state.durationProbed = true;
+                  }
+                  const vdata = ev.target.getVideoData ? ev.target.getVideoData() : null;
+                  if (vdata && vdata.title && (!state.currentFileOrigName || state.currentFileOrigName === `YouTube (${vid})`)) {
+                    const userRenamed = trackTitleEl.textContent.trim() !== state.currentFileOrigName;
+                    state.currentFileOrigName = vdata.title;
+                    if (!userRenamed) {
+                      trackTitleEl.textContent = vdata.title;
+                      if (state.playlist[state.currentTrackIndex] && state.playlist[state.currentTrackIndex].ytVideoId === vid) {
+                        state.playlist[state.currentTrackIndex].name = vdata.title;
+                        state.playlist[state.currentTrackIndex].origName = vdata.title;
+                      }
+                    }
+                  }
+                  applyYouTubePlaybackRate(snapYouTubePlaybackRate(state.playbackRate));
+                  if (ytPendingSeekAfterReady !== null) {
+                    seekYouTubePlayer(ytPendingSeekAfterReady);
+                    ytPendingSeekAfterReady = null;
+                  }
+                  if (ytPendingPlayAfterReady) {
+                    ytPendingPlayAfterReady = false;
+                    ev.target.playVideo();
+                  }
+                } catch (_) {}
+
+                updateTimeUI();
+                updatePinButtonsUI();
+                updateSectionBarUI();
+                renderAllCanvases();
+                saveCurrentFileMemory(true);
+                const pinNote = state.markers.length > 0 ? `（記憶済みピン ${state.markers.length}個を復元）` : '';
+                showToast(`YouTube読込完了${pinNote}`);
+              },
+              onStateChange: (ev) => {
+                if (isCancelled() || !state.isYouTubeMode || state.ytVideoId !== vid) return;
+                const st = ev.data;
+                const YTState = window.YT ? window.YT.PlayerState : { ENDED: 0, PLAYING: 1, PAUSED: 2, BUFFERING: 3 };
+
+                const d = getYouTubeDuration();
+                if (d > 0 && (!state.durationProbed || Math.abs(state.duration - d) > 0.25)) {
+                  state.duration = d;
+                  state.durationProbed = true;
+                }
+
+                if (st === YTState.PLAYING) {
+                  if (ytLoadingMsg) ytLoadingMsg.classList.add('hidden');
+                  const t = getYouTubeCurrentTime();
+                  state.isPlaying = true;
+                  state.currentTime = t;
+                  state.lastSyncTime = t;
+                  state.lastSyncPerf = performance.now();
+                  applyYouTubePlaybackRate(snapYouTubePlaybackRate(state.playbackRate));
+                  updatePlayUI();
+                  updateTimeUI();
+                  renderAllCanvases();
+                } else if (st === YTState.PAUSED) {
+                  const t = getYouTubeCurrentTime();
+                  state.isPlaying = false;
+                  state.currentTime = t;
+                  state.lastSyncTime = t;
+                  state.lastSyncPerf = performance.now();
+                  updatePlayUI();
+                  updateTimeUI();
+                  renderAllCanvases();
+                  saveCurrentFileMemory(true);
+                } else if (st === YTState.ENDED) {
+                  state.isPlaying = false;
+                  updatePlayUI();
+                  handleTrackEnded();
+                }
+              },
+              onPlaybackRateChange: (ev) => {
+                if (isCancelled() || !state.isYouTubeMode) return;
+                const r = Number(ev.data);
+                if (isFinite(r) && r > 0 && Math.abs(r - state.playbackRate) > 0.005) {
+                  state.playbackRate = r;
+                  const txt = `${r.toFixed(2)}x`;
+                  speedBadgeText.textContent = txt;
+                  document.getElementById('modalSpeedVal').textContent = txt;
+                  document.getElementById('speedSlider').value = r;
+                  document.querySelectorAll('.speed-preset-btn').forEach(btn => {
+                    btn.classList.toggle('active-star', Math.abs(parseFloat(btn.dataset.speed) - r) < 0.005);
+                  });
+                  saveCurrentFileMemory(false);
+                }
+              },
+              onError: (ev) => {
+                if (isCancelled() || !state.isYouTubeMode) return;
+                const code = ev ? ev.data : 0;
+                let msg = 'YouTube動画の再生に失敗しました';
+                if (code === 101 || code === 150) {
+                  msg = 'この動画は投稿者の設定により外部埋め込み再生が禁止されています';
+                } else if (code === 100) {
+                  msg = '動画が見つからないか、非公開に設定されています';
+                } else if (code === 2) {
+                  msg = 'YouTube動画IDが無効です';
+                }
+                if (ytLoadingMsg && ytLoadingText) {
+                  ytLoadingText.textContent = msg;
+                  ytLoadingMsg.classList.remove('hidden');
+                }
+                showToast(msg);
+              }
+            }
+          });
+        } catch (err) {
+          console.error('YouTube load error:', err);
+          if (ytLoadingMsg && ytLoadingText) {
+            ytLoadingText.textContent = 'YouTubeプレイヤーの読み込みに失敗しました（オンライン環境でお試しください）';
+            ytLoadingMsg.classList.remove('hidden');
+          }
+          showToast('YouTubeプレイヤーを読み込めませんでした（通信状態を確認してください）');
+        }
+      }
+
+      // Interactive seek on YouTube Overview Bar (tap sets green temp pin & seeks)
+      if (ytOverviewCanvas) {
+        let ytBarDragging = false;
+        const ytBarClientXToTime = (clientX) => {
+          const rect = ytOverviewCanvas.getBoundingClientRect();
+          const padX = 10;
+          const barW = Math.max(20, rect.width - padX * 2);
+          const frac = Math.max(0, Math.min(1, (clientX - rect.left - padX) / barW));
+          return frac * Math.max(0, state.duration || 0);
+        };
+        ytOverviewCanvas.addEventListener('touchstart', (e) => {
+          if (!state.isYouTubeMode || !e.touches[0]) return;
+          e.preventDefault();
+          e.stopPropagation();
+          ytBarDragging = true;
+          seekTo(ytBarClientXToTime(e.touches[0].clientX), { setGreenPin: true });
+        }, { passive: false });
+        ytOverviewCanvas.addEventListener('touchmove', (e) => {
+          if (!ytBarDragging || !state.isYouTubeMode || !e.touches[0]) return;
+          e.preventDefault();
+          e.stopPropagation();
+          seekTo(ytBarClientXToTime(e.touches[0].clientX), { setGreenPin: false });
+        }, { passive: false });
+        ytOverviewCanvas.addEventListener('touchend', () => { ytBarDragging = false; });
+        ytOverviewCanvas.addEventListener('touchcancel', () => { ytBarDragging = false; });
+        ytOverviewCanvas.addEventListener('mousedown', (e) => {
+          if (!state.isYouTubeMode || e.button !== 0) return;
+          e.stopPropagation();
+          ytBarDragging = true;
+          seekTo(ytBarClientXToTime(e.clientX), { setGreenPin: true });
+        });
+        window.addEventListener('mousemove', (e) => {
+          if (!ytBarDragging || !state.isYouTubeMode) return;
+          seekTo(ytBarClientXToTime(e.clientX), { setGreenPin: false });
+        });
+        window.addEventListener('mouseup', () => { ytBarDragging = false; });
+      }
+
+      function renderYouTubeHistoryList() {
+        if (!ytHistoryListWrap) return;
+        const map = readAllFileMemories();
+        const ytItems = Object.entries(map)
+          .filter(([k, rec]) => (k.startsWith('yt:') || (rec && rec.ytVideoId)) && rec)
+          .map(([k, rec]) => ({
+            key: k,
+            videoId: rec.ytVideoId || k.replace(/^yt:/, ''),
+            title: rec.displayName || rec.origName || `YouTube (${rec.ytVideoId || k.replace(/^yt:/, '')})`,
+            duration: Number(rec.duration) || 0,
+            pinCount: Array.isArray(rec.markers) ? rec.markers.length : 0,
+            updatedAt: Number(rec.updatedAt) || 0,
+            url: rec.ytUrl || `https://www.youtube.com/watch?v=${rec.ytVideoId || k.replace(/^yt:/, '')}`
+          }))
+          .sort((a, b) => b.updatedAt - a.updatedAt);
+
+        if (ytHistCountBadge) ytHistCountBadge.textContent = `${ytItems.length}件`;
+        ytHistoryListWrap.innerHTML = '';
+
+        if (ytItems.length === 0) {
+          ytHistoryListWrap.innerHTML = '<div class="fav-empty-hint">まだYouTube練習履歴はありません。<br>上の欄にURLを貼り付けて開くと、ピンと一緒に自動記憶されます。</div>';
+          return;
+        }
+
+        ytItems.slice(0, 30).forEach((item) => {
+          const row = document.createElement('div');
+          row.className = 'yt-hist-item';
+
+          const mainBtn = document.createElement('button');
+          mainBtn.type = 'button';
+          mainBtn.className = 'yt-hist-main';
+          const durPart = item.duration > 0 ? `${formatTime(item.duration)} • ` : '';
+          mainBtn.innerHTML = `<div class="yt-hist-title">${escapeHtml(item.title)}</div><div class="yt-hist-meta mono">${durPart}黄色ピン ${item.pinCount}個 • ID:${escapeHtml(item.videoId)}</div>`;
+          mainBtn.addEventListener('click', () => {
+            loadYouTubeVideo(item.videoId, { ytUrl: item.url, displayName: item.title, autoPlay: false });
+          });
+
+          const delBtn = document.createElement('button');
+          delBtn.type = 'button';
+          delBtn.className = 'fav-icon-btn del';
+          delBtn.textContent = '削除';
+          delBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            removeFileMemoryKey(item.key);
+            updateMemoryCountBadge();
+            renderYouTubeHistoryList();
+            showToast('YouTube履歴を削除しました');
+          });
+
+          row.appendChild(mainBtn);
+          row.appendChild(delBtn);
+          ytHistoryListWrap.appendChild(row);
+        });
+      }
+
+      function openYouTubeOpenModal() {
+        if (!ytOpenModal) return;
+        closeFavoriteFoldersModal();
+        settingsModal.classList.add('hidden');
+        if (inputYtUrl) {
+          inputYtUrl.value = state.isYouTubeMode && state.ytUrl ? state.ytUrl : '';
+        }
+        renderYouTubeHistoryList();
+        ytOpenModal.classList.remove('hidden');
+        setTimeout(() => {
+          if (inputYtUrl) {
+            inputYtUrl.focus();
+            inputYtUrl.select();
+          }
+        }, 60);
+      }
+
+      function closeYouTubeOpenModal() {
+        if (ytOpenModal) ytOpenModal.classList.add('hidden');
+      }
+
+      function submitYouTubeOpenInput() {
+        const parsed = extractYouTubeVideoInfo(inputYtUrl ? inputYtUrl.value : '');
+        if (!parsed) {
+          showToast('YouTubeのURLまたは11文字の動画IDを入力してください');
+          return;
+        }
+        loadYouTubeVideo(parsed.videoId, { ytUrl: parsed.url, startSec: parsed.startSec, autoPlay: false });
+      }
 
       // ==================== SETTINGS / MARKER / PLAYLIST MODAL ====================
       const settingsModal = document.getElementById('settingsModal');
@@ -22012,6 +23855,10 @@
       }
 
       async function startOrCancelTranscription() {
+        if (state.isYouTubeMode) {
+          showToast('文字起こしはローカル音源・録音ファイルのみ対応しています');
+          return;
+        }
         if (state.transcriptRunning) {
           state.transcriptCancelled = true;
           updateTranscriptProgress(true, '中止しています...', 0);
@@ -23674,7 +25521,7 @@
         }
         state.playlist.forEach((tr, idx) => {
           const isCur = idx === state.currentTrackIndex;
-          const mb = tr.blob ? `${(tr.blob.size / (1024 * 1024)).toFixed(1)}MB` : '';
+          const mb = tr.isYouTube ? 'YouTube公式' : (tr.blob ? `${(tr.blob.size / (1024 * 1024)).toFixed(1)}MB` : '');
           const item = document.createElement('div');
           item.className = 'list-item' + (isCur ? ' current' : '');
           const main = document.createElement('div');
@@ -25316,8 +27163,77 @@
       });
 
       // Header & Startup Actions
-      btnRecordHeader.addEventListener('click', () => state.isRecording ? stopRecording() : startRecording());
+      btnRecordHeader.addEventListener('click', () => {
+        if (state.isRecording) {
+          stopRecording();
+        } else if (canCaptureTabAudio()) {
+          openRecSourceModal();
+        } else {
+          startRecording();
+        }
+      });
       document.getElementById('btnStartRecord').addEventListener('click', startRecording);
+      const btnStartTabRecordEl = document.getElementById('btnStartTabRecord');
+      if (btnStartTabRecordEl) btnStartTabRecordEl.addEventListener('click', startTabAudioRecording);
+      const btnOpenYtStartup = document.getElementById('btnOpenYouTubeFromStartup');
+      if (btnOpenYtStartup) btnOpenYtStartup.addEventListener('click', openYouTubeOpenModal);
+      const btnFavOpenYt = document.getElementById('btnFavOpenYouTube');
+      if (btnFavOpenYt) btnFavOpenYt.addEventListener('click', openYouTubeOpenModal);
+      const btnYtChangeUrl = document.getElementById('btnYtChangeUrl');
+      if (btnYtChangeUrl) btnYtChangeUrl.addEventListener('click', openYouTubeOpenModal);
+      const btnYtExitMode = document.getElementById('btnYtExitMode');
+      if (btnYtExitMode) btnYtExitMode.addEventListener('click', () => {
+        exitYouTubeMode({ showStartup: true });
+        showToast('YouTubeモードを終了しました');
+      });
+      const btnCloseYtOpenX = document.getElementById('btnCloseYtOpenX');
+      if (btnCloseYtOpenX) btnCloseYtOpenX.addEventListener('click', closeYouTubeOpenModal);
+      const btnCancelYtOpen = document.getElementById('btnCancelYtOpen');
+      if (btnCancelYtOpen) btnCancelYtOpen.addEventListener('click', closeYouTubeOpenModal);
+      const btnLoadYtUrlRun = document.getElementById('btnLoadYtUrlRun');
+      if (btnLoadYtUrlRun) btnLoadYtUrlRun.addEventListener('click', submitYouTubeOpenInput);
+      if (inputYtUrl) {
+        inputYtUrl.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            submitYouTubeOpenInput();
+          }
+        });
+      }
+      const btnYtPasteUrl = document.getElementById('btnYtPasteUrl');
+      if (btnYtPasteUrl) {
+        btnYtPasteUrl.addEventListener('click', async () => {
+          try {
+            const txt = await navigator.clipboard.readText();
+            if (txt && inputYtUrl) {
+              inputYtUrl.value = txt.trim();
+              showToast('クリップボードからURLを貼り付けました');
+            }
+          } catch (_) {
+            showToast('入力欄を長押しして「貼り付け」を選んでください');
+          }
+        });
+      }
+      if (ytOpenModal) {
+        ytOpenModal.addEventListener('click', (e) => {
+          if (e.target === ytOpenModal) closeYouTubeOpenModal();
+        });
+      }
+      const btnStartTabRecordSettingsEl = document.getElementById('btnStartTabRecordSettings');
+      if (btnStartTabRecordSettingsEl) btnStartTabRecordSettingsEl.addEventListener('click', startTabAudioRecording);
+      const btnRecChoiceMicEl = document.getElementById('btnRecChoiceMic');
+      if (btnRecChoiceMicEl) btnRecChoiceMicEl.addEventListener('click', () => { closeRecSourceModal(); startRecording(); });
+      const btnRecChoiceTabEl = document.getElementById('btnRecChoiceTab');
+      if (btnRecChoiceTabEl) btnRecChoiceTabEl.addEventListener('click', startTabAudioRecording);
+      const btnCloseRecSourceXEl = document.getElementById('btnCloseRecSourceX');
+      if (btnCloseRecSourceXEl) btnCloseRecSourceXEl.addEventListener('click', closeRecSourceModal);
+      const btnCancelRecSourceEl = document.getElementById('btnCancelRecSource');
+      if (btnCancelRecSourceEl) btnCancelRecSourceEl.addEventListener('click', closeRecSourceModal);
+      if (recSourceModal) {
+        recSourceModal.addEventListener('click', (e) => {
+          if (e.target === recSourceModal) closeRecSourceModal();
+        });
+      }
       document.getElementById('btnOpenMetroFromStart').addEventListener('click', () => setUpperPage('metro', { scrollActive: false }));
 
       // Precision Metronome Listeners
@@ -25562,11 +27478,34 @@
       document.addEventListener('webkitfullscreenchange', onFullscreenStateChanged);
 
       // ==================== GITHUB / PWA SOFTWARE UPDATE CHECK & APPLY ====================
-      const APP_VERSION = 'v63';
+      const APP_VERSION = 'v65';
 
       // Ordered newest-first; each release appends a new object at the top.
       // Users who skip multiple versions automatically see ALL unseen versions between lastSeen and current.
       const APP_RELEASE_NOTES = [
+        {
+          version: 'v65',
+          verNum: 65,
+          date: '2026/11/27',
+          title: 'YouTube URL をそのまま開いて練習できる「YouTube公式プレイヤーモード」を追加',
+          items: [
+            '起動画面および「開く」メニューに「YouTube URL で練習する（公式再生）」を追加しました。通常URL・youtu.be・Shorts・Live・動画IDを貼り付けるだけでスマホでもPCでもそのまま再生できます',
+            'YouTube公式埋め込みプレイヤー上で、黄色ピン（名前・時刻編集）・緑の一時ピン・区間リピート（A-Bループ）・区間スキップ・3秒戻し/進み・速度変更（YouTube対応速度へ自動調整）が使えます',
+            '下段の拡大タイムライン（ドラッグ・慣性スクロール・ピンチ拡大）と動画直下の全体ピンバーで、細かいピン位置合わせが直感的に行えます',
+            '動画IDごとにピン情報・再生位置・区間スキップ設定をIndexedDBへ自動記憶し、「最近のYouTube練習履歴」から1タップで再開できます（ピン共有の書き出し・読み込みにも対応）'
+          ]
+        },
+        {
+          version: 'v64',
+          verNum: 64,
+          date: '2026/11/27',
+          title: 'PCブラウザで別タブ音声（YouTube等）を直接デジタル録音・波形化する機能を追加',
+          items: [
+            'PCのChrome / Edge等で別タブに開いたYouTubeなどの音声を、環境音なしのデジタル無劣化ステレオPCM（24bit / 16bit）で直接録音して波形化できる機能を追加しました',
+            '起動画面・設定画面の「別タブ・PCの音を録音（YouTube等）」ボタン、またはPC環境でのヘッダー「録音」ボタン（マイク／別タブの2択表示）からすぐ起動できます',
+            '別タブ側の「共有を停止」バーを押したときも自動で録音を終了して波形化し、そのまま速度変更・ピッチ変更・区間リピート・WAV/M4A保存まで行えます（スマホでは従来通りワンタップでマイク録音を開始します）'
+          ]
+        },
         {
           version: 'v63',
           verNum: 63,
@@ -26884,10 +28823,12 @@
 
       // Upper Pin List Footer Actions
       document.getElementById('btnAutoPinStartsUpper').addEventListener('click', () => {
+        if (state.isYouTubeMode) { showToast('自動ピン検出はローカル音源のみ対応しています'); return; }
         autoAddPieceBoundaryPins('start');
         scrollActiveMarkerIntoView(upperMarkerListWrap);
       });
       document.getElementById('btnAutoPinEndsUpper').addEventListener('click', () => {
+        if (state.isYouTubeMode) { showToast('自動ピン検出はローカル音源のみ対応しています'); return; }
         autoAddPieceBoundaryPins('end');
         scrollActiveMarkerIntoView(upperMarkerListWrap);
       });
@@ -27109,6 +29050,10 @@
       // Status Bar Quick Buttons
       btnPlaylistIndex.addEventListener('click', () => openSettingsModal('playlist'));
       btnBoostQuick.addEventListener('click', () => {
+        if (state.hasAudio && state.isYouTubeMode) {
+          showToast('YouTube公式モードの音量は動画プレイヤー側または端末音量で調整してください');
+          return;
+        }
         initAudioGraph();
         const seq = ['auto', 1, 1.5, 2, 3, 5];
         const idx = seq.findIndex(v => String(v) === String(state.boostMode));
@@ -27118,6 +29063,10 @@
         showToast(`再生音量ブースト: ${Math.round(getEffectiveBoost() * 100)}%`);
       });
       btnEngineQuick.addEventListener('click', () => {
+        if (state.hasAudio && state.isYouTubeMode) {
+          showToast('YouTube公式モードではYouTube標準の速度変更を使用します（ボコーダーはローカル音源のみ）');
+          return;
+        }
         initAudioGraph();
         if (state.hasAudio && state.isFallbackLargeFile) {
           showToast('大容量ファイルのため省メモリ再生中（通常ファイル・録音では自動でボコーダーに戻ります）');
@@ -27192,6 +29141,10 @@
         else seekTo(state.duration, { setGreenPin: false });
       });
       document.getElementById('btnReverbCycle').addEventListener('click', () => {
+        if (state.hasAudio && state.isYouTubeMode) {
+          showToast('YouTube公式モードではリバーブは使えません（ローカル音源のみ対応）');
+          return;
+        }
         initAudioGraph();
         applyReverb(state.reverbIndex + 1);
       });
@@ -27201,7 +29154,12 @@
         btn.addEventListener('click', () => {
           const spd = parseFloat(btn.dataset.speed);
           setPlaybackSpeed(spd);
-          showToast(`再生速度: ${spd.toFixed(2)}x`);
+          const applied = state.playbackRate;
+          if (state.isYouTubeMode && Math.abs(applied - spd) > 0.005) {
+            showToast(`再生速度: ${applied.toFixed(2)}x（YouTube対応速度に自動調整）`);
+          } else {
+            showToast(`再生速度: ${applied.toFixed(2)}x`);
+          }
         });
       });
       document.getElementById('btnDeleteOrListMarker').addEventListener('click', deleteNearestYellowOrOpenList);
@@ -27515,7 +29473,11 @@
 
       window.addEventListener('popstate', () => {
         // 1. Close topmost open modal if any
-        if (joinAudioModal && !joinAudioModal.classList.contains('hidden')) {
+        if (ytOpenModal && !ytOpenModal.classList.contains('hidden')) {
+          closeYouTubeOpenModal();
+        } else if (recSourceModal && !recSourceModal.classList.contains('hidden')) {
+          closeRecSourceModal();
+        } else if (joinAudioModal && !joinAudioModal.classList.contains('hidden')) {
           closeJoinAudioModal();
         } else if (favFileActionModal && !favFileActionModal.classList.contains('hidden')) {
           closeFavFileActionModal();
