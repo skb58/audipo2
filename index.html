@@ -8,7 +8,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="Audipo2">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="app-version" content="v72">
+  <meta name="app-version" content="v73">
   <link rel="manifest" href="./manifest.json">
   <title>Audipo風 練習プレイヤー＆レコーダー</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='bg' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%231b2030'/%3E%3Cstop offset='100%25' stop-color='%230d0f15'/%3E%3C/linearGradient%3E%3ClinearGradient id='wv' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0%25' stop-color='%2360c5ff'/%3E%3Cstop offset='100%25' stop-color='%232563eb'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='url(%23bg)'/%3E%3Crect x='1' y='1' width='62' height='62' rx='15' fill='none' stroke='%233b82f6' stroke-opacity='0.3' stroke-width='2'/%3E%3Cg fill='url(%23wv)'%3E%3Crect x='10' y='28' width='4.5' height='12' rx='2.25' opacity='0.6'/%3E%3Crect x='18' y='22' width='4.5' height='24' rx='2.25' opacity='0.85'/%3E%3Crect x='26' y='15' width='4.5' height='36' rx='2.25'/%3E%3Crect x='34' y='21' width='4.5' height='25' rx='2.25' opacity='0.9'/%3E%3Crect x='42' y='26' width='4.5' height='16' rx='2.25' opacity='0.75'/%3E%3Crect x='50' y='30' width='4.5' height='9' rx='2.25' opacity='0.5'/%3E%3C/g%3E%3Cpath d='M36.25 10.5c0-1.4 1.1-2.5 2.5-2.5h5.5c1.4 0 2.5 1.1 2.5 2.5v2.4c0 .8-.3 1.5-.9 2.1l-3.2 3.1c-.6.6-1.6.6-2.2 0l-3.2-3.1c-.6-.6-.9-1.3-.9-2.1v-2.4z' fill='%23facc15'/%3E%3C/svg%3E">
@@ -2298,11 +2298,6 @@
       color: #ffffff;
     }
 
-    .start-btn-tab {
-      background: rgba(56, 189, 248, 0.14);
-      border: 1px solid rgba(56, 189, 248, 0.5);
-      color: #bae6fd;
-    }
 
     .start-btn-yt {
       background: rgba(239, 68, 68, 0.14);
@@ -2560,83 +2555,6 @@
       color: #fecaca;
     }
 
-    .rec-src-card {
-      width: 100%;
-      padding: 12px 13px;
-      border-radius: 13px;
-      background: #141419;
-      border: 1px solid var(--border-strong);
-      text-align: left;
-      display: flex;
-      align-items: flex-start;
-      gap: 11px;
-      transition: transform 0.08s ease, border-color 0.14s ease, background-color 0.14s ease;
-    }
-
-    .rec-src-card:active {
-      transform: scale(0.97);
-    }
-
-    .rec-src-card-mic {
-      border-color: rgba(239, 68, 68, 0.45);
-      background: rgba(239, 68, 68, 0.08);
-    }
-
-    .rec-src-card-tab {
-      border-color: rgba(56, 189, 248, 0.52);
-      background: rgba(56, 189, 248, 0.09);
-    }
-
-    .rec-src-icon {
-      width: 38px;
-      height: 38px;
-      border-radius: 10px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-    }
-
-    .rec-src-card-mic .rec-src-icon {
-      background: rgba(239, 68, 68, 0.2);
-      color: #fca5a5;
-    }
-
-    .rec-src-card-tab .rec-src-icon {
-      background: rgba(56, 189, 248, 0.2);
-      color: #7dd3fc;
-    }
-
-    .rec-src-body {
-      flex: 1;
-      min-width: 0;
-    }
-
-    .rec-src-title {
-      font-size: 13.5px;
-      font-weight: 800;
-      color: #ffffff;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      line-height: 1.3;
-    }
-
-    .rec-src-badge {
-      padding: 1px 6px;
-      border-radius: 999px;
-      font-size: 9.5px;
-      font-weight: 800;
-      background: rgba(56, 189, 248, 0.22);
-      color: #bae6fd;
-    }
-
-    .rec-src-desc {
-      margin-top: 3px;
-      font-size: 11px;
-      line-height: 1.45;
-      color: var(--text-sub);
-    }
 
     .start-btn-demo {
       background: #25252c;
@@ -6726,11 +6644,6 @@
       color: #2d2c29;
     }
 
-    body.theme-minimal .start-btn-tab {
-      background: #ebf0f5;
-      border-color: rgba(85, 108, 133, 0.34);
-      color: #364c63;
-    }
 
     body.theme-minimal .start-btn-yt {
       background: #f6ebeb;
@@ -6803,34 +6716,6 @@
       color: #a63232;
     }
 
-    body.theme-minimal .rec-src-card {
-      background: #f6f4ef;
-      border-color: rgba(45, 44, 41, 0.1);
-      box-shadow: 0 1.5px 5px rgba(45, 44, 41, 0.045);
-    }
-
-    body.theme-minimal .rec-src-card-mic .rec-src-icon {
-      background: #f6ebeb;
-      color: #b83b3b;
-    }
-
-    body.theme-minimal .rec-src-card-tab .rec-src-icon {
-      background: #ebf0f5;
-      color: #465d75;
-    }
-
-    body.theme-minimal .rec-src-title {
-      color: #252421;
-    }
-
-    body.theme-minimal .rec-src-badge {
-      background: #e1e8ef;
-      color: #364c63;
-    }
-
-    body.theme-minimal .rec-src-desc {
-      color: #6f6c66;
-    }
 
     body.theme-minimal .start-btn-demo svg {
       stroke: #2d2c29 !important;
@@ -8329,15 +8214,6 @@
                     <span>YouTube URL で練習する（公式再生）</span>
                   </button>
 
-                  <button id="btnStartTabRecord" type="button" class="start-btn start-btn-tab">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                      <rect x="2" y="4" width="20" height="14" rx="2"/>
-                      <path d="M8 21h8"/>
-                      <path d="M12 18v3"/>
-                      <polygon points="10 8.5 15 11 10 13.5 10 8.5" fill="currentColor" stroke="none"/>
-                    </svg>
-                    <span>別タブ・PCの音を録音（YouTube等）</span>
-                  </button>
 
                   <button id="btnOpenMetroFromStart" type="button" class="start-btn start-btn-demo">
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#60c5ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -9065,21 +8941,6 @@
             <option value="">端末の標準マイク（自動）</option>
           </select>
 
-          <div class="toggle-row" style="margin-top:11px;padding-top:10px;flex-direction:column;align-items:stretch;gap:7px;">
-            <div>
-              <div class="sec-title">別タブ・PC音声の直接録音（YouTube等・PC向け）</div>
-              <div class="engine-desc">PCのChrome/Edgeで別タブに開いたYouTube等の音声を、環境音なしのデジタル無劣化ステレオPCMとして直接取り込みます。</div>
-            </div>
-            <button id="btnStartTabRecordSettings" type="button" class="start-btn start-btn-tab" style="min-height:38px;font-size:12.5px;">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <rect x="2" y="4" width="20" height="14" rx="2"/>
-                <path d="M8 21h8"/>
-                <path d="M12 18v3"/>
-                <polygon points="10 8.5 15 11 10 13.5 10 8.5" fill="currentColor" stroke="none"/>
-              </svg>
-              <span>別タブ・PCの音を直接録音する</span>
-            </button>
-          </div>
         </div>
 
         <!-- Track Name Rename -->
@@ -9116,7 +8977,7 @@
         <div class="modal-section" style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
           <div>
             <div class="sec-title">バージョン情報</div>
-            <div id="settingsVersionLabel" class="engine-desc mono">現在: v72</div>
+            <div id="settingsVersionLabel" class="engine-desc mono">現在: v73</div>
           </div>
           <button id="btnShowReleaseHistory" type="button" class="step-btn" style="color:#93c5fd;border-color:rgba(66,165,245,0.45);">更新履歴を見る</button>
         </div>
@@ -9280,7 +9141,7 @@
           </div>
           <div>
             <h3 id="whatsNewTitle" class="whats-new-title">アップデートのお知らせ</h3>
-            <p id="whatsNewSub" class="whats-new-sub mono">v72 に更新されました</p>
+            <p id="whatsNewSub" class="whats-new-sub mono">v73 に更新されました</p>
           </div>
         </div>
         <button id="btnCloseWhatsNewX" type="button" class="modal-close" aria-label="閉じる">✕</button>
@@ -10126,55 +9987,6 @@
     </div>
   </div>
 
-  <!-- ==================== 17. RECORDING SOURCE PICKER MODAL (PC) ==================== -->
-  <div id="recSourceModal" class="modal-backdrop hidden" style="z-index:81;">
-    <div class="mark-edit-card" role="dialog" aria-modal="true" aria-labelledby="recSourceTitle" style="max-width:400px;">
-      <div class="whats-new-head" style="margin-bottom:10px;">
-        <div class="whats-new-title-wrap">
-          <div>
-            <h3 id="recSourceTitle" class="whats-new-title">録音方法を選択</h3>
-            <p class="whats-new-sub">録音する音源を選んでください</p>
-          </div>
-        </div>
-        <button id="btnCloseRecSourceX" type="button" class="modal-close" aria-label="閉じる">✕</button>
-      </div>
-
-      <div style="display:flex;flex-direction:column;gap:9px;">
-        <button id="btnRecChoiceMic" type="button" class="rec-src-card rec-src-card-mic">
-          <span class="rec-src-icon" aria-hidden="true">
-            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
-              <rect x="9" y="2" width="6" height="12" rx="3"/>
-              <path d="M5 10a7 7 0 0 0 14 0"/>
-              <line x1="12" y1="17" x2="12" y2="22"/>
-            </svg>
-          </span>
-          <span class="rec-src-body">
-            <span class="rec-src-title">マイクで録音</span>
-            <span class="rec-src-desc">端末マイクや外部マイクから楽器演奏・声を24bit高音質PCMで録音します。</span>
-          </span>
-        </button>
-
-        <button id="btnRecChoiceTab" type="button" class="rec-src-card rec-src-card-tab">
-          <span class="rec-src-icon" aria-hidden="true">
-            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <rect x="2" y="4" width="20" height="14" rx="2"/>
-              <path d="M8 21h8"/>
-              <path d="M12 18v3"/>
-              <polygon points="10 8.5 15 11 10 13.5 10 8.5" fill="currentColor" stroke="none"/>
-            </svg>
-          </span>
-          <span class="rec-src-body">
-            <span class="rec-src-title">別タブ・PCの音を録音 <span class="rec-src-badge">YouTube等</span></span>
-            <span class="rec-src-desc">別タブの音声をデジタル無劣化ステレオで直接録音します。次の画面でタブを選び<strong>「タブの音声を共有」</strong>をONにしてください。</span>
-          </span>
-        </button>
-      </div>
-
-      <div class="mark-edit-footer" style="margin-top:12px;">
-        <button id="btnCancelRecSource" type="button" class="mark-dialog-btn">キャンセル</button>
-      </div>
-    </div>
-  </div>
 
   <!-- Toast Banner -->
   <div id="toastBanner" class="toast-banner"></div>
@@ -10295,7 +10107,6 @@
       const recLiveGainLabel = document.getElementById('recLiveGainLabel');
       const recModeTitle = document.getElementById('recModeTitle');
       const recLiveSpecLabel = document.getElementById('recLiveSpecLabel');
-      const recSourceModal = document.getElementById('recSourceModal');
       const recGainHintBox = document.getElementById('recGainHintBox');
       const recGainHintText = document.getElementById('recGainHintText');
       const recStereoStatusNote = document.getElementById('recStereoStatusNote');
@@ -10569,9 +10380,7 @@
 
         // Live PCM Recording state
         isRecording: false,
-        recMode: 'mic', // 'mic' | 'tab'
         recStream: null,
-        recDisplayStream: null,
         recSourceNode: null,
         recGainNode: null,
         recLimiterNode: null,
@@ -18948,217 +18757,12 @@ ${info.url}`;
 
       function updateRecGainHintUI(isLowLevel) {
         if (!recGainHintBox || !recGainHintText) return;
-        if (state.recMode === 'tab') {
-          state.recLowLevelAlertActive = false;
-          recGainHintBox.classList.remove('low-level');
-          recGainHintText.textContent = 'YouTube等の別タブ音声をデジタル無劣化ステレオで直接録音中。別タブで再生し、終わったら「共有を停止」または下の「停止して波形化」を押してください。';
-          return;
-        }
         state.recLowLevelAlertActive = Boolean(isLowLevel);
         recGainHintBox.classList.toggle('low-level', state.recLowLevelAlertActive);
         if (state.recLowLevelAlertActive) {
           recGainHintText.textContent = '⚠ 音量が小さめです：設定で「入力ゲイン」を上げてください（録音途中も変更できますが、音量変化や操作音が入るためおすすめしません）';
         } else {
           recGainHintText.textContent = '音量が小さい場合は設定で「入力ゲイン」を上げてください。録音途中も変更できますが、音量変化や操作音が入るためおすすめしません。';
-        }
-      }
-
-      function canCaptureTabAudio() {
-        return Boolean(navigator.mediaDevices && typeof navigator.mediaDevices.getDisplayMedia === 'function');
-      }
-
-      function openRecSourceModal() {
-        if (!recSourceModal) {
-          startRecording();
-          return;
-        }
-        settingsModal.classList.add('hidden');
-        recSourceModal.classList.remove('hidden');
-      }
-
-      function closeRecSourceModal() {
-        if (recSourceModal) recSourceModal.classList.add('hidden');
-      }
-
-      async function startTabAudioRecording() {
-        if (state.isRecording) return;
-        closeRecSourceModal();
-        settingsModal.classList.add('hidden');
-
-        if (!canCaptureTabAudio()) {
-          showToast('別タブ音声の直接録音はPCブラウザ（Chrome / Edge）専用です。スマホではPC等で録音したファイルを「開く」から読み込んでください');
-          return;
-        }
-
-        try {
-          if (state.tunerRunning) stopTuner();
-          if (state.isYouTubeMode) exitYouTubeMode({ showStartup: false });
-          if (state.isPlaying) pausePlayback();
-          stopBgKeepAlive();
-          await ensureAudioCtxRunning(600);
-          syncVocoderConnection();
-
-          let displayStream = null;
-          try {
-            displayStream = await navigator.mediaDevices.getDisplayMedia({
-              video: { width: { ideal: 320 }, height: { ideal: 180 }, frameRate: { ideal: 5 } },
-              audio: {
-                echoCancellation: false,
-                noiseSuppression: false,
-                autoGainControl: false,
-                channelCount: 2,
-                sampleRate: 48000
-              },
-              preferCurrentTab: false,
-              selfBrowserSurface: 'exclude',
-              systemAudio: 'include'
-            });
-          } catch (firstErr) {
-            if (firstErr && (firstErr.name === 'NotAllowedError' || firstErr.name === 'AbortError')) {
-              showToast('別タブ録音をキャンセルしました');
-              return;
-            }
-            displayStream = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: true });
-          }
-
-          if (!displayStream) return;
-
-          const audioTracks = displayStream.getAudioTracks();
-          if (!audioTracks || audioTracks.length === 0) {
-            displayStream.getTracks().forEach(t => t.stop());
-            showToast('音声が含まれていません。タブ選択時に「タブの音声を共有」をONにしてください');
-            return;
-          }
-
-          const audioOnlyStream = new MediaStream(audioTracks);
-          const track = audioTracks[0];
-          const trackSettings = (track && track.getSettings) ? track.getSettings() : {};
-
-          // Auto-stop and build waveform when user clicks Chrome's floating "共有を停止" button
-          displayStream.getTracks().forEach((tr) => {
-            tr.onended = () => {
-              if (state.isRecording && state.recMode === 'tab') {
-                stopRecording();
-              }
-            };
-          });
-
-          const src = audioCtx.createMediaStreamSource(audioOnlyStream);
-          src.channelCountMode = 'max';
-          src.channelInterpretation = 'discrete';
-
-          const actualCh = (Number(trackSettings.channelCount) || Number(src.channelCount) || 2) >= 2 ? 2 : 1;
-
-          state.isRecording = true;
-          state.recMode = 'tab';
-          state.recStream = audioOnlyStream;
-          state.recDisplayStream = displayStream;
-          state.recBuffersL = [];
-          state.recBuffersR = [];
-          state.recChannelCount = actualCh;
-          state.recHasTrueStereoDiff = actualCh >= 2;
-          state.recPendingMarkers = [];
-          state.recSampleRate = audioCtx.sampleRate;
-          state.recStartPerf = performance.now();
-          state.recLastDecentLevelPerf = state.recStartPerf;
-          state.recLowLevelAlertActive = false;
-
-          // Pure 1.0x (0dB) lossless digital passthrough (no mic gain boost or limiter coloration)
-          const gainNode = audioCtx.createGain();
-          gainNode.gain.value = 1.0;
-          gainNode.channelCount = 2;
-          gainNode.channelCountMode = 'max';
-          gainNode.channelInterpretation = 'discrete';
-          src.connect(gainNode);
-
-          const analyser = audioCtx.createAnalyser();
-          analyser.fftSize = 512;
-          gainNode.connect(analyser);
-
-          const silentGain = audioCtx.createGain();
-          silentGain.gain.value = 0;
-
-          const workletOk = await ensureRecWorkletLoaded();
-          let workletNode = null;
-          let processor = null;
-
-          if (workletOk) {
-            workletNode = new AudioWorkletNode(audioCtx, 'raw-pcm-recorder-processor', {
-              numberOfInputs: 1,
-              numberOfOutputs: 1,
-              channelCount: 2,
-              channelCountMode: 'max',
-              channelInterpretation: 'discrete'
-            });
-            workletNode.port.onmessage = (ev) => {
-              const d = ev.data;
-              if (!d || d.done) return;
-              if (d.meta) {
-                const liveCh = d.channels >= 2 ? 2 : 1;
-                state.recChannelCount = liveCh;
-                if (d.stereoDiff) state.recHasTrueStereoDiff = true;
-                updateRecLiveSpecBadge(liveCh, false);
-                return;
-              }
-              if (d.l) state.recBuffersL.push(d.l);
-              if (d.stereo && d.r) {
-                state.recChannelCount = 2;
-                state.recBuffersR.push(d.r);
-              }
-            };
-            gainNode.connect(workletNode);
-            workletNode.connect(silentGain);
-            silentGain.connect(audioCtx.destination);
-          } else {
-            const spCh = actualCh >= 2 ? 2 : 1;
-            processor = audioCtx.createScriptProcessor(8192, spCh, 1);
-            processor.onaudioprocess = (ev) => {
-              if (!state.isRecording) return;
-              const inL = ev.inputBuffer.getChannelData(0);
-              state.recBuffersL.push(new Float32Array(inL));
-              if (ev.inputBuffer.numberOfChannels > 1) {
-                state.recChannelCount = 2;
-                state.recBuffersR.push(new Float32Array(ev.inputBuffer.getChannelData(1)));
-              }
-            };
-            gainNode.connect(processor);
-            processor.connect(silentGain);
-            silentGain.connect(audioCtx.destination);
-          }
-
-          state.recSourceNode = src;
-          state.recGainNode = gainNode;
-          state.recLimiterNode = null;
-          state.recAnalyser = analyser;
-          state.recWorkletNode = workletNode;
-          state.recProcessor = processor;
-          state.recSilentGain = silentGain;
-
-          if (recModeTitle) recModeTitle.textContent = 'タブ録音中';
-          if (btnRecOpenMicGain) btnRecOpenMicGain.classList.add('hidden');
-          updateRecLiveSpecBadge(actualCh, false);
-          updateRecGainHintUI(false);
-          if (recMidGainWarn) recMidGainWarn.classList.add('hidden');
-
-          startupOverlay.classList.add('hidden');
-          recOverlay.classList.remove('hidden');
-          btnRecordHeader.classList.add('recording');
-          recHeaderLabel.textContent = '停止';
-          recMarkerCountBadge.textContent = '0';
-          recLiveGainLabel.textContent = 'デジタル直録';
-
-          acquireScreenWakeLock();
-          renderLiveRecordingLoop();
-          const khz = (state.recSampleRate / 1000).toFixed(1).replace(/\.0$/, '');
-          const chLabel = actualCh >= 2 ? 'ステレオ' : 'モノラル';
-          showToast(`別タブ音声の録音を開始しました（${khz}kHz ${state.recBitDepth}bit ${chLabel}・デジタル直録）`);
-        } catch (err) {
-          if (err && (err.name === 'NotAllowedError' || err.name === 'AbortError')) {
-            showToast('別タブ録音をキャンセルしました');
-          } else {
-            console.error('Tab audio capture failed:', err);
-            showToast('別タブ音声の録音を開始できませんでした（PCのChrome / Edgeでお試しください）');
-          }
         }
       }
 
@@ -19292,9 +18896,7 @@ ${info.url}`;
           const stereoDeniedByOs = actualCh < 2 && !stereoExplicitSucceeded;
 
           state.isRecording = true;
-          state.recMode = 'mic';
           state.recStream = stream;
-          state.recDisplayStream = null;
           state.recBuffersL = [];
           state.recBuffersR = [];
           state.recChannelCount = actualCh;
@@ -19458,7 +19060,6 @@ ${info.url}`;
               updateRecGainHintUI(false);
             }
           } else if (
-            state.recMode === 'mic' &&
             state.micGain < 5.9 &&
             (nowPerf - state.recStartPerf) >= 2600 &&
             (nowPerf - state.recLastDecentLevelPerf) >= 2600
@@ -19516,7 +19117,6 @@ ${info.url}`;
 
       async function stopRecording() {
         if (!state.isRecording) return;
-        const wasTabMode = state.recMode === 'tab';
         state.isRecording = false;
         if (state.recAnimId) cancelAnimationFrame(state.recAnimId);
         releaseScreenWakeLock();
@@ -19561,7 +19161,6 @@ ${info.url}`;
           if (state.recLimiterNode) state.recLimiterNode.disconnect();
           if (state.recSilentGain) state.recSilentGain.disconnect();
           if (state.recStream) state.recStream.getTracks().forEach(t => { t.onended = null; t.stop(); });
-          if (state.recDisplayStream) state.recDisplayStream.getTracks().forEach(t => { t.onended = null; t.stop(); });
         } catch (_) {}
 
         // After stopping mic tracks, iOS/Android may briefly suspend/interrupt the shared AudioContext during PlayAndRecord->Playback switch
@@ -19579,8 +19178,6 @@ ${info.url}`;
         state.recProcessor = null;
         state.recSilentGain = null;
         state.recStream = null;
-        state.recDisplayStream = null;
-        state.recMode = 'mic';
         if (recModeTitle) recModeTitle.textContent = '録音中';
         if (btnRecOpenMicGain) btnRecOpenMicGain.classList.remove('hidden');
         state.recBuffersL = [];
@@ -19666,22 +19263,8 @@ ${info.url}`;
           }
         };
 
-        if (!wasTabMode) {
-          applyZeroPhaseSubsonicCut(dstL, sr, 20.0);
-          if (dstR) applyZeroPhaseSubsonicCut(dstR, sr, 20.0);
-        } else {
-          // Pure digital tab audio: preserve full bass down to DC, apply only a 2ms edge anti-click taper
-          const edgeLen = Math.min(Math.floor(totalSamples / 4), Math.round(sr * 0.002));
-          for (let i = 0; i < edgeLen; i++) {
-            const w = 0.5 * (1.0 - Math.cos((Math.PI * i) / Math.max(1, edgeLen)));
-            dstL[i] *= w;
-            dstL[totalSamples - 1 - i] *= w;
-            if (dstR) {
-              dstR[i] *= w;
-              dstR[totalSamples - 1 - i] *= w;
-            }
-          }
-        }
+        applyZeroPhaseSubsonicCut(dstL, sr, 20.0);
+        if (dstR) applyZeroPhaseSubsonicCut(dstR, sr, 20.0);
 
         let maxAbs = 0;
         for (let i = 0; i < totalSamples; i++) {
@@ -19697,9 +19280,9 @@ ${info.url}`;
           }
         }
 
-        // Optional linear peak normalization ONLY for mic recordings when user enables it
+        // Optional linear peak normalization when user enables it
         let normGain = 1.0;
-        if (!wasTabMode && state.recAutoNormalize && maxAbs > 0.001 && maxAbs < 0.89) {
+        if (state.recAutoNormalize && maxAbs > 0.001 && maxAbs < 0.89) {
           normGain = Math.min(6.0, 0.89 / maxAbs);
           if (normGain > 1.04) {
             for (let i = 0; i < totalSamples; i++) {
@@ -19712,7 +19295,7 @@ ${info.url}`;
         }
 
         const wavBlob = encodeWavFromAudioBuffer(recBuffer, state.recBitDepth);
-        const title = makeRecordingFilename(wasTabMode ? 'tab_' : '');
+        const title = makeRecordingFilename();
         state.playlist.push({ name: title, origName: title, blob: wavBlob, markers: capturedMarkers, startSectionEnabled: true, isUnsavedRecording: true });
         state.currentTrackIndex = state.playlist.length - 1;
 
@@ -19722,12 +19305,8 @@ ${info.url}`;
           persistSession: true,
           isUnsavedRecording: true
         });
-        if (wasTabMode) {
-          showToast(`タブ録音完了（${state.recBitDepth}bit・${isStereo ? 'ステレオ' : 'モノラル'}・デジタル直録 • 未保存）`);
-        } else {
-          const normNote = normGain > 1.04 ? `・ノーマライズ(${normGain.toFixed(1)}x)` : '';
-          showToast(`録音完了（${state.recBitDepth}bit・黄色ピン ${capturedMarkers.length}個${normNote} • 未保存）`);
-        }
+        const normNote = normGain > 1.04 ? `・ノーマライズ(${normGain.toFixed(1)}x)` : '';
+        showToast(`録音完了（${state.recBitDepth}bit・黄色ピン ${capturedMarkers.length}個${normNote} • 未保存）`);
       }
 
       // ==================== PIN (MARKER) & BIDIRECTIONAL GREEN <-> YELLOW LOGIC ====================
@@ -29539,15 +29118,11 @@ ${info.url}`;
       btnRecordHeader.addEventListener('click', () => {
         if (state.isRecording) {
           stopRecording();
-        } else if (canCaptureTabAudio()) {
-          openRecSourceModal();
         } else {
           startRecording();
         }
       });
       document.getElementById('btnStartRecord').addEventListener('click', startRecording);
-      const btnStartTabRecordEl = document.getElementById('btnStartTabRecord');
-      if (btnStartTabRecordEl) btnStartTabRecordEl.addEventListener('click', startTabAudioRecording);
       const btnOpenYtStartup = document.getElementById('btnOpenYouTubeFromStartup');
       if (btnOpenYtStartup) btnOpenYtStartup.addEventListener('click', openYouTubeOpenModal);
       if (btnBookmarkHeader) btnBookmarkHeader.addEventListener('click', openBookmarksModal);
@@ -29788,21 +29363,6 @@ ${info.url}`;
       if (ytOpenModal) {
         ytOpenModal.addEventListener('click', (e) => {
           if (e.target === ytOpenModal) closeYouTubeOpenModal();
-        });
-      }
-      const btnStartTabRecordSettingsEl = document.getElementById('btnStartTabRecordSettings');
-      if (btnStartTabRecordSettingsEl) btnStartTabRecordSettingsEl.addEventListener('click', startTabAudioRecording);
-      const btnRecChoiceMicEl = document.getElementById('btnRecChoiceMic');
-      if (btnRecChoiceMicEl) btnRecChoiceMicEl.addEventListener('click', () => { closeRecSourceModal(); startRecording(); });
-      const btnRecChoiceTabEl = document.getElementById('btnRecChoiceTab');
-      if (btnRecChoiceTabEl) btnRecChoiceTabEl.addEventListener('click', startTabAudioRecording);
-      const btnCloseRecSourceXEl = document.getElementById('btnCloseRecSourceX');
-      if (btnCloseRecSourceXEl) btnCloseRecSourceXEl.addEventListener('click', closeRecSourceModal);
-      const btnCancelRecSourceEl = document.getElementById('btnCancelRecSource');
-      if (btnCancelRecSourceEl) btnCancelRecSourceEl.addEventListener('click', closeRecSourceModal);
-      if (recSourceModal) {
-        recSourceModal.addEventListener('click', (e) => {
-          if (e.target === recSourceModal) closeRecSourceModal();
         });
       }
       document.getElementById('btnOpenMetroFromStart').addEventListener('click', () => setUpperPage('metro', { scrollActive: false }));
@@ -30049,11 +29609,21 @@ ${info.url}`;
       document.addEventListener('webkitfullscreenchange', onFullscreenStateChanged);
 
       // ==================== GITHUB / PWA SOFTWARE UPDATE CHECK & APPLY ====================
-      const APP_VERSION = 'v72';
+      const APP_VERSION = 'v73';
 
       // Ordered newest-first; each release appends a new object at the top.
       // Users who skip multiple versions automatically see ALL unseen versions between lastSeen and current.
       const APP_RELEASE_NOTES = [
+        {
+          version: 'v73',
+          verNum: 73,
+          date: '2026/11/27',
+          title: '別タブ・PC音声録音機能を削除して画面をすっきり整理',
+          items: [
+            '起動画面・設定画面から「別タブ・PCの音を録音（YouTube等）」ボタンと録音ソース選択モーダルを削除しました',
+            'PC環境でもヘッダーの「録音」ボタンから直接ワンタップでマイク録音を開始できるようになりました'
+          ]
+        },
         {
           version: 'v72',
           verNum: 72,
@@ -32136,8 +31706,6 @@ ${info.url}`;
           }
         } else if (ytOpenModal && !ytOpenModal.classList.contains('hidden')) {
           closeYouTubeOpenModal();
-        } else if (recSourceModal && !recSourceModal.classList.contains('hidden')) {
-          closeRecSourceModal();
         } else if (joinAudioModal && !joinAudioModal.classList.contains('hidden')) {
           closeJoinAudioModal();
         } else if (favFileActionModal && !favFileActionModal.classList.contains('hidden')) {
