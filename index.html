@@ -8,7 +8,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="Audipo2">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="app-version" content="v81">
+  <meta name="app-version" content="v82">
   <link rel="manifest" href="./manifest.json">
   <title>Audipo風 練習プレイヤー＆レコーダー</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='bg' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%231b2030'/%3E%3Cstop offset='100%25' stop-color='%230d0f15'/%3E%3C/linearGradient%3E%3ClinearGradient id='wv' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0%25' stop-color='%2360c5ff'/%3E%3Cstop offset='100%25' stop-color='%232563eb'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='url(%23bg)'/%3E%3Crect x='1' y='1' width='62' height='62' rx='15' fill='none' stroke='%233b82f6' stroke-opacity='0.3' stroke-width='2'/%3E%3Cg fill='url(%23wv)'%3E%3Crect x='10' y='28' width='4.5' height='12' rx='2.25' opacity='0.6'/%3E%3Crect x='18' y='22' width='4.5' height='24' rx='2.25' opacity='0.85'/%3E%3Crect x='26' y='15' width='4.5' height='36' rx='2.25'/%3E%3Crect x='34' y='21' width='4.5' height='25' rx='2.25' opacity='0.9'/%3E%3Crect x='42' y='26' width='4.5' height='16' rx='2.25' opacity='0.75'/%3E%3Crect x='50' y='30' width='4.5' height='9' rx='2.25' opacity='0.5'/%3E%3C/g%3E%3Cpath d='M36.25 10.5c0-1.4 1.1-2.5 2.5-2.5h5.5c1.4 0 2.5 1.1 2.5 2.5v2.4c0 .8-.3 1.5-.9 2.1l-3.2 3.1c-.6.6-1.6.6-2.2 0l-3.2-3.1c-.6-.6-.9-1.3-.9-2.1v-2.4z' fill='%23facc15'/%3E%3C/svg%3E">
@@ -9677,6 +9677,24 @@
           <input type="text" id="inputTrackName" class="text-input" placeholder="トラック名を入力">
         </div>
 
+        <!-- Auto Pin Numbering -->
+        <div class="modal-section">
+          <div class="sec-head" style="margin-bottom:4px;">
+            <span class="sec-title-group">
+              <span class="sec-title">ピン追加時の数字自動付与</span>
+              <button type="button" class="setting-help-btn" data-help-key="pinAutoNumber" aria-label="ピン追加時の数字自動付与の説明">?</button>
+            </span>
+            <span id="modalPinAutoNumVal" class="sec-value mono" style="color:#86efac;">ON</span>
+          </div>
+          <div class="toggle-row" style="margin-top:4px;padding-top:6px;">
+            <div>
+              <div class="sec-title" style="font-size:11.5px;">新規ピンに連番（1, 2, 3…）を自動で付ける</div>
+              <div id="pinAutoNumStatusText" class="engine-desc">ON（途中の位置に追加しても現在の最大番号＋1を自動付与）</div>
+            </div>
+            <button id="btnTogglePinAutoNum" type="button" class="toggle-pill on">ON</button>
+          </div>
+        </div>
+
         <!-- Auto-Save Memory & Session Persistence Info -->
         <div class="modal-section">
           <div class="sec-head">
@@ -9726,7 +9744,7 @@
         <div class="modal-section" style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
           <div>
             <div class="sec-title">バージョン情報</div>
-            <div id="settingsVersionLabel" class="engine-desc mono">現在: v81</div>
+            <div id="settingsVersionLabel" class="engine-desc mono">現在: v82</div>
           </div>
           <button id="btnShowReleaseHistory" type="button" class="step-btn" style="color:#93c5fd;border-color:rgba(66,165,245,0.45);">更新履歴を見る</button>
         </div>
@@ -9913,7 +9931,7 @@
           </div>
           <div>
             <h3 id="whatsNewTitle" class="whats-new-title">アップデートのお知らせ</h3>
-            <p id="whatsNewSub" class="whats-new-sub mono">v81 に更新されました</p>
+            <p id="whatsNewSub" class="whats-new-sub mono">v82 に更新されました</p>
           </div>
         </div>
         <button id="btnCloseWhatsNewX" type="button" class="modal-close" aria-label="閉じる">✕</button>
@@ -11151,6 +11169,43 @@
         }).sort((a, b) => a.time - b.time);
       }
 
+      function getNextAutoPinName(targetList = state.markers) {
+        if (!state.pinAutoNumber) return '';
+        let maxNum = 0;
+        (targetList || []).forEach((m) => {
+          const raw = String(m && m.name ? m.name : '').trim();
+          if (!raw) return;
+          const match = raw.match(/^(\d+)(?:[\s\u3000]|$)/);
+          if (match) {
+            const val = parseInt(match[1], 10);
+            if (Number.isFinite(val) && val > maxNum) {
+              maxNum = val;
+            }
+          }
+        });
+        return String(maxNum + 1);
+      }
+
+      function updatePinAutoNumberUI() {
+        const on = state.pinAutoNumber !== false;
+        const valEl = document.getElementById('modalPinAutoNumVal');
+        const txtEl = document.getElementById('pinAutoNumStatusText');
+        const btnEl = document.getElementById('btnTogglePinAutoNum');
+        if (valEl) {
+          valEl.textContent = on ? 'ON' : 'OFF';
+          valEl.style.color = on ? '#86efac' : '#a1a1aa';
+        }
+        if (txtEl) {
+          txtEl.textContent = on
+            ? 'ON（途中の位置に追加しても現在の最大番号＋1を自動付与）'
+            : 'OFF（名前を空欄のままピンを追加）';
+        }
+        if (btnEl) {
+          btnEl.textContent = on ? 'ON' : 'OFF';
+          btnEl.classList.toggle('on', on);
+        }
+      }
+
       const state = {
         hasAudio: false,
         isYouTubeMode: false,
@@ -11223,6 +11278,7 @@
         tunerRunning: false,
         tunerGraphVisible: true,
         pinColorFilter: 'all',
+        pinAutoNumber: true,
         kbdInst: 'piano', // 'piano' | 'synth' | 'flute' | 'violin'
         kbdOctave: 4, // 1..6 (base octave for 2-octave span C{oct}..C{oct+2})
         kbdTranspose: 0, // -6..+6 semitones (key center shift)
@@ -11954,6 +12010,7 @@
             metroVolDefaultV2: true,
             tunerA4: state.tunerA4,
             tunerGraphVisible: Boolean(state.tunerGraphVisible),
+            pinAutoNumber: Boolean(state.pinAutoNumber),
             kbdInst: state.kbdInst,
             kbdOctave: state.kbdOctave,
             kbdTranspose: state.kbdTranspose,
@@ -12059,6 +12116,9 @@
           }
           if (typeof p.tunerGraphVisible === 'boolean') {
             state.tunerGraphVisible = p.tunerGraphVisible;
+          }
+          if (typeof p.pinAutoNumber === 'boolean') {
+            state.pinAutoNumber = p.pinAutoNumber;
           }
           if (['piano', 'synth', 'flute', 'violin'].includes(p.kbdInst)) {
             state.kbdInst = p.kbdInst;
@@ -20231,9 +20291,10 @@ ${info.url}`;
         if (!state.isRecording) return;
         const t = (performance.now() - state.recStartPerf) / 1000;
         if (t > 0.15) {
-          state.recPendingMarkers.push(makeMarkerObj(t, '', true, true));
+          const autoName = getNextAutoPinName(state.recPendingMarkers);
+          state.recPendingMarkers.push(makeMarkerObj(t, autoName, true, true));
           recMarkerCountBadge.textContent = String(state.recPendingMarkers.length);
-          showToast(`録音中に黄色ピン追加 (${formatTime(t)})`);
+          showToast(autoName ? `録音中に黄色ピン「${autoName}」追加 (${formatTime(t)})` : `録音中に黄色ピン追加 (${formatTime(t)})`);
         }
       }
 
@@ -20527,8 +20588,10 @@ ${info.url}`;
 
           if (t > 0.05 && t < state.duration - 0.05) {
             const exists = state.markers.some(m => Math.abs(m.time - t) < 0.2);
+            let addedAutoName = '';
             if (!exists) {
-              state.markers.push(makeMarkerObj(t, '', true, true));
+              addedAutoName = getNextAutoPinName(state.markers);
+              state.markers.push(makeMarkerObj(t, addedAutoName, true, true));
               state.markers.sort((a, b) => a.time - b.time);
             }
             syncCurrentPlaylistMarkers();
@@ -20536,7 +20599,7 @@ ${info.url}`;
             updatePinButtonsUI();
             updateSectionBarUI();
             renderAllCanvases();
-            showToast(`緑▼を黄色ピンに確定: ${formatTime(t)}`);
+            showToast(addedAutoName ? `緑▼を黄色ピン「${addedAutoName}」に確定: ${formatTime(t)}` : `緑▼を黄色ピンに確定: ${formatTime(t)}`);
           } else {
             updatePinButtonsUI();
             renderAllCanvases();
@@ -20590,7 +20653,8 @@ ${info.url}`;
         if (clearedGreen) {
           state.tempMarker = null;
         }
-        const createdMarker = makeMarkerObj(t, '', true, true);
+        const autoName = getNextAutoPinName(state.markers);
+        const createdMarker = makeMarkerObj(t, autoName, true, true);
         state.markers.push(createdMarker);
         state.markers.sort((a, b) => a.time - b.time);
         syncCurrentPlaylistMarkers();
@@ -20600,7 +20664,7 @@ ${info.url}`;
         updatePinButtonsUI();
         updateSectionBarUI();
         renderAllCanvases();
-        showToast(`黄色ピン追加: ${formatTime(t)}`);
+        showToast(autoName ? `黄色ピン「${autoName}」を追加: ${formatTime(t)}` : `黄色ピン追加: ${formatTime(t)}`);
         return createdMarker;
       }
 
@@ -31217,19 +31281,30 @@ ${info.url}`;
       document.addEventListener('webkitfullscreenchange', onFullscreenStateChanged);
 
       // ==================== GITHUB / PWA SOFTWARE UPDATE CHECK & APPLY ====================
-      const APP_VERSION = 'v81';
+      const APP_VERSION = 'v82';
 
       // Ordered newest-first; each release appends a new object at the top.
       // Users who skip multiple versions automatically see ALL unseen versions between lastSeen and current.
       const APP_RELEASE_NOTES = [
         {
-          version: 'v81',
-          verNum: 81,
+          version: 'v82',
+          verNum: 82,
           date: '2026/11/28',
           title: 'ピン削除の確認ウィンドウと、長押しでのピン編集（名前入力）を追加',
           items: [
             '再生画面のピン追加／削除ボタンでピンを消すとき、いきなり消えずに確認ウィンドウが開くようになりました（キャンセルすれば消えません）',
             '同じボタンを長押しするとピンの編集画面が開き、そのまま名前を入力できます。近くにピンが無い場合は、現在位置にピンを追加してから編集画面が開きます'
+          ]
+        },
+        {
+          version: 'v81',
+          verNum: 81,
+          date: '2026/11/28',
+          title: '黄色ピン追加時の数字（連番）自動付与と設定ON/OFFを追加',
+          items: [
+            '黄色ピンを追加したとき（手動追加・緑ピンからの確定・録音中の追加）に、自動で「1」「2」「3」…の番号をマーク名として付与するようにしました（デフォルトON）',
+            '曲の途中の位置に追加した場合や途中のピンを削除した場合でも、既存の番号は振り直さず、現在の最大番号＋1を自動で付けます',
+            '設定画面の「ピン追加時の数字自動付与」から、いつでもON/OFFを切り替えられます'
           ]
         },
         {
@@ -32407,6 +32482,27 @@ ${info.url}`;
               title: '補足',
               bullets: [
                 ['ブロック全体を文字起こし', '各ブロックの最初だけでなく、区切られたブロックの先頭から末尾まで全体が文字起こしされます（長い発話は最大約24秒単位で自動分割）。']
+              ]
+            }
+          ]
+        },
+        pinAutoNumber: {
+          title: 'ピン追加時の数字自動付与',
+          sub: '新規ピンへの自動連番（最大番号＋1）',
+          summary: '黄色ピンを新しく追加したときに、自動で「1」「2」「3」…の番号を名前として付けます（初期設定はON）。',
+          sections: [
+            {
+              title: '番号の付け方ルール',
+              bullets: [
+                ['途中に追加しても最大番号＋1', 'すでに「1」「2」「5」のピンがある状態で1と2の間へ追加しても、番号は振り直さず「6」が付きます。'],
+                ['削除しても既存番号は固定', '途中のピンを削除しても、ほかのピンに付けた番号は変わりません。'],
+                ['先頭数字＋名前にも対応', '「26 優ちゃん」のように先頭に数字があるピンがある場合、次は「27」になります。']
+              ]
+            },
+            {
+              title: 'OFFにしたとき',
+              bullets: [
+                ['名前なしで追加', '従来どおり名前が空欄のまま黄色ピンが追加されます（後からマーク編集で自由に名前を付けられます）。']
               ]
             }
           ]
@@ -33610,6 +33706,7 @@ ${info.url}`;
         updateRecSettingsUI();
         updateTunerA4UI();
         updateTunerGraphUI();
+        updatePinAutoNumberUI();
         updateMetroUI();
         updateKeyboardUI();
         updateTranscriptUI();
@@ -33640,6 +33737,16 @@ ${info.url}`;
 
         closeFullBackupRestoreModal();
         showToast(isOverwrite ? 'バックアップから完全上書き復元しました' : 'バックアップをマージ復元しました');
+      }
+
+      const btnTogglePinAutoNum = document.getElementById('btnTogglePinAutoNum');
+      if (btnTogglePinAutoNum) {
+        btnTogglePinAutoNum.addEventListener('click', () => {
+          state.pinAutoNumber = !state.pinAutoNumber;
+          updatePinAutoNumberUI();
+          saveAppPrefs();
+          showToast(state.pinAutoNumber ? 'ピンの数字自動付与をONにしました' : 'ピンの数字自動付与をOFFにしました');
+        });
       }
 
       document.getElementById('btnFullBackupDownload').addEventListener('click', () => executeFullBackupExport('download'));
@@ -34121,6 +34228,7 @@ ${info.url}`;
         buildKeyboardDOM(window.innerWidth > window.innerHeight ? 2 : 1);
         updateTunerA4UI();
         updateTunerGraphUI();
+        updatePinAutoNumberUI();
         clearTunerVisuals('OFF');
         renderTunerPitchGraph();
         updateMetroUI();
