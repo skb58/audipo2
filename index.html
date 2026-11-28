@@ -8,7 +8,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="Audipo2">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="app-version" content="v78">
+  <meta name="app-version" content="v79">
   <link rel="manifest" href="./manifest.json">
   <title>Audipo風 練習プレイヤー＆レコーダー</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='bg' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%231b2030'/%3E%3Cstop offset='100%25' stop-color='%230d0f15'/%3E%3C/linearGradient%3E%3ClinearGradient id='wv' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0%25' stop-color='%2360c5ff'/%3E%3Cstop offset='100%25' stop-color='%232563eb'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='url(%23bg)'/%3E%3Crect x='1' y='1' width='62' height='62' rx='15' fill='none' stroke='%233b82f6' stroke-opacity='0.3' stroke-width='2'/%3E%3Cg fill='url(%23wv)'%3E%3Crect x='10' y='28' width='4.5' height='12' rx='2.25' opacity='0.6'/%3E%3Crect x='18' y='22' width='4.5' height='24' rx='2.25' opacity='0.85'/%3E%3Crect x='26' y='15' width='4.5' height='36' rx='2.25'/%3E%3Crect x='34' y='21' width='4.5' height='25' rx='2.25' opacity='0.9'/%3E%3Crect x='42' y='26' width='4.5' height='16' rx='2.25' opacity='0.75'/%3E%3Crect x='50' y='30' width='4.5' height='9' rx='2.25' opacity='0.5'/%3E%3C/g%3E%3Cpath d='M36.25 10.5c0-1.4 1.1-2.5 2.5-2.5h5.5c1.4 0 2.5 1.1 2.5 2.5v2.4c0 .8-.3 1.5-.9 2.1l-3.2 3.1c-.6.6-1.6.6-2.2 0l-3.2-3.1c-.6-.6-.9-1.3-.9-2.1v-2.4z' fill='%23facc15'/%3E%3C/svg%3E">
@@ -247,87 +247,32 @@
       box-shadow: 0 24px 60px rgba(0, 0, 0, 0.86), 0 0 24px rgba(250, 204, 21, 0.14);
     }
 
-    .bm-cur-card {
-      padding: 9px 11px;
-      border-radius: 12px;
-      background: linear-gradient(135deg, rgba(250, 204, 21, 0.12) 0%, rgba(245, 158, 11, 0.08) 100%);
-      border: 1px solid rgba(250, 204, 21, 0.42);
+    .bm-footer-stack {
       display: flex;
       flex-direction: column;
-      gap: 7px;
-      flex-shrink: 0;
-    }
-
-    .bm-cur-card.is-saved {
-      background: linear-gradient(135deg, rgba(34, 197, 94, 0.12) 0%, rgba(16, 185, 129, 0.08) 100%);
-      border-color: rgba(74, 222, 128, 0.48);
-    }
-
-    .bm-cur-head {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
       gap: 8px;
-      min-width: 0;
-    }
-
-    .bm-cur-info {
-      flex: 1;
-      min-width: 0;
-    }
-
-    .bm-cur-label {
-      font-size: 10px;
-      font-weight: 800;
-      color: #fde68a;
-      letter-spacing: 0.2px;
-    }
-
-    .bm-cur-card.is-saved .bm-cur-label {
-      color: #86efac;
-    }
-
-    .bm-cur-name {
-      font-size: 12.5px;
-      font-weight: 800;
-      color: #ffffff;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      margin-top: 1px;
-    }
-
-    .bm-cur-actions {
-      display: flex;
-      align-items: center;
-      gap: 6px;
     }
 
     .bm-save-cur-btn {
-      flex: 1;
-      height: 36px;
-      padding: 0 12px;
-      border-radius: 9px;
-      background: linear-gradient(135deg, #eab308 0%, #ca8a04 100%);
-      border: 1px solid #fef08a;
+      width: 100%;
+      height: 42px;
+      padding: 0 14px;
+      border-radius: 11px;
+      background: linear-gradient(135deg, #facc15 0%, #eab308 100%);
+      border: 1px solid rgba(254, 240, 138, 0.85);
       color: #111113;
-      font-size: 12.5px;
+      font-size: 13.5px;
       font-weight: 800;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 5px;
+      gap: 6px;
+      box-shadow: 0 4px 14px rgba(234, 179, 8, 0.28);
       transition: transform 0.08s ease;
     }
 
     .bm-save-cur-btn:active {
-      transform: scale(0.96);
-    }
-
-    .bm-cur-card.is-saved .bm-save-cur-btn {
-      background: rgba(250, 204, 21, 0.16);
-      border-color: rgba(250, 204, 21, 0.55);
-      color: #fef08a;
+      transform: scale(0.97);
     }
 
     .bm-toolbar-row {
@@ -6334,40 +6279,17 @@
       box-shadow: 0 20px 56px rgba(15, 15, 20, 0.16);
     }
 
-    body.theme-light .bm-cur-card {
-      background: var(--lt-card);
-      border-color: rgba(217, 119, 6, 0.38);
-    }
-
-    body.theme-light .bm-cur-card.is-saved {
-      background: #f0fdf4;
-      border-color: rgba(22, 163, 74, 0.42);
-    }
-
-    body.theme-light .bm-cur-label {
-      color: #b45309;
-    }
-
-    body.theme-light .bm-cur-card.is-saved .bm-cur-label {
-      color: #15803d;
-    }
-
-    body.theme-light .bm-cur-name,
     body.theme-light .bm-row-title,
     body.theme-light .bm-row.is-folder .bm-row-title {
       color: var(--lt-ink-strong);
     }
 
     body.theme-light .bm-save-cur-btn {
-      background: var(--lt-accent);
-      border-color: var(--lt-accent);
-      color: var(--lt-accent-text);
-    }
-
-    body.theme-light .bm-cur-card.is-saved .bm-save-cur-btn {
-      background: var(--lt-subtle-bg);
-      border-color: rgba(17, 17, 17, 0.14);
-      color: var(--lt-accent);
+      border-radius: 13px;
+      background: #ffffff;
+      border: 1.5px solid #222222;
+      color: #111111;
+      box-shadow: 0 2px 7px rgba(17, 17, 17, 0.08);
     }
 
     body.theme-light .bm-tool-btn,
@@ -8174,7 +8096,6 @@
     body.theme-clean .whats-new-ok-btn,
     body.theme-clean .modal-footer-btn,
     body.theme-clean .fav-primary-picker-btn,
-    body.theme-clean .bm-save-cur-btn,
     body.theme-clean .start-btn-local,
     body.theme-clean .metro-start-btn,
     body.theme-clean .kbd-to-landscape-hero,
@@ -8184,6 +8105,13 @@
       border-color: transparent;
       color: #ffffff;
       box-shadow: 0 4px 12px rgba(244, 114, 182, 0.34);
+    }
+
+    body.theme-clean .bm-save-cur-btn {
+      background: linear-gradient(135deg, #c084fc 0%, #a855f7 100%);
+      border: 1px solid transparent;
+      color: #ffffff;
+      box-shadow: 0 4px 12px rgba(168, 85, 247, 0.30);
     }
 
     body.theme-clean .modal-card,
@@ -9433,7 +9361,7 @@
         <div class="modal-section" style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
           <div>
             <div class="sec-title">バージョン情報</div>
-            <div id="settingsVersionLabel" class="engine-desc mono">現在: v78</div>
+            <div id="settingsVersionLabel" class="engine-desc mono">現在: v79</div>
           </div>
           <button id="btnShowReleaseHistory" type="button" class="step-btn" style="color:#93c5fd;border-color:rgba(66,165,245,0.45);">更新履歴を見る</button>
         </div>
@@ -9597,7 +9525,7 @@
           </div>
           <div>
             <h3 id="whatsNewTitle" class="whats-new-title">アップデートのお知らせ</h3>
-            <p id="whatsNewSub" class="whats-new-sub mono">v78 に更新されました</p>
+            <p id="whatsNewSub" class="whats-new-sub mono">v79 に更新されました</p>
           </div>
         </div>
         <button id="btnCloseWhatsNewX" type="button" class="modal-close" aria-label="閉じる">✕</button>
@@ -10296,23 +10224,11 @@
         <div id="bmListWrap" class="fav-list"></div>
       </div>
 
-      <!-- Current Playing Track Quick Save Card (positioned right above the Close button) -->
-      <div id="bmCurrentTrackCard" class="bm-cur-card hidden" style="margin-top:10px;">
-        <div class="bm-cur-head">
-          <div class="bm-cur-info">
-            <div id="bmCurStatusLabel" class="bm-cur-label">いま開いている曲をお気に入り登録</div>
-            <div id="bmCurTrackName" class="bm-cur-name"></div>
-          </div>
-        </div>
-        <div class="bm-cur-actions">
-          <button id="btnBmSaveCurrent" type="button" class="bm-save-cur-btn">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-            <span id="bmSaveCurBtnLabel">お気に入りに追加</span>
-          </button>
-        </div>
-      </div>
-
-      <div class="whats-new-footer" style="margin-top:8px;">
+      <div class="whats-new-footer bm-footer-stack" style="margin-top:10px;">
+        <button id="btnBmSaveCurrent" type="button" class="bm-save-cur-btn hidden">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          <span id="bmSaveCurBtnLabel">お気に入りに追加</span>
+        </button>
         <button id="btnCloseBookmarksOk" type="button" class="whats-new-ok-btn">閉じる</button>
       </div>
     </div>
@@ -27407,9 +27323,6 @@ ${info.url}`;
       const MAX_BM_BLOB_CACHE_BYTES = 85 * 1024 * 1024; // Cache up to 85MB in IndexedDB when no FileHandle is available
 
       const bookmarksModal = document.getElementById('bookmarksModal');
-      const bmCurrentTrackCard = document.getElementById('bmCurrentTrackCard');
-      const bmCurStatusLabel = document.getElementById('bmCurStatusLabel');
-      const bmCurTrackName = document.getElementById('bmCurTrackName');
       const btnBmSaveCurrent = document.getElementById('btnBmSaveCurrent');
       const bmSaveCurBtnLabel = document.getElementById('bmSaveCurBtnLabel');
       const bmDuplicateModal = document.getElementById('bmDuplicateModal');
@@ -27845,17 +27758,15 @@ ${info.url}`;
           bmState.curFolderId = null;
         }
 
-        // 1. Current track quick-save card (always normal add button; duplicates prompt via confirmation modal)
-        if (bmCurrentTrackCard) {
+        // 1. Current track quick-save button right above Close (same full-width style, distinct color)
+        if (btnBmSaveCurrent) {
           if (state.hasAudio) {
-            bmCurrentTrackCard.classList.remove('hidden');
-            bmCurrentTrackCard.classList.remove('is-saved');
-            const curTitle = trackTitleEl.textContent.trim() || state.currentFileOrigName || '現在の曲';
-            bmCurTrackName.textContent = (state.isYouTubeMode ? '[YouTube] ' : '[音声] ') + curTitle;
-            bmCurStatusLabel.textContent = 'いま開いている曲をお気に入り登録';
-            bmSaveCurBtnLabel.textContent = bmState.curFolderId ? 'このフォルダにお気に入り追加' : 'お気に入りに追加';
+            btnBmSaveCurrent.classList.remove('hidden');
+            if (bmSaveCurBtnLabel) {
+              bmSaveCurBtnLabel.textContent = bmState.curFolderId ? 'このフォルダにお気に入り追加' : 'お気に入りに追加';
+            }
           } else {
-            bmCurrentTrackCard.classList.add('hidden');
+            btnBmSaveCurrent.classList.add('hidden');
           }
         }
 
@@ -30366,11 +30277,21 @@ ${info.url}`;
       document.addEventListener('webkitfullscreenchange', onFullscreenStateChanged);
 
       // ==================== GITHUB / PWA SOFTWARE UPDATE CHECK & APPLY ====================
-      const APP_VERSION = 'v78';
+      const APP_VERSION = 'v79';
 
       // Ordered newest-first; each release appends a new object at the top.
       // Users who skip multiple versions automatically see ALL unseen versions between lastSeen and current.
       const APP_RELEASE_NOTES = [
+        {
+          version: 'v79',
+          verNum: 79,
+          date: '2026/11/28',
+          title: 'お気に入り登録ボタンをスッキリ刷新',
+          items: [
+            'ブックマーク画面下の「いま開いている曲をお気に入り登録」の枠と文字を削除し、下の「閉じる」ボタンと同じサイズ・形の色違いボタンとしてスッキリ並べました',
+            'ダーク（ゴールド）・ミルキーピンク（パステルラベンダー）・モノトーン（白×黒枠）の全テーマで、「閉じる」ボタンとひと目で見分けやすい配色にしています'
+          ]
+        },
         {
           version: 'v78',
           verNum: 78,
