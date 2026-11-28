@@ -8,7 +8,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="Audipo2">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="app-version" content="v80">
+  <meta name="app-version" content="v81">
   <link rel="manifest" href="./manifest.json">
   <title>Audipo風 練習プレイヤー＆レコーダー</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='bg' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%231b2030'/%3E%3Cstop offset='100%25' stop-color='%230d0f15'/%3E%3C/linearGradient%3E%3ClinearGradient id='wv' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0%25' stop-color='%2360c5ff'/%3E%3Cstop offset='100%25' stop-color='%232563eb'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='url(%23bg)'/%3E%3Crect x='1' y='1' width='62' height='62' rx='15' fill='none' stroke='%233b82f6' stroke-opacity='0.3' stroke-width='2'/%3E%3Cg fill='url(%23wv)'%3E%3Crect x='10' y='28' width='4.5' height='12' rx='2.25' opacity='0.6'/%3E%3Crect x='18' y='22' width='4.5' height='24' rx='2.25' opacity='0.85'/%3E%3Crect x='26' y='15' width='4.5' height='36' rx='2.25'/%3E%3Crect x='34' y='21' width='4.5' height='25' rx='2.25' opacity='0.9'/%3E%3Crect x='42' y='26' width='4.5' height='16' rx='2.25' opacity='0.75'/%3E%3Crect x='50' y='30' width='4.5' height='9' rx='2.25' opacity='0.5'/%3E%3C/g%3E%3Cpath d='M36.25 10.5c0-1.4 1.1-2.5 2.5-2.5h5.5c1.4 0 2.5 1.1 2.5 2.5v2.4c0 .8-.3 1.5-.9 2.1l-3.2 3.1c-.6.6-1.6.6-2.2 0l-3.2-3.1c-.6-.6-.9-1.3-.9-2.1v-2.4z' fill='%23facc15'/%3E%3C/svg%3E">
@@ -9261,7 +9261,7 @@
       </button>
 
       <!-- Col 4: Toggle Add / Delete Yellow Confirmed Pin -->
-      <button id="btnAddYellow" type="button" class="pad-btn" title="現在位置に黄色マーカーを追加 / 既存ピンを削除">
+      <button id="btnAddYellow" type="button" class="pad-btn" title="現在位置に黄色マーカーを追加 / 既存ピンを削除（長押しでピンを編集）">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
           <path d="M4.2 6.5h6.2a1.6 1.6 0 0 1 1.6 1.6v3.2c0 .55-.24 1.07-.66 1.43l-3.15 2.7a1.4 1.4 0 0 1-1.78 0l-3.15-2.7A1.88 1.88 0 0 1 2.6 11.3V8.1a1.6 1.6 0 0 1 1.6-1.6Z" fill="#facc15"/>
           <path id="addYellowPlusSign" d="M18 8.3v6.4M14.8 11.5h6.4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
@@ -9726,7 +9726,7 @@
         <div class="modal-section" style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
           <div>
             <div class="sec-title">バージョン情報</div>
-            <div id="settingsVersionLabel" class="engine-desc mono">現在: v80</div>
+            <div id="settingsVersionLabel" class="engine-desc mono">現在: v81</div>
           </div>
           <button id="btnShowReleaseHistory" type="button" class="step-btn" style="color:#93c5fd;border-color:rgba(66,165,245,0.45);">更新履歴を見る</button>
         </div>
@@ -9888,6 +9888,18 @@
   </div>
 
   <!-- ==================== 8. WHAT'S NEW / UPDATE NOTICE MODAL ==================== -->
+  <!-- ==================== 7.6 DELETE SINGLE PIN CONFIRMATION MODAL ==================== -->
+  <div id="deletePinConfirmModal" class="modal-backdrop hidden" style="z-index:76;">
+    <div class="mark-edit-card" role="dialog" aria-modal="true" aria-labelledby="deletePinConfirmTitle">
+      <h3 id="deletePinConfirmTitle" class="mark-edit-title" style="color:#fca5a5;">このピンを削除しますか？</h3>
+      <p id="deletePinConfirmDesc" style="margin:0 0 16px;font-size:12.5px;line-height:1.58;color:#d4d4d8;"></p>
+      <div class="mark-edit-footer">
+        <button id="btnDeletePinCancel" type="button" class="mark-dialog-btn" style="color:#a1a1aa;">キャンセル</button>
+        <button id="btnDeletePinExecute" type="button" class="mark-dialog-btn" style="color:#f87171;">削除する</button>
+      </div>
+    </div>
+  </div>
+
   <div id="whatsNewModal" class="modal-backdrop hidden" style="z-index:82;">
     <div class="whats-new-card" role="dialog" aria-modal="true" aria-labelledby="whatsNewTitle">
       <div class="whats-new-head">
@@ -9901,7 +9913,7 @@
           </div>
           <div>
             <h3 id="whatsNewTitle" class="whats-new-title">アップデートのお知らせ</h3>
-            <p id="whatsNewSub" class="whats-new-sub mono">v80 に更新されました</p>
+            <p id="whatsNewSub" class="whats-new-sub mono">v81 に更新されました</p>
           </div>
         </div>
         <button id="btnCloseWhatsNewX" type="button" class="modal-close" aria-label="閉じる">✕</button>
@@ -20490,7 +20502,7 @@ ${info.url}`;
         addYellowPlusSign.classList.toggle('hidden', isOnYellow);
         addYellowMinusSign.classList.toggle('hidden', !isOnYellow);
         btnAddYellow.classList.toggle('active-red-glow', isOnYellow);
-        btnAddYellow.title = isOnYellow ? '現在位置の黄色マーカーを削除' : '現在位置に黄色マーカーを追加';
+        btnAddYellow.title = isOnYellow ? '現在位置の黄色マーカーを削除（長押しで編集）' : '現在位置に黄色マーカーを追加（長押しで名前入力）';
       }
 
       function jumpToGreenPin() {
@@ -20578,7 +20590,8 @@ ${info.url}`;
         if (clearedGreen) {
           state.tempMarker = null;
         }
-        state.markers.push(makeMarkerObj(t, '', true, true));
+        const createdMarker = makeMarkerObj(t, '', true, true);
+        state.markers.push(createdMarker);
         state.markers.sort((a, b) => a.time - b.time);
         syncCurrentPlaylistMarkers();
         updateWaveGainUI();
@@ -20588,6 +20601,7 @@ ${info.url}`;
         updateSectionBarUI();
         renderAllCanvases();
         showToast(`黄色ピン追加: ${formatTime(t)}`);
+        return createdMarker;
       }
 
       function toggleYellowPinAtCurrent() {
@@ -20598,21 +20612,85 @@ ${info.url}`;
         if (!state.hasAudio) return;
         const nearYellow = findYellowMarkerNear(state.currentTime, getYellowPinHitTolerance());
         if (nearYellow) {
-          const idx = state.markers.findIndex(m => m.id === nearYellow.id);
-          if (idx >= 0) {
-            const removed = state.markers.splice(idx, 1)[0];
-            syncCurrentPlaylistMarkers();
-            updateHeaderSubInfo();
-            updatePinButtonsUI();
-            updateSectionBarUI();
-            renderAllCanvases();
-            const lbl = removed.name ? `${formatTime(removed.time)} (${removed.name})` : formatTime(removed.time);
-            showToast(`黄色ピン削除: ${lbl}`);
-            return;
-          }
+          openDeletePinConfirm(nearYellow);
+          return;
         }
         addYellowPinAtCurrent();
       }
+
+      // ===== Single yellow pin delete confirmation (from the add/delete pin button) =====
+      const deletePinConfirmModal = document.getElementById('deletePinConfirmModal');
+      const deletePinConfirmDesc = document.getElementById('deletePinConfirmDesc');
+      let pendingDeletePinId = null;
+
+      function openDeletePinConfirm(marker) {
+        if (!marker) return;
+        pendingDeletePinId = marker.id;
+        const lbl = marker.name ? `${formatTime(marker.time)}（${marker.name}）` : formatTime(marker.time);
+        deletePinConfirmDesc.textContent = `現在位置付近の黄色ピン ${lbl} を削除します。よろしいですか？（元に戻せません）`;
+        deletePinConfirmModal.classList.remove('hidden');
+      }
+
+      function closeDeletePinConfirm() {
+        pendingDeletePinId = null;
+        if (deletePinConfirmModal) deletePinConfirmModal.classList.add('hidden');
+      }
+
+      function executeDeletePendingPin() {
+        const id = pendingDeletePinId;
+        closeDeletePinConfirm();
+        if (!id) return;
+        const idx = state.markers.findIndex(m => m.id === id);
+        if (idx < 0) return;
+        const removed = state.markers.splice(idx, 1)[0];
+        syncCurrentPlaylistMarkers();
+        updateHeaderSubInfo();
+        updatePinButtonsUI();
+        updateSectionBarUI();
+        renderAllCanvases();
+        const lbl = removed.name ? `${formatTime(removed.time)} (${removed.name})` : formatTime(removed.time);
+        showToast(`黄色ピン削除: ${lbl}`);
+      }
+
+      document.getElementById('btnDeletePinCancel').addEventListener('click', closeDeletePinConfirm);
+      document.getElementById('btnDeletePinExecute').addEventListener('click', executeDeletePendingPin);
+      deletePinConfirmModal.addEventListener('click', (e) => {
+        if (e.target === deletePinConfirmModal) closeDeletePinConfirm();
+      });
+
+      // ===== Long-press the add/delete pin button: open the pin editor in name-input mode =====
+      let addYellowLongPressTimer = null;
+      let addYellowClickSuppress = false;
+
+      function handleAddYellowLongPress() {
+        addYellowLongPressTimer = null;
+        if (state.isRecording || !state.hasAudio) return;
+        addYellowClickSuppress = true;
+        if (navigator.vibrate) { try { navigator.vibrate(12); } catch (err) {} }
+        const nearYellow = findYellowMarkerNear(state.currentTime, getYellowPinHitTolerance());
+        if (nearYellow) {
+          openMarkEditModal(nearYellow.id);
+          return;
+        }
+        const created = addYellowPinAtCurrent();
+        if (created && created.id) {
+          openMarkEditModal(created.id);
+        }
+      }
+
+      btnAddYellow.addEventListener('pointerdown', () => {
+        addYellowClickSuppress = false;
+        if (addYellowLongPressTimer) clearTimeout(addYellowLongPressTimer);
+        addYellowLongPressTimer = setTimeout(handleAddYellowLongPress, 550);
+      });
+      ['pointerup', 'pointerleave', 'pointercancel'].forEach((evName) => {
+        btnAddYellow.addEventListener(evName, () => {
+          if (addYellowLongPressTimer) { clearTimeout(addYellowLongPressTimer); addYellowLongPressTimer = null; }
+        });
+      });
+      btnAddYellow.addEventListener('contextmenu', (e) => {
+        if (addYellowLongPressTimer || addYellowClickSuppress) e.preventDefault();
+      });
 
       // ==================== AUTO PIECE START / END DETECTION (RECITAL / CHANGEOVER PAUSE DETECTOR) ====================
       function computeEnvelopeFrames(dtSec = 0.25) {
@@ -31139,11 +31217,21 @@ ${info.url}`;
       document.addEventListener('webkitfullscreenchange', onFullscreenStateChanged);
 
       // ==================== GITHUB / PWA SOFTWARE UPDATE CHECK & APPLY ====================
-      const APP_VERSION = 'v80';
+      const APP_VERSION = 'v81';
 
       // Ordered newest-first; each release appends a new object at the top.
       // Users who skip multiple versions automatically see ALL unseen versions between lastSeen and current.
       const APP_RELEASE_NOTES = [
+        {
+          version: 'v81',
+          verNum: 81,
+          date: '2026/11/28',
+          title: 'ピン削除の確認ウィンドウと、長押しでのピン編集（名前入力）を追加',
+          items: [
+            '再生画面のピン追加／削除ボタンでピンを消すとき、いきなり消えずに確認ウィンドウが開くようになりました（キャンセルすれば消えません）',
+            '同じボタンを長押しするとピンの編集画面が開き、そのまま名前を入力できます。近くにピンが無い場合は、現在位置にピンを追加してから編集画面が開きます'
+          ]
+        },
         {
           version: 'v80',
           verNum: 80,
@@ -32932,7 +33020,10 @@ ${info.url}`;
       btnPromoteTemp.addEventListener('click', handleConvertPinButton);
       btnJumpTemp.addEventListener('click', jumpToGreenPin);
       document.getElementById('btnPrevYellow').addEventListener('click', jumpPrevYellowPin);
-      btnAddYellow.addEventListener('click', toggleYellowPinAtCurrent);
+      btnAddYellow.addEventListener('click', () => {
+        if (addYellowClickSuppress) { addYellowClickSuppress = false; return; }
+        toggleYellowPinAtCurrent();
+      });
       document.getElementById('btnNextYellow').addEventListener('click', jumpNextYellowPin);
       document.getElementById('btnSpeedPitch').addEventListener('click', () => openSettingsModal('settings'));
 
@@ -33673,6 +33764,8 @@ ${info.url}`;
           closeWhatsNewModal();
         } else if (saveExportModal && !saveExportModal.classList.contains('hidden')) {
           closeSaveExportModal();
+        } else if (deletePinConfirmModal && !deletePinConfirmModal.classList.contains('hidden')) {
+          closeDeletePinConfirm();
         } else if (clearPinsConfirmModal && !clearPinsConfirmModal.classList.contains('hidden')) {
           clearPinsConfirmModal.classList.add('hidden');
         } else if (!cutConfirmModal.classList.contains('hidden')) {
