@@ -8,7 +8,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="Audipo2">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="app-version" content="v79">
+  <meta name="app-version" content="v80">
   <link rel="manifest" href="./manifest.json">
   <title>Audipo風 練習プレイヤー＆レコーダー</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='bg' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%231b2030'/%3E%3Cstop offset='100%25' stop-color='%230d0f15'/%3E%3C/linearGradient%3E%3ClinearGradient id='wv' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0%25' stop-color='%2360c5ff'/%3E%3Cstop offset='100%25' stop-color='%232563eb'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='url(%23bg)'/%3E%3Crect x='1' y='1' width='62' height='62' rx='15' fill='none' stroke='%233b82f6' stroke-opacity='0.3' stroke-width='2'/%3E%3Cg fill='url(%23wv)'%3E%3Crect x='10' y='28' width='4.5' height='12' rx='2.25' opacity='0.6'/%3E%3Crect x='18' y='22' width='4.5' height='24' rx='2.25' opacity='0.85'/%3E%3Crect x='26' y='15' width='4.5' height='36' rx='2.25'/%3E%3Crect x='34' y='21' width='4.5' height='25' rx='2.25' opacity='0.9'/%3E%3Crect x='42' y='26' width='4.5' height='16' rx='2.25' opacity='0.75'/%3E%3Crect x='50' y='30' width='4.5' height='9' rx='2.25' opacity='0.5'/%3E%3C/g%3E%3Cpath d='M36.25 10.5c0-1.4 1.1-2.5 2.5-2.5h5.5c1.4 0 2.5 1.1 2.5 2.5v2.4c0 .8-.3 1.5-.9 2.1l-3.2 3.1c-.6.6-1.6.6-2.2 0l-3.2-3.1c-.6-.6-.9-1.3-.9-2.1v-2.4z' fill='%23facc15'/%3E%3C/svg%3E">
@@ -1242,6 +1242,67 @@
     .tuner-bar.lit-red {
       background: #f97316;
       box-shadow: 0 0 6px rgba(249, 115, 22, 0.65);
+    }
+
+    .tuner-graph-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+      margin-top: 6px;
+      padding-top: 5px;
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .tuner-graph-btn {
+      height: 22px;
+      padding: 0 8px;
+      border-radius: 6px;
+      background: #23262d;
+      border: 1px solid var(--border-strong);
+      color: #a1a1aa;
+      font-size: 10px;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      white-space: nowrap;
+    }
+
+    .tuner-graph-btn:active {
+      transform: scale(0.94);
+    }
+
+    .tuner-graph-btn.active {
+      background: rgba(34, 197, 94, 0.2);
+      border-color: rgba(34, 197, 94, 0.65);
+      color: #86efac;
+    }
+
+    .tuner-graph-stat {
+      flex: 1;
+      text-align: center;
+      font-size: 10px;
+      font-weight: 700;
+      color: #a1a1aa;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .tuner-graph-wrap {
+      margin-top: 5px;
+      height: 68px;
+      border-radius: 9px;
+      background: #0f1312;
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      overflow: hidden;
+    }
+
+    #tunerGraphCanvas {
+      width: 100%;
+      height: 100%;
+      display: block;
     }
 
     /* ===== METRONOME HERO CARD (2-COLUMN: LEFT PENDULUM / RIGHT BPM & STEP CONTROLS) ===== */
@@ -3169,12 +3230,199 @@
     .mark-edit-card {
       width: 100%;
       max-width: 380px;
+      max-height: 88dvh;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
       background: #232328;
       border: 1px solid var(--border-strong);
       border-radius: 14px;
       padding: 18px 18px 14px;
       box-shadow: 0 24px 56px rgba(0, 0, 0, 0.85);
       color: var(--text-main);
+    }
+
+    .mark-color-row {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 5px;
+      margin-bottom: 11px;
+    }
+
+    .mark-color-btn {
+      height: 31px;
+      padding: 0 4px;
+      border-radius: 8px;
+      background: #1a1a20;
+      border: 1.5px solid var(--border-subtle);
+      color: #d4d4d8;
+      font-size: 10.5px;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      white-space: nowrap;
+      transition: transform 0.08s ease, border-color 0.12s ease, background-color 0.12s ease;
+    }
+
+    .mark-color-btn:active {
+      transform: scale(0.94);
+    }
+
+    .mark-color-btn.active {
+      background: #2b2b36;
+      border-color: #ffffff;
+      color: #ffffff;
+      box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.25);
+    }
+
+    .pin-color-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      display: inline-block;
+    }
+
+    .mark-memo-input {
+      width: 100%;
+      min-height: 54px;
+      padding: 7px 9px;
+      border-radius: 9px;
+      background: #19191d;
+      border: 1px solid var(--border-strong);
+      color: #f4f4f6;
+      font-family: inherit;
+      font-size: 12.5px;
+      line-height: 1.45;
+      resize: vertical;
+      outline: none;
+      margin-bottom: 12px;
+      user-select: text;
+      -webkit-user-select: text;
+    }
+
+    .mark-memo-input:focus {
+      border-color: var(--accent-blue);
+    }
+
+    .mark-memo-input::placeholder {
+      color: var(--text-dim);
+      font-size: 11.5px;
+    }
+
+    .pin-filter-bar {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 5px 8px 3px;
+      overflow-x: auto;
+      scrollbar-width: none;
+      flex-shrink: 0;
+    }
+
+    .pin-filter-bar::-webkit-scrollbar {
+      display: none;
+    }
+
+    .pin-filter-chip {
+      height: 24px;
+      padding: 0 8px;
+      border-radius: 999px;
+      background: #1a1a21;
+      border: 1px solid var(--border-subtle);
+      color: #a1a1aa;
+      font-size: 10.5px;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      white-space: nowrap;
+      flex-shrink: 0;
+      transition: transform 0.08s ease, background-color 0.12s ease, border-color 0.12s ease;
+    }
+
+    .pin-filter-chip:active {
+      transform: scale(0.94);
+    }
+
+    .pin-filter-chip.active {
+      background: rgba(66, 165, 245, 0.2);
+      border-color: var(--accent-blue);
+      color: #e0f2fe;
+    }
+
+    .pin-tag-chip {
+      display: inline-block;
+      margin-left: 5px;
+      padding: 0 5px;
+      border-radius: 5px;
+      font-size: 9.5px;
+      font-weight: 800;
+      line-height: 1.45;
+      vertical-align: 1px;
+    }
+
+    .list-item-memo {
+      margin-top: 4px;
+      padding: 3px 7px;
+      border-left: 2.5px solid #facc15;
+      border-radius: 0 6px 6px 0;
+      background: rgba(255, 255, 255, 0.035);
+      font-size: 11px;
+      line-height: 1.42;
+      color: #d4d4d8;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .backup-opt-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 9px;
+      margin-bottom: 8px;
+      border-radius: 9px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border-subtle);
+      font-size: 11px;
+      color: #d4d4d8;
+      cursor: pointer;
+    }
+
+    .backup-opt-row input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      accent-color: #3b82f6;
+      margin: 0;
+      flex-shrink: 0;
+    }
+
+    .backup-summary-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+      margin-bottom: 10px;
+    }
+
+    .backup-stat-cell {
+      padding: 7px 9px;
+      border-radius: 9px;
+      background: #14141a;
+      border: 1px solid var(--border-subtle);
+    }
+
+    .backup-stat-label {
+      font-size: 10px;
+      color: var(--text-sub);
+      font-weight: 700;
+    }
+
+    .backup-stat-val {
+      font-size: 12.5px;
+      font-weight: 800;
+      color: #ffffff;
+      margin-top: 2px;
     }
 
     .mark-edit-title {
@@ -8217,6 +8465,90 @@
     body.theme-light .startup-overlay {
       background: var(--lt-bg);
     }
+
+    body.theme-light .tuner-graph-bar {
+      border-top-color: rgba(17, 17, 17, 0.07);
+    }
+
+    body.theme-light .tuner-graph-btn {
+      background: var(--lt-subtle-bg);
+      border-color: rgba(17, 17, 17, 0.1);
+      color: var(--lt-ink-sub);
+    }
+
+    body.theme-light .tuner-graph-btn.active {
+      background: var(--lt-accent);
+      border-color: var(--lt-accent);
+      color: var(--lt-accent-text);
+    }
+
+    body.theme-light .tuner-graph-stat {
+      color: var(--lt-ink-sub);
+    }
+
+    body.theme-light .tuner-graph-wrap {
+      background: var(--lt-bg);
+      border-color: rgba(17, 17, 17, 0.08);
+    }
+
+    body.theme-light .mark-color-btn,
+    body.theme-light .pin-filter-chip {
+      background: var(--lt-subtle-bg);
+      border-color: rgba(17, 17, 17, 0.1);
+      color: var(--lt-ink);
+    }
+
+    body.theme-light .mark-color-btn.active,
+    body.theme-light .pin-filter-chip.active {
+      background: var(--lt-accent);
+      border-color: var(--lt-accent);
+      color: var(--lt-accent-text);
+      box-shadow: none;
+    }
+
+    body.theme-light .mark-memo-input {
+      background: var(--lt-input-bg);
+      border-color: var(--lt-border-strong);
+      color: var(--lt-ink-strong);
+    }
+
+    body.theme-light .mark-memo-input:focus {
+      background: var(--lt-input-focus-bg);
+      border-color: var(--lt-accent);
+    }
+
+    body.theme-light .list-item-memo {
+      background: var(--lt-subtle-bg);
+      color: var(--lt-ink);
+    }
+
+    body.theme-light .backup-opt-row {
+      background: var(--lt-subtle-bg);
+      border-color: var(--lt-border);
+      color: var(--lt-ink);
+    }
+
+    body.theme-light .backup-stat-cell {
+      background: var(--lt-card);
+      border-color: var(--lt-border);
+    }
+
+    body.theme-light .backup-stat-val {
+      color: var(--lt-ink-strong);
+    }
+
+    body.theme-clean .tuner-graph-wrap {
+      background: #fff9fc;
+      border-color: #f6d1e2;
+    }
+
+    body.theme-clean .tuner-graph-btn.active,
+    body.theme-clean .mark-color-btn.active,
+    body.theme-clean .pin-filter-chip.active {
+      background: linear-gradient(135deg, #f472b6 0%, #fb7185 100%);
+      border-color: transparent;
+      color: #ffffff;
+    }
   </style>
 </head>
 <body>
@@ -8230,6 +8562,7 @@
   <input type="file" id="fileInput" accept="audio/*,.m4a,.mp3,.wav,.aac,.flac,.ogg,.opus,.wma,.aif,.aiff,.caf,.txt,.json" multiple class="sr-only">
   <input type="file" id="pinImportInput" accept=".txt,.json,text/plain,application/json" multiple class="sr-only">
   <input type="file" id="joinFileInput" accept="audio/*,.m4a,.mp3,.wav,.aac,.flac,.ogg,.opus,.wma,.aif,.aiff,.caf" multiple class="sr-only">
+  <input type="file" id="fullBackupImportInput" accept=".json,application/json,.txt" class="sr-only">
 
   <!-- ==================== 1. TOP HEADER BAR ==================== -->
   <header class="app-header">
@@ -8394,6 +8727,14 @@
                 </div>
 
                 <div id="tunerMeterBars" class="tuner-meter-bars" aria-label="チューナーセントメーター"></div>
+                <div class="tuner-graph-bar">
+                  <button id="btnTunerGraphToggle" type="button" class="tuner-graph-btn active" title="時系列の音程グラフを表示/非表示">音程グラフ ON</button>
+                  <span id="tunerGraphStat" class="tuner-graph-stat mono">直近8秒</span>
+                  <button id="btnTunerGraphClear" type="button" class="tuner-graph-btn" title="音程グラフの履歴を消去">消去</button>
+                </div>
+                <div id="tunerGraphWrap" class="tuner-graph-wrap">
+                  <canvas id="tunerGraphCanvas" aria-label="音程推移グラフ"></canvas>
+                </div>
               </div>
 
               <!-- Middle: 2-Column Hero Card (Left: Pendulum Needle / Right: BPM & -5 -1 +1 +5 Controls) -->
@@ -8602,6 +8943,7 @@
 
           <!-- Page 3 (Right): Audipo-style Pin List -->
           <div id="upperPagePins" class="upper-page upper-page-pins">
+            <div id="upperPinFilterBar" class="pin-filter-bar hidden" role="group" aria-label="ピンの色絞り込み"></div>
             <div id="upperMarkerListWrap" class="upper-pin-list"></div>
             <div class="upper-pin-footer">
               <button id="btnAutoPinStartsUpper" type="button" class="pin-foot-btn pin-foot-btn-start" title="演奏の区切り（入れ替え・チューニング等の停止）から各曲の始まりに黄色ピンを自動追加">曲の始まり</button>
@@ -9357,11 +9699,34 @@
           </div>
         </div>
 
+        <!-- App Full Backup & Restore -->
+        <div class="modal-section">
+          <div class="sec-head" style="margin-bottom:6px;">
+            <span class="sec-title-group">
+              <span class="sec-title">アプリ丸ごとバックアップ・復元</span>
+              <button type="button" class="setting-help-btn" data-help-key="fullBackup" aria-label="アプリ丸ごとバックアップの説明">?</button>
+            </span>
+            <span id="modalBackupSummaryBadge" class="sec-value mono" style="font-size:10.5px;color:#86efac;">JSON形式</span>
+          </div>
+          <div class="engine-desc" style="margin-bottom:8px;">
+            全曲のピン記憶（色・メモ含む）・お気に入りブックマーク（フォルダ構造）・アプリ設定・文字起こしを1つのファイルに保存し、別端末やキャッシュ削除後に復元できます。
+          </div>
+          <label class="backup-opt-row">
+            <input type="checkbox" id="chkBackupIncludeApiKey">
+            <span>Gemini APIキーも含める（自分の端末移行用）</span>
+          </label>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:7px;">
+            <button id="btnFullBackupDownload" type="button" class="step-btn" style="background:rgba(34,197,94,0.16);border-color:rgba(34,197,94,0.55);color:#86efac;">バックアップ保存 (.json)</button>
+            <button id="btnFullBackupShare" type="button" class="step-btn" style="background:rgba(66,165,245,0.15);border-color:rgba(96,165,250,0.52);color:#bae6fd;">共有メニューで送る</button>
+          </div>
+          <button id="btnFullBackupRestorePick" type="button" class="step-btn" style="width:100%;height:34px;background:rgba(250,204,21,0.13);border-color:rgba(250,204,21,0.52);color:#fef08a;">バックアップファイルから復元</button>
+        </div>
+
         <!-- App Version & Release History -->
         <div class="modal-section" style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
           <div>
             <div class="sec-title">バージョン情報</div>
-            <div id="settingsVersionLabel" class="engine-desc mono">現在: v79</div>
+            <div id="settingsVersionLabel" class="engine-desc mono">現在: v80</div>
           </div>
           <button id="btnShowReleaseHistory" type="button" class="step-btn" style="color:#93c5fd;border-color:rgba(66,165,245,0.45);">更新履歴を見る</button>
         </div>
@@ -9393,6 +9758,7 @@
 
       <!-- TAB 2: YELLOW MARKER LIST -->
       <div id="panelMarkers" class="modal-body hidden">
+        <div id="modalPinFilterBar" class="pin-filter-bar hidden" style="padding:0 0 2px;" role="group" aria-label="ピンの色絞り込み"></div>
         <div id="markerListWrap"></div>
         <div style="display:flex;gap:5px;margin-top:4px;">
           <button id="btnAutoPinStartsModal" type="button" class="pin-foot-btn pin-foot-btn-start" title="演奏の区切りから各曲の始まりに黄色ピンを自動追加">曲の始まり</button>
@@ -9438,6 +9804,16 @@
       <h3 class="mark-edit-title">マークの編集</h3>
 
       <input type="text" id="editMarkNameInput" class="mark-name-input" placeholder="マーク名を入力（例: 26 優ちゃん、Aメロ）">
+
+      <div id="editMarkColorRow" class="mark-color-row" role="group" aria-label="ピンの色">
+        <button type="button" data-pin-color="yellow" class="mark-color-btn active"><span class="pin-color-dot" style="background:#facc15;"></span><span>標準</span></button>
+        <button type="button" data-pin-color="red" class="mark-color-btn"><span class="pin-color-dot" style="background:#f87171;"></span><span>要練習</span></button>
+        <button type="button" data-pin-color="blue" class="mark-color-btn"><span class="pin-color-dot" style="background:#60a5fa;"></span><span>OK</span></button>
+        <button type="button" data-pin-color="green" class="mark-color-btn"><span class="pin-color-dot" style="background:#4ade80;"></span><span>確認</span></button>
+        <button type="button" data-pin-color="purple" class="mark-color-btn"><span class="pin-color-dot" style="background:#c084fc;"></span><span>メモ</span></button>
+      </div>
+
+      <textarea id="editMarkMemoInput" class="mark-memo-input" rows="2" placeholder="ひとことメモ（息継ぎ・指使い・先生の講評など）"></textarea>
 
       <div id="editMarkTimeBox" class="mark-time-box">
         <div id="editMarkTimeText" class="mark-time-readout mono">00 : 00 . 000</div>
@@ -9525,7 +9901,7 @@
           </div>
           <div>
             <h3 id="whatsNewTitle" class="whats-new-title">アップデートのお知らせ</h3>
-            <p id="whatsNewSub" class="whats-new-sub mono">v79 に更新されました</p>
+            <p id="whatsNewSub" class="whats-new-sub mono">v80 に更新されました</p>
           </div>
         </div>
         <button id="btnCloseWhatsNewX" type="button" class="modal-close" aria-label="閉じる">✕</button>
@@ -10382,6 +10758,58 @@
   </div>
 
 
+  <!-- ==================== 22. FULL BACKUP RESTORE CONFIRMATION MODAL ==================== -->
+  <div id="fullBackupRestoreModal" class="modal-backdrop hidden" style="z-index:88;">
+    <div class="pin-conflict-card" role="dialog" aria-modal="true" aria-labelledby="fbRestoreTitle" style="border-color:rgba(96,165,250,0.58);">
+      <div id="fbRestoreBadge" class="pin-conflict-badge mono">バックアップ確認</div>
+      <h3 id="fbRestoreTitle" class="mark-edit-title" style="margin-bottom:8px;font-size:15.5px;">アプリデータを復元しますか？</h3>
+
+      <div class="pin-conflict-file-box" style="margin-bottom:9px;">
+        <div id="fbRestoreFileName" class="pin-conflict-fname">backup.json</div>
+        <div id="fbRestoreFileMeta" class="pin-conflict-fmeta mono">作成日時: -</div>
+      </div>
+
+      <div class="backup-summary-grid">
+        <div class="backup-stat-cell">
+          <div class="backup-stat-label">曲のピン記憶</div>
+          <div id="fbStatPins" class="backup-stat-val mono">0曲 (0個)</div>
+        </div>
+        <div class="backup-stat-cell">
+          <div class="backup-stat-label">ブックマーク</div>
+          <div id="fbStatBookmarks" class="backup-stat-val mono">0件</div>
+        </div>
+        <div class="backup-stat-cell">
+          <div class="backup-stat-label">文字起こし</div>
+          <div id="fbStatTranscripts" class="backup-stat-val mono">0曲</div>
+        </div>
+        <div class="backup-stat-cell">
+          <div class="backup-stat-label">設定・APIキー</div>
+          <div id="fbStatPrefs" class="backup-stat-val mono">設定あり</div>
+        </div>
+      </div>
+
+      <label id="fbRestoreApiKeyRow" class="backup-opt-row hidden">
+        <input type="checkbox" id="chkFbRestoreApiKey" checked>
+        <span>バックアップ内の Gemini APIキーも復元する</span>
+      </label>
+
+      <div class="pin-conflict-actions">
+        <button id="btnFbRestoreMerge" type="button" class="pin-act-btn pin-act-merge">
+          <span>マージ復元（おすすめ）</span>
+          <small>今のピン・ブックマークを残したまま統合して復元</small>
+        </button>
+        <button id="btnFbRestoreOverwrite" type="button" class="pin-act-btn pin-act-overwrite">
+          <span>完全上書き復元</span>
+          <small>今のデータをバックアップの内容で完全に置き換え</small>
+        </button>
+        <button id="btnFbRestoreCancel" type="button" class="pin-act-btn pin-act-skip">
+          <span>キャンセル</span>
+          <small>復元をやめて閉じる</small>
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- Toast Banner -->
   <div id="toastBanner" class="toast-banner"></div>
 
@@ -10591,7 +11019,15 @@
       const tunerCentsText = document.getElementById('tunerCentsText');
       const tunerA4Text = document.getElementById('tunerA4Text');
       const tunerMeterBars = document.getElementById('tunerMeterBars');
+      const btnTunerGraphToggle = document.getElementById('btnTunerGraphToggle');
+      const btnTunerGraphClear = document.getElementById('btnTunerGraphClear');
+      const tunerGraphStat = document.getElementById('tunerGraphStat');
+      const tunerGraphWrap = document.getElementById('tunerGraphWrap');
+      const tunerGraphCanvas = document.getElementById('tunerGraphCanvas');
+      const tunerGraphCtx = tunerGraphCanvas ? tunerGraphCanvas.getContext('2d') : null;
       const upperPagePins = document.getElementById('upperPagePins');
+      const upperPinFilterBar = document.getElementById('upperPinFilterBar');
+      const modalPinFilterBar = document.getElementById('modalPinFilterBar');
       const upperMarkerListWrap = document.getElementById('upperMarkerListWrap');
       const dotUpperTranscript = document.getElementById('dotUpperTranscript');
       const upperPageTranscript = document.getElementById('upperPageTranscript');
@@ -10617,26 +11053,88 @@
       const btnTranscriptClear = document.getElementById('btnTranscriptClear');
 
       // ==================== APPLICATION STATE ====================
+      const PIN_COLOR_KEYS = ['yellow', 'red', 'blue', 'green', 'purple'];
+      const PIN_COLOR_CODE_TO_KEY = { y: 'yellow', r: 'red', b: 'blue', g: 'green', p: 'purple' };
+      const PIN_COLOR_KEY_TO_CODE = { yellow: 'y', red: 'r', blue: 'b', green: 'g', purple: 'p' };
+      const PIN_COLOR_META = {
+        yellow: {
+          label: '標準',
+          dark: '#facc15', darkDim: 'rgba(250, 204, 21, 0.38)', darkLine: 'rgba(250, 204, 21, 0.82)', darkText: '#fef08a', darkChipBg: 'rgba(250, 204, 21, 0.2)',
+          light: '#d97706', lightDim: 'rgba(217, 119, 6, 0.34)', lightLine: 'rgba(217, 119, 6, 0.78)', lightText: '#92400e', lightChipBg: '#fef3c7',
+          clean: '#f59e0b', cleanDim: 'rgba(245, 158, 11, 0.35)', cleanLine: 'rgba(245, 158, 11, 0.80)', cleanText: '#92400e', cleanChipBg: '#fef3c7'
+        },
+        red: {
+          label: '要練習',
+          dark: '#f87171', darkDim: 'rgba(248, 113, 113, 0.38)', darkLine: 'rgba(248, 113, 113, 0.86)', darkText: '#fecaca', darkChipBg: 'rgba(239, 68, 68, 0.22)',
+          light: '#dc2626', lightDim: 'rgba(220, 38, 38, 0.32)', lightLine: 'rgba(220, 38, 38, 0.82)', lightText: '#991b1b', lightChipBg: '#fee2e2',
+          clean: '#f43f5e', cleanDim: 'rgba(244, 63, 94, 0.34)', cleanLine: 'rgba(244, 63, 94, 0.84)', cleanText: '#9f1239', cleanChipBg: '#ffe4e6'
+        },
+        blue: {
+          label: 'OK',
+          dark: '#60a5fa', darkDim: 'rgba(96, 165, 250, 0.38)', darkLine: 'rgba(96, 165, 250, 0.86)', darkText: '#bfdbfe', darkChipBg: 'rgba(59, 130, 246, 0.22)',
+          light: '#2563eb', lightDim: 'rgba(37, 99, 235, 0.32)', lightLine: 'rgba(37, 99, 235, 0.82)', lightText: '#1e40af', lightChipBg: '#dbeafe',
+          clean: '#3b82f6', cleanDim: 'rgba(59, 130, 246, 0.34)', cleanLine: 'rgba(59, 130, 246, 0.82)', cleanText: '#1d4ed8', cleanChipBg: '#dbeafe'
+        },
+        green: {
+          label: '確認',
+          dark: '#4ade80', darkDim: 'rgba(74, 222, 128, 0.38)', darkLine: 'rgba(74, 222, 128, 0.86)', darkText: '#bbf7d0', darkChipBg: 'rgba(34, 197, 94, 0.22)',
+          light: '#16a34a', lightDim: 'rgba(22, 163, 74, 0.32)', lightLine: 'rgba(22, 163, 74, 0.82)', lightText: '#166534', lightChipBg: '#dcfce7',
+          clean: '#10b981', cleanDim: 'rgba(16, 185, 129, 0.34)', cleanLine: 'rgba(16, 185, 129, 0.82)', cleanText: '#065f46', cleanChipBg: '#d1fae5'
+        },
+        purple: {
+          label: 'メモ',
+          dark: '#c084fc', darkDim: 'rgba(192, 132, 252, 0.38)', darkLine: 'rgba(192, 132, 252, 0.86)', darkText: '#e9d5ff', darkChipBg: 'rgba(168, 85, 247, 0.24)',
+          light: '#7c3aed', lightDim: 'rgba(124, 58, 237, 0.32)', lightLine: 'rgba(124, 58, 237, 0.82)', lightText: '#5b21b6', lightChipBg: '#ede9fe',
+          clean: '#a855f7', cleanDim: 'rgba(168, 85, 247, 0.34)', cleanLine: 'rgba(168, 85, 247, 0.84)', cleanText: '#6b21a8', cleanChipBg: '#f3e8ff'
+        }
+      };
+
+      function normalizePinColor(c) {
+        if (typeof c === 'string') {
+          const k = c.trim().toLowerCase();
+          if (PIN_COLOR_META[k]) return k;
+          if (PIN_COLOR_CODE_TO_KEY[k]) return PIN_COLOR_CODE_TO_KEY[k];
+        }
+        return 'yellow';
+      }
+
+      function getPinColorStyle(colorKey) {
+        const key = normalizePinColor(colorKey);
+        const m = PIN_COLOR_META[key];
+        const t = state.uiTheme;
+        if (t === 'clean') {
+          return { key, label: m.label, fill: m.clean, dim: m.cleanDim, line: m.cleanLine, text: m.cleanText, chipBg: m.cleanChipBg };
+        }
+        if (t === 'monotone') {
+          return { key, label: m.label, fill: m.light, dim: m.lightDim, line: m.lightLine, text: m.lightText, chipBg: m.lightChipBg };
+        }
+        return { key, label: m.label, fill: m.dark, dim: m.darkDim, line: m.darkLine, text: m.darkText, chipBg: m.darkChipBg };
+      }
+
       let nextMarkerUid = 1;
-      function makeMarkerObj(time, name = '', enabled = true, sectionEnabled = true) {
+      function makeMarkerObj(time, name = '', enabled = true, sectionEnabled = true, color = 'yellow', memo = '') {
         return {
           id: `mk_${nextMarkerUid++}_${Math.random().toString(36).slice(2, 6)}`,
           time: Number(time) || 0,
           name: String(name || ''),
           enabled: enabled !== false,
-          sectionEnabled: sectionEnabled !== false
+          sectionEnabled: sectionEnabled !== false,
+          color: normalizePinColor(color),
+          memo: String(memo || '')
         };
       }
 
       function cloneMarkerList(list) {
         return (list || []).map(m => {
-          if (typeof m === 'number') return makeMarkerObj(m, '', true, true);
+          if (typeof m === 'number') return makeMarkerObj(m, '', true, true, 'yellow', '');
           return {
             id: m.id || `mk_${nextMarkerUid++}`,
             time: Number(m.time) || 0,
             name: String(m.name || ''),
             enabled: m.enabled !== false,
-            sectionEnabled: m.sectionEnabled !== false
+            sectionEnabled: m.sectionEnabled !== false,
+            color: normalizePinColor(m.color),
+            memo: String(m.memo || '')
           };
         }).sort((a, b) => a.time - b.time);
       }
@@ -10711,6 +11209,8 @@
         metroRunning: false,
         tunerA4: 440,
         tunerRunning: false,
+        tunerGraphVisible: true,
+        pinColorFilter: 'all',
         kbdInst: 'piano', // 'piano' | 'synth' | 'flute' | 'violin'
         kbdOctave: 4, // 1..6 (base octave for 2-octave span C{oct}..C{oct+2})
         kbdTranspose: 0, // -6..+6 semitones (key center shift)
@@ -11441,6 +11941,7 @@
             metroVolume: state.metroVolume,
             metroVolDefaultV2: true,
             tunerA4: state.tunerA4,
+            tunerGraphVisible: Boolean(state.tunerGraphVisible),
             kbdInst: state.kbdInst,
             kbdOctave: state.kbdOctave,
             kbdTranspose: state.kbdTranspose,
@@ -11543,6 +12044,9 @@
           }
           if (typeof p.tunerA4 === 'number' && p.tunerA4 >= 430 && p.tunerA4 <= 450) {
             state.tunerA4 = Math.round(p.tunerA4);
+          }
+          if (typeof p.tunerGraphVisible === 'boolean') {
+            state.tunerGraphVisible = p.tunerGraphVisible;
           }
           if (['piano', 'synth', 'flute', 'violin'].includes(p.kbdInst)) {
             state.kbdInst = p.kbdInst;
@@ -13312,6 +13816,8 @@
         if (reverbLabel) reverbLabel.style.color = revActive ? pal.reverbActive : '';
         if (reverbIcon) reverbIcon.style.color = revActive ? pal.reverbActive : '';
         if (typeof renderAllCanvases === 'function') renderAllCanvases();
+        if (typeof renderTunerPitchGraph === 'function') renderTunerPitchGraph();
+        if (typeof renderMarkerList === 'function') renderMarkerList();
 
         if (persist) {
           saveAppPrefs();
@@ -17105,12 +17611,17 @@
           displayName,
           size: Math.max(0, Math.round(Number(size) || 0)),
           duration: Math.max(0, dur),
-          markers: cloneMarkerList(state.markers).map(m => ({
-            time: Math.round(m.time * 1000) / 1000,
-            name: m.name || '',
-            enabled: m.enabled !== false,
-            sectionEnabled: m.sectionEnabled !== false
-          })),
+          markers: cloneMarkerList(state.markers).map(m => {
+            const obj = {
+              time: Math.round(m.time * 1000) / 1000,
+              name: m.name || '',
+              enabled: m.enabled !== false,
+              sectionEnabled: m.sectionEnabled !== false
+            };
+            if (m.color && m.color !== 'yellow') obj.color = m.color;
+            if (m.memo) obj.memo = m.memo;
+            return obj;
+          }),
           startSectionEnabled: state.startSectionEnabled !== false,
           tempMarker: state.tempMarker !== null ? Math.round(Number(state.tempMarker) * 1000) / 1000 : null,
           currentTime: Math.round(Math.max(0, Math.min(dur || 0, Number(getLivePlayheadTime()) || 0)) * 1000) / 1000,
@@ -17146,12 +17657,17 @@
             displayName: String(rec.displayName || rec.origName || 'audio'),
             size: sz,
             duration: dur,
-            markers: cloneMarkerList(rec.markers).map(m => ({
-              time: Math.round(m.time * 1000) / 1000,
-              name: m.name || '',
-              enabled: m.enabled !== false,
-              sectionEnabled: m.sectionEnabled !== false
-            })),
+            markers: cloneMarkerList(rec.markers).map(m => {
+              const obj = {
+                time: Math.round(m.time * 1000) / 1000,
+                name: m.name || '',
+                enabled: m.enabled !== false,
+                sectionEnabled: m.sectionEnabled !== false
+              };
+              if (m.color && m.color !== 'yellow') obj.color = m.color;
+              if (m.memo) obj.memo = m.memo;
+              return obj;
+            }),
             startSectionEnabled: rec.startSectionEnabled !== false,
             tempMarker: typeof rec.tempMarker === 'number' && isFinite(rec.tempMarker) ? Math.round(rec.tempMarker * 1000) / 1000 : null,
             currentTime: typeof rec.currentTime === 'number' && isFinite(rec.currentTime) ? Math.round(rec.currentTime * 1000) / 1000 : 0,
@@ -17286,6 +17802,11 @@
               const t = Math.round((Number(mk.time) || 0) * 1000) / 1000;
               const fl = (mk.enabled !== false ? 1 : 0) | (mk.sectionEnabled !== false ? 2 : 0);
               const nm = String(mk.name || '');
+              const col = normalizePinColor(mk.color);
+              const colCode = PIN_COLOR_KEY_TO_CODE[col] || 'y';
+              const memo = String(mk.memo || '');
+              if (memo) return [t, nm, fl, colCode, memo];
+              if (colCode !== 'y') return [t, nm, fl, colCode];
               if (fl === 3 && !nm) return [t];
               if (fl === 3) return [t, nm];
               return [t, nm, fl];
@@ -17314,7 +17835,9 @@
                     time: Number(tup[0]) || 0,
                     name: typeof tup[1] === 'string' ? tup[1] : '',
                     enabled: Boolean(fl & 1),
-                    sectionEnabled: Boolean(fl & 2)
+                    sectionEnabled: Boolean(fl & 2),
+                    color: typeof tup[3] === 'string' ? normalizePinColor(tup[3]) : 'yellow',
+                    memo: typeof tup[4] === 'string' ? tup[4] : ''
                   };
                 }
                 return tup;
@@ -17831,8 +18354,10 @@ ${info.url}`;
           const dup = mergedMarkers.find(ex => Math.abs(ex.time - inc.time) <= 0.25);
           if (dup) {
             if (!dup.name && inc.name) dup.name = inc.name;
+            if ((!dup.color || dup.color === 'yellow') && inc.color && inc.color !== 'yellow') dup.color = normalizePinColor(inc.color);
+            if (!dup.memo && inc.memo) dup.memo = inc.memo;
           } else {
-            mergedMarkers.push(makeMarkerObj(inc.time, inc.name, inc.enabled, inc.sectionEnabled));
+            mergedMarkers.push(makeMarkerObj(inc.time, inc.name, inc.enabled, inc.sectionEnabled, inc.color, inc.memo));
           }
         }
         mergedMarkers.sort((a, b) => a.time - b.time);
@@ -20474,9 +20999,14 @@ ${info.url}`;
         if (!sec) return;
 
         const rangeStr = `${formatTime(sec.start)} 〜 ${formatTime(sec.end)}`;
+        const mkObj = sec.markerObj || null;
+        const colStyle = mkObj && mkObj.color && mkObj.color !== 'yellow' ? getPinColorStyle(mkObj.color) : null;
+        const dotPart = colStyle ? ` <span class="pin-color-dot" style="background:${colStyle.fill};vertical-align:0px;"></span>` : '';
         const namePart = sec.name ? ` <strong>[${escapeHtml(sec.name)}]</strong>` : '';
+        const memoFirstLine = mkObj && mkObj.memo ? String(mkObj.memo).split(/\r?\n/)[0].trim() : '';
+        const memoPart = memoFirstLine ? ` <span style="opacity:0.8;">✎${escapeHtml(memoFirstLine.slice(0, 20))}</span>` : '';
         const skipTag = !sec.sectionEnabled ? ' <span style="color:#fcd34d;font-weight:700;">(スキップ設定中)</span>' : '';
-        currentSectionInfo.innerHTML = `区間: ${rangeStr}${namePart}${skipTag}`;
+        currentSectionInfo.innerHTML = `区間: ${rangeStr}${dotPart}${namePart}${memoPart}${skipTag}`;
 
         if (!sec.sectionEnabled) {
           btnToggleSectionSkip.classList.add('skip-active');
@@ -21450,6 +21980,8 @@ ${info.url}`;
       // ==================== AUDIPO-STYLE MARK EDIT MODAL ====================
       const markEditModal = document.getElementById('markEditModal');
       const editMarkNameInput = document.getElementById('editMarkNameInput');
+      const editMarkColorRow = document.getElementById('editMarkColorRow');
+      const editMarkMemoInput = document.getElementById('editMarkMemoInput');
       const editMarkTimeBox = document.getElementById('editMarkTimeBox');
       const editMarkTimeText = document.getElementById('editMarkTimeText');
       const btnEditMarkPreview = document.getElementById('btnEditMarkPreview');
@@ -21458,7 +21990,15 @@ ${info.url}`;
       const toggleEditMarkEnabled = document.getElementById('toggleEditMarkEnabled');
       const toggleEditSectionEnabled = document.getElementById('toggleEditSectionEnabled');
 
-      let editingMarkTarget = null; // { isStart: boolean, markerId: string|null, draftTime: number, draftEnabled: boolean, draftSectionEnabled: boolean, startedPreview: boolean }
+      let editingMarkTarget = null; // { isStart, markerId, draftTime, draftEnabled, draftSectionEnabled, draftColor, startedPreview }
+
+      function syncEditMarkColorUI(colorKey) {
+        const norm = normalizePinColor(colorKey);
+        if (!editMarkColorRow) return;
+        editMarkColorRow.querySelectorAll('.mark-color-btn').forEach((btn) => {
+          btn.classList.toggle('active', btn.dataset.pinColor === norm);
+        });
+      }
 
       const PREVIEW_PLAY_SVG = '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M7 5.5v13a1.4 1.4 0 0 0 2.13 1.2l10.2-6.5a1.4 1.4 0 0 0 0-2.4L9.13 4.3A1.4 1.4 0 0 0 7 5.5Z"/></svg>';
       const PREVIEW_STOP_SVG = '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="6" width="12" height="12" rx="2.5"/></svg>';
@@ -21483,10 +22023,16 @@ ${info.url}`;
             draftTime: 0,
             draftEnabled: true,
             draftSectionEnabled: state.startSectionEnabled !== false,
+            draftColor: 'yellow',
             startedPreview: false
           };
           editMarkNameInput.value = '0:00 (曲頭)';
           editMarkNameInput.disabled = true;
+          if (editMarkColorRow) editMarkColorRow.classList.add('hidden');
+          if (editMarkMemoInput) {
+            editMarkMemoInput.value = '';
+            editMarkMemoInput.classList.add('hidden');
+          }
           editMarkTimeBox.classList.add('hidden');
           btnEditMarkDelete.classList.add('hidden');
           editMarkEnabledRow.classList.add('hidden');
@@ -21499,10 +22045,19 @@ ${info.url}`;
             draftTime: m.time,
             draftEnabled: m.enabled !== false,
             draftSectionEnabled: m.sectionEnabled !== false,
+            draftColor: normalizePinColor(m.color),
             startedPreview: false
           };
           editMarkNameInput.value = m.name || '';
           editMarkNameInput.disabled = false;
+          if (editMarkColorRow) {
+            editMarkColorRow.classList.remove('hidden');
+            syncEditMarkColorUI(editingMarkTarget.draftColor);
+          }
+          if (editMarkMemoInput) {
+            editMarkMemoInput.value = m.memo || '';
+            editMarkMemoInput.classList.remove('hidden');
+          }
           editMarkTimeBox.classList.remove('hidden');
           editMarkTimeText.textContent = formatTimeMs(m.time);
           btnEditMarkDelete.classList.remove('hidden');
@@ -21538,6 +22093,16 @@ ${info.url}`;
           }
         });
       });
+
+      if (editMarkColorRow) {
+        editMarkColorRow.querySelectorAll('.mark-color-btn').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            if (!editingMarkTarget || editingMarkTarget.isStart) return;
+            editingMarkTarget.draftColor = normalizePinColor(btn.dataset.pinColor);
+            syncEditMarkColorUI(editingMarkTarget.draftColor);
+          });
+        });
+      }
 
       toggleEditMarkEnabled.addEventListener('click', () => {
         if (!editingMarkTarget) return;
@@ -21594,6 +22159,8 @@ ${info.url}`;
           const m = state.markers.find(item => item.id === editingMarkTarget.markerId);
           if (m) {
             m.name = editMarkNameInput.value.trim();
+            m.color = normalizePinColor(editingMarkTarget.draftColor);
+            m.memo = editMarkMemoInput ? editMarkMemoInput.value.trim() : '';
             m.time = editingMarkTarget.draftTime;
             m.enabled = editingMarkTarget.draftEnabled;
             m.sectionEnabled = editingMarkTarget.draftSectionEnabled;
@@ -22222,15 +22789,16 @@ ${info.url}`;
             }
           }
 
-          // Yellow Confirmed Pins (▼) + Marker Names (like Audipo screenshot)
+          // Confirmed Pins (▼, color-coded) + Marker Names / Memo hint
           if (state.hasAudio && state.markers.length > 0) {
             for (const mk of state.markers) {
               const mT = mk.time;
               if (mT >= rStart && mT <= rEnd) {
                 const mx = waveX + ((mT - rStart) / rowDur) * waveW;
                 const isEnabled = mk.enabled !== false;
+                const pc = getPinColorStyle(mk.color);
 
-                ctx.fillStyle = isEnabled ? pal.pinYellow : pal.pinYellowDim;
+                ctx.fillStyle = isEnabled ? pc.fill : pc.dim;
                 ctx.beginPath();
                 ctx.moveTo(mx - 4.8, barTop - 2);
                 ctx.lineTo(mx + 4.8, barTop - 2);
@@ -22238,17 +22806,21 @@ ${info.url}`;
                 ctx.closePath();
                 ctx.fill();
 
-                if (mk.name) {
+                const firstMemo = mk.memo ? String(mk.memo).split(/\r?\n/)[0].trim() : '';
+                const labelTxt = mk.name
+                  ? (firstMemo ? `${mk.name} ✎` : mk.name)
+                  : (firstMemo ? `✎ ${firstMemo}` : '');
+                if (labelTxt) {
                   ctx.font = '700 10px -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Noto Sans JP", sans-serif';
                   ctx.textAlign = 'left';
                   ctx.textBaseline = 'top';
                   const maxLabelW = Math.max(24, (waveX + waveW) - (mx + 6));
                   const textY = barTop + 1;
                   ctx.fillStyle = pal.labelBg;
-                  const measuredW = Math.min(maxLabelW, ctx.measureText(mk.name).width + 4);
+                  const measuredW = Math.min(maxLabelW, ctx.measureText(labelTxt).width + 4);
                   ctx.fillRect(mx + 5, textY - 1, measuredW, 12);
-                  ctx.fillStyle = isEnabled ? pal.pinYellowText : '#a1a1aa';
-                  ctx.fillText(mk.name, mx + 7, textY, maxLabelW);
+                  ctx.fillStyle = isEnabled ? pc.text : '#a1a1aa';
+                  ctx.fillText(labelTxt, mx + 7, textY, maxLabelW);
                 }
               }
             }
@@ -22569,26 +23141,23 @@ ${info.url}`;
           );
         }
 
-        // Draw Yellow Confirmed Pins + Names in zoom window
+        // Draw Confirmed Pins (color-coded) + Names & Memo in zoom window
         if (state.hasAudio) {
           for (const mk of state.markers) {
             const mT = mk.time;
             if (mT >= winStart && mT <= winEnd) {
               const mx = (mT - winStart) * pxPerSec;
               const isEnabled = mk.enabled !== false;
+              const pc = getPinColorStyle(mk.color);
 
-              ctx.strokeStyle = isEnabled
-                ? (isMin ? 'rgba(217, 119, 6, 0.78)' : 'rgba(250, 204, 21, 0.82)')
-                : (isMin ? 'rgba(217, 119, 6, 0.30)' : 'rgba(250, 204, 21, 0.35)');
-              ctx.lineWidth = 1.5;
+              ctx.strokeStyle = isEnabled ? pc.line : pc.dim;
+              ctx.lineWidth = 1.6;
               ctx.beginPath();
               ctx.moveTo(mx, 0);
               ctx.lineTo(mx, H);
               ctx.stroke();
 
-              ctx.fillStyle = isEnabled
-                ? (isMin ? '#d97706' : '#facc15')
-                : (isMin ? 'rgba(217, 119, 6, 0.38)' : 'rgba(250, 204, 21, 0.45)');
+              ctx.fillStyle = isEnabled ? pc.fill : pc.dim;
               ctx.beginPath();
               ctx.moveTo(mx - 6, 0);
               ctx.lineTo(mx + 6, 0);
@@ -22596,15 +23165,30 @@ ${info.url}`;
               ctx.closePath();
               ctx.fill();
 
+              let nextLabelY = 3;
               if (mk.name) {
                 ctx.font = '700 11px -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Noto Sans JP", sans-serif';
                 ctx.textAlign = 'left';
                 ctx.textBaseline = 'top';
                 const tw = ctx.measureText(mk.name).width;
                 ctx.fillStyle = pal.zoomLabelBg;
-                ctx.fillRect(mx + 5, 3, tw + 8, 16);
-                ctx.fillStyle = isEnabled ? pal.pinYellowText : '#a1a1aa';
-                ctx.fillText(mk.name, mx + 9, 5);
+                ctx.fillRect(mx + 5, nextLabelY, tw + 8, 16);
+                ctx.fillStyle = isEnabled ? pc.text : '#a1a1aa';
+                ctx.fillText(mk.name, mx + 9, nextLabelY + 2);
+                nextLabelY += 18;
+              }
+              const memoLine = mk.memo ? String(mk.memo).split(/\r?\n/)[0].trim() : '';
+              if (memoLine) {
+                const clipped = memoLine.length > 26 ? memoLine.slice(0, 26) + '…' : memoLine;
+                const memoLabel = `✎ ${clipped}`;
+                ctx.font = '600 9.5px -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Noto Sans JP", sans-serif';
+                ctx.textAlign = 'left';
+                ctx.textBaseline = 'top';
+                const mw = ctx.measureText(memoLabel).width;
+                ctx.fillStyle = pal.zoomLabelBg;
+                ctx.fillRect(mx + 5, nextLabelY, mw + 8, 14);
+                ctx.fillStyle = isEnabled ? pc.fill : '#a1a1aa';
+                ctx.fillText(memoLabel, mx + 9, nextLabelY + 2);
               }
             }
           }
@@ -23671,18 +24255,19 @@ ${info.url}`;
           ctx.fillRect(x0, 2, Math.max(2, x1 - x0), H - 4);
         }
 
-        // Yellow Confirmed Pins
+        // Confirmed Pins (color-coded)
         for (const mk of state.markers) {
           const mx = padX + Math.max(0, Math.min(1, mk.time / dur)) * barW;
           const en = mk.enabled !== false;
-          ctx.strokeStyle = en ? (isMin ? '#d97706' : '#facc15') : 'rgba(250,204,21,0.38)';
+          const pc = getPinColorStyle(mk.color);
+          ctx.strokeStyle = en ? pc.fill : pc.dim;
           ctx.lineWidth = 1.6;
           ctx.beginPath();
           ctx.moveTo(mx, 0);
           ctx.lineTo(mx, H);
           ctx.stroke();
 
-          ctx.fillStyle = en ? (isMin ? '#d97706' : '#facc15') : 'rgba(250,204,21,0.42)';
+          ctx.fillStyle = en ? pc.fill : pc.dim;
           ctx.beginPath();
           ctx.moveTo(mx - 4.5, 0);
           ctx.lineTo(mx + 4.5, 0);
@@ -24275,6 +24860,8 @@ ${info.url}`;
 
         if (nextPage === 'kbd') {
           updateKeyboardUI();
+        } else if (nextPage === 'metro') {
+          requestAnimationFrame(() => renderTunerPitchGraph());
         } else if (nextPage === 'pins') {
           renderMarkerList();
           if (opts.scrollActive !== false) {
@@ -26858,8 +27445,210 @@ ${info.url}`;
         yinBuf: null,
         rafId: null,
         smoothMidi: null,
-        lastDetectPerf: 0
+        lastDetectPerf: 0,
+        history: [], // { t: ms, cents: -50..50, midi: int, noteStr: string }
+        lastGraphSamplePerf: 0
       };
+      const TUNER_GRAPH_WINDOW_MS = 8000;
+
+      function updateTunerGraphUI() {
+        const vis = state.tunerGraphVisible !== false;
+        if (tunerGraphWrap) tunerGraphWrap.classList.toggle('hidden', !vis);
+        if (btnTunerGraphToggle) {
+          btnTunerGraphToggle.classList.toggle('active', vis);
+          btnTunerGraphToggle.textContent = vis ? '音程グラフ ON' : '音程グラフ OFF';
+        }
+        if (vis) {
+          requestAnimationFrame(() => renderTunerPitchGraph());
+        }
+      }
+
+      function clearTunerPitchHistory() {
+        tuner.history = [];
+        if (tunerGraphStat) tunerGraphStat.textContent = '直近8秒';
+        renderTunerPitchGraph();
+      }
+
+      function pushTunerPitchPoint(nowPerf, midiFloat) {
+        if (nowPerf - tuner.lastGraphSamplePerf < 28) return;
+        tuner.lastGraphSamplePerf = nowPerf;
+        const nearestMidi = Math.round(midiFloat);
+        const cents = Math.max(-50, Math.min(50, (midiFloat - nearestMidi) * 100));
+        const noteIdx = ((nearestMidi % 12) + 12) % 12;
+        const octave = Math.floor(nearestMidi / 12) - 1;
+        const noteStr = `${TUNER_NOTE_NAMES[noteIdx]}${octave}`;
+        tuner.history.push({ t: nowPerf, cents, midi: nearestMidi, noteStr });
+        const cutoff = nowPerf - (TUNER_GRAPH_WINDOW_MS + 600);
+        while (tuner.history.length > 0 && tuner.history[0].t < cutoff) {
+          tuner.history.shift();
+        }
+      }
+
+      function renderTunerPitchGraph(nowOverride = null) {
+        if (!tunerGraphCanvas || !tunerGraphCtx || state.tunerGraphVisible === false) return;
+        const rect = tunerGraphCanvas.getBoundingClientRect();
+        if (rect.width <= 0 || rect.height <= 0) return;
+        const dpr = window.devicePixelRatio || 1;
+        const pw = Math.round(rect.width * dpr);
+        const ph = Math.round(rect.height * dpr);
+        if (tunerGraphCanvas.width !== pw || tunerGraphCanvas.height !== ph) {
+          tunerGraphCanvas.width = pw;
+          tunerGraphCanvas.height = ph;
+        }
+        const ctx = tunerGraphCtx;
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        const W = rect.width;
+        const H = rect.height;
+        const isLight = isMinimalTheme();
+        const isClean = state.uiTheme === 'clean';
+        const now = nowOverride !== null ? nowOverride : (state.tunerRunning ? performance.now() : (tuner.history.length ? tuner.history[tuner.history.length - 1].t : performance.now()));
+        const cutoff = now - TUNER_GRAPH_WINDOW_MS;
+
+        // Prune expired points while running
+        if (state.tunerRunning) {
+          while (tuner.history.length > 0 && tuner.history[0].t < cutoff - 400) {
+            tuner.history.shift();
+          }
+        }
+
+        // Background
+        ctx.fillStyle = isClean ? '#fff9fc' : (isLight ? '#f8f9fa' : '#0f1312');
+        ctx.fillRect(0, 0, W, H);
+
+        const padL = 24;
+        const padR = 6;
+        const padT = 8;
+        const padB = 8;
+        const plotW = Math.max(10, W - padL - padR);
+        const plotH = Math.max(10, H - padT - padB);
+        const yOfCents = (c) => padT + ((50 - Math.max(-50, Math.min(50, c))) / 100) * plotH;
+        const xOfTime = (t) => padL + ((t - cutoff) / TUNER_GRAPH_WINDOW_MS) * plotW;
+
+        // ±5 cents green in-tune target band
+        const yTop5 = yOfCents(5);
+        const yBot5 = yOfCents(-5);
+        ctx.fillStyle = isLight ? 'rgba(22, 163, 74, 0.12)' : 'rgba(34, 197, 94, 0.14)';
+        ctx.fillRect(padL, yTop5, plotW, yBot5 - yTop5);
+
+        // Horizontal guide lines (±25c dashed, 0c solid)
+        ctx.lineWidth = 1;
+        ctx.setLineDash([3, 3]);
+        ctx.strokeStyle = isLight ? 'rgba(17, 17, 17, 0.11)' : 'rgba(255, 255, 255, 0.10)';
+        [25, -25].forEach((cVal) => {
+          const gy = Math.round(yOfCents(cVal)) + 0.5;
+          ctx.beginPath();
+          ctx.moveTo(padL, gy);
+          ctx.lineTo(W - padR, gy);
+          ctx.stroke();
+        });
+        ctx.setLineDash([]);
+
+        // Center 0c reference line
+        const y0 = Math.round(yOfCents(0)) + 0.5;
+        ctx.strokeStyle = isLight ? 'rgba(22, 163, 74, 0.55)' : 'rgba(74, 222, 128, 0.55)';
+        ctx.beginPath();
+        ctx.moveTo(padL, y0);
+        ctx.lineTo(W - padR, y0);
+        ctx.stroke();
+
+        // Y-axis labels
+        ctx.font = '700 8.5px ui-monospace, SFMono-Regular, Menlo, monospace';
+        ctx.textAlign = 'right';
+        ctx.textBaseline = 'middle';
+        ctx.fillStyle = isLight ? '#6b7280' : '#71717a';
+        ctx.fillText('+50', padL - 4, padT + 1);
+        ctx.fillStyle = isLight ? '#15803d' : '#4ade80';
+        ctx.fillText('0¢', padL - 4, y0);
+        ctx.fillStyle = isLight ? '#6b7280' : '#71717a';
+        ctx.fillText('-50', padL - 4, H - padB);
+
+        const pts = tuner.history.filter(p => p.t >= cutoff);
+        if (pts.length === 0) {
+          ctx.font = '600 10.5px -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Noto Sans JP", sans-serif';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillStyle = isLight ? '#9ca3af' : '#52525b';
+          ctx.fillText(state.tunerRunning ? '音を出すと直近8秒の音程推移を表示します' : 'チューナーONで音程グラフを表示します', padL + plotW / 2, H / 2);
+          if (tunerGraphStat) tunerGraphStat.textContent = '直近8秒';
+          return;
+        }
+
+        // Draw segmented pitch trace colored by accuracy
+        ctx.lineWidth = 2.1;
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        let lastLabelX = -999;
+        let prevNoteMidi = null;
+
+        for (let i = 0; i < pts.length; i++) {
+          const p = pts[i];
+          const px = xOfTime(p.t);
+          const py = yOfCents(p.cents);
+          const prev = i > 0 ? pts[i - 1] : null;
+          const isContinuous = prev && (p.t - prev.t) <= 230 && p.midi === prev.midi;
+
+          if (isContinuous) {
+            const ppx = xOfTime(prev.t);
+            const ppy = yOfCents(prev.cents);
+            const absC = Math.abs(p.cents);
+            ctx.strokeStyle = absC <= 5
+              ? (isLight ? '#16a34a' : '#22c55e')
+              : (absC <= 18 ? (isLight ? '#d97706' : '#facc15') : (isLight ? '#ea580c' : '#f97316'));
+            ctx.beginPath();
+            ctx.moveTo(ppx, ppy);
+            ctx.lineTo(px, py);
+            ctx.stroke();
+          }
+
+          // Note change label (spaced >= 34px apart so labels stay crisp)
+          if ((!isContinuous || p.midi !== prevNoteMidi) && (px - lastLabelX) >= 34) {
+            ctx.font = '800 9px ui-monospace, SFMono-Regular, Menlo, monospace';
+            ctx.textAlign = 'left';
+            ctx.textBaseline = 'top';
+            const lw = ctx.measureText(p.noteStr).width + 6;
+            const lx = Math.min(W - padR - lw, Math.max(padL + 1, px));
+            ctx.fillStyle = isLight ? 'rgba(255, 255, 255, 0.88)' : 'rgba(15, 19, 18, 0.82)';
+            ctx.fillRect(lx, 2, lw, 12);
+            ctx.fillStyle = isClean ? '#be185d' : (isLight ? '#111111' : '#e4e4e7');
+            ctx.fillText(p.noteStr, lx + 3, 3.5);
+            lastLabelX = lx;
+          }
+          prevNoteMidi = p.midi;
+        }
+
+        // Glowing live head marker on newest sample
+        const lastP = pts[pts.length - 1];
+        if (lastP && (!state.tunerRunning || (now - lastP.t) < 260)) {
+          const lx = xOfTime(lastP.t);
+          const ly = yOfCents(lastP.cents);
+          const absC = Math.abs(lastP.cents);
+          ctx.fillStyle = absC <= 5 ? '#22c55e' : (absC <= 18 ? '#facc15' : '#f97316');
+          ctx.beginPath();
+          ctx.arc(lx, ly, 3.4, 0, Math.PI * 2);
+          ctx.fill();
+        }
+
+        // Update recent 2.5s stability / vibrato span readout for current note
+        if (tunerGraphStat) {
+          const recentCut = lastP.t - 2500;
+          let minC = Infinity, maxC = -Infinity, cnt = 0;
+          for (let i = pts.length - 1; i >= 0; i--) {
+            const p = pts[i];
+            if (p.t < recentCut || p.midi !== lastP.midi) break;
+            if (p.cents < minC) minC = p.cents;
+            if (p.cents > maxC) maxC = p.cents;
+            cnt++;
+          }
+          if (cnt >= 4) {
+            const halfSpan = Math.round((maxC - minC) / 2);
+            const avgC = Math.round((maxC + minC) / 2);
+            const avgStr = avgC > 0 ? `+${avgC}` : `${avgC}`;
+            tunerGraphStat.textContent = `${lastP.noteStr} • 中心 ${avgStr}¢ / 幅 ±${halfSpan}¢`;
+          } else {
+            tunerGraphStat.textContent = `${lastP.noteStr} • 直近8秒`;
+          }
+        }
+      }
 
       function initTunerBars() {
         if (!tunerMeterBars || tunerMeterBars.children.length === TUNER_BAR_COUNT) return;
@@ -27024,10 +27813,12 @@ ${info.url}`;
           }
           tuner.lastDetectPerf = now;
           renderTunerReading(tuner.smoothMidi);
+          pushTunerPitchPoint(now, tuner.smoothMidi);
         } else if (now - tuner.lastDetectPerf > 420) {
           tuner.smoothMidi = null;
           clearTunerVisuals('待機');
         }
+        renderTunerPitchGraph(now);
 
         tuner.rafId = requestAnimationFrame(tunerLoop);
       }
@@ -27071,7 +27862,10 @@ ${info.url}`;
           btnTunerToggle.classList.add('on');
           tunerCard.classList.add('tuner-active');
           tunerToggleLabel.textContent = 'ON';
+          tuner.history = [];
+          tuner.lastGraphSamplePerf = 0;
           clearTunerVisuals('待機');
+          renderTunerPitchGraph();
           tuner.rafId = requestAnimationFrame(tunerLoop);
         } catch (err) {
           console.error('Tuner start failed:', err);
@@ -27098,11 +27892,51 @@ ${info.url}`;
         tunerCard.classList.remove('tuner-active', 'tuner-in-tune');
         tunerToggleLabel.textContent = 'チューナー';
         clearTunerVisuals('OFF');
+        renderTunerPitchGraph();
       }
 
       function toggleTuner() {
         if (state.tunerRunning) stopTuner();
         else startTuner();
+      }
+
+      function renderPinFilterBars() {
+        const counts = { all: state.markers.length, yellow: 0, red: 0, blue: 0, green: 0, purple: 0 };
+        let hasColored = false;
+        state.markers.forEach((mk) => {
+          const ck = normalizePinColor(mk.color);
+          counts[ck] = (counts[ck] || 0) + 1;
+          if (ck !== 'yellow') hasColored = true;
+        });
+        if (state.pinColorFilter !== 'all' && !counts[state.pinColorFilter]) {
+          state.pinColorFilter = 'all';
+        }
+        const showBar = state.hasAudio && state.markers.length > 0 && hasColored;
+        [upperPinFilterBar, modalPinFilterBar].forEach((bar) => {
+          if (!bar) return;
+          bar.classList.toggle('hidden', !showBar);
+          if (!showBar) return;
+          bar.innerHTML = '';
+          const addChip = (key, label, dotColor = '') => {
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'pin-filter-chip' + (state.pinColorFilter === key ? ' active' : '');
+            const dotHtml = dotColor ? `<span class="pin-color-dot" style="background:${dotColor};width:7px;height:7px;"></span>` : '';
+            btn.innerHTML = `${dotHtml}<span>${label}</span><span class="mono" style="opacity:0.75;">${counts[key] || 0}</span>`;
+            btn.addEventListener('click', () => {
+              state.pinColorFilter = key;
+              renderMarkerList();
+            });
+            bar.appendChild(btn);
+          };
+          addChip('all', 'すべて');
+          PIN_COLOR_KEYS.forEach((ck) => {
+            if (counts[ck] > 0) {
+              const st = getPinColorStyle(ck);
+              addChip(ck, st.label, st.fill);
+            }
+          });
+        });
       }
 
       function populateMarkerListContainer(wrap, opts = {}) {
@@ -27116,44 +27950,52 @@ ${info.url}`;
 
         const activeSec = getCurrentYellowSection(state.currentTime);
         const activeKey = activeSec ? (activeSec.markerId === null ? '__start__' : activeSec.markerId) : '';
+        const filterKey = state.pinColorFilter || 'all';
 
         const pencilSvg = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.83 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>';
-        const pinBadgeSvg = '<svg width="13" height="13" viewBox="0 0 24 24" fill="#facc15" style="vertical-align:-2px;margin-right:7px;"><path d="M6.5 4h11a2 2 0 0 1 2 2v4.8c0 .8-.36 1.56-.98 2.08l-5.2 4.35a2 2 0 0 1-2.64 0l-5.2-4.35A2.7 2.7 0 0 1 4.5 10.8V6a2 2 0 0 1 2-2Z"/></svg>';
+        const makePinBadgeSvg = (fillCol) => `<svg width="13" height="13" viewBox="0 0 24 24" fill="${fillCol}" style="vertical-align:-2px;margin-right:7px;"><path d="M6.5 4h11a2 2 0 0 1 2 2v4.8c0 .8-.36 1.56-.98 2.08l-5.2 4.35a2 2 0 0 1-2.64 0l-5.2-4.35A2.7 2.7 0 0 1 4.5 10.8V6a2 2 0 0 1 2-2Z"/></svg>`;
         const skipBadgeSvg = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#a1a1aa" stroke-width="2.4" stroke-linecap="round" style="vertical-align:-2px;margin-right:7px;"><path d="M8 5v14M16 5v14"/></svg>';
 
-        // Row 0: Start of track (0:00)
-        const isStartActive = activeKey === '__start__';
-        const startItem = document.createElement('div');
-        startItem.className = 'list-item' + (isStartActive ? ' active-section' : '');
-        startItem.dataset.secKey = '__start__';
+        // Row 0: Start of track (0:00) — shown when filter is 'all'
+        if (filterKey === 'all') {
+          const isStartActive = activeKey === '__start__';
+          const startItem = document.createElement('div');
+          startItem.className = 'list-item' + (isStartActive ? ' active-section' : '');
+          startItem.dataset.secKey = '__start__';
 
-        const startMain = document.createElement('div');
-        startMain.className = 'list-item-main';
-        const startIcon = state.startSectionEnabled !== false ? pinBadgeSvg : skipBadgeSvg;
-        const startSkipNote = state.startSectionEnabled !== false ? '' : ' <span style="color:#fcd34d;font-size:10px;">(スキップ)</span>';
-        const startNowBadge = `<span class="active-section-badge${isStartActive ? '' : ' hidden'}">現在区間</span>`;
-        startMain.innerHTML = `<div class="list-item-title mono">${startIcon}0:00${startSkipNote}${startNowBadge}</div>`;
-        startMain.addEventListener('click', () => {
-          seekTo(0, { setGreenPin: false });
-          if (closeSettingsOnSeek) settingsModal.classList.add('hidden');
-        });
+          const startMain = document.createElement('div');
+          startMain.className = 'list-item-main';
+          const startIcon = state.startSectionEnabled !== false ? makePinBadgeSvg(getPinColorStyle('yellow').fill) : skipBadgeSvg;
+          const startSkipNote = state.startSectionEnabled !== false ? '' : ' <span style="color:#fcd34d;font-size:10px;">(スキップ)</span>';
+          const startNowBadge = `<span class="active-section-badge${isStartActive ? '' : ' hidden'}">現在区間</span>`;
+          startMain.innerHTML = `<div class="list-item-title mono">${startIcon}0:00${startSkipNote}${startNowBadge}</div>`;
+          startMain.addEventListener('click', () => {
+            seekTo(0, { setGreenPin: false });
+            if (closeSettingsOnSeek) settingsModal.classList.add('hidden');
+          });
 
-        const startPencil = document.createElement('button');
-        startPencil.type = 'button';
-        startPencil.className = 'marker-row-pencil';
-        startPencil.title = '0:00の区間設定を編集';
-        startPencil.innerHTML = pencilSvg;
-        startPencil.addEventListener('click', (e) => {
-          e.stopPropagation();
-          openMarkEditModal(null);
-        });
-        startItem.appendChild(startMain);
-        startItem.appendChild(startPencil);
-        wrap.appendChild(startItem);
+          const startPencil = document.createElement('button');
+          startPencil.type = 'button';
+          startPencil.className = 'marker-row-pencil';
+          startPencil.title = '0:00の区間設定を編集';
+          startPencil.innerHTML = pencilSvg;
+          startPencil.addEventListener('click', (e) => {
+            e.stopPropagation();
+            openMarkEditModal(null);
+          });
+          startItem.appendChild(startMain);
+          startItem.appendChild(startPencil);
+          wrap.appendChild(startItem);
+        }
 
-        // Yellow Markers
-        state.markers.forEach((mk) => {
+        // Confirmed Markers (with color tags & memos)
+        const visibleMarkers = filterKey === 'all'
+          ? state.markers
+          : state.markers.filter((mk) => normalizePinColor(mk.color) === filterKey);
+
+        visibleMarkers.forEach((mk) => {
           const isCurSec = activeKey === mk.id;
+          const pc = getPinColorStyle(mk.color);
           const item = document.createElement('div');
           item.className = 'list-item' + (isCurSec ? ' active-section' : '');
           item.dataset.secKey = mk.id;
@@ -27163,11 +28005,17 @@ ${info.url}`;
 
           const main = document.createElement('div');
           main.className = 'list-item-main';
-          const iconHtml = mk.sectionEnabled === false ? skipBadgeSvg : pinBadgeSvg;
+          const iconHtml = mk.sectionEnabled === false ? skipBadgeSvg : makePinBadgeSvg(pc.fill);
+          const tagChipHtml = pc.key !== 'yellow'
+            ? `<span class="pin-tag-chip" style="background:${pc.chipBg};color:${pc.text};">${escapeHtml(pc.label)}</span>`
+            : '';
           const nameHtml = mk.name ? ` <span style="font-weight:700;color:#ffffff;">${escapeHtml(mk.name)}</span>` : '';
           const skipBadge = mk.sectionEnabled === false ? ' <span style="color:#fcd34d;font-size:10px;">(スキップ)</span>' : '';
           const nowBadge = `<span class="active-section-badge${isCurSec ? '' : ' hidden'}">現在区間</span>`;
-          main.innerHTML = `<div class="list-item-title mono">${iconHtml}${formatTime(mk.time)}${nameHtml}${skipBadge}${nowBadge}</div>`;
+          const memoHtml = mk.memo
+            ? `<div class="list-item-memo" style="border-left-color:${pc.fill};">${escapeHtml(mk.memo)}</div>`
+            : '';
+          main.innerHTML = `<div class="list-item-title mono">${iconHtml}${formatTime(mk.time)}${tagChipHtml}${nameHtml}${skipBadge}${nowBadge}</div>${memoHtml}`;
           main.addEventListener('click', () => {
             seekTo(mk.time, { setGreenPin: false });
             if (closeSettingsOnSeek) settingsModal.classList.add('hidden');
@@ -27176,7 +28024,7 @@ ${info.url}`;
           const pencilBtn = document.createElement('button');
           pencilBtn.type = 'button';
           pencilBtn.className = 'marker-row-pencil';
-          pencilBtn.title = 'マークの名前・設定を編集';
+          pencilBtn.title = 'マークの名前・色・メモを編集';
           pencilBtn.innerHTML = pencilSvg;
           pencilBtn.addEventListener('click', (e) => {
             e.stopPropagation();
@@ -27193,6 +28041,7 @@ ${info.url}`;
       function renderMarkerList() {
         const countStr = String(state.markers.length);
         document.getElementById('markerTabCount').textContent = countStr;
+        renderPinFilterBars();
         populateMarkerListContainer(upperMarkerListWrap, { closeSettingsOnSeek: false });
         populateMarkerListContainer(document.getElementById('markerListWrap'), { closeSettingsOnSeek: true });
       }
@@ -30079,6 +30928,19 @@ ${info.url}`;
 
       // Chromatic Tuner Listeners
       btnTunerToggle.addEventListener('click', toggleTuner);
+      if (btnTunerGraphToggle) {
+        btnTunerGraphToggle.addEventListener('click', () => {
+          state.tunerGraphVisible = !state.tunerGraphVisible;
+          updateTunerGraphUI();
+          saveAppPrefs();
+        });
+      }
+      if (btnTunerGraphClear) {
+        btnTunerGraphClear.addEventListener('click', () => {
+          clearTunerPitchHistory();
+          showToast('音程グラフを消去しました');
+        });
+      }
       document.getElementById('btnTunerA4Down').addEventListener('click', () => setTunerA4(state.tunerA4 - 1));
       document.getElementById('btnTunerA4Up').addEventListener('click', () => setTunerA4(state.tunerA4 + 1));
 
@@ -30277,11 +31139,22 @@ ${info.url}`;
       document.addEventListener('webkitfullscreenchange', onFullscreenStateChanged);
 
       // ==================== GITHUB / PWA SOFTWARE UPDATE CHECK & APPLY ====================
-      const APP_VERSION = 'v79';
+      const APP_VERSION = 'v80';
 
       // Ordered newest-first; each release appends a new object at the top.
       // Users who skip multiple versions automatically see ALL unseen versions between lastSeen and current.
       const APP_RELEASE_NOTES = [
+        {
+          version: 'v80',
+          verNum: 80,
+          date: '2026/11/28',
+          title: 'チューナー音程グラフ・ピンの色分け＆メモ・アプリ丸ごとバックアップを追加',
+          items: [
+            'チューナーに直近8秒の時系列「音程グラフ」を追加しました。±5¢適正帯・ズレ色分け・音名ラベル・揺れ幅（±◯¢）がひと目で分かり、ロングトーンやビブラートの確認に便利です',
+            'ピンに5色の色分けタグ（標準／要練習／OK／確認／メモ）と「ひとことメモ」欄を追加しました。波形やYouTubeシークバーの色分け表示、ピン一覧での色絞り込み、ピン共有URL／ファイルへの引き継ぎにも対応しています',
+            '設定画面に「アプリ丸ごとバックアップ・復元」を追加しました。全曲のピン記憶・お気に入りブックマーク（フォルダ構造）・アプリ設定・文字起こしを1つのJSONファイルに保存し、マージ復元または完全上書き復元ができます'
+          ]
+        },
         {
           version: 'v79',
           verNum: 79,
@@ -31449,6 +32322,29 @@ ${info.url}`;
               ]
             }
           ]
+        },
+        fullBackup: {
+          title: 'アプリ丸ごとバックアップ・復元',
+          sub: '機種変更・キャッシュ削除に備える全体保存',
+          summary: '全曲のピン記憶（色・ひとことメモ含む）、お気に入りブックマーク（フォルダ構成）、アプリ設定、文字起こし結果を1つの .json ファイルにまとめて保存・復元できます。',
+          sections: [
+            {
+              title: 'バックアップに含まれるもの',
+              bullets: [
+                ['ピン記憶', '記憶済みの全曲（ローカル音源・YouTube）のピン位置・名前・色・メモ・区間スキップ・再生位置。'],
+                ['お気に入りブックマーク', '作成したフォルダ階層とYouTube／音声ブックマーク一覧（音声データ本体自体は端末容量保護のため含みません）。'],
+                ['アプリ設定・文字起こし', 'テーマ・ボコーダー質感・チューナーA4・メトロノーム・鍵盤・録音設定・文字起こしテキスト。'],
+                ['Gemini APIキー（任意）', '安全のため標準では除外されます。自分の新しいスマホへ移行するときだけチェックをONにしてください。']
+              ]
+            },
+            {
+              title: '復元の2つの方法',
+              bullets: [
+                ['マージ復元（おすすめ）', '今この端末にあるピンやブックマークを消さずに、バックアップの内容を統合して復元します。'],
+                ['完全上書き復元', '今この端末にある記憶をすべてバックアップの内容で置き換えます。機種変更直後の移行に便利です。']
+              ]
+            }
+          ]
         }
       };
 
@@ -32382,6 +33278,322 @@ ${info.url}`;
       });
       document.getElementById('btnClearAllMarkers').addEventListener('click', openClearAllMarkersConfirm);
 
+      // ==================== APP FULL BACKUP & RESTORE (JSON) ====================
+      const fullBackupImportInput = document.getElementById('fullBackupImportInput');
+      const chkBackupIncludeApiKey = document.getElementById('chkBackupIncludeApiKey');
+      const fullBackupRestoreModal = document.getElementById('fullBackupRestoreModal');
+      const fbRestoreFileName = document.getElementById('fbRestoreFileName');
+      const fbRestoreFileMeta = document.getElementById('fbRestoreFileMeta');
+      const fbStatPins = document.getElementById('fbStatPins');
+      const fbStatBookmarks = document.getElementById('fbStatBookmarks');
+      const fbStatTranscripts = document.getElementById('fbStatTranscripts');
+      const fbStatPrefs = document.getElementById('fbStatPrefs');
+      const fbRestoreApiKeyRow = document.getElementById('fbRestoreApiKeyRow');
+      const chkFbRestoreApiKey = document.getElementById('chkFbRestoreApiKey');
+      let pendingFullBackupData = null;
+
+      function buildFullBackupPayload(includeApiKey = false) {
+        if (state.hasAudio) {
+          saveCurrentFileMemory(true);
+        }
+        saveAppPrefs();
+
+        const fileMemories = readAllFileMemories();
+        const curRec = buildCurrentTrackPinRecord();
+        if (curRec && (curRec.ytVideoId || (curRec.size > 0 && curRec.duration > 0)) && !state.isUnsavedRecording) {
+          const ck = curRec.ytVideoId ? makeYouTubeMemoryKey(curRec.ytVideoId) : (state.currentMemoryKey || makeFileFingerprint(curRec.size, curRec.duration));
+          fileMemories[ck] = curRec;
+        }
+
+        let appPrefs = null;
+        try {
+          const rawP = localStorage.getItem(LS_APP_PREFS_KEY);
+          if (rawP) appPrefs = JSON.parse(rawP);
+        } catch (_) {}
+
+        let favFoldersMeta = null;
+        try {
+          const rawF = localStorage.getItem(LS_FAV_FOLDERS_KEY);
+          if (rawF) favFoldersMeta = JSON.parse(rawF);
+        } catch (_) {}
+
+        const bookmarks = readBookmarksStore();
+        const transcripts = readTranscriptStore();
+
+        const payload = {
+          format: 'audipo2_full_backup_v1',
+          appVersion: APP_VERSION,
+          exportedAt: new Date().toISOString(),
+          fileMemories,
+          bookmarks,
+          appPrefs,
+          transcripts,
+          favFoldersMeta
+        };
+        if (includeApiKey) {
+          try {
+            const k = (localStorage.getItem(LS_GEMINI_API_KEY) || '').trim();
+            if (k) payload.geminiApiKey = k;
+          } catch (_) {}
+        }
+
+        const trackCount = Object.keys(fileMemories).length;
+        const pinCount = Object.values(fileMemories).reduce((sum, r) => sum + (Array.isArray(r?.markers) ? r.markers.length : 0), 0);
+        const bmCount = (bookmarks.items || []).length;
+        const jsonText = JSON.stringify(payload, null, 2);
+        return { payload, jsonText, trackCount, pinCount, bmCount };
+      }
+
+      async function executeFullBackupExport(mode = 'download') {
+        const includeKey = Boolean(chkBackupIncludeApiKey && chkBackupIncludeApiKey.checked);
+        const built = buildFullBackupPayload(includeKey);
+        const fileName = `audipo2_backup_${makeDateStampYmd()}.json`;
+        const blob = new Blob([built.jsonText], { type: 'application/json;charset=utf-8' });
+
+        if (mode === 'share' && navigator.share) {
+          try {
+            const shareFile = new File([blob], fileName, { type: 'application/json' });
+            if (!navigator.canShare || navigator.canShare({ files: [shareFile] })) {
+              await navigator.share({
+                files: [shareFile],
+                title: fileName,
+                text: `Audipo2 バックアップ（${built.trackCount}曲・ピン${built.pinCount}個・お気に入り${built.bmCount}件）`
+              });
+              showToast(`バックアップを共有しました（${built.trackCount}曲・お気に入り${built.bmCount}件）`);
+              return;
+            }
+          } catch (err) {
+            if (err && err.name === 'AbortError') {
+              showToast('共有をキャンセルしました');
+              return;
+            }
+          }
+        }
+
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = fileName;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setTimeout(() => URL.revokeObjectURL(url), 4000);
+        showToast(`バックアップを保存しました: ${fileName}`);
+      }
+
+      function closeFullBackupRestoreModal() {
+        pendingFullBackupData = null;
+        if (fullBackupRestoreModal) fullBackupRestoreModal.classList.add('hidden');
+      }
+
+      function parseFullBackupJson(rawText) {
+        if (typeof rawText !== 'string') return null;
+        const clean = rawText.replace(/^\uFEFF/, '').trim();
+        if (!clean) return null;
+        let parsed = null;
+        try {
+          parsed = JSON.parse(clean);
+        } catch (_) {
+          return null;
+        }
+        if (!parsed || typeof parsed !== 'object' || parsed.format !== 'audipo2_full_backup_v1') {
+          return null;
+        }
+        return parsed;
+      }
+
+      function openFullBackupRestorePreview(parsed, fileName) {
+        pendingFullBackupData = parsed;
+        const memObj = (parsed.fileMemories && typeof parsed.fileMemories === 'object') ? parsed.fileMemories : {};
+        const memEntries = Object.values(memObj).filter(r => r && typeof r === 'object');
+        const pinTotal = memEntries.reduce((s, r) => s + (Array.isArray(r.markers) ? r.markers.length : 0), 0);
+        const bmFolders = Array.isArray(parsed.bookmarks?.folders) ? parsed.bookmarks.folders.length : 0;
+        const bmItems = Array.isArray(parsed.bookmarks?.items) ? parsed.bookmarks.items.length : 0;
+        const trCount = (parsed.transcripts && typeof parsed.transcripts === 'object') ? Object.keys(parsed.transcripts).length : 0;
+        const hasPrefs = Boolean(parsed.appPrefs && typeof parsed.appPrefs === 'object');
+        const hasApiKey = Boolean(typeof parsed.geminiApiKey === 'string' && parsed.geminiApiKey.trim());
+
+        if (fbRestoreFileName) fbRestoreFileName.textContent = fileName || 'backup.json';
+        let dateStr = '不明';
+        if (parsed.exportedAt) {
+          const d = new Date(parsed.exportedAt);
+          if (!isNaN(d.getTime())) {
+            const p2 = (n) => String(n).padStart(2, '0');
+            dateStr = `${d.getFullYear()}/${p2(d.getMonth() + 1)}/${p2(d.getDate())} ${p2(d.getHours())}:${p2(d.getMinutes())}`;
+          }
+        }
+        if (fbRestoreFileMeta) {
+          fbRestoreFileMeta.textContent = `作成日時: ${dateStr} • ${parsed.appVersion || 'v80'}`;
+        }
+        if (fbStatPins) fbStatPins.textContent = `${memEntries.length}曲 (${pinTotal}個)`;
+        if (fbStatBookmarks) fbStatBookmarks.textContent = `${bmFolders}フォルダ / ${bmItems}件`;
+        if (fbStatTranscripts) fbStatTranscripts.textContent = `${trCount}曲`;
+        if (fbStatPrefs) fbStatPrefs.textContent = `${hasPrefs ? '設定あり' : '設定なし'}${hasApiKey ? ' + APIキー' : ''}`;
+        if (fbRestoreApiKeyRow) fbRestoreApiKeyRow.classList.toggle('hidden', !hasApiKey);
+        if (chkFbRestoreApiKey) chkFbRestoreApiKey.checked = hasApiKey;
+        if (fullBackupRestoreModal) fullBackupRestoreModal.classList.remove('hidden');
+      }
+
+      async function applyFullBackupRestore(mode) {
+        const data = pendingFullBackupData;
+        if (!data) return;
+        const isOverwrite = mode === 'overwrite';
+
+        // 1. File Memories (Pins, Colors, Memos, Skip, Playhead, YouTube history)
+        const incMem = (data.fileMemories && typeof data.fileMemories === 'object') ? data.fileMemories : {};
+        const nextMem = isOverwrite ? {} : readAllFileMemories();
+        Object.entries(incMem).forEach(([k, rawRec]) => {
+          const norm = normalizeImportedPinEntry(rawRec);
+          if (!norm) return;
+          const targetKey = norm.ytVideoId
+            ? makeYouTubeMemoryKey(norm.ytVideoId)
+            : (norm.size > 0 ? makeFileFingerprint(norm.size, norm.duration) : k);
+          if (!isOverwrite && nextMem[targetKey]) {
+            nextMem[targetKey] = mergePinRecords(nextMem[targetKey], norm, norm.duration);
+          } else {
+            nextMem[targetKey] = norm;
+          }
+        });
+        writeAllFileMemories(nextMem);
+
+        // 2. Bookmarks (Nested Folders + Items)
+        const incBm = (data.bookmarks && typeof data.bookmarks === 'object') ? data.bookmarks : null;
+        if (incBm) {
+          const incFolders = Array.isArray(incBm.folders) ? incBm.folders.filter(f => f && f.id && f.name) : [];
+          const incItems = Array.isArray(incBm.items) ? incBm.items.filter(it => it && it.id && it.title) : [];
+          if (isOverwrite) {
+            writeBookmarksStore({ version: 1, folders: incFolders, items: incItems });
+          } else {
+            const curBm = readBookmarksStore();
+            const fIds = new Set(curBm.folders.map(f => f.id));
+            incFolders.forEach((f) => {
+              if (!fIds.has(f.id)) {
+                curBm.folders.push(f);
+                fIds.add(f.id);
+              }
+            });
+            const itIds = new Set(curBm.items.map(it => it.id));
+            incItems.forEach((it) => {
+              if (!itIds.has(it.id)) {
+                curBm.items.push(it);
+                itIds.add(it.id);
+              }
+            });
+            writeBookmarksStore(curBm);
+          }
+        }
+
+        // 3. Transcripts
+        const incTr = (data.transcripts && typeof data.transcripts === 'object') ? data.transcripts : null;
+        if (incTr) {
+          const nextTr = isOverwrite ? {} : readTranscriptStore();
+          Object.entries(incTr).forEach(([k, rec]) => {
+            if (!rec || !Array.isArray(rec.segments)) return;
+            if (isOverwrite || !nextTr[k] || (rec.updatedAt || 0) >= (nextTr[k].updatedAt || 0)) {
+              nextTr[k] = rec;
+            }
+          });
+          try { localStorage.setItem(LS_TRANSCRIPTS_KEY, JSON.stringify(nextTr)); } catch (_) {}
+        }
+
+        // 4. App Preferences
+        if (data.appPrefs && typeof data.appPrefs === 'object') {
+          try {
+            localStorage.setItem(LS_APP_PREFS_KEY, JSON.stringify(data.appPrefs));
+          } catch (_) {}
+        }
+
+        // 5. Optional Gemini API key
+        if (typeof data.geminiApiKey === 'string' && data.geminiApiKey.trim() && chkFbRestoreApiKey && chkFbRestoreApiKey.checked) {
+          try { localStorage.setItem(LS_GEMINI_API_KEY, data.geminiApiKey.trim()); } catch (_) {}
+        }
+
+        // 6. Re-hydrate UI & active track pins immediately
+        loadAppPrefs();
+        applyUiTheme(state.uiTheme, false);
+        updateVocoderUI();
+        updateLowpassFilter();
+        updateWaveGainUI();
+        applyMasterBoost();
+        setMicGain(state.micGain);
+        updateRecSettingsUI();
+        updateTunerA4UI();
+        updateTunerGraphUI();
+        updateMetroUI();
+        updateKeyboardUI();
+        updateTranscriptUI();
+        updateMemoryCountBadge();
+        updateStartupLastFileHint();
+        if (typeof updateBookmarkHeaderUI === 'function') updateBookmarkHeaderUI();
+
+        if (state.hasAudio) {
+          const hit = state.isYouTubeMode
+            ? lookupYouTubeMemory(state.ytVideoId)
+            : lookupFileMemoryEntry(state.currentFileSize, state.duration);
+          if (hit && hit.rec) {
+            state.markers = cloneMarkerList(hit.rec.markers || []);
+            state.startSectionEnabled = hit.rec.startSectionEnabled !== false;
+            state.currentMemoryKey = hit.key;
+            syncCurrentPlaylistMarkers();
+            updateHeaderSubInfo();
+            updatePinButtonsUI();
+            updateSectionBarUI();
+          }
+          if (!state.isYouTubeMode && state.currentFileSize > 0) {
+            state.transcriptSegments = lookupTranscriptForFile(state.currentFileSize, state.duration);
+          }
+        }
+        renderMarkerList();
+        renderTranscriptList();
+        renderAllCanvases();
+
+        closeFullBackupRestoreModal();
+        showToast(isOverwrite ? 'バックアップから完全上書き復元しました' : 'バックアップをマージ復元しました');
+      }
+
+      document.getElementById('btnFullBackupDownload').addEventListener('click', () => executeFullBackupExport('download'));
+      document.getElementById('btnFullBackupShare').addEventListener('click', () => executeFullBackupExport('share'));
+      document.getElementById('btnFullBackupRestorePick').addEventListener('click', () => {
+        if (!fullBackupImportInput) return;
+        fullBackupImportInput.value = '';
+        fullBackupImportInput.click();
+      });
+      if (fullBackupImportInput) {
+        fullBackupImportInput.addEventListener('change', async (e) => {
+          const file = e.target.files && e.target.files[0];
+          if (!file) return;
+          try {
+            const text = await file.text();
+            const parsed = parseFullBackupJson(text);
+            if (!parsed) {
+              // If user accidentally picked a pin-only file, guide them smoothly!
+              const pinParsed = await parseAudipoPinDataAsync(text);
+              if (pinParsed && pinParsed.entries.length > 0) {
+                settingsModal.classList.add('hidden');
+                await runPinImportFlow(pinParsed.entries, pinParsed.scope === 'current' && pinParsed.entries.length === 1);
+                return;
+              }
+              showToast('有効なAudipo2バックアップファイルではありません');
+              return;
+            }
+            openFullBackupRestorePreview(parsed, file.name);
+          } catch (err) {
+            console.warn('Full backup read failed:', err);
+            showToast('バックアップファイルの読み込みに失敗しました');
+          } finally {
+            fullBackupImportInput.value = '';
+          }
+        });
+      }
+      document.getElementById('btnFbRestoreMerge').addEventListener('click', () => applyFullBackupRestore('merge'));
+      document.getElementById('btnFbRestoreOverwrite').addEventListener('click', () => applyFullBackupRestore('overwrite'));
+      document.getElementById('btnFbRestoreCancel').addEventListener('click', closeFullBackupRestoreModal);
+      if (fullBackupRestoreModal) {
+        fullBackupRestoreModal.addEventListener('click', (e) => {
+          if (e.target === fullBackupRestoreModal) closeFullBackupRestoreModal();
+        });
+      }
+
       // ==================== ANDROID / MOBILE BACK BUTTON GUARD ====================
       // Pressing Back closes open modals first, then returns to the Waveform Home screen ('wave').
       // When already on the Waveform Home screen, stays in place and prevents exiting the app.
@@ -32435,6 +33647,8 @@ ${info.url}`;
           } else {
             closeBookmarksModal();
           }
+        } else if (fullBackupRestoreModal && !fullBackupRestoreModal.classList.contains('hidden')) {
+          closeFullBackupRestoreModal();
         } else if (ytOpenModal && !ytOpenModal.classList.contains('hidden')) {
           closeYouTubeOpenModal();
         } else if (joinAudioModal && !joinAudioModal.classList.contains('hidden')) {
@@ -32813,7 +34027,9 @@ ${info.url}`;
         initTunerBars();
         buildKeyboardDOM(window.innerWidth > window.innerHeight ? 2 : 1);
         updateTunerA4UI();
+        updateTunerGraphUI();
         clearTunerVisuals('OFF');
+        renderTunerPitchGraph();
         updateMetroUI();
         updateKeyboardUI();
         setUpperPage('wave', { scrollActive: false });
