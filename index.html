@@ -8,7 +8,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="Audipo2">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="app-version" content="v82">
+  <meta name="app-version" content="v83">
   <link rel="manifest" href="./manifest.json">
   <title>Audipo風 練習プレイヤー＆レコーダー</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='bg' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%231b2030'/%3E%3Cstop offset='100%25' stop-color='%230d0f15'/%3E%3C/linearGradient%3E%3ClinearGradient id='wv' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0%25' stop-color='%2360c5ff'/%3E%3Cstop offset='100%25' stop-color='%232563eb'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='url(%23bg)'/%3E%3Crect x='1' y='1' width='62' height='62' rx='15' fill='none' stroke='%233b82f6' stroke-opacity='0.3' stroke-width='2'/%3E%3Cg fill='url(%23wv)'%3E%3Crect x='10' y='28' width='4.5' height='12' rx='2.25' opacity='0.6'/%3E%3Crect x='18' y='22' width='4.5' height='24' rx='2.25' opacity='0.85'/%3E%3Crect x='26' y='15' width='4.5' height='36' rx='2.25'/%3E%3Crect x='34' y='21' width='4.5' height='25' rx='2.25' opacity='0.9'/%3E%3Crect x='42' y='26' width='4.5' height='16' rx='2.25' opacity='0.75'/%3E%3Crect x='50' y='30' width='4.5' height='9' rx='2.25' opacity='0.5'/%3E%3C/g%3E%3Cpath d='M36.25 10.5c0-1.4 1.1-2.5 2.5-2.5h5.5c1.4 0 2.5 1.1 2.5 2.5v2.4c0 .8-.3 1.5-.9 2.1l-3.2 3.1c-.6.6-1.6.6-2.2 0l-3.2-3.1c-.6-.6-.9-1.3-.9-2.1v-2.4z' fill='%23facc15'/%3E%3C/svg%3E">
@@ -8103,12 +8103,14 @@
 
     body.theme-light #clearPinMemoryTitle,
     body.theme-light #clearPinsConfirmTitle,
+    body.theme-light #deletePinConfirmTitle,
     body.theme-light #cutConfirmModal .mark-edit-title {
       color: #dc2626 !important;
     }
 
     body.theme-light #clearPinMemoryDesc,
     body.theme-light #clearPinsConfirmDesc,
+    body.theme-light #deletePinConfirmDesc,
     body.theme-light #cutConfirmModal p {
       color: var(--lt-ink) !important;
     }
@@ -9744,7 +9746,7 @@
         <div class="modal-section" style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
           <div>
             <div class="sec-title">バージョン情報</div>
-            <div id="settingsVersionLabel" class="engine-desc mono">現在: v82</div>
+            <div id="settingsVersionLabel" class="engine-desc mono">現在: v83</div>
           </div>
           <button id="btnShowReleaseHistory" type="button" class="step-btn" style="color:#93c5fd;border-color:rgba(66,165,245,0.45);">更新履歴を見る</button>
         </div>
@@ -9819,7 +9821,7 @@
   <!-- ==================== 6. AUDIPO-STYLE MARK EDIT MODAL ==================== -->
   <div id="markEditModal" class="modal-backdrop hidden" style="z-index:75;">
     <div class="mark-edit-card">
-      <h3 class="mark-edit-title">マークの編集</h3>
+      <h3 id="markEditTitle" class="mark-edit-title">マークの編集</h3>
 
       <input type="text" id="editMarkNameInput" class="mark-name-input" placeholder="マーク名を入力（例: 26 優ちゃん、Aメロ）">
 
@@ -9905,7 +9907,6 @@
     </div>
   </div>
 
-  <!-- ==================== 8. WHAT'S NEW / UPDATE NOTICE MODAL ==================== -->
   <!-- ==================== 7.6 DELETE SINGLE PIN CONFIRMATION MODAL ==================== -->
   <div id="deletePinConfirmModal" class="modal-backdrop hidden" style="z-index:76;">
     <div class="mark-edit-card" role="dialog" aria-modal="true" aria-labelledby="deletePinConfirmTitle">
@@ -9918,6 +9919,7 @@
     </div>
   </div>
 
+  <!-- ==================== 8. WHAT'S NEW / UPDATE NOTICE MODAL ==================== -->
   <div id="whatsNewModal" class="modal-backdrop hidden" style="z-index:82;">
     <div class="whats-new-card" role="dialog" aria-modal="true" aria-labelledby="whatsNewTitle">
       <div class="whats-new-head">
@@ -9931,7 +9933,7 @@
           </div>
           <div>
             <h3 id="whatsNewTitle" class="whats-new-title">アップデートのお知らせ</h3>
-            <p id="whatsNewSub" class="whats-new-sub mono">v82 に更新されました</p>
+            <p id="whatsNewSub" class="whats-new-sub mono">v83 に更新されました</p>
           </div>
         </div>
         <button id="btnCloseWhatsNewX" type="button" class="modal-close" aria-label="閉じる">✕</button>
@@ -20725,33 +20727,88 @@ ${info.url}`;
       // ===== Long-press the add/delete pin button: open the pin editor in name-input mode =====
       let addYellowLongPressTimer = null;
       let addYellowClickSuppress = false;
+      let addYellowClickSuppressTimer = null;
+      let addYellowDownTime = 0;
+      let addYellowDownX = 0;
+      let addYellowDownY = 0;
+      let addYellowPendingFocusOnUp = false;
+
+      function cancelAddYellowLongPressTimer() {
+        if (addYellowLongPressTimer) {
+          clearTimeout(addYellowLongPressTimer);
+          addYellowLongPressTimer = null;
+        }
+      }
 
       function handleAddYellowLongPress() {
         addYellowLongPressTimer = null;
         if (state.isRecording || !state.hasAudio) return;
         addYellowClickSuppress = true;
+        if (addYellowClickSuppressTimer) clearTimeout(addYellowClickSuppressTimer);
+        addYellowClickSuppressTimer = setTimeout(() => {
+          addYellowClickSuppress = false;
+          addYellowClickSuppressTimer = null;
+        }, 700);
+
         if (navigator.vibrate) { try { navigator.vibrate(12); } catch (err) {} }
-        const nearYellow = findYellowMarkerNear(state.currentTime, getYellowPinHitTolerance());
+
+        const targetT = addYellowDownTime;
+        const nearYellow = findYellowMarkerNear(targetT, getYellowPinHitTolerance());
         if (nearYellow) {
-          openMarkEditModal(nearYellow.id);
+          addYellowPendingFocusOnUp = true;
+          openMarkEditModal(nearYellow.id, { selectName: false });
           return;
         }
-        const created = addYellowPinAtCurrent();
-        if (created && created.id) {
-          openMarkEditModal(created.id);
+        if (targetT <= 0.05 || targetT >= state.duration - 0.05) {
+          showToast('曲の開始・終了付近には追加できません');
+          return;
         }
+        const veryClose = state.markers.find(m => Math.abs(m.time - targetT) < 0.2);
+        if (veryClose) {
+          addYellowPendingFocusOnUp = true;
+          openMarkEditModal(veryClose.id, { selectName: false });
+          return;
+        }
+        // Open editor in draft-new mode (pin is only committed on OK; Cancel leaves no orphan pin)
+        addYellowPendingFocusOnUp = true;
+        openMarkEditModal(null, { createAtTime: targetT, selectName: true });
       }
 
-      btnAddYellow.addEventListener('pointerdown', () => {
+      btnAddYellow.addEventListener('pointerdown', (e) => {
+        if (e.pointerType === 'mouse' && e.button !== 0) return;
         addYellowClickSuppress = false;
-        if (addYellowLongPressTimer) clearTimeout(addYellowLongPressTimer);
+        addYellowPendingFocusOnUp = false;
+        if (addYellowClickSuppressTimer) {
+          clearTimeout(addYellowClickSuppressTimer);
+          addYellowClickSuppressTimer = null;
+        }
+        addYellowDownTime = state.hasAudio ? getLivePlayheadTime() : 0;
+        addYellowDownX = e.clientX;
+        addYellowDownY = e.clientY;
+        cancelAddYellowLongPressTimer();
         addYellowLongPressTimer = setTimeout(handleAddYellowLongPress, 550);
+      });
+      btnAddYellow.addEventListener('pointermove', (e) => {
+        if (!addYellowLongPressTimer) return;
+        if (Math.hypot(e.clientX - addYellowDownX, e.clientY - addYellowDownY) > 16) {
+          cancelAddYellowLongPressTimer();
+        }
       });
       ['pointerup', 'pointerleave', 'pointercancel'].forEach((evName) => {
         btnAddYellow.addEventListener(evName, () => {
-          if (addYellowLongPressTimer) { clearTimeout(addYellowLongPressTimer); addYellowLongPressTimer = null; }
+          cancelAddYellowLongPressTimer();
         });
       });
+      // Re-focus name input on finger lift (real user gesture on mobile browsers so soft keyboard opens reliably)
+      window.addEventListener('pointerup', () => {
+        cancelAddYellowLongPressTimer();
+        if (addYellowPendingFocusOnUp) {
+          addYellowPendingFocusOnUp = false;
+          if (editingMarkTarget && !editingMarkTarget.isStart && !markEditModal.classList.contains('hidden')) {
+            focusEditMarkNameInput(Boolean(editingMarkTarget.isNew));
+          }
+        }
+      }, true);
       btnAddYellow.addEventListener('contextmenu', (e) => {
         if (addYellowLongPressTimer || addYellowClickSuppress) e.preventDefault();
       });
@@ -21055,14 +21112,7 @@ ${info.url}`;
           }
         }
         if (bestIdx >= 0 && bestDiff <= 2.5) {
-          const removed = state.markers.splice(bestIdx, 1)[0];
-          syncCurrentPlaylistMarkers();
-          updateHeaderSubInfo();
-          updatePinButtonsUI();
-          updateSectionBarUI();
-          renderAllCanvases();
-          const lbl = removed.name ? `${formatTime(removed.time)} (${removed.name})` : formatTime(removed.time);
-          showToast(`黄色ピン削除: ${lbl}`);
+          openDeletePinConfirm(state.markers[bestIdx]);
         } else {
           setUpperPage('pins');
         }
@@ -22154,13 +22204,61 @@ ${info.url}`;
           : `${PREVIEW_PLAY_SVG}<span>試しにここから再生</span>`;
       }
 
-      function openMarkEditModal(markerId = null) {
-        if (!state.hasAudio) return;
+      const markEditTitle = document.getElementById('markEditTitle');
+      let markEditOpenedPerf = 0;
 
-        if (markerId === null) {
+      function focusEditMarkNameInput(selectAll = false) {
+        if (!editMarkNameInput || editMarkNameInput.disabled) return;
+        try {
+          editMarkNameInput.focus({ preventScroll: true });
+        } catch (_) {
+          try { editMarkNameInput.focus(); } catch (__) {}
+        }
+        if (selectAll && editMarkNameInput.value) {
+          try { editMarkNameInput.select(); } catch (_) {}
+        }
+      }
+
+      function openMarkEditModal(markerId = null, opts = {}) {
+        if (!state.hasAudio) return;
+        const createAtTime = (opts && typeof opts.createAtTime === 'number' && isFinite(opts.createAtTime))
+          ? Math.max(0.05, Math.min(state.duration - 0.05, opts.createAtTime))
+          : null;
+        const shouldSelectName = Boolean(opts && opts.selectName);
+
+        if (createAtTime !== null) {
+          // Draft-new pin mode (created via long-press; only saved to state.markers when OK is pressed)
+          const autoName = getNextAutoPinName(state.markers);
+          editingMarkTarget = {
+            isStart: false,
+            isNew: true,
+            markerId: null,
+            draftTime: createAtTime,
+            draftEnabled: true,
+            draftSectionEnabled: true,
+            draftColor: 'yellow',
+            startedPreview: false
+          };
+          if (markEditTitle) markEditTitle.textContent = '新規マークの追加';
+          editMarkNameInput.value = autoName;
+          editMarkNameInput.disabled = false;
+          if (editMarkColorRow) {
+            editMarkColorRow.classList.remove('hidden');
+            syncEditMarkColorUI('yellow');
+          }
+          if (editMarkMemoInput) {
+            editMarkMemoInput.value = '';
+            editMarkMemoInput.classList.remove('hidden');
+          }
+          editMarkTimeBox.classList.remove('hidden');
+          editMarkTimeText.textContent = formatTimeMs(createAtTime);
+          btnEditMarkDelete.classList.add('hidden');
+          editMarkEnabledRow.classList.remove('hidden');
+        } else if (markerId === null) {
           // Editing 0:00 start section
           editingMarkTarget = {
             isStart: true,
+            isNew: false,
             markerId: null,
             draftTime: 0,
             draftEnabled: true,
@@ -22168,6 +22266,7 @@ ${info.url}`;
             draftColor: 'yellow',
             startedPreview: false
           };
+          if (markEditTitle) markEditTitle.textContent = 'マークの編集';
           editMarkNameInput.value = '0:00 (曲頭)';
           editMarkNameInput.disabled = true;
           if (editMarkColorRow) editMarkColorRow.classList.add('hidden');
@@ -22183,6 +22282,7 @@ ${info.url}`;
           if (!m) return;
           editingMarkTarget = {
             isStart: false,
+            isNew: false,
             markerId: m.id,
             draftTime: m.time,
             draftEnabled: m.enabled !== false,
@@ -22190,6 +22290,7 @@ ${info.url}`;
             draftColor: normalizePinColor(m.color),
             startedPreview: false
           };
+          if (markEditTitle) markEditTitle.textContent = 'マークの編集';
           editMarkNameInput.value = m.name || '';
           editMarkNameInput.disabled = false;
           if (editMarkColorRow) {
@@ -22209,10 +22310,16 @@ ${info.url}`;
         toggleEditMarkEnabled.classList.toggle('on', editingMarkTarget.draftEnabled);
         toggleEditSectionEnabled.classList.toggle('on', editingMarkTarget.draftSectionEnabled);
         updateEditMarkPreviewUI();
+        markEditOpenedPerf = performance.now();
         markEditModal.classList.remove('hidden');
 
         if (!editingMarkTarget.isStart) {
-          setTimeout(() => editMarkNameInput.focus(), 60);
+          focusEditMarkNameInput(shouldSelectName);
+          setTimeout(() => {
+            if (editingMarkTarget && !editingMarkTarget.isStart && !markEditModal.classList.contains('hidden')) {
+              focusEditMarkNameInput(shouldSelectName);
+            }
+          }, 60);
         }
       }
 
@@ -22295,8 +22402,24 @@ ${info.url}`;
 
       document.getElementById('btnEditMarkOk').addEventListener('click', () => {
         if (!editingMarkTarget) return;
+        const wasNew = Boolean(editingMarkTarget.isNew);
+        let savedLabel = '';
         if (editingMarkTarget.isStart) {
           state.startSectionEnabled = editingMarkTarget.draftSectionEnabled;
+        } else if (wasNew) {
+          const t = editingMarkTarget.draftTime;
+          const nm = editMarkNameInput.value.trim();
+          const col = normalizePinColor(editingMarkTarget.draftColor);
+          const memo = editMarkMemoInput ? editMarkMemoInput.value.trim() : '';
+          if (state.tempMarker !== null && Math.abs(state.tempMarker - t) <= 0.5) {
+            state.tempMarker = null;
+          }
+          const created = makeMarkerObj(t, nm, editingMarkTarget.draftEnabled, editingMarkTarget.draftSectionEnabled, col, memo);
+          state.markers.push(created);
+          state.markers.sort((a, b) => a.time - b.time);
+          updateWaveGainUI();
+          applyMasterBoost();
+          savedLabel = nm ? `黄色ピン「${nm}」を追加: ${formatTime(t)}` : `黄色ピン追加: ${formatTime(t)}`;
         } else {
           const m = state.markers.find(item => item.id === editingMarkTarget.markerId);
           if (m) {
@@ -22316,11 +22439,14 @@ ${info.url}`;
         renderAllCanvases();
         renderMarkerList();
         closeMarkEditModal();
-        showToast('マーク設定を保存しました');
+        showToast(wasNew ? savedLabel : 'マーク設定を保存しました');
       });
 
       markEditModal.addEventListener('click', (e) => {
-        if (e.target === markEditModal) closeMarkEditModal();
+        if (e.target === markEditModal) {
+          if (performance.now() - markEditOpenedPerf < 400) return;
+          closeMarkEditModal();
+        }
       });
 
       // ==================== TRANSPORT, PLAYHEAD INTERPOLATION & PLAYLIST ====================
@@ -31281,11 +31407,23 @@ ${info.url}`;
       document.addEventListener('webkitfullscreenchange', onFullscreenStateChanged);
 
       // ==================== GITHUB / PWA SOFTWARE UPDATE CHECK & APPLY ====================
-      const APP_VERSION = 'v82';
+      const APP_VERSION = 'v83';
 
       // Ordered newest-first; each release appends a new object at the top.
       // Users who skip multiple versions automatically see ALL unseen versions between lastSeen and current.
       const APP_RELEASE_NOTES = [
+        {
+          version: 'v83',
+          verNum: 83,
+          date: '2026/11/28',
+          title: 'ピン削除確認・長押しピン編集の使い勝手とライトテーマ表示を修正',
+          items: [
+            'ライトテーマ（ミルキーピンク／モノトーン）で単一ピン削除の確認ウィンドウの文字色が薄くなりすぎる表示不具合を修正しました',
+            '再生中に黄色ピンボタンを長押しして新規追加した際、押し始めた瞬間の再生位置でピンを打つように修正しました（0.55秒のズレを解消）',
+            '長押しでの新規ピン追加は「OK」を押すまで仮状態にし、「キャンセル」を押せば不要なピンを残さないようにしました。また自動連番の名前欄を選択状態で開き、指を離したタイミングでスマホのキーボードが立ち上がりやすく改善しました（長押し直後の誤閉じ防止・スライドキャンセル・左クリック限定にも対応）',
+            '画面下段の「削除/一覧」ボタンから近くのピンを削除するときも、同じ削除確認ウィンドウを表示するよう統一しました'
+          ]
+        },
         {
           version: 'v82',
           verNum: 82,
